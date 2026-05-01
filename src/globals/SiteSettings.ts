@@ -4,14 +4,13 @@ export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
   fields: [
     {
-      name: 'festivalBanner',
-      type: 'group',
-      label: 'Banner Ngày Lễ',
+      name: 'heroSliders',
+      type: 'array',
+      label: 'Slider Trang chủ',
       fields: [
-        { name: 'active', type: 'checkbox', label: 'Bật Banner lễ hội' },
-        { name: 'image', type: 'upload', relationTo: 'media' },
-        { name: 'link', type: 'text' },
-        { name: 'endDate', type: 'date', label: 'Ngày kết thúc lễ' },
+        { name: 'image', type: 'upload', relationTo: 'media', required: true },
+        { name: 'link', type: 'text', label: 'Link khi bấm vào banner' },
+        { name: 'title', type: 'text', label: 'Tiêu đề hiển thị (nếu có)' },
       ],
     },
     {

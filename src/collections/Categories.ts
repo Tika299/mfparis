@@ -5,6 +5,7 @@ export const Categories: CollectionConfig = {
   admin: { useAsTitle: 'name' },
   fields: [
     { name: 'name', type: 'text', required: true },
+    { name: 'image', type: 'upload', relationTo: 'media' },
     { name: 'slug', type: 'text', required: true, unique: true },
     { name: 'parent', type: 'relationship', relationTo: 'categories', label: 'Danh mục cha' },
   ],
