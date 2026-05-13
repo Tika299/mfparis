@@ -40,7 +40,7 @@ export const Footer = async () => {
             <input
               type="email"
               placeholder="Email của bạn"
-              className="bg-transparent border-none px-0 py-1 w-full focus:ring-0 text-sm"
+              className="bg-transparent outline-none border-none px-0 py-1 w-full focus:ring-0 text-sm"
             />
             <button className="font-bold text-xs uppercase tracking-widest">Gửi</button>
           </div>
