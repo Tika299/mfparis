@@ -28,11 +28,13 @@ export const useCartStore = create<CartState>()(
           if (existingItem) {
             return {
               items: state.items.map((i) =>
-                i.id === newItem.id ? { ...i, quantity: i.quantity + 1 } : i,
+                i.id === newItem.id
+                  ? { ...i, quantity: i.quantity + newItem.quantity } // SỬA Ở ĐÂY
+                  : i,
               ),
             }
           }
-          return { items: [...state.items, { ...newItem, quantity: 1 }] }
+          return { items: [...state.items, { ...newItem, quantity: newItem.quantity }] }
         }),
       removeItem: (id) =>
         set((state) => ({

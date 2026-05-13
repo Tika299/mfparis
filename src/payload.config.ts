@@ -11,6 +11,8 @@ import { Media } from './collections/Media'
 import { Orders } from './collections/Orders'
 import { SiteSettings } from './globals/SiteSettings'
 import { Categories } from './collections/Categories'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
+import { Posts } from './collections/Posts'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -22,7 +24,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Brands, Products, Categories, Orders],
+  collections: [Users, Media, Brands, Products, Categories, Orders, Posts],
   globals: [SiteSettings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
@@ -36,4 +38,17 @@ export default buildConfig({
   }),
   sharp,
   plugins: [],
+  email: nodemailerAdapter({
+    defaultFromAddress: 'mfparisvn@gmail.com', // Email gửi đi
+    defaultFromName: 'MF PARIS - Hệ thống Đơn hàng',
+    transportOptions: {
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true, // dùng SSL
+      auth: {
+        user: 'mfparisvn@gmail.com',
+        pass: 'jrkbgahkrkewjvbf', // Mật khẩu ứng dụng vừa tạo
+      },
+    },
+  }),
 })

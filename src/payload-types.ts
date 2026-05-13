@@ -73,6 +73,7 @@ export interface Config {
     products: Product;
     categories: Category;
     orders: Order;
+    posts: Post;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,6 +87,7 @@ export interface Config {
     products: ProductsSelect<false> | ProductsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -235,6 +237,7 @@ export interface Product {
   ogImage?: (number | null) | Media;
   slug: string;
   status?: ('draft' | 'published') | null;
+  displayLocation?: ('best-seller' | 'cleansing' | 'new-arrival')[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -245,6 +248,7 @@ export interface Product {
 export interface Category {
   id: number;
   name: string;
+  image?: (number | null) | Media;
   slug: string;
   parent?: (number | null) | Category;
   updatedAt: string;
@@ -256,7 +260,7 @@ export interface Category {
  */
 export interface Order {
   id: number;
-  customer: number | User;
+  customer?: (number | null) | User;
   customerInfo: {
     fullName: string;
     phone: string;
@@ -277,6 +281,39 @@ export interface Order {
   totalAmount: number;
   paymentMethod?: ('cod' | 'bank_transfer' | 'fundiin') | null;
   status?: ('pending' | 'confirmed' | 'shipping' | 'completed' | 'cancelled') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  slug: string;
+  thumbnail: number | Media;
+  category?: ('review' | 'beauty' | 'news') | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  excerpt?: string | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -327,6 +364,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'orders';
         value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: number | Post;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -460,6 +501,7 @@ export interface ProductsSelect<T extends boolean = true> {
   ogImage?: T;
   slug?: T;
   status?: T;
+  displayLocation?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -469,6 +511,7 @@ export interface ProductsSelect<T extends boolean = true> {
  */
 export interface CategoriesSelect<T extends boolean = true> {
   name?: T;
+  image?: T;
   slug?: T;
   parent?: T;
   updatedAt?: T;
@@ -502,6 +545,26 @@ export interface OrdersSelect<T extends boolean = true> {
   totalAmount?: T;
   paymentMethod?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  thumbnail?: T;
+  category?: T;
+  content?: T;
+  excerpt?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -551,12 +614,14 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface SiteSetting {
   id: number;
-  festivalBanner?: {
-    active?: boolean | null;
-    image?: (number | null) | Media;
-    link?: string | null;
-    endDate?: string | null;
-  };
+  heroSliders?:
+    | {
+        image: number | Media;
+        link?: string | null;
+        title?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   header?: {
     logo?: (number | null) | Media;
     menu?:
@@ -580,13 +645,13 @@ export interface SiteSetting {
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
-  festivalBanner?:
+  heroSliders?:
     | T
     | {
-        active?: T;
         image?: T;
         link?: T;
-        endDate?: T;
+        title?: T;
+        id?: T;
       };
   header?:
     | T

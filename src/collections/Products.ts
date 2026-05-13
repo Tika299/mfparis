@@ -92,5 +92,17 @@ export const Products: CollectionConfig = {
       ],
       admin: { position: 'sidebar' },
     },
+    {
+      name: 'displayLocation',
+      type: 'select',
+      hasMany: true, // Một sản phẩm có thể vừa là Bán chạy, vừa thuộc mục Làm sạch
+      label: 'Vị trí hiển thị trang chủ',
+      options: [
+        { label: 'Sản phẩm bán chạy', value: 'best-seller' },
+        { label: 'Làm sạch làn da', value: 'cleansing' },
+        { label: 'Sản phẩm mới', value: 'new-arrival' },
+      ],
+      admin: { position: 'sidebar' },
+    },
   ],
 }

@@ -1,75 +1,284 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { ProductCard } from '@/components/ProductCard'
+import { HeroSlider } from '@/components/HeroSlider'
+import { HomeTabs } from '@/components/HomeTabs' // Đảm bảo bạn đã tạo file này
+import Image from 'next/image'
 import Link from 'next/link'
 
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
 
-  // 1. Lấy sản phẩm mới nhất
-  const products = await payload.find({
-    collection: 'products',
-    depth: 2,
-    limit: 8,
-    where: { status: { equals: 'published' } },
-  })
+  // 1. Fetch dữ liệu đồng bộ từ Database
+  const [settings, bestSellersRes, cleansingRes, categoriesRes, brandsRes, postsRes] =
+    await Promise.all([
+      payload.findGlobal({ slug: 'site-settings' }),
+      // Lấy sản phẩm Bán chạy
+      payload.find({
+        collection: 'products',
+        where: {
+          and: [
+            { status: { equals: 'published' } },
+            { displayLocation: { contains: 'best-seller' } },
+          ],
+        },
+        limit: 8,
+      }),
+      // Lấy sản phẩm mục Làm sạch da
+      payload.find({
+        collection: 'products',
+        where: {
+          and: [
+            { status: { equals: 'published' } },
+            { displayLocation: { contains: 'cleansing' } },
+          ],
+        },
+        limit: 4,
+      }),
+      payload.find({ collection: 'categories', limit: 10 }),
+      payload.find({ collection: 'brands', limit: 8 }),
+      payload.find({ collection: 'posts', limit: 4 }),
+    ])
 
-  // 2. Lấy danh sách thương hiệu nổi bật
-  const brands = await payload.find({
-    collection: 'brands',
-    limit: 6,
-    where: { isFeatured: { equals: true } },
-  })
+  // Xử lý logic chia danh mục cho phần Explorer
+  const featuredCats = categoriesRes.docs.slice(0, 2)
+  const listCats = categoriesRes.docs
 
   return (
-    <div className="flex flex-col gap-20 pb-20">
-      {/* SECTION 1: HERO BANNER (Phong cách tối giản) */}
-      <section className="relative h-[70vh] w-full bg-[#F5F5F5] flex items-center justify-center overflow-hidden">
-        <div className="text-center z-10 px-4">
-          <p className="uppercase tracking-[0.3em] text-sm mb-4">Pure & Authentic</p>
-          <h1 className="text-4xl md:text-6xl font-light mb-8 uppercase tracking-tighter">
-            Nước hoa & Mỹ phẩm <br /> <span className="font-bold">Pháp Chính Hãng</span>
-          </h1>
-          <Link
-            href="/products"
-            className="border border-black px-10 py-4 uppercase text-xs font-bold hover:bg-black hover:text-white transition-all"
-          >
-            Khám phá ngay
-          </Link>
+    <div className="bg-[#FDFBF9] min-h-screen">
+      {/* 1. HERO SLIDER (Lấy từ Admin) */}
+      {settings.heroSliders && settings.heroSliders.length > 0 ? (
+        <HeroSlider sliders={settings.heroSliders} />
+      ) : (
+        /* Fallback nếu Admin chưa có Slider */
+        <section className="bg-[#161A1E] text-white py-24 relative overflow-hidden">
+          <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between min-h-[500px]">
+            <div className="md:w-1/2 z-10 mb-10 md:mb-0 space-y-6">
+              <span className="bg-amber-600 text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest">
+                New Collection
+              </span>
+              <h1 className="text-5xl md:text-7xl font-bold leading-tight tracking-tighter italic font-serif">
+                Làm dịu làn da
+                <br />
+                Cấp ẩm cả ngày
+              </h1>
+              <p className="text-gray-400 text-sm max-w-md leading-relaxed">
+                Khám phá dòng sản phẩm chuyên sâu giúp phục hồi và nuôi dưỡng làn da từ tinh hoa
+                Pháp.
+              </p>
+              <Link
+                href="/products"
+                className="inline-block bg-white text-black px-10 py-4 rounded-full font-bold uppercase text-[11px] tracking-widest hover:bg-gray-100 transition shadow-lg"
+              >
+                Mua ngay
+              </Link>
+            </div>
+            <div className="md:w-1/2 flex justify-end">
+              <div className="relative aspect-square w-full max-w-[450px] overflow-hidden rounded-2xl shadow-2xl">
+                <Image
+                  src="https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=800"
+                  alt="Hero"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 2. BRAND MARQUEE (Keyword bar) */}
+      <div className="bg-white border-b border-gray-100 py-6 overflow-hidden">
+        <div className="container mx-auto px-6 flex justify-between items-center text-[10px] text-gray-400 font-black tracking-[0.2em] uppercase">
+          <span>DỊU NHẸ CHO DA</span>
+          <span className="hidden md:inline">THÀNH PHẦN TỰ NHIÊN</span>
+          <span>KHÔNG KÍCH ỨNG</span>
+          <span className="hidden md:inline">CHUYÊN GIA KHUYÊN DÙNG</span>
+          <span>MF PARIS AUTHENTIC</span>
+        </div>
+      </div>
+
+      {/* 3. SẢN PHẨM BÁN CHẠY (Sử dụng Client Component Tabs) */}
+      <section className="py-10">
+        <HomeTabs initialProducts={bestSellersRes.docs} categories={listCats.slice(0, 3)} />
+      </section>
+
+      {/* 4. KHÁM PHÁ DANH MỤC (2 Boxes + 1 List) */}
+      <section className="bg-white py-24 border-y border-gray-50">
+        <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
+          {featuredCats.map((cat: any) => {
+            const catImg =
+              cat.image && typeof cat.image === 'object' ? cat.image.url : '/placeholder.jpg'
+            return (
+              <div
+                key={cat.id}
+                className="md:col-span-4 relative aspect-square rounded-2xl overflow-hidden group cursor-pointer shadow-sm border border-gray-50"
+              >
+                <Image
+                  src={catImg}
+                  alt={cat.name}
+                  fill
+                  className="object-cover group-hover:scale-110 transition duration-1000"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+                  <div>
+                    <h3 className="text-white text-2xl font-bold italic font-serif uppercase tracking-tighter">
+                      {cat.name}
+                    </h3>
+                    <Link
+                      href={`/categories/${cat.slug}`}
+                      className="text-white/80 text-[10px] font-bold uppercase tracking-widest underline mt-2 block"
+                    >
+                      Xem ngay
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+
+          <div className="md:col-span-4 md:pl-10">
+            <h2 className="text-4xl font-bold mb-10 leading-tight font-serif italic">
+              Khám phá
+              <br />
+              danh mục
+            </h2>
+            <ul className="space-y-6 text-xs font-bold uppercase tracking-widest text-gray-500">
+              {listCats.map((cat: any) => (
+                <li
+                  key={cat.id}
+                  className="flex justify-between items-center border-b pb-4 cursor-pointer hover:text-amber-700 transition-colors"
+                >
+                  <Link href={`/categories/${cat.slug}`}>{cat.name}</Link>
+                  <i className="fa-solid fa-arrow-right text-[10px]"></i>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
-      {/* SECTION 2: FEATURED BRANDS */}
-      <section className="container mx-auto px-4">
-        <div className="flex justify-center gap-10 md:gap-20 grayscale opacity-50 overflow-x-auto pb-4">
-          {brands.docs.map((brand: any) => (
-            <span key={brand.id} className="text-xl font-bold uppercase whitespace-nowrap">
-              {brand.name}
-            </span>
+      {/* 5. CHÍNH SÁCH TIỆN ÍCH */}
+      <section className="py-16 bg-[#FDFBF9]">
+        <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+          {[
+            {
+              icon: 'fa-truck-fast',
+              title: 'Miễn phí vận chuyển',
+              desc: 'Cho đơn hàng từ 500k trở lên',
+            },
+            {
+              icon: 'fa-face-smile',
+              title: 'Khách hàng hài lòng',
+              desc: '99% đánh giá 5 sao từ người dùng',
+            },
+            {
+              icon: 'fa-arrow-rotate-left',
+              title: 'Hoàn trả nhanh chóng',
+              desc: 'Đổi trả dễ dàng trong vòng 7 ngày',
+            },
+          ].map((item, i) => (
+            <div key={i} className="flex flex-col items-center">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm border">
+                <i className={`fa-solid ${item.icon} text-xl`}></i>
+              </div>
+              <h4 className="font-bold text-xs uppercase tracking-widest">{item.title}</h4>
+              <p className="text-[11px] text-gray-500 mt-2 uppercase tracking-tighter italic">
+                {item.desc}
+              </p>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* SECTION 3: NEW ARRIVALS (Sản phẩm mới) */}
-      <section className="container mx-auto px-4">
-        <div className="flex flex-col items-center mb-12">
-          <h2 className="text-2xl font-bold uppercase tracking-widest mb-3">Sản phẩm mới về</h2>
-          <div className="h-[2px] w-12 bg-black"></div>
+      {/* 6. LÀM SẠCH LÀN DA */}
+      <section className="container mx-auto px-6 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold italic font-serif">Làm sạch làn da</h2>
         </div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-12">
-          {products.docs.map((product) => (
-            <ProductCard key={product.id} product={product} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-10">
+          {cleansingRes.docs.map((p) => (
+            <ProductCard key={p.id} product={p} />
           ))}
         </div>
+      </section>
 
-        <div className="flex justify-center mt-12">
-          <Link
-            href="/products"
-            className="text-sm font-bold uppercase border-b-2 border-black pb-1 hover:text-gray-500 hover:border-gray-500 transition-all"
-          >
-            Xem tất cả sản phẩm
-          </Link>
+      {/* 7. THƯƠNG HIỆU NỔI BẬT */}
+      <section className="bg-gray-50 py-16 border-y border-gray-100">
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-[10px] uppercase tracking-[0.4em] text-gray-400 font-black mb-12">
+            Thương hiệu nổi bật
+          </h2>
+          <div className="flex flex-wrap justify-center items-center opacity-40 grayscale gap-12">
+            {brandsRes.docs.map((brand: any) => (
+              <span key={brand.id} className="text-xl font-black uppercase tracking-tighter">
+                {brand.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 8. BLOG / CÂU CHUYỆN */}
+      <section className="container mx-auto px-6 py-24">
+        <h2 className="text-4xl font-bold text-center italic font-serif mb-16 leading-tight">
+          Câu chuyện, chu trình và
+          <br />
+          ghi chú chăm sóc da
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {postsRes.docs.map((post: any, i: number) => {
+            const bgColors = ['bg-amber-50', 'bg-emerald-50', 'bg-rose-50', 'bg-blue-50']
+            const thumbUrl =
+              post.thumbnail && typeof post.thumbnail === 'object'
+                ? post.thumbnail.url
+                : '/placeholder.jpg'
+            return (
+              <Link href={`/blog/${post.slug}`} key={post.id} className="group">
+                <div
+                  className={`${bgColors[i % 4]} rounded-2xl p-4 mb-6 transition-transform group-hover:-translate-y-2 duration-500`}
+                >
+                  <div className="relative aspect-square w-full rounded-xl overflow-hidden shadow-sm bg-white">
+                    <Image src={thumbUrl} alt={post.title} fill className="object-cover" />
+                  </div>
+                </div>
+                <p className="text-[10px] text-gray-400 uppercase font-black tracking-widest">
+                  {post.category}
+                </p>
+                <h3 className="font-bold text-sm mt-3 leading-snug group-hover:text-amber-800 transition-colors h-12 line-clamp-2">
+                  {post.title}
+                </h3>
+              </Link>
+            )
+          })}
+        </div>
+      </section>
+
+      {/* 9. INSTAGRAM GRID 1:1 */}
+      <section className="bg-white py-20 border-t">
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-3xl font-bold italic font-serif mb-2 tracking-tight">
+            MF PARIS trên Instagram
+          </h2>
+          <p className="text-xs uppercase tracking-widest text-gray-400 mb-12">
+            @mfparis.beauty • Theo dõi chúng tôi để nhận thêm nhiều mẹo bổ ích
+          </p>
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="aspect-square bg-gray-100 relative overflow-hidden group">
+                <Image
+                  src={`https://images.unsplash.com/photo-${1600000000000 + i * 1010000}?q=80&w=400`}
+                  alt="Insta"
+                  fill
+                  className="object-cover group-hover:scale-110 transition duration-700"
+                />
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                  <i className="fa-brands fa-instagram text-xl"></i>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </div>
