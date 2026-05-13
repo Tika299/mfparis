@@ -182,6 +182,9 @@ export interface Media {
 export interface Brand {
   id: number;
   name: string;
+  /**
+   * Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO
+   */
   slug: string;
   logo?: (number | null) | Media;
   description?: string | null;
@@ -196,17 +199,17 @@ export interface Brand {
 export interface Product {
   id: number;
   title: string;
+  sku?: string | null;
   brand: number | Brand;
   categories?: (number | Category)[] | null;
-  price?: {
-    basePrice?: number | null;
+  price: {
+    basePrice: number;
     salePrice?: number | null;
+    stock?: number | null;
   };
-  sku?: string | null;
-  stock?: number | null;
   images?:
     | {
-        image?: (number | null) | Media;
+        image: number | Media;
         id?: string | null;
       }[]
     | null;
@@ -226,15 +229,27 @@ export interface Product {
     };
     [k: string]: unknown;
   } | null;
-  attributes?: {
-    origin?: string | null;
-    concentration?: string | null;
-    volume?: string | null;
-    gender?: ('men' | 'women' | 'unisex') | null;
-  };
+  /**
+   * Bạn có thể tự thêm các ô như: Mùi hương, SPF, Calo, Thành phần...
+   */
+  specifications?:
+    | {
+        label: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Tiêu đề hiển thị trên Google (Mặc định sẽ lấy tên sản phẩm)
+   */
   seoTitle?: string | null;
+  /**
+   * Mô tả ngắn hiển thị trên kết quả tìm kiếm Google
+   */
   seoDescription?: string | null;
-  ogImage?: (number | null) | Media;
+  /**
+   * Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO
+   */
   slug: string;
   status?: ('draft' | 'published') | null;
   displayLocation?: ('best-seller' | 'cleansing' | 'new-arrival')[] | null;
@@ -249,6 +264,9 @@ export interface Category {
   id: number;
   name: string;
   image?: (number | null) | Media;
+  /**
+   * Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO
+   */
   slug: string;
   parent?: (number | null) | Category;
   updatedAt: string;
@@ -291,6 +309,9 @@ export interface Order {
 export interface Post {
   id: number;
   title: string;
+  /**
+   * Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO
+   */
   slug: string;
   thumbnail: number | Media;
   category?: ('review' | 'beauty' | 'news') | null;
@@ -470,6 +491,7 @@ export interface BrandsSelect<T extends boolean = true> {
  */
 export interface ProductsSelect<T extends boolean = true> {
   title?: T;
+  sku?: T;
   brand?: T;
   categories?: T;
   price?:
@@ -477,9 +499,8 @@ export interface ProductsSelect<T extends boolean = true> {
     | {
         basePrice?: T;
         salePrice?: T;
+        stock?: T;
       };
-  sku?: T;
-  stock?: T;
   images?:
     | T
     | {
@@ -488,17 +509,15 @@ export interface ProductsSelect<T extends boolean = true> {
       };
   shortDescription?: T;
   description?: T;
-  attributes?:
+  specifications?:
     | T
     | {
-        origin?: T;
-        concentration?: T;
-        volume?: T;
-        gender?: T;
+        label?: T;
+        value?: T;
+        id?: T;
       };
   seoTitle?: T;
   seoDescription?: T;
-  ogImage?: T;
   slug?: T;
   status?: T;
   displayLocation?: T;

@@ -126,30 +126,30 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </div>
 
             {/* Thông số sản phẩm */}
-            <div className="space-y-4 mb-8 bg-gray-50 p-6">
-              <div className="flex justify-between text-sm border-b pb-2 border-gray-200">
+            <div className="space-y-4 mb-8 bg-gray-50 p-6 rounded-xl">
+              <h4 className="font-bold uppercase text-xs tracking-widest border-b pb-2 mb-4">
+                Thông tin chi tiết
+              </h4>
+
+              {/* Lặp qua tất cả các ô bạn đã tự thêm trong Admin */}
+              {product.specifications && product.specifications.length > 0 ? (
+                product.specifications.map((spec: any) => (
+                  <div
+                    key={spec.id}
+                    className="flex justify-between text-sm border-b border-gray-100 pb-2 last:border-0"
+                  >
+                    <span className="text-gray-500 uppercase font-medium">{spec.label}</span>
+                    <span className="font-bold text-gray-900">{spec.value}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-gray-400 italic">Đang cập nhật thông số...</p>
+              )}
+
+              {/* Các trường cố định như Xuất xứ vẫn có thể giữ lại nếu muốn */}
+              <div className="flex justify-between text-sm pt-2">
                 <span className="text-gray-500 uppercase font-medium">Xuất xứ</span>
-                <span className="font-bold">{(product.attributes as any)?.origin || 'Pháp'}</span>
-              </div>
-              <div className="flex justify-between text-sm border-b pb-2 border-gray-200">
-                <span className="text-gray-500 uppercase font-medium">Dung tích</span>
-                <span className="font-bold">{(product.attributes as any)?.volume}</span>
-              </div>
-              <div className="flex justify-between text-sm border-b pb-2 border-gray-200">
-                <span className="text-gray-500 uppercase font-medium">Giới tính</span>
-                <span className="font-bold">
-                  {(product.attributes as any)?.gender === 'men'
-                    ? 'Nam'
-                    : (product.attributes as any)?.gender === 'women'
-                      ? 'Nữ'
-                      : 'Unisex'}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500 uppercase font-medium">Nồng độ</span>
-                <span className="font-bold">
-                  {(product.attributes as any)?.concentration || 'EDP'}
-                </span>
+                <span className="font-bold">{product.origin || 'Pháp'}</span>
               </div>
             </div>
 

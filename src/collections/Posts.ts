@@ -1,4 +1,5 @@
 import { CollectionConfig } from 'payload'
+import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -18,7 +19,13 @@ export const Posts: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
-      admin: { position: 'sidebar' },
+      hooks: {
+        beforeValidate: [beforeChangeSlug],
+      },
+      admin: {
+        position: 'sidebar',
+        description: 'Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO',
+      },
     },
     {
       name: 'thumbnail',
