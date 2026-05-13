@@ -24,7 +24,7 @@ export const HomeTabs = ({
         <div className="flex justify-center space-x-8 text-[11px] font-bold uppercase tracking-widest text-gray-400">
           <button
             onClick={() => setActiveTab('all')}
-            className={`${activeTab === 'all' ? 'text-black border-b-2 border-black' : ''} pb-1 transition-all`}
+            className={`${activeTab === 'all' ? 'text-black border-b-2 border-black' : ''} pb-1 transition-all cursor-pointer`}
           >
             Tất cả
           </button>
@@ -32,7 +32,7 @@ export const HomeTabs = ({
             <button
               key={cat.id}
               onClick={() => setActiveTab(cat.slug)}
-              className={`${activeTab === cat.slug ? 'text-black border-b-2 border-black' : ''} pb-1 transition-all`}
+              className={`${activeTab === cat.slug ? 'text-black border-b-2 border-black' : ''} pb-1 transition-all cursor-pointer`}
             >
               {cat.name}
             </button>

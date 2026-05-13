@@ -3,6 +3,7 @@ import configPromise from '@payload-config'
 import { ProductCard } from '@/components/ProductCard'
 import { HeroSlider } from '@/components/HeroSlider'
 import { HomeTabs } from '@/components/HomeTabs' // Đảm bảo bạn đã tạo file này
+import { Truck, Smile, RotateCcw, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -151,7 +152,12 @@ export default async function HomePage() {
                   className="flex justify-between items-center border-b pb-4 cursor-pointer hover:text-amber-700 transition-colors"
                 >
                   <Link href={`/categories/${cat.slug}`}>{cat.name}</Link>
-                  <i className="fa-solid fa-arrow-right text-[10px]"></i>
+                  <Link href={`/categories/${cat.slug}`}>
+                    <ArrowRight
+                      size={14}
+                      className="text-gray-400 group-hover:text-black transition-colors"
+                    />
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -164,24 +170,24 @@ export default async function HomePage() {
         <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
           {[
             {
-              icon: 'fa-truck-fast',
+              icon: <Truck size={24} />,
               title: 'Miễn phí vận chuyển',
               desc: 'Cho đơn hàng từ 500k trở lên',
             },
             {
-              icon: 'fa-face-smile',
+              icon: <Smile size={24} />,
               title: 'Khách hàng hài lòng',
               desc: '99% đánh giá 5 sao từ người dùng',
             },
             {
-              icon: 'fa-arrow-rotate-left',
+              icon: <RotateCcw size={24} />,
               title: 'Hoàn trả nhanh chóng',
               desc: 'Đổi trả dễ dàng trong vòng 7 ngày',
             },
           ].map((item, i) => (
             <div key={i} className="flex flex-col items-center">
               <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm border">
-                <i className={`fa-solid ${item.icon} text-xl`}></i>
+                {item.icon}
               </div>
               <h4 className="font-bold text-xs uppercase tracking-widest">{item.title}</h4>
               <p className="text-[11px] text-gray-500 mt-2 uppercase tracking-tighter italic">
