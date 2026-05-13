@@ -129,14 +129,13 @@
   }
   :root {
     --font-sans: var(--font-be-vietnam), ui-sans-serif, system-ui, -apple-system, sans-serif;
-    --font-serif: var(--font-serif), ui-serif, Georgia, serif;
   }
 }
 
 h1,
 h2,
 .font-serif {
-  font-family: var(--font-serif);
+  font-family: var(--font-be-vietnam);
 }
 
 button,

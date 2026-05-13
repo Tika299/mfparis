@@ -1,7 +1,7 @@
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import '../globals.css'
-import { Playfair_Display, Be_Vietnam_Pro } from 'next/font/google' // Thay đổi ở đây
+import { Be_Vietnam_Pro } from 'next/font/google' // Thay đổi ở đây
 
 // Cấu hình Be Vietnam Pro
 const beVietnamPro = Be_Vietnam_Pro({
@@ -11,15 +11,9 @@ const beVietnamPro = Be_Vietnam_Pro({
   display: 'swap',
 })
 
-const serif = Playfair_Display({ subsets: ['latin'], variable: '--font-serif' })
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="vi"
-      suppressHydrationWarning
-      className={`${serif.variable} ${beVietnamPro.variable}`}
-    >
+    <html lang="vi" suppressHydrationWarning className={`${beVietnamPro.variable}`}>
       <body className="font-sans antialiased text-[#1a1a1a]">
         <Header />
         <main>{children}</main>

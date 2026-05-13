@@ -20,7 +20,7 @@ export const HomeTabs = ({
   return (
     <div className="container mx-auto px-6 py-20">
       <div className="text-center mb-16">
-        <h2 className="text-4xl font-bold italic font-serif mb-6">Sản phẩm bán chạy</h2>
+        <h2 className="text-4xl font-bold font-serif mb-6">Sản phẩm bán chạy</h2>
         <div className="flex justify-center space-x-8 text-[11px] font-bold uppercase tracking-widest text-gray-400">
           <button
             onClick={() => setActiveTab('all')}

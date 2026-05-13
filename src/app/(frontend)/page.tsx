@@ -195,7 +195,7 @@ export default async function HomePage() {
       {/* 6. LÀM SẠCH LÀN DA */}
       <section className="container mx-auto px-6 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold italic font-serif">Làm sạch làn da</h2>
+          <h2 className="text-4xl font-bold font-serif">Làm sạch làn da</h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-10">
           {cleansingRes.docs.map((p) => (
@@ -207,7 +207,7 @@ export default async function HomePage() {
       {/* 7. THƯƠNG HIỆU NỔI BẬT */}
       <section className="bg-gray-50 py-16 border-y border-gray-100">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-[10px] uppercase tracking-[0.4em] text-gray-400 font-black mb-12">
+          <h2 className="text-4xl font-bold mb-12" style={{ fontFamily: 'Be Vietnam Pro' }}>
             Thương hiệu nổi bật
           </h2>
           <div className="flex flex-wrap justify-center items-center opacity-40 grayscale gap-12">
@@ -222,7 +222,7 @@ export default async function HomePage() {
 
       {/* 8. BLOG / CÂU CHUYỆN */}
       <section className="container mx-auto px-6 py-24">
-        <h2 className="text-4xl font-bold text-center italic font-serif mb-16 leading-tight">
+        <h2 className="text-4xl font-bold text-center font-serif mb-16 leading-tight">
           Câu chuyện, chu trình và
           <br />
           ghi chú chăm sóc da
@@ -252,33 +252,6 @@ export default async function HomePage() {
               </Link>
             )
           })}
-        </div>
-      </section>
-
-      {/* 9. INSTAGRAM GRID 1:1 */}
-      <section className="bg-white py-20 border-t">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold italic font-serif mb-2 tracking-tight">
-            MF PARIS trên Instagram
-          </h2>
-          <p className="text-xs uppercase tracking-widest text-gray-400 mb-12">
-            @mfparis.beauty • Theo dõi chúng tôi để nhận thêm nhiều mẹo bổ ích
-          </p>
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="aspect-square bg-gray-100 relative overflow-hidden group">
-                <Image
-                  src={`https://images.unsplash.com/photo-${1600000000000 + i * 1010000}?q=80&w=400`}
-                  alt="Insta"
-                  fill
-                  className="object-cover group-hover:scale-110 transition duration-700"
-                />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                  <i className="fa-brands fa-instagram text-xl"></i>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
     </div>
