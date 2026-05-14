@@ -74,6 +74,7 @@ export interface Config {
     categories: Category;
     orders: Order;
     posts: Post;
+    'post-categories': PostCategory;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +89,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    'post-categories': PostCategoriesSelect<false> | PostCategoriesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -314,7 +316,7 @@ export interface Post {
    */
   slug: string;
   thumbnail: number | Media;
-  category?: ('review' | 'beauty' | 'news') | null;
+  categories?: (number | PostCategory)[] | null;
   content?: {
     root: {
       type: string;
@@ -335,6 +337,17 @@ export interface Post {
     metaTitle?: string | null;
     metaDescription?: string | null;
   };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "post-categories".
+ */
+export interface PostCategory {
+  id: number;
+  title: string;
+  slug: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -389,6 +402,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'posts';
         value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'post-categories';
+        value: number | PostCategory;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -575,7 +592,7 @@ export interface PostsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   thumbnail?: T;
-  category?: T;
+  categories?: T;
   content?: T;
   excerpt?: T;
   seo?:
@@ -584,6 +601,16 @@ export interface PostsSelect<T extends boolean = true> {
         metaTitle?: T;
         metaDescription?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "post-categories_select".
+ */
+export interface PostCategoriesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
   updatedAt?: T;
   createdAt?: T;
 }

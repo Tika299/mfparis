@@ -13,6 +13,7 @@ import { SiteSettings } from './globals/SiteSettings'
 import { Categories } from './collections/Categories'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { Posts } from './collections/Posts'
+import { PostCategories } from './collections/PostCategories'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -24,7 +25,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Brands, Products, Categories, Orders, Posts],
+  collections: [Users, Media, Brands, Products, Categories, Orders, Posts, PostCategories],
   globals: [SiteSettings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

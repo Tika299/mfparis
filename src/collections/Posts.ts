@@ -35,13 +35,14 @@ export const Posts: CollectionConfig = {
       label: 'Ảnh đại diện bài viết',
     },
     {
-      name: 'category',
-      type: 'select',
-      options: [
-        { label: 'Review Nước Hoa', value: 'review' },
-        { label: 'Kinh Nghiệm Làm Đẹp', value: 'beauty' },
-        { label: 'Tin Tức MF Paris', value: 'news' },
-      ],
+      name: 'categories', // Đổi tên thành số nhiều nếu muốn chọn nhiều danh mục
+      type: 'relationship',
+      relationTo: 'post-categories', // Kết nối tới collection vừa tạo ở Bước 1
+      hasMany: true, // Cho phép 1 bài viết thuộc nhiều danh mục (giống WordPress)
+      label: 'Danh mục bài viết',
+      admin: {
+        position: 'sidebar',
+      },
     },
     {
       name: 'content',

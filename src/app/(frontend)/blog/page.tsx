@@ -26,7 +26,9 @@ export default async function BlogPage() {
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </div>
-            <p className="text-xs text-red-600 font-bold uppercase mb-2">{post.category}</p>
+            <p className="text-[10px] text-gray-400 uppercase font-black tracking-widest">
+              {post.categories?.map((cat: any) => cat.name).join(', ')}
+            </p>
             <h2 className="text-xl font-bold group-hover:text-red-600 transition-colors line-clamp-2">
               {post.title}
             </h2>
