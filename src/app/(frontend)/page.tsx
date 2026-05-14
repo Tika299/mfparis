@@ -110,7 +110,9 @@ export default async function HomePage() {
         <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
           {featuredCats.map((cat: any) => {
             const catImg =
-              cat.image && typeof cat.image === 'object' ? cat.image.url : '/placeholder.jpg'
+              cat.image && typeof cat.image === 'object'
+                ? cat.image.url
+                : 'http://localhost:3000/api/media/file/placeholder.jpg'
             return (
               <div
                 key={cat.id}
@@ -239,7 +241,7 @@ export default async function HomePage() {
             const thumbUrl =
               post.thumbnail && typeof post.thumbnail === 'object'
                 ? post.thumbnail.url
-                : '/placeholder.jpg'
+                : 'http://localhost:3000/api/media/file/placeholder.jpg'
             return (
               <Link href={`/blog/${post.slug}`} key={post.id} className="group">
                 <div

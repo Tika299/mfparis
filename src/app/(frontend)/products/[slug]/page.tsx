@@ -175,10 +175,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {/* Mô tả chi tiết */}
             <div className="mt-12 border-t pt-8">
               <h3 className="font-black uppercase text-sm mb-4 tracking-widest">Mô tả sản phẩm</h3>
-              <div className="prose prose-sm max-w-none text-gray-600 leading-relaxed">
-                {product.shortDescription as string}
-                {/* Ở đây nếu dùng RichText của Payload thì cần thêm thư viện render RichText */}
-              </div>
+              <div
+                className="prose prose-sm max-w-none text-gray-600 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: product.description as string }}
+              />
             </div>
           </div>
         </div>

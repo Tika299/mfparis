@@ -216,23 +216,9 @@ export interface Product {
       }[]
     | null;
   shortDescription?: string | null;
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  description?: string | null;
   /**
-   * Bạn có thể tự thêm các ô như: Mùi hương, SPF, Calo, Thành phần...
+   * Thêm các thông số như: Nồng độ, Mùi hương, SPF, Calo, Thành phần...
    */
   specifications?:
     | {
@@ -242,15 +228,15 @@ export interface Product {
       }[]
     | null;
   /**
-   * Tiêu đề hiển thị trên Google (Mặc định sẽ lấy tên sản phẩm)
+   * Tiêu đề hiển thị trên Google (Để trống sẽ lấy tên sản phẩm)
    */
   seoTitle?: string | null;
   /**
-   * Mô tả ngắn hiển thị trên kết quả tìm kiếm Google
+   * Mô tả ngắn gọn khi tìm kiếm trên Google
    */
   seoDescription?: string | null;
   /**
-   * Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO
+   * Tự động tạo từ tên, có thể chỉnh sửa thủ công
    */
   slug: string;
   status?: ('draft' | 'published') | null;

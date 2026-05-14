@@ -9,13 +9,13 @@ export const Products: CollectionConfig = {
     group: 'Kinh doanh',
   },
   access: {
-    read: () => true, // Cho phép mọi người xem sản phẩm
+    read: () => true,
   },
   fields: [
     {
       type: 'tabs',
       tabs: [
-        /* TAB 1: THÔNG TIN CƠ BẢN */
+        /* TAB 1: THÔNG TIN CHUNG */
         {
           label: 'Thông tin chung',
           fields: [
@@ -27,13 +27,19 @@ export const Products: CollectionConfig = {
                   type: 'text',
                   required: true,
                   label: 'Tên sản phẩm',
-                  admin: { width: '70%' },
+                  admin: {
+                    width: '70%',
+                    placeholder: 'Nhập tên sản phẩm (VD: Nước hoa Dior J’adore)',
+                  },
                 },
                 {
                   name: 'sku',
                   type: 'text',
-                  label: 'Mã SKU',
-                  admin: { width: '30%' },
+                  label: 'Mã sản phẩm (SKU)',
+                  admin: {
+                    width: '30%',
+                    placeholder: 'VD: DIOR-JAD-100',
+                  },
                 },
               ],
             },
@@ -46,6 +52,7 @@ export const Products: CollectionConfig = {
                   relationTo: 'brands',
                   required: true,
                   label: 'Thương hiệu',
+                  admin: { width: '50%' },
                 },
                 {
                   name: 'categories',
@@ -53,47 +60,38 @@ export const Products: CollectionConfig = {
                   relationTo: 'categories',
                   hasMany: true,
                   label: 'Danh mục sản phẩm',
+                  admin: { width: '50%' },
                 },
               ],
             },
+            /* PHẦN GIÁ VÀ KHO HÀNG - ĐÃ FIX LỖI LỆCH HÀNG */
             {
-              type: 'row',
+              name: 'price',
+              type: 'group',
+              label: 'Giá & Kho hàng',
               fields: [
                 {
-                  name: 'price',
-                  type: 'group',
-                  label: 'Giá & Kho hàng',
+                  type: 'row',
                   fields: [
                     {
-                      type: 'row', // Đưa cả 3 ô vào cùng 1 hàng
-                      fields: [
-                        {
-                          name: 'basePrice',
-                          type: 'number',
-                          required: true,
-                          label: 'Giá niêm yết (đ)',
-                          admin: {
-                            width: '33.33%', // Chia đều 1/3 hàng
-                          },
-                        },
-                        {
-                          name: 'salePrice',
-                          type: 'number',
-                          label: 'Giá khuyến mãi (đ)',
-                          admin: {
-                            width: '33.33%', // Chia đều 1/3 hàng
-                          },
-                        },
-                        {
-                          name: 'stock',
-                          type: 'number',
-                          label: 'Số lượng kho',
-                          defaultValue: 0,
-                          admin: {
-                            width: '33.33%', // Chia đều 1/3 hàng
-                          },
-                        },
-                      ],
+                      name: 'basePrice',
+                      type: 'number',
+                      required: true,
+                      label: 'Giá niêm yết (đ)',
+                      admin: { width: '33.33%' },
+                    },
+                    {
+                      name: 'salePrice',
+                      type: 'number',
+                      label: 'Giá khuyến mãi (đ)',
+                      admin: { width: '33.33%' },
+                    },
+                    {
+                      name: 'stock',
+                      type: 'number',
+                      label: 'Số lượng kho',
+                      defaultValue: 0,
+                      admin: { width: '33.33%' },
                     },
                   ],
                 },
@@ -102,7 +100,7 @@ export const Products: CollectionConfig = {
             {
               name: 'images',
               type: 'array',
-              label: 'Bộ sưu tập hình ảnh (Tỉ lệ 1:1)',
+              label: 'Bộ sưu tập hình ảnh (Tỷ lệ 1:1)',
               minRows: 1,
               fields: [
                 {
@@ -116,30 +114,33 @@ export const Products: CollectionConfig = {
             {
               name: 'shortDescription',
               type: 'textarea',
-              label: 'Mô tả ngắn (Hiện ở đầu trang chi tiết)',
+              label: 'Mô tả ngắn (Hiển thị cạnh giá tiền)',
+              admin: {
+                placeholder: 'Nhập mô tả tóm tắt về sản phẩm...',
+              },
             },
             {
               name: 'description',
-              type: 'richText',
+              type: 'textarea',
               label: 'Nội dung mô tả chi tiết',
             },
           ],
         },
 
-        /* TAB 2: THUỘC TÍNH TỰ ĐỊNH NGHĨA (Đây là phần bạn yêu cầu) */
+        /* TAB 2: THÔNG SỐ KỸ THUẬT (DYNAMIC ATTRIBUTES) */
         {
           label: 'Thông số kỹ thuật',
           fields: [
             {
               name: 'specifications',
               type: 'array',
-              label: 'Thông số tùy chỉnh',
+              label: 'Thuộc tính sản phẩm',
               labels: {
                 singular: 'Thông số',
                 plural: 'Các thông số',
               },
               admin: {
-                description: 'Bạn có thể tự thêm các ô như: Mùi hương, SPF, Calo, Thành phần...',
+                description: 'Thêm các thông số như: Nồng độ, Mùi hương, SPF, Calo, Thành phần...',
               },
               fields: [
                 {
@@ -148,14 +149,22 @@ export const Products: CollectionConfig = {
                     {
                       name: 'label',
                       type: 'text',
-                      label: 'Tên thuộc tính (VD: Nồng độ)',
+                      label: 'Tên thông số',
                       required: true,
+                      admin: {
+                        width: '50%',
+                        placeholder: 'VD: Mùi hương',
+                      },
                     },
                     {
                       name: 'value',
                       type: 'text',
-                      label: 'Giá trị (VD: EDP 20%)',
+                      label: 'Giá trị',
                       required: true,
+                      admin: {
+                        width: '50%',
+                        placeholder: 'VD: Hương gỗ phương Đông',
+                      },
                     },
                   ],
                 },
@@ -164,7 +173,7 @@ export const Products: CollectionConfig = {
           ],
         },
 
-        /* TAB 3: CẤU HÌNH SEO (RANK MATH STYLE) */
+        /* TAB 3: CẤU HÌNH SEO */
         {
           label: 'SEO',
           fields: [
@@ -173,7 +182,7 @@ export const Products: CollectionConfig = {
               type: 'text',
               label: 'SEO Title',
               admin: {
-                description: 'Tiêu đề hiển thị trên Google (Mặc định sẽ lấy tên sản phẩm)',
+                description: 'Tiêu đề hiển thị trên Google (Để trống sẽ lấy tên sản phẩm)',
               },
             },
             {
@@ -181,7 +190,7 @@ export const Products: CollectionConfig = {
               type: 'textarea',
               label: 'Meta Description',
               admin: {
-                description: 'Mô tả ngắn hiển thị trên kết quả tìm kiếm Google',
+                description: 'Mô tả ngắn gọn khi tìm kiếm trên Google',
               },
             },
           ],
@@ -189,7 +198,7 @@ export const Products: CollectionConfig = {
       ],
     },
 
-    /* SIDEBAR FIELDS */
+    /* SIDEBAR (CỘT PHẢI) */
     {
       name: 'slug',
       type: 'text',
@@ -197,18 +206,17 @@ export const Products: CollectionConfig = {
       unique: true,
       label: 'Đường dẫn (Slug)',
       hooks: {
-        // Gắn hook xử lý tự động vào đây
         beforeValidate: [beforeChangeSlug],
       },
       admin: {
         position: 'sidebar',
-        description: 'Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO',
+        description: 'Tự động tạo từ tên, có thể chỉnh sửa thủ công',
       },
     },
     {
       name: 'status',
       type: 'select',
-      label: 'Trạng thái sản phẩm',
+      label: 'Trạng thái',
       defaultValue: 'draft',
       options: [
         { label: 'Nháp (Ẩn)', value: 'draft' },
@@ -221,7 +229,7 @@ export const Products: CollectionConfig = {
     {
       name: 'displayLocation',
       type: 'select',
-      label: 'Hiển thị trên trang chủ',
+      label: 'Vị trí trang chủ',
       hasMany: true,
       options: [
         { label: 'Sản phẩm bán chạy', value: 'best-seller' },
@@ -233,21 +241,4 @@ export const Products: CollectionConfig = {
       },
     },
   ],
-  hooks: {
-    // Tự động tạo slug từ title nếu slug trống
-    beforeValidate: [
-      ({ data }) => {
-        if (data?.title && !data.slug) {
-          return {
-            ...data,
-            slug: data.title
-              .toLowerCase()
-              .replace(/ /g, '-')
-              .replace(/[^\w-]+/g, ''),
-          }
-        }
-        return data
-      },
-    ],
-  },
 }

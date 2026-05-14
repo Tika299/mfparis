@@ -8,7 +8,7 @@ export const ProductCard = ({ product }: { product: any }) => {
   const mainImage =
     product.images?.[0]?.image && typeof product.images[0].image === 'object'
       ? product.images[0].image.url
-      : '/placeholder.jpg'
+      : 'http://localhost:3000/api/media/file/placeholder.jpg'
 
   const salePrice = product.price?.salePrice
   const basePrice = product.price?.basePrice
