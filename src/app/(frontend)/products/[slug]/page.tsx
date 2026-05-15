@@ -1,12 +1,20 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
-import Image from 'next/image'
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { formatPrice } from '@/utilities/formatPrice'
-import { ProductPurchase } from '@/components/ProductPurchase'
+import { ProductGallery } from '@/components/ProductGallery' // Đảm bảo bạn đã tạo file này
+import { ProductPurchase } from '@/components/ProductPurchase' // Đảm bảo bạn đã tạo file này
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge'
+import { Star, ShieldCheck, Leaf, FlaskConical, Truck, Award } from 'lucide-react'
 
-// 1. Cấu hình SEO động (Next.js 15)
+// 1. Cấu hình SEO động (Next.js 15 - Params là Promise)
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const payload = await getPayload({ config: configPromise })
@@ -18,168 +26,187 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const product = result.docs[0]
   if (!product) return { title: 'Không tìm thấy sản phẩm' }
 
+  const ogImage = typeof product.images?.[0]?.image === 'object' ? product.images[0].image.url : ''
+
   return {
-    title: `${product.title} | MF Paris - Nước hoa Pháp chính hãng`,
+    title: `${product.title} | MF Paris Chính Hãng`,
     description:
-      product.seoDescription || `Mua ngay ${product.title} tại MF Paris. Cam kết chính hãng 100%.`,
+      product.seoDescription ||
+      `Mua ngay ${product.title} tại MF Paris. Cam kết hàng Pháp chính hãng, giá tốt nhất.`,
     openGraph: {
-      images: [
-        typeof product.images?.[0]?.image !== 'string'
-          ? (product.images?.[0]?.image as any).url
-          : '',
-      ],
+      images: [ogImage],
     },
   }
 }
 
-// 2. Trang hiển thị chi tiết
+// 2. Trang Chi tiết sản phẩm
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const payload = await getPayload({ config: configPromise })
 
+  // Lấy dữ liệu sản phẩm kèm theo Brand và Category
   const result = await payload.find({
     collection: 'products',
     where: { slug: { equals: slug } },
-    depth: 2, // Lấy đầy đủ thông tin Brand và Media
+    depth: 2,
   })
 
-  const product = result.docs[0]
+  const product: any = result.docs[0]
   if (!product) notFound()
 
-  // Tính toán % giảm giá
-  const discountPercent = product.price?.salePrice
-    ? Math.round(
-        ((product.price.basePrice - product.price.salePrice) / product.price.basePrice) * 100,
-      )
-    : 0
+  // Tính % giảm giá
+  const basePrice = product.price?.basePrice || 0
+  const salePrice = product.price?.salePrice
+  const discountPercent = salePrice ? Math.round(((basePrice - salePrice) / basePrice) * 100) : 0
 
   return (
-    <div className="bg-white min-h-screen">
-      <div className="container mx-auto px-4 py-10 lg:py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* CỘT TRÁI: HÌNH ẢNH (Giao diện 7/12 cột) */}
-          <div className="lg:col-span-7 space-y-4">
-            <div className="relative aspect-[3/4] w-full bg-[#f9f9f9] overflow-hidden group">
-              {discountPercent > 0 && (
-                <Badge className="absolute top-4 left-4 z-10 bg-red-600 text-white px-3 py-1 rounded-none font-bold">
-                  -{discountPercent}%
-                </Badge>
-              )}
-              <Image
-                src={(product.images?.[0]?.image as any).url}
-                alt={product.title as string}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 1024px) 100vw, 60vw"
-              />
-            </div>
+    <div className="bg-[#FDFBF9] min-h-screen pb-20 font-sans">
+      <div className="container mx-auto px-4 py-6 md:py-10">
+        {/* BREADCRUMB */}
+        <nav className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-8 overflow-hidden whitespace-nowrap">
+          <a href="/" className="hover:text-black transition-colors">
+            Trang chủ
+          </a>
+          <span>/</span>
+          <a href="/products" className="hover:text-black transition-colors">
+            Sản phẩm
+          </a>
+          <span>/</span>
+          <span className="text-black truncate">{product.title}</span>
+        </nav>
 
-            {/* Gallery ảnh nhỏ */}
-            <div className="grid grid-cols-4 gap-4">
-              {product.images?.map((item: any, i: number) => (
-                <div
-                  key={i}
-                  className="relative aspect-square border hover:border-black cursor-pointer bg-gray-50"
-                >
-                  <Image
-                    src={item.image.url}
-                    alt={`gallery-${i}`}
-                    fill
-                    className="object-cover p-2"
-                  />
-                </div>
-              ))}
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 xl:gap-16">
+          {/* CỘT TRÁI: GALLERY ẢNH (Tỉ lệ 1:1 kiểu Long Châu) */}
+          <div className="lg:col-span-7">
+            <ProductGallery images={product.images} />
           </div>
 
-          {/* CỘT PHẢI: THÔNG TIN SẢN PHẨM (Giao diện 5/12 cột) */}
-          <div className="lg:col-span-5 flex flex-col">
-            <div className="border-b pb-6 mb-6">
-              <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-2 font-bold">
-                {(product.brand as any)?.name || 'MF PARIS'}
-              </p>
-              <h1 className="text-2xl md:text-3xl font-bold uppercase tracking-tight leading-tight">
-                {product.title as string}
-              </h1>
-              <p className="text-sm text-gray-500 mt-2 italic">
-                Mã sản phẩm: {product.sku || 'Đang cập nhật'}
-              </p>
-            </div>
+          {/* CỘT PHẢI: THÔNG TIN MUA HÀNG */}
+          <div className="lg:col-span-5 space-y-8">
+            <header className="space-y-3">
+              <div className="space-y-2">
+                {/* Thương hiệu */}
+                <span className="sub-heading">{product.brand?.name || 'MF Paris Authentic'}</span>
+                {/* Tên sản phẩm */}
+                <h1 className="heading-product">{product.title}</h1>
+              </div>
 
-            {/* Giá tiền */}
-            <div className="flex items-baseline gap-4 mb-8">
-              {product.price?.salePrice ? (
-                <>
-                  <span className="text-3xl font-black text-red-600">
-                    {formatPrice(product.price.salePrice)}₫
-                  </span>
-                  <span className="text-lg text-gray-400 line-through">
-                    {formatPrice(product.price.basePrice)}₫
-                  </span>
-                </>
-              ) : (
-                <span className="text-3xl font-black text-black">
-                  {formatPrice(product.price?.basePrice)}₫
+              {/* Đánh giá sao giả lập */}
+              <div className="flex items-center gap-3 pt-2">
+                <div className="flex text-yellow-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={14} fill="currentColor" />
+                  ))}
+                </div>
+                <span className="text-[11px] text-gray-400 font-bold border-l pl-3 uppercase tracking-tighter">
+                  Mã SKU: {product.sku || 'N/A'}
                 </span>
-              )}
+              </div>
+
+              {/* Giá tiền */}
+              <div className="flex items-center gap-4 pt-4">
+                <div className="text-3xl font-black text-[#16423C]">
+                  {formatPrice(salePrice || basePrice)}₫
+                </div>
+                {salePrice && (
+                  <>
+                    <span className="text-lg text-gray-300 line-through decoration-red-500/30">
+                      {formatPrice(basePrice)}₫
+                    </span>
+                    <Badge className="bg-red-500 hover:bg-red-500 rounded-full font-bold">
+                      -{discountPercent}%
+                    </Badge>
+                  </>
+                )}
+              </div>
+            </header>
+
+            {/* KHỐI MUA HÀNG (Rounded Box) */}
+            <div className="p-8 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 space-y-6">
+              <ProductPurchase product={product} />
+
+              {/* Cam kết ngắn */}
+              <div className="pt-4 border-t border-gray-50 flex items-center justify-between text-[10px] font-bold uppercase tracking-tighter text-gray-400">
+                <div className="flex items-center gap-2">
+                  <Truck size={14} /> Giao nhanh 2h
+                </div>
+                <div className="flex items-center gap-2">
+                  <Award size={14} /> Đổi trả 7 ngày
+                </div>
+                <div className="flex items-center gap-2">
+                  <ShieldCheck size={14} /> 100% Chính hãng
+                </div>
+              </div>
             </div>
 
-            {/* Thông số sản phẩm */}
-            <div className="space-y-4 mb-8 bg-gray-50 p-6 rounded-xl">
-              <h4 className="font-bold uppercase text-xs tracking-widest border-b pb-2 mb-4">
-                Thông tin chi tiết
-              </h4>
+            {/* THÔNG SỐ KỸ THUẬT ĐỘNG (Dynamic Specs) */}
+            {product.specifications && product.specifications.length > 0 && (
+              <div className="space-y-4 bg-white/50 p-6 rounded-3xl border border-gray-100">
+                <h3 className="text-xs font-black uppercase tracking-widest border-b pb-3">
+                  Thông số sản phẩm
+                </h3>
+                <div className="grid grid-cols-1 gap-3">
+                  {product.specifications.map((spec: any) => (
+                    <div key={spec.id} className="flex justify-between text-sm">
+                      <span className="text-gray-400 font-medium">{spec.label}</span>
+                      <span className="font-bold text-gray-800">{spec.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-              {/* Lặp qua tất cả các ô bạn đã tự thêm trong Admin */}
-              {product.specifications && product.specifications.length > 0 ? (
-                product.specifications.map((spec: any) => (
-                  <div
-                    key={spec.id}
-                    className="flex justify-between text-sm border-b border-gray-100 pb-2 last:border-0"
+            {/* ACCORDION (Thông tin bổ sung) */}
+            <div className="pt-2">
+              <Accordion type="single" collapsible className="w-full space-y-3">
+                {product.accordions?.map((item: any, i: number) => (
+                  <AccordionItem
+                    key={i}
+                    value={`item-${i}`}
+                    className="border-b-0 bg-white rounded-2xl px-6 shadow-sm border border-gray-100 overflow-hidden"
                   >
-                    <span className="text-gray-500 uppercase font-medium">{spec.label}</span>
-                    <span className="font-bold text-gray-900">{spec.value}</span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-xs text-gray-400 italic">Đang cập nhật thông số...</p>
-              )}
-
-              {/* Các trường cố định như Xuất xứ vẫn có thể giữ lại nếu muốn */}
-              <div className="flex justify-between text-sm pt-2">
-                <span className="text-gray-500 uppercase font-medium">Xuất xứ</span>
-                <span className="font-bold">{product.origin || 'Pháp'}</span>
-              </div>
+                    <AccordionTrigger className="font-bold text-xs uppercase tracking-[0.1em] py-5 hover:no-underline text-gray-700">
+                      {item.title}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-gray-500 leading-loose text-sm pb-6">
+                      <div
+                        className="prose prose-sm max-w-none"
+                        dangerouslySetInnerHTML={{ __html: item.content }}
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </div>
+          </div>
+        </div>
 
-            {/* Khu vực mua hàng (Client Component) */}
-            <ProductPurchase product={product} />
+        {/* PHẦN MÔ TẢ CHI TIẾT (Full Width bên dưới) */}
+        <div className="mt-24 mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold font-serif inline-block relative">
+              Chi tiết sản phẩm
+              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-12 h-1 bg-amber-700/20"></div>
+            </h2>
+          </div>
 
-            {/* Cam kết shop */}
-            <div className="mt-8 grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-tighter">
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                  🛡️
-                </div>
-                Cam kết chính hãng
-              </div>
-              <div className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-tighter">
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                  🚚
-                </div>
-                Giao hàng hỏa tốc
-              </div>
-            </div>
+          {/* Render HTML từ WordPress Description */}
+          <div
+            className="prose prose-neutral max-w-none 
+              text-gray-600 leading-[1.8] 
+              prose-headings:font-serif prose-headings:italic 
+              prose-img:rounded-3xl prose-img:shadow-lg"
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          />
+        </div>
 
-            {/* Mô tả chi tiết */}
-            <div className="mt-12 border-t pt-8">
-              <h3 className="font-black uppercase text-sm mb-4 tracking-widest">Mô tả sản phẩm</h3>
-              <div
-                className="prose prose-sm max-w-none text-gray-600 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: product.description as string }}
-              />
-            </div>
+        {/* SECTION: CÓ THỂ BẠN CŨNG THÍCH (Gợi ý thêm - Bạn có thể code logic sau) */}
+        <div className="mt-32 border-t pt-20">
+          <h2 className="text-3xl font-bold font-serif mb-12 text-center">Có thể bạn cũng thích</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <p className="col-span-full text-center text-gray-400 text-xs uppercase tracking-widest italic">
+              Đang cập nhật sản phẩm liên quan...
+            </p>
           </div>
         </div>
       </div>

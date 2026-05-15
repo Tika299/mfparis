@@ -163,3 +163,50 @@ body {
 ::-webkit-scrollbar-thumb {
   background: #000;
 }
+
+/* Ẩn scrollbar cho hàng thumbnail */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@layer components {
+  /* Tiêu đề sản phẩm chính - Đẳng cấp Tạp chí */
+  .heading-product {
+    @apply font-serif font-bold tracking-tighter leading-[1.1];
+    font-size: clamp(1.875rem, 4vw, 3rem); /* Tự co giãn theo màn hình */
+    color: #1a1a1a;
+  }
+
+  /* Tiêu đề Section (Sản phẩm bán chạy, Khám phá...) */
+  .heading-section {
+    @apply font-serif font-bold tracking-tight text-center relative;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  /* Gạch chân trang trí mỏng kiểu Pháp */
+  .heading-border {
+    @apply block w-12 h-[1px] bg-amber-700/40 mx-auto mt-4;
+  }
+
+  /* Nhãn phụ phía trên tiêu đề (Thương hiệu) */
+  .sub-heading {
+    @apply uppercase tracking-[0.3em] text-[10px] font-black text-amber-800/60 mb-2 block;
+  }
+}
+
+.prose h2 {
+  @apply font-sans text-3xl font-bold text-black mt-12 mb-6;
+}
+.prose h3 {
+  @apply font-sans uppercase tracking-widest text-sm font-black text-gray-800 mt-8 mb-4;
+}
+.prose p {
+  @apply text-gray-600 leading-relaxed mb-6;
+}
+.prose strong {
+  @apply text-black;
+}
