@@ -2,10 +2,11 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { ProductCard } from '@/components/ProductCard'
 import { HeroSlider } from '@/components/HeroSlider'
-import { HomeTabs } from '@/components/HomeTabs' // Đảm bảo bạn đã tạo file này
+import { HomeTabs } from '@/components/HomeTabs'
 import { Truck, Smile, RotateCcw, ArrowRight } from 'lucide-react'
-import Image from 'next/image'
+import { OptimizedImage } from '@/components/OptimizedImage'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
@@ -41,13 +42,12 @@ export default async function HomePage() {
       payload.find({ collection: 'posts', limit: 4 }),
     ])
 
-  // Xử lý logic chia danh mục cho phần Explorer
   const featuredCats = categoriesRes.docs.slice(0, 2)
   const listCats = categoriesRes.docs
 
   return (
     <div className="bg-[#FDFBF9] min-h-screen">
-      {/* 1. HERO SLIDER (Lấy từ Admin) */}
+      {/* 1. HERO SLIDER */}
       {settings.heroSliders && settings.heroSliders.length > 0 ? (
         <HeroSlider sliders={settings.heroSliders} />
       ) : (
@@ -76,12 +76,13 @@ export default async function HomePage() {
             </div>
             <div className="md:w-1/2 flex justify-end">
               <div className="relative aspect-square w-full max-w-[450px] overflow-hidden rounded-2xl shadow-2xl">
+                {/* Dùng Image thường cho URL bên ngoài */}
                 <Image
                   src="https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=800"
                   alt="Hero"
                   fill
-                  className="object-cover"
                   priority
+                  className="object-cover"
                 />
               </div>
             </div>
@@ -89,7 +90,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 2. BRAND MARQUEE (Keyword bar) */}
+      {/* 2. BRAND MARQUEE */}
       <div className="bg-white border-b border-gray-100 py-6 overflow-hidden">
         <div className="container mx-auto px-6 flex justify-between items-center text-[10px] text-gray-400 font-black tracking-[0.2em] uppercase">
           <span>DỊU NHẸ CHO DA</span>
@@ -100,46 +101,41 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* 3. SẢN PHẨM BÁN CHẠY (Sử dụng Client Component Tabs) */}
+      {/* 3. SẢN PHẨM BÁN CHẠY */}
       <section className="py-10">
         <HomeTabs initialProducts={bestSellersRes.docs} categories={listCats.slice(0, 3)} />
       </section>
 
-      {/* 4. KHÁM PHÁ DANH MỤC (2 Boxes + 1 List) */}
+      {/* 4. KHÁM PHÁ DANH MỤC */}
       <section className="bg-white py-24 border-y border-gray-50">
         <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
-          {featuredCats.map((cat: any) => {
-            const catImg =
-              cat.image && typeof cat.image === 'object'
-                ? cat.image.url
-                : 'http://localhost:3000/api/media/file/placeholder.jpg'
-            return (
-              <div
-                key={cat.id}
-                className="md:col-span-4 relative aspect-square rounded-2xl overflow-hidden group cursor-pointer shadow-sm border border-gray-50"
-              >
-                <Image
-                  src={catImg}
-                  alt={cat.name}
-                  fill
-                  className="object-cover group-hover:scale-110 transition duration-1000"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
-                  <div>
-                    <h3 className="text-white text-2xl font-bold italic font-serif uppercase tracking-tighter">
-                      {cat.name}
-                    </h3>
-                    <Link
-                      href={`/categories/${cat.slug}`}
-                      className="text-white/80 text-[10px] font-bold uppercase tracking-widest underline mt-2 block"
-                    >
-                      Xem ngay
-                    </Link>
-                  </div>
+          {featuredCats.map((cat: any) => (
+            <div
+              key={cat.id}
+              className="md:col-span-4 relative aspect-square rounded-2xl overflow-hidden group cursor-pointer shadow-sm border border-gray-50"
+            >
+              {/* TRUYỀN NGUYÊN OBJECT cat.image */}
+              <OptimizedImage
+                media={cat.image}
+                alt={cat.name}
+                size="card"
+                className="absolute inset-0 w-full h-full group-hover:scale-110 transition duration-1000"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+                <div>
+                  <h3 className="text-white text-2xl font-bold italic font-serif uppercase tracking-tighter">
+                    {cat.name}
+                  </h3>
+                  <Link
+                    href={`/categories/${cat.slug}`}
+                    className="text-white/80 text-[10px] font-bold uppercase tracking-widest underline mt-2 block"
+                  >
+                    Xem ngay
+                  </Link>
                 </div>
               </div>
-            )
-          })}
+            </div>
+          ))}
 
           <div className="md:col-span-4 md:pl-10">
             <h2 className="text-4xl font-bold mb-10 leading-tight font-serif italic">
@@ -188,7 +184,7 @@ export default async function HomePage() {
             },
           ].map((item, i) => (
             <div key={i} className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm border">
+              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm border border-gray-50">
                 {item.icon}
               </div>
               <h4 className="font-bold text-xs uppercase tracking-widest">{item.title}</h4>
@@ -215,9 +211,7 @@ export default async function HomePage() {
       {/* 7. THƯƠNG HIỆU NỔI BẬT */}
       <section className="bg-gray-50 py-16 border-y border-gray-100">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold mb-12" style={{ fontFamily: 'Be Vietnam Pro' }}>
-            Thương hiệu nổi bật
-          </h2>
+          <h2 className="text-4xl font-bold mb-12">Thương hiệu nổi bật</h2>
           <div className="flex flex-wrap justify-center items-center opacity-40 grayscale gap-12">
             {brandsRes.docs.map((brand: any) => (
               <span key={brand.id} className="text-xl font-black uppercase tracking-tighter">
@@ -238,17 +232,14 @@ export default async function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {postsRes.docs.map((post: any, i: number) => {
             const bgColors = ['bg-amber-50', 'bg-emerald-50', 'bg-rose-50', 'bg-blue-50']
-            const thumbUrl =
-              post.thumbnail && typeof post.thumbnail === 'object'
-                ? post.thumbnail.url
-                : 'http://localhost:3000/api/media/file/placeholder.jpg'
             return (
               <Link href={`/blog/${post.slug}`} key={post.id} className="group">
                 <div
                   className={`${bgColors[i % 4]} rounded-2xl p-4 mb-6 transition-transform group-hover:-translate-y-2 duration-500`}
                 >
                   <div className="relative aspect-square w-full rounded-xl overflow-hidden shadow-sm bg-white">
-                    <Image src={thumbUrl} alt={post.title} fill className="object-cover" />
+                    {/* TRUYỀN NGUYÊN OBJECT post.thumbnail */}
+                    <OptimizedImage media={post.thumbnail} alt={post.title} size="card" />
                   </div>
                 </div>
                 <p className="text-[10px] text-gray-400 uppercase font-black tracking-widest">

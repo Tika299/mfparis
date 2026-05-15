@@ -1,14 +1,16 @@
 'use client'
 import { useCartStore } from '@/lib/store'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Trash2, Plus, Minus } from 'lucide-react'
+import Image from 'next/image'
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity } = useCartStore()
 
   const totalPrice = items.reduce((total, item) => total + item.price * item.quantity, 0)
+
+  console.log('Cart Items:', items) // Debug: Kiểm tra dữ liệu giỏ hàng
 
   if (items.length === 0) {
     return (
@@ -31,7 +33,13 @@ export default function CartPage() {
           {items.map((item) => (
             <div key={item.id} className="flex gap-4 border-b pb-6 items-center">
               <div className="relative w-24 h-32 bg-gray-100">
-                <Image src={item.image} alt={item.title} fill className="object-cover" />
+                <Image
+                  src={item.image || '/api/media/file/placeholder.jpg'}
+                  alt={item.title}
+                  fill
+                  sizes="96px"
+                  className="object-cover rounded-lg"
+                />
               </div>
               <div className="flex-grow">
                 <h3 className="font-bold text-sm uppercase">{item.title}</h3>

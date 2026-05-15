@@ -1,6 +1,6 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
-import Image from 'next/image'
+import { OptimizedImage } from '@/components/OptimizedImage'
 import Link from 'next/link'
 
 export default async function BlogPage() {
@@ -19,10 +19,9 @@ export default async function BlogPage() {
         {posts.docs.map((post: any) => (
           <Link href={`/blog/${post.slug}`} key={post.id} className="group">
             <div className="relative aspect-video overflow-hidden bg-gray-100 mb-4">
-              <Image
-                src={post.thumbnail.url}
+              <OptimizedImage
+                media={post.thumbnail?.card?.url}
                 alt={post.title}
-                fill
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </div>
