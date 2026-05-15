@@ -708,18 +708,19 @@ export interface SiteSetting {
   id: number;
   heroSliders?:
     | {
-        image: number | Media;
+        imageDesktop: number | Media;
+        imageTablet: number | Media;
+        imageMobile: number | Media;
         link?: string | null;
-        title?: string | null;
         id?: string | null;
       }[]
     | null;
   header?: {
     logo?: (number | null) | Media;
-    menu?:
+    navItems?:
       | {
-          label?: string | null;
-          link?: string | null;
+          label: string;
+          link: string;
           id?: string | null;
         }[]
       | null;
@@ -740,16 +741,17 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   heroSliders?:
     | T
     | {
-        image?: T;
+        imageDesktop?: T;
+        imageTablet?: T;
+        imageMobile?: T;
         link?: T;
-        title?: T;
         id?: T;
       };
   header?:
     | T
     | {
         logo?: T;
-        menu?:
+        navItems?:
           | T
           | {
               label?: T;

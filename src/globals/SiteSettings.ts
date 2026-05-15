@@ -6,24 +6,66 @@ export const SiteSettings: GlobalConfig = {
     {
       name: 'heroSliders',
       type: 'array',
-      label: 'Slider Trang chủ',
+      label: 'Slider Trang chủ (Đa thiết bị)',
       fields: [
-        { name: 'image', type: 'upload', relationTo: 'media', required: true },
-        { name: 'link', type: 'text', label: 'Link khi bấm vào banner' },
-        { name: 'title', type: 'text', label: 'Tiêu đề hiển thị (nếu có)' },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'imageDesktop',
+              type: 'upload',
+              relationTo: 'media',
+              required: true,
+              label: 'Ảnh PC (Gợi ý: 1920x800)',
+              admin: { width: '33%' },
+            },
+            {
+              name: 'imageTablet',
+              type: 'upload',
+              relationTo: 'media',
+              required: true,
+              label: 'Ảnh Tablet (Gợi ý: 1024x1024)',
+              admin: { width: '33%' },
+            },
+            {
+              name: 'imageMobile',
+              type: 'upload',
+              relationTo: 'media',
+              required: true,
+              label: 'Ảnh Mobile (Gợi ý: 600x800)',
+              admin: { width: '33%' },
+            },
+          ],
+        },
+        {
+          name: 'link',
+          type: 'text',
+          label: 'Đường dẫn khi click',
+        },
       ],
     },
     {
       name: 'header',
       type: 'group',
       fields: [
-        { name: 'logo', type: 'upload', relationTo: 'media' },
+        { name: 'logo', type: 'upload', relationTo: 'media', label: 'Logo Website' },
         {
-          name: 'menu',
+          name: 'navItems',
           type: 'array',
+          label: 'Menu điều hướng',
           fields: [
-            { name: 'label', type: 'text' },
-            { name: 'link', type: 'text' },
+            {
+              name: 'label',
+              type: 'text',
+              label: 'Tên mục menu (VD: Nước hoa)',
+              required: true,
+            },
+            {
+              name: 'link',
+              type: 'text',
+              label: 'Đường dẫn (VD: /categories/nuoc-hoa)',
+              required: true,
+            },
           ],
         },
       ],
