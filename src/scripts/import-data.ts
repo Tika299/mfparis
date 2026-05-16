@@ -23,6 +23,39 @@ const formatSlug = (val: string): string =>
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '')
 
+const convertHTMLtoLexical = (html: string) => {
+  return {
+    root: {
+      type: 'root',
+      direction: 'ltr', // Thêm dòng này (ltr = left to right)
+      format: '', // Thêm dòng này
+      indent: 0,
+      version: 1,
+      children: [
+        {
+          type: 'paragraph', // Sử dụng paragraph thay vì node 'html' lạ
+          direction: 'ltr',
+          format: '',
+          indent: 0,
+          textFormat: 0,
+          version: 1,
+          children: [
+            {
+              detail: 0,
+              format: 0,
+              mode: 'normal',
+              style: '',
+              text: html, // Chúng ta tạm thời để mã HTML vào đây
+              type: 'text',
+              version: 1,
+            },
+          ],
+        },
+      ],
+    },
+  } as any // Cực kỳ quan trọng để sửa lỗi "is not assignable"
+}
+
 // 3. Hàm tải ảnh từ URL và upload vào Payload Media
 async function uploadMedia(payload: any, url: string, alt: string) {
   try {
@@ -46,9 +79,9 @@ async function uploadMedia(payload: any, url: string, alt: string) {
       },
     })
     return media.id
-  } catch (error) {
+  } catch (error: any) {
     console.error(`   ❌ Lỗi tải ảnh (${url}):`, error.message)
-    return null
+    return undefined
   }
 }
 
@@ -77,7 +110,7 @@ async function run() {
       console.log(`\n--- Đang xử lý: ${item.name} ---`)
 
       // A. XỬ LÝ BRAND (THƯƠNG HIỆU)
-      let brandId = null
+      let brandId = undefined
       if (item.brands && item.brands.length > 0) {
         const bName = item.brands[0].name
         const bSlug = item.brands[0].slug || formatSlug(bName)
@@ -161,20 +194,20 @@ async function run() {
           categories: categoryIds,
           price: {
             basePrice: Number(item.regular_price) || 0,
-            salePrice: item.sale_price ? Number(item.sale_price) : null,
+            salePrice: item.sale_price ? Number(item.sale_price) : undefined,
             stock: item.manage_stock ? item.stock_quantity || 0 : 99,
           },
           images: uploadedImageObjects,
           specifications: specs,
-          description: item.description,
-          shortDescription: item.short_description?.replace(/<\/?[^>]+(>|$)/g, ''), // Xóa HTML tag cho nhanh
+          description: convertHTMLtoLexical(item.description || ''),
+          shortDescription: item.short_description?.replace(/<\/?[^>]+(>|$)/g, ''),
           status: 'published',
           displayLocation: ['new-arrival'],
-        },
+        } as any, // THÊM "as any" Ở ĐÂY ĐỂ BỎ QUA KIỂM TRA TYPE KHẮT KHE
       })
 
       console.log(`   ✨ HOÀN THÀNH: ${item.name}`)
-    } catch (error) {
+    } catch (error: any) {
       console.error(`   ❌ LỖI tại sản phẩm ${item.name}:`, error)
     }
   }

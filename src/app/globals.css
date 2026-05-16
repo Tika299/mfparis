@@ -210,3 +210,30 @@ body {
 .prose strong {
   @apply text-black;
 }
+
+/* Ép hiển thị danh sách cho cả HTML WordPress và Lexical JSON */
+.prose ul {
+  list-style-type: disc !important; /* Dấu chấm tròn */
+  padding-left: 1.5rem !important; /* Thụt lề trái */
+  margin-bottom: 1.5rem !important;
+  display: block !important;
+}
+
+.prose ol {
+  list-style-type: decimal !important; /* Số thứ tự 1, 2, 3 */
+  padding-left: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+  display: block !important;
+}
+
+.prose li {
+  display: list-item !important; /* Bắt buộc hiển thị dạng list-item */
+  margin-bottom: 0.5rem !important;
+  padding-left: 0.5rem !important;
+  line-height: 1.6;
+}
+
+/* Đảm bảo dấu chấm có màu sắc phù hợp */
+.prose ul li::marker {
+  color: #16423c; /* Màu xanh đặc trưng của mfparis */
+}

@@ -121,8 +121,19 @@ export const Products: CollectionConfig = {
             },
             {
               name: 'description',
-              type: 'textarea',
+              type: 'richText',
               label: 'Nội dung mô tả chi tiết',
+              admin: {
+                description: 'Bạn có thể dùng trình soạn thảo trực quan hoặc dán mã HTML vào.',
+                components: {
+                  // Thêm component xem trước vào sau ô nhập liệu
+                  afterInput: [
+                    {
+                      path: '@/components/Admin/RichTextPreview#RichTextPreview',
+                    },
+                  ],
+                },
+              },
             },
           ],
         },

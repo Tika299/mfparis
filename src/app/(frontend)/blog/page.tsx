@@ -20,8 +20,9 @@ export default async function BlogPage() {
           <Link href={`/blog/${post.slug}`} key={post.id} className="group">
             <div className="relative aspect-video overflow-hidden bg-gray-100 mb-4">
               <OptimizedImage
-                media={post.thumbnail?.card?.url}
+                media={post.thumbnail}
                 alt={post.title}
+                size="card"
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </div>

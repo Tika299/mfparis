@@ -20,7 +20,7 @@ export const OptimizedImage = ({
   // 1. Kiểm tra nếu không có media
   if (!media || typeof media !== 'object') {
     return (
-      <div className={cn('bg-gray-100 flex items-center justify-center', className)}>
+      <div className={cn('bg-gray-100 flex items-center justify-center w-full h-full', className)}>
         <Image
           src="/api/media/file/placeholder.jpg"
           alt="Placeholder"
@@ -36,7 +36,7 @@ export const OptimizedImage = ({
   const imageAlt = alt || media.alt || 'MF Paris Product'
 
   return (
-    <div className={cn('relative overflow-hidden', className)}>
+    <div className={cn('relative overflow-hidden w-full h-full', className)}>
       <Image
         src={src}
         alt={imageAlt}

@@ -224,33 +224,49 @@ export default async function HomePage() {
 
       {/* 8. BLOG / CÂU CHUYỆN */}
       <section className="container mx-auto px-6 py-24">
-        <h2 className="text-4xl font-bold text-center font-serif mb-16 leading-tight">
-          Câu chuyện, chu trình và
-          <br />
-          ghi chú chăm sóc da
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {postsRes.docs.map((post: any, i: number) => {
-            const bgColors = ['bg-amber-50', 'bg-emerald-50', 'bg-rose-50', 'bg-blue-50']
-            return (
-              <Link href={`/blog/${post.slug}`} key={post.id} className="group">
-                <div
-                  className={`${bgColors[i % 4]} rounded-2xl p-4 mb-6 transition-transform group-hover:-translate-y-2 duration-500`}
-                >
-                  <div className="relative aspect-square w-full rounded-xl overflow-hidden shadow-sm bg-white">
-                    {/* TRUYỀN NGUYÊN OBJECT post.thumbnail */}
-                    <OptimizedImage media={post.thumbnail} alt={post.title} size="card" />
-                  </div>
+        <div className="flex justify-between items-end mb-12">
+          <div>
+            <h2 className="text-4xl font-bold italic font-serif leading-tight text-[#16423C]">
+              Câu chuyện & <br /> Ghi chú chăm sóc da
+            </h2>
+          </div>
+          <Link
+            href="/blog"
+            className="text-xs font-bold uppercase border-b-2 border-black pb-1 hover:text-amber-700 hover:border-amber-700 transition-all"
+          >
+            Xem tất cả bài viết
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {postsRes.docs.map((post: any, i: number) => (
+            <Link href={`/blog/${post.slug}`} key={post.id} className="group flex flex-col">
+              {/* KHUNG ẢNH 16:9 */}
+              <div className="relative aspect-video w-full rounded-[1.5rem] overflow-hidden shadow-sm bg-gray-100 mb-5">
+                <OptimizedImage
+                  media={post.thumbnail}
+                  alt={post.title}
+                  size="card"
+                  className="group-hover:scale-110 transition duration-1000"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
+                    {post.categories?.[0]?.name || 'Tin tức'}
+                  </span>
+                  <span className="text-[9px] text-gray-400 font-bold uppercase">
+                    {new Date(post.createdAt).toLocaleDateString('vi-VN')}
+                  </span>
                 </div>
-                <p className="text-[10px] text-gray-400 uppercase font-black tracking-widest">
-                  {post.category}
-                </p>
-                <h3 className="font-bold text-sm mt-3 leading-snug group-hover:text-amber-800 transition-colors h-12 line-clamp-2">
+                <h3 className="font-bold text-sm leading-snug group-hover:text-amber-800 transition-colors line-clamp-2 min-h-[40px]">
                   {post.title}
                 </h3>
-              </Link>
-            )
-          })}
+                <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">{post.excerpt}</p>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
     </div>

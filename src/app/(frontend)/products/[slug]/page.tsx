@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge'
 import { Star, ShieldCheck, Leaf, FlaskConical, Truck, Award } from 'lucide-react'
+import RichText from '@/components/RichText'
 
 // 1. Cấu hình SEO động (Next.js 15 - Params là Promise)
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -58,7 +59,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const basePrice = product.price?.basePrice || 0
   const salePrice = product.price?.salePrice
   const discountPercent = salePrice ? Math.round(((basePrice - salePrice) / basePrice) * 100) : 0
-
+  console.log(product)
   return (
     <div className="bg-[#FDFBF9] min-h-screen pb-20 font-sans">
       <div className="container mx-auto px-4 py-6 md:py-10">
@@ -191,12 +192,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </div>
 
           {/* Render HTML từ WordPress Description */}
-          <div
-            className="prose prose-neutral max-w-none 
-              text-gray-600 leading-[1.8] 
-              prose-headings:font-serif prose-headings:italic 
-              prose-img:rounded-3xl prose-img:shadow-lg"
-            dangerouslySetInnerHTML={{ __html: product.description }}
+          <RichText
+            content={product.description}
+            className="prose prose-neutral max-w-none text-gray-600 leading-relaxed"
           />
         </div>
 

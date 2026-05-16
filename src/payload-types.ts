@@ -242,7 +242,24 @@ export interface Product {
       }[]
     | null;
   shortDescription?: string | null;
-  description?: string | null;
+  /**
+   * Bạn có thể dùng trình soạn thảo trực quan hoặc dán mã HTML vào.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Thêm các thông số như: Nồng độ, Mùi hương, SPF, Calo, Thành phần...
    */
