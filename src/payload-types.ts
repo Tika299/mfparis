@@ -215,7 +215,24 @@ export interface Brand {
    */
   slug: string;
   logo?: (number | null) | Media;
-  description?: string | null;
+  /**
+   * Bạn có thể dùng trình soạn thảo trực quan hoặc dán mã HTML vào.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   isFeatured?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -346,6 +363,9 @@ export interface Post {
   slug: string;
   thumbnail: number | Media;
   categories?: (number | PostCategory)[] | null;
+  /**
+   * Bạn có thể dùng trình soạn thảo trực quan hoặc dán mã HTML vào.
+   */
   content?: {
     root: {
       type: string;

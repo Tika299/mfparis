@@ -19,6 +19,19 @@ export const OptimizedImage = ({
 }: OptimizedImageProps) => {
   // 1. Kiểm tra nếu không có media
   if (!media || typeof media !== 'object') {
+    // Nếu là ID (đang trong mode Preview của Admin)
+    if (typeof media === 'number' || typeof media === 'string') {
+      return (
+        <div
+          className={cn('bg-gray-200 animate-pulse flex items-center justify-center', className)}
+        >
+          <span style={{ fontSize: '30px', color: 'black', fontWeight: 'bold' }}>
+            Đang tải ảnh từ thư viện...
+          </span>
+        </div>
+      )
+    }
+    // Nếu thực sự không có gì
     return (
       <div className={cn('bg-gray-100 flex items-center justify-center w-full h-full', className)}>
         <Image

@@ -2,87 +2,89 @@ import React, { Fragment } from 'react'
 import { cn } from '@/utilities'
 import { OptimizedImage } from '@/components/OptimizedImage'
 
-// Định nghĩa các loại Node cơ bản của Lexical
-type LexicalNode = {
-  type: string
-  tag?: string
-  text?: string
-  bold?: boolean
-  italic?: boolean
-  underline?: boolean
-  children?: LexicalNode[]
-  value?: any // Dùng cho node Upload (Hình ảnh)
-  format?: string | number
-  [key: string]: any
-}
-
-// Hàm chuyển đổi từ JSON sang JSX
-function serializeLexical(nodes: LexicalNode[]): React.ReactNode {
+function serializeLexical(nodes: any[]): React.ReactNode {
   if (!nodes) return null
 
   return nodes.map((node, i) => {
+    // 1. XỬ LÝ TEXT NODE (Hỗ trợ cả text thường và mã HTML trộn lẫn)
     if (node.type === 'text') {
+      const isHTML = node.text?.includes('<') && node.text?.includes('>')
+
+      if (isHTML) {
+        return <div key={i} dangerouslySetInnerHTML={{ __html: node.text }} />
+      }
+
       let text: React.ReactNode = <span key={i}>{node.text}</span>
-
-      // Ensure format is a number (it may be undefined or a string)
-      const formatNum =
-        typeof node.format === 'number' ? node.format : parseInt(String(node.format || ''), 10) || 0
-
-      if (formatNum & 1) text = <strong key={i}>{text}</strong> // Bold
-      if (formatNum & 2) text = <em key={i}>{text}</em> // Italic
-      if (formatNum & 8) text = <u key={i}>{text}</u> // Underline
+      const formatNum = node.format || 0
+      if (formatNum & 1) text = <strong key={i}>{text}</strong>
+      if (formatNum & 2) text = <em key={i}>{text}</em>
+      if (formatNum & 8) text = <u key={i}>{text}</u>
       return <Fragment key={i}>{text}</Fragment>
     }
 
     if (!node) return null
 
+    // 2. XỬ LÝ ELEMENT NODE
     switch (node.type) {
-      case 'h1':
-        return <h1 key={i}>{serializeLexical(node.children!)}</h1>
-      case 'h2':
-        return <h2 key={i}>{serializeLexical(node.children!)}</h2>
-      case 'h3':
-        return <h3 key={i}>{serializeLexical(node.children!)}</h3>
-      case 'list':
-        if (node.tag === 'ol') {
+      case 'heading': {
+        const Tag = (node.tag || 'h2') as any
+        return (
+          <Tag key={i} className="font-serif italic font-bold mt-10 mb-4">
+            {serializeLexical(node.children)}
+          </Tag>
+        )
+      }
+
+      case 'paragraph':
+        // Nếu paragraph chỉ chứa 1 con và con đó là HTML, không bọc thẻ <p> nữa để tránh lỗi lồng thẻ
+        const isChildHTML = node.children?.[0]?.text?.includes('<')
+        if (isChildHTML) {
           return (
-            <ol key={i} className="list-decimal pl-6 my-6 space-y-2">
-              {serializeLexical(node.children!)}
-            </ol>
-          )
-        } else {
-          return (
-            <ul key={i} className="list-disc pl-6 my-6 space-y-2">
-              {serializeLexical(node.children!)}
-            </ul>
+            <div key={i} className="my-4">
+              {serializeLexical(node.children)}
+            </div>
           )
         }
-      case 'listitem':
         return (
-          <li key={i} className="leading-relaxed text-gray-700">
-            {serializeLexical(node.children!)}
-          </li>
+          <p key={i} className="mb-6 leading-relaxed text-gray-600">
+            {serializeLexical(node.children)}
+          </p>
         )
-      case 'quote':
-        return <blockquote key={i}>{serializeLexical(node.children!)}</blockquote>
 
-      // XỬ LÝ HÌNH ẢNH CHÈN TRONG BÀI VIẾT
-      case 'upload':
+      case 'list': {
+        const Tag = node.tag === 'ol' ? 'ol' : 'ul'
+        return (
+          <Tag
+            key={i}
+            className={cn(node.tag === 'ol' ? 'list-decimal' : 'list-disc', 'pl-8 mb-6 space-y-2')}
+          >
+            {serializeLexical(node.children)}
+          </Tag>
+        )
+      }
+
+      case 'listitem':
+        return <li key={i}>{serializeLexical(node.children)}</li>
+
+      case 'upload': {
+        // Fix lỗi Preview: Trong chế độ Edit, node.value có thể là ID (number) hoặc Object
+        // Nếu là ID, OptimizedImage sẽ hiện placeholder, nếu là Object sẽ hiện ảnh thật
         return (
           <div
             key={i}
-            className="my-10 w-full aspect-video md:aspect-[21/9] relative rounded-[2rem] overflow-hidden shadow-xl"
+            className="my-12 w-full aspect-video relative rounded-[2rem] overflow-hidden shadow-xl bg-gray-50"
           >
             <OptimizedImage
               media={node.value}
               size="large"
-              alt={node.value?.alt || 'MF Paris Content Image'}
+              alt={node.value?.alt || 'MF Paris Content'}
             />
           </div>
         )
+      }
 
       default:
-        return <p key={i}>{serializeLexical(node.children!)}</p>
+        return node.children ? serializeLexical(node.children) : null
     }
   })
 }
@@ -90,20 +92,16 @@ function serializeLexical(nodes: LexicalNode[]): React.ReactNode {
 export default function RichText({ content, className }: { content: any; className?: string }) {
   if (!content) return null
 
-  // TRƯỜNG HỢP 1: Dữ liệu Migrated từ WordPress (HTML nằm trong mảng con đầu tiên)
-  const firstChildText = content?.root?.children?.[0]?.children?.[0]?.text
-  const isMigratedHTML = typeof firstChildText === 'string' && firstChildText.includes('<')
-
-  if (isMigratedHTML) {
+  // Xử lý trường hợp dữ liệu thô là chuỗi HTML (không phải Object JSON)
+  if (typeof content === 'string') {
     return (
       <div
-        className={cn('prose prose-neutral prose-lg max-w-none', className)}
-        dangerouslySetInnerHTML={{ __html: firstChildText }}
+        className={cn('prose max-w-none', className)}
+        dangerouslySetInnerHTML={{ __html: content }}
       />
     )
   }
 
-  // TRƯỜNG HỢP 2: Dữ liệu Lexical chuẩn (Soạn mới hoàn toàn)
   return (
     <div className={cn('prose prose-neutral prose-lg max-w-none', className)}>
       {content.root && serializeLexical(content.root.children)}

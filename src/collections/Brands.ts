@@ -20,7 +20,22 @@ export const Brands: CollectionConfig = {
       },
     },
     { name: 'logo', type: 'upload', relationTo: 'media' },
-    { name: 'description', type: 'textarea' },
+    {
+      name: 'description',
+      type: 'richText',
+      label: 'Mô tả thương hiệu',
+      admin: {
+        description: 'Bạn có thể dùng trình soạn thảo trực quan hoặc dán mã HTML vào.',
+        components: {
+          // Thêm component xem trước vào sau ô nhập liệu
+          afterInput: [
+            {
+              path: '@/components/Admin/RichTextPreview#RichTextPreview',
+            },
+          ],
+        },
+      },
+    },
     { name: 'isFeatured', type: 'checkbox', label: 'Thương hiệu nổi bật' },
   ],
 }

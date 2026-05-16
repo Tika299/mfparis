@@ -48,6 +48,17 @@ export const Posts: CollectionConfig = {
       name: 'content',
       type: 'richText', // Sử dụng Lexical editor đã cấu hình trong payload.config
       label: 'Nội dung bài viết',
+      admin: {
+        description: 'Bạn có thể dùng trình soạn thảo trực quan hoặc dán mã HTML vào.',
+        components: {
+          // Thêm component xem trước vào sau ô nhập liệu
+          afterInput: [
+            {
+              path: '@/components/Admin/RichTextPreview#RichTextPreview',
+            },
+          ],
+        },
+      },
     },
     {
       name: 'excerpt',

@@ -14,6 +14,7 @@ import {
   Link as LinkIcon,
   ChevronRight,
 } from 'lucide-react'
+import RichText from '@/components/RichText'
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -78,14 +79,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <OptimizedImage media={post.thumbnail} size="large" alt={post.title} priority />
             </div>
             {/* NỘI DUNG CHI TIẾT */}
-            <div
-              className="prose prose-neutral max-w-none 
-                prose-p:text-gray-700 prose-p:leading-[1.8] prose-p:text-[16px]
-                prose-headings:text-gray-900 prose-headings:font-bold
-                prose-img:rounded-2xl prose-img:my-10
-                prose-strong:text-black"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
+            <RichText content={post.content} />
 
             {/* TAGS & SHARE */}
             <div className="mt-16 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-6">
