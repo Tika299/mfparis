@@ -2,6 +2,7 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 import { formatPrice } from '@/utilities/formatPrice'
 import { ProductGallery } from '@/components/ProductGallery' // Đảm bảo bạn đã tạo file này
 import { ProductPurchase } from '@/components/ProductPurchase' // Đảm bảo bạn đã tạo file này
@@ -86,8 +87,21 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <div className="lg:col-span-5 space-y-8">
             <header className="space-y-3">
               <div className="space-y-2">
-                {/* Thương hiệu */}
-                <span className="sub-heading">{product.brand?.name || 'MF Paris Authentic'}</span>
+                <div className="flex items-center justify-between">
+                  {/* BIẾN THƯƠNG HIỆU THÀNH LINK */}
+                  <Link
+                    href={`/brands/${product.brand?.slug}`}
+                    className="text-xs font-black uppercase tracking-[0.3em] text-amber-700 bg-amber-50 px-3 py-1 rounded-full hover:bg-amber-700 hover:text-white transition-all duration-300"
+                  >
+                    {product.brand?.name || 'Paris Authentic'}
+                  </Link>
+
+                  {discountPercent > 0 && (
+                    <Badge className="bg-red-600 font-bold text-xs uppercase tracking-tighter">
+                      Tiết kiệm {discountPercent}%
+                    </Badge>
+                  )}
+                </div>
                 {/* Tên sản phẩm */}
                 <h1 className="heading-product">{product.title}</h1>
               </div>
@@ -152,6 +166,26 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                       <span className="text-gray-400 font-medium">{spec.label}</span>
                       <span className="font-bold text-gray-800">{spec.value}</span>
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Danh Mục */}
+            {product.categories && product.categories.length > 0 && (
+              <div className="space-y-4 bg-white/50 p-6 rounded-3xl border border-gray-100">
+                <h3 className="text-xs font-black uppercase tracking-widest border-b pb-3">
+                  Danh mục
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {product.categories.map((cat: any) => (
+                    <Link
+                      key={cat.id}
+                      href={`/categories/${cat.slug}`}
+                      className="text-xs font-bold text-gray-600 hover:text-amber-700 hover:underline decoration-amber-200 underline-offset-4 transition-all"
+                    >
+                      {cat.name}
+                    </Link>
                   ))}
                 </div>
               </div>
