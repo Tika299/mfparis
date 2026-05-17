@@ -12,9 +12,7 @@ export default async function BlogPage() {
 
   return (
     <div className="container mx-auto py-20 px-4">
-      <h1 className="text-4xl font-bold text-center mb-16 uppercase tracking-widest">
-        Blog làm đẹp
-      </h1>
+      <h1 className="text-4xl font-bold text-center mb-16 uppercase tracking-widest">Blog</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
         {posts.docs.map((post: any) => (
           <Link href={`/blog/${post.slug}`} key={post.id} className="group">

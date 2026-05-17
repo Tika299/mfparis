@@ -15,6 +15,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Star, ShieldCheck, Leaf, FlaskConical, Truck, Award } from 'lucide-react'
 import RichText from '@/components/RichText'
+import { RelatedProducts } from '@/components/RelatedProducts'
 
 // 1. Cấu hình SEO động (Next.js 15 - Params là Promise)
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -60,7 +61,26 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const basePrice = product.price?.basePrice || 0
   const salePrice = product.price?.salePrice
   const discountPercent = salePrice ? Math.round(((basePrice - salePrice) / basePrice) * 100) : 0
-  console.log(product)
+  // 2. TRUY VẤN SẢN PHẨM LIÊN QUAN
+  const categoryIds = product.categories?.map((cat: any) => cat.id) || []
+
+  const relatedRes = await payload.find({
+    collection: 'products',
+    limit: 10,
+    depth: 1,
+    where: {
+      and: [
+        { slug: { not_equals: slug } }, // Không lấy chính nó
+        { status: { equals: 'published' } }, // Phải là hàng đang bán
+        {
+          or: [
+            { brand: { equals: product.brand?.id } }, // Cùng thương hiệu
+            { categories: { in: categoryIds } }, // Hoặc cùng danh mục
+          ],
+        },
+      ],
+    },
+  })
   return (
     <div className="bg-[#FDFBF9] min-h-screen pb-20 font-sans">
       <div className="container mx-auto px-4 py-6 md:py-10">
@@ -235,10 +255,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         {/* SECTION: CÓ THỂ BẠN CŨNG THÍCH (Gợi ý thêm - Bạn có thể code logic sau) */}
         <div className="mt-32 border-t pt-20">
           <h2 className="text-3xl font-bold font-serif mb-12 text-center">Có thể bạn cũng thích</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <p className="col-span-full text-center text-gray-400 text-xs uppercase tracking-widest italic">
-              Đang cập nhật sản phẩm liên quan...
-            </p>
+          {/* 3. HIỂN THỊ SLIDER SẢN PHẨM LIÊN QUAN */}
+          <div className="max-w-[1440px] mx-auto">
+            <RelatedProducts products={relatedRes.docs} />
           </div>
         </div>
       </div>

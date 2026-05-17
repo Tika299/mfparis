@@ -214,9 +214,9 @@ export default async function HomePage() {
           <h2 className="text-4xl font-bold mb-12">Thương hiệu nổi bật</h2>
           <div className="flex flex-wrap justify-center items-center opacity-40 grayscale gap-12">
             {brandsRes.docs.map((brand: any) => (
-              <span key={brand.id} className="text-xl font-black uppercase tracking-tighter">
-                {brand.name}
-              </span>
+              <Link href={`/brands/${brand.slug}`} key={brand.id}>
+                <span className="text-xl font-black uppercase tracking-tighter">{brand.name}</span>
+              </Link>
             ))}
           </div>
         </div>
