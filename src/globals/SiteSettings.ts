@@ -71,10 +71,21 @@ export const SiteSettings: GlobalConfig = {
       ],
     },
     {
-      name: 'contactInfo',
+      name: 'contact',
       type: 'group',
       fields: [
-        { name: 'hotline', type: 'text' },
+        {
+          name: 'phone',
+          type: 'text',
+          label: 'Số điện thoại gọi điện',
+          admin: { width: '50%' },
+        },
+        {
+          name: 'zaloLink',
+          type: 'text',
+          label: 'Link Zalo (Zalo ME)',
+          admin: { width: '50%' },
+        },
         { name: 'address', type: 'textarea' },
         { name: 'facebookUrl', type: 'text' },
       ],

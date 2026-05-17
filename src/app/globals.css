@@ -237,3 +237,48 @@ body {
 .prose ul li::marker {
   color: #16423c; /* Màu xanh đặc trưng của mfparis */
 }
+
+@keyframes quick-ring {
+  0% {
+    transform: rotate(0) scale(1) skew(1deg);
+  }
+  10% {
+    transform: rotate(-25deg) scale(1) skew(1deg);
+  }
+  20% {
+    transform: rotate(25deg) scale(1) skew(1deg);
+  }
+  30% {
+    transform: rotate(-25deg) scale(1) skew(1deg);
+  }
+  40% {
+    transform: rotate(25deg) scale(1) skew(1deg);
+  }
+  50% {
+    transform: rotate(0) scale(1) skew(1deg);
+  }
+  100% {
+    transform: rotate(0) scale(1) skew(1deg);
+  }
+}
+
+.animate-ring {
+  animation: quick-ring 1s infinite;
+}
+
+.contact-shadow {
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}

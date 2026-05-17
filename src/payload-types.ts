@@ -762,8 +762,9 @@ export interface SiteSetting {
         }[]
       | null;
   };
-  contactInfo?: {
-    hotline?: string | null;
+  contact?: {
+    phone?: string | null;
+    zaloLink?: string | null;
     address?: string | null;
     facebookUrl?: string | null;
   };
@@ -796,10 +797,11 @@ export interface SiteSettingsSelect<T extends boolean = true> {
               id?: T;
             };
       };
-  contactInfo?:
+  contact?:
     | T
     | {
-        hotline?: T;
+        phone?: T;
+        zaloLink?: T;
         address?: T;
         facebookUrl?: T;
       };

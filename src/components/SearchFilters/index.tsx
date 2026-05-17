@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation' // Thêm usePathname
 import { Slider } from '@/components/ui/slider'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -15,21 +15,27 @@ import {
 export const SearchFilters = ({ brands }: { brands: any[] }) => {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const pathname = usePathname() // Lấy đường dẫn hiện tại (VD: /categories/nuoc-hoa)
 
-  // State cục bộ cho Price
   const [range, setRange] = useState([
     Number(searchParams.get('min')) || 0,
     Number(searchParams.get('max')) || 5000000,
   ])
 
-  // Cập nhật URL khi nhấn "Áp dụng" hoặc thay đổi sắp xếp
+  // Đồng bộ lại state khi URL thay đổi (nhấn nút Back/Forward)
+  useEffect(() => {
+    setRange([Number(searchParams.get('min')) || 0, Number(searchParams.get('max')) || 5000000])
+  }, [searchParams])
+
   const updateFilters = (updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString())
     Object.entries(updates).forEach(([key, value]) => {
       if (value === null) params.delete(key)
       else params.set(key, value)
     })
-    router.push(`/search?${params.toString()}`)
+
+    // SỬA TẠI ĐÂY: Thay vì '/search', ta dùng pathname hiện tại
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
   return (
@@ -94,7 +100,7 @@ export const SearchFilters = ({ brands }: { brands: any[] }) => {
 
         <Button
           onClick={() => updateFilters({ min: range[0].toString(), max: range[1].toString() })}
-          className="w-full bg-black text-white text-[10px] uppercase font-black tracking-widest rounded-xl h-10"
+          className="w-full bg-black text-white text-[10px] uppercase font-black tracking-widest rounded-xl h-10 cursor-pointer"
         >
           Áp dụng giá
         </Button>

@@ -2,86 +2,57 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { ProductCard } from '@/components/ProductCard'
 import Link from 'next/link'
+import { SearchFilters } from '@/components/SearchFilters'
 
 export default async function AllProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ brand?: string; min?: string; max?: string }>
+  searchParams: Promise<{ brand?: string; min?: string; max?: string; sort?: string }>
 }) {
-  const { brand, min, max } = await searchParams
+  const { brand, min, max, sort = '-createdAt' } = await searchParams
   const payload = await getPayload({ config: configPromise })
 
-  // Xây dựng bộ lọc động
-  const whereQueries: any = [{ status: { equals: 'published' } }]
+  // 1. Xây dựng Query
+  const whereQueries: any = {
+    and: [{ status: { equals: 'published' } }],
+  }
 
   if (brand) {
-    whereQueries.push({ 'brand.slug': { equals: brand } })
+    whereQueries.and.push({ 'brand.slug': { equals: brand } })
   }
+
   if (min) {
-    whereQueries.push({ 'price.salePrice': { greater_than_or_equal: Number(min) } })
+    whereQueries.and.push({ 'price.basePrice': { greater_than_equal: Number(min) } })
   }
+
   if (max) {
-    whereQueries.push({ 'price.salePrice': { less_than_equal: Number(max) } })
+    whereQueries.and.push({ 'price.basePrice': { less_than_equal: Number(max) } })
   }
 
-  const products = await payload.find({
-    collection: 'products',
-    depth: 2,
-    where: { and: whereQueries },
-  })
-
-  const brands = await payload.find({ collection: 'brands' })
+  // 2. Thực thi lấy dữ liệu
+  const [productsRes, brandsRes] = await Promise.all([
+    payload.find({
+      collection: 'products',
+      limit: 40,
+      where: whereQueries,
+      sort: sort, // Truyền trực tiếp sort từ URL vào Payload
+      depth: 2,
+    }),
+    payload.find({ collection: 'brands', limit: 100 }),
+  ])
 
   return (
     <div className="container mx-auto py-10 px-6 flex flex-col md:flex-row gap-10">
       {/* SIDEBAR FILTERS */}
-      <aside className="w-full md:w-64 space-y-8">
-        <div>
-          <h3 className="font-bold uppercase text-xs tracking-widest border-b pb-2 mb-4">
-            Thương hiệu
-          </h3>
-          <ul className="space-y-2 text-sm">
-            <li>
-              <Link href="/products" className={!brand ? 'font-bold' : ''}>
-                Tất cả
-              </Link>
-            </li>
-            {brands.docs.map((b: any) => (
-              <li key={b.id}>
-                <Link
-                  href={`/products?brand=${b.slug}`}
-                  className={brand === b.slug ? 'font-bold text-red-600' : 'hover:text-red-600'}
-                >
-                  {b.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="font-bold uppercase text-xs tracking-widest border-b pb-2 mb-4">
-            Khoảng giá
-          </h3>
-          <ul className="space-y-2 text-sm">
-            <li>
-              <Link href="/products?min=0&max=1000000">Dưới 1.000.000₫</Link>
-            </li>
-            <li>
-              <Link href="/products?min=1000000&max=3000000">1.000.000₫ - 3.000.000₫</Link>
-            </li>
-            <li>
-              <Link href="/products?min=3000000">Trên 3.000.000₫</Link>
-            </li>
-          </ul>
-        </div>
+      <aside className="lg:col-span-3">
+        <SearchFilters brands={brandsRes.docs} />
       </aside>
 
       {/* PRODUCT GRID */}
       <main className="flex-grow">
         <h1 className="text-3xl font-serif italic mb-8">Tất cả sản phẩm</h1>
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-8">
-          {products.docs.map((p) => (
+          {productsRes.docs.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
         </div>

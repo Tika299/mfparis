@@ -226,9 +226,7 @@ export default async function HomePage() {
       <section className="container mx-auto px-6 py-24">
         <div className="flex justify-between items-end mb-12">
           <div>
-            <h2 className="text-4xl font-bold italic font-serif leading-tight text-[#16423C]">
-              Câu chuyện & <br /> Ghi chú chăm sóc da
-            </h2>
+            <h2 className="text-4xl font-bold leading-tight">Câu chuyện & Ghi chú chăm sóc da</h2>
           </div>
           <Link
             href="/blog"
