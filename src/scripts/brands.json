@@ -1,0 +1,262 @@
+[
+  {
+    "id": 8173,
+    "name": "3 Chenes Laboratoires",
+    "slug": "3-chenes-laboratoires",
+    "parent": 0,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 0,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands/8173",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8174,
+    "name": "A-derma",
+    "slug": "a-derma",
+    "parent": 0,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 0,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands/8174",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8175,
+    "name": "Aboca",
+    "slug": "aboca",
+    "parent": 0,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 0,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands/8175",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8176,
+    "name": "ACM Laboratoire",
+    "slug": "acm-laboratoire",
+    "parent": 0,
+    "description": "[html_block id=\"41785\"]",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 13,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands/8176",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8648,
+    "name": "Actisoufre",
+    "slug": "actisoufre",
+    "parent": 0,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands/8648",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8555,
+    "name": "Activlab Pharma",
+    "slug": "activlab-pharma",
+    "parent": 0,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands/8555",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8177,
+    "name": "Adidas",
+    "slug": "adidas",
+    "parent": 0,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 0,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands/8177",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8178,
+    "name": "Afnan",
+    "slug": "afnan",
+    "parent": 0,
+    "description": "[html_block id=\"41758\"]",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 10,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands/8178",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8179,
+    "name": "Al Haramain",
+    "slug": "al-haramain",
+    "parent": 0,
+    "description": "[html_block id=\"41918\"]",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 3,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands/8179",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8180,
+    "name": "Alaia Paris",
+    "slug": "alaia-paris",
+    "parent": 0,
+    "description": "[html_block id=\"41919\"]",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 0,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands/8180",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/brands"
+        }
+      ]
+    }
+  }
+]

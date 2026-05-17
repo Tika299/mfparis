@@ -1,0 +1,320 @@
+[
+  {
+    "id": 8683,
+    "name": "Canxi",
+    "slug": "canxi",
+    "parent": 8563,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8683",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8560,
+    "name": "Chăm sóc cá nhân",
+    "slug": "cham-soc-ca-nhan",
+    "parent": 0,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 21,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8560",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8594,
+    "name": "Chống lão hóa",
+    "slug": "chong-lao-hoa",
+    "parent": 7766,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 9,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8594",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7766"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8551,
+    "name": "Chống nắng",
+    "slug": "chong-nang",
+    "parent": 8523,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8551",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8090,
+    "name": "Chưa phân loại",
+    "slug": "chua-phan-loai",
+    "parent": 0,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8090",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8534,
+    "name": "Collagen",
+    "slug": "collagen",
+    "parent": 8523,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 43560,
+      "date_created": "2025-07-30T12:46:47",
+      "date_created_gmt": "2025-07-30T05:46:47",
+      "date_modified": "2025-07-30T12:47:31",
+      "date_modified_gmt": "2025-07-30T05:47:31",
+      "src": "https://mfparis.vn/wp-content/uploads/2025/07/goi-bo-sung-collagen-forte-pharma-expert-collagen-intense-2x14-1.jpg",
+      "name": "Gói Bổ Sung Collagen Forté Pharma Expert Collagen Intense 2&#215;14",
+      "alt": "Gói Bổ Sung Collagen Forté Pharma Expert Collagen Intense 2x14"
+    },
+    "menu_order": 0,
+    "count": 14,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8534",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8679,
+    "name": "D3",
+    "slug": "d3",
+    "parent": 8563,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8679",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8559,
+    "name": "Da",
+    "slug": "da",
+    "parent": 8523,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 3,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8559",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8564,
+    "name": "Dầu cá",
+    "slug": "dau-ca",
+    "parent": 8563,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8564",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7768,
+    "name": "Dầu Gội",
+    "slug": "dau-goi",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 33261,
+      "date_created": "2024-04-09T16:48:57",
+      "date_created_gmt": "2024-04-09T09:48:57",
+      "date_modified": "2024-04-09T16:49:08",
+      "date_modified_gmt": "2024-04-09T09:49:08",
+      "src": "https://mfparis.vn/wp-content/uploads/2024/04/dau-goi-da-nhay-cam-bioderma-node-non-detergent-7.jpg",
+      "name": "Dầu Gội Da Nhạy Cảm Bioderma Nodé Non-Detergent",
+      "alt": "Dầu Gội Da Nhạy Cảm Bioderma Nodé Non-Detergent"
+    },
+    "menu_order": 0,
+    "count": 10,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7768",
+          "targetHints": {
+            "allow": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  }
+]

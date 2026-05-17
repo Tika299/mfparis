@@ -1,0 +1,480 @@
+[
+  {
+    "id": 448,
+    "count": 40,
+    "description": "Bảng Xếp Hạng nước hoa giúp bạn có thể lựa chọn những chai nước hoa ưa thích phù hợp với thời điểm mà bạn sử dụng.",
+    "link": "https://mfparis.vn/tap-chi-nuoc-hoa-mf/bang-xep-hang/",
+    "name": "Bảng Xếp Hạng",
+    "slug": "bang-xep-hang",
+    "taxonomy": "category",
+    "parent": 45,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/448",
+          "targetHints": {
+            "allow": ["GET"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/45"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=448"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 454,
+    "count": 2,
+    "description": "",
+    "link": "https://mfparis.vn/tap-chi-lam-dep/bang-xep-hang-my-pham/",
+    "name": "Bảng Xếp Hạng Mỹ Phẩm",
+    "slug": "bang-xep-hang-my-pham",
+    "taxonomy": "category",
+    "parent": 42,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/454",
+          "targetHints": {
+            "allow": ["GET"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/42"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=454"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 455,
+    "count": 3,
+    "description": "",
+    "link": "https://mfparis.vn/tap-chi-suc-khoe/bang-xep-hang-thuc-pham-chuc-nang/",
+    "name": "Bảng Xếp Hạng Thực Phẩm Chức Năng",
+    "slug": "bang-xep-hang-thuc-pham-chuc-nang",
+    "taxonomy": "category",
+    "parent": 91,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/455",
+          "targetHints": {
+            "allow": ["GET"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/91"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=455"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 458,
+    "count": 1,
+    "description": "",
+    "link": "https://mfparis.vn/goc-me-va-be/bao-ve-be/",
+    "name": "Bảo Vệ Bé",
+    "slug": "bao-ve-be",
+    "taxonomy": "category",
+    "parent": 445,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/458",
+          "targetHints": {
+            "allow": ["GET"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/445"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=458"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 7979,
+    "count": 1,
+    "description": "",
+    "link": "https://mfparis.vn/body/",
+    "name": "Body",
+    "slug": "body",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/7979",
+          "targetHints": {
+            "allow": ["GET"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=7979"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 451,
+    "count": 3,
+    "description": "Để có một body đẹp vạn người mê chúng ta cần có cách Chăm Sóc Body đúng cách và hiểu quả lâu dài. Nơi này sẻ cho bạn nhiều kinh nghiệm cũng như kiến thức về việc chăm sóc body hiệu quả. Tìm hiểu ngay nhé!",
+    "link": "https://mfparis.vn/tap-chi-lam-dep/goc-cham-soc-body/",
+    "name": "Chăm Sóc Body",
+    "slug": "goc-cham-soc-body",
+    "taxonomy": "category",
+    "parent": 42,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/451",
+          "targetHints": {
+            "allow": ["GET"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/42"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=451"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 449,
+    "count": 13,
+    "description": "Nơi chia sẻ kinh nghiệm kiến thức và các mẹo <strong>Chăm Sóc Da </strong>bổ ích mà bạn có thể mang về chăm sóc cho bản thân.",
+    "link": "https://mfparis.vn/tap-chi-lam-dep/goc-cham-soc-da/",
+    "name": "Chăm Sóc Da",
+    "slug": "goc-cham-soc-da",
+    "taxonomy": "category",
+    "parent": 42,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/449",
+          "targetHints": {
+            "allow": ["GET"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/42"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=449"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 453,
+    "count": 2,
+    "description": "Chăm Sóc Mẹ Bầu là chủ đề các ông bố và bà mẹ luôn luôn quan tâm để bảo vệ và giữ gìn sức khỏe cho người mẹ từ khi mang thai đến khi sinh còn và cả sau sinh.",
+    "link": "https://mfparis.vn/goc-me-va-be/cham-soc-me-bau/",
+    "name": "Chăm Sóc Mẹ Bầu",
+    "slug": "cham-soc-me-bau",
+    "taxonomy": "category",
+    "parent": 445,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/453",
+          "targetHints": {
+            "allow": ["GET"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/445"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=453"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 450,
+    "count": 11,
+    "description": "Để chăm sóc tóc khỏe mạnh bạn cần phải có thật nhiều kiến thức và nơi này có thể giúp bạn có một mái tóc đẹp lâu dài.",
+    "link": "https://mfparis.vn/tap-chi-lam-dep/goc-cham-soc-toc/",
+    "name": "Chăm Sóc Tóc",
+    "slug": "goc-cham-soc-toc",
+    "taxonomy": "category",
+    "parent": 42,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/450",
+          "targetHints": {
+            "allow": ["GET"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/42"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=450"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 214,
+    "count": 12,
+    "description": "",
+    "link": "https://mfparis.vn/chia-se-kinh-nghiem/",
+    "name": "Chia Sẻ Kinh Nghiệm",
+    "slug": "chia-se-kinh-nghiem",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/214",
+          "targetHints": {
+            "allow": ["GET"]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=214"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  }
+]

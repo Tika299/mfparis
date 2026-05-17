@@ -16,7 +16,8 @@
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
-    "import-wp": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts npx tsx --env-file=.env src/scripts/import-data.ts"
+    "import-wp": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts npx tsx --env-file=.env src/scripts/import-data.ts",
+    "import-tax": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts npx tsx --env-file=.env src/scripts/import-taxonomy.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.84.1",
