@@ -101,9 +101,11 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     'site-settings': SiteSetting;
+    'about-page': AboutPage;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
   };
   locale: null;
   widgets: {
@@ -301,6 +303,11 @@ export interface Product {
   slug: string;
   status?: ('draft' | 'published') | null;
   displayLocation?: ('best-seller' | 'cleansing' | 'new-arrival')[] | null;
+  isCombo?: boolean | null;
+  /**
+   * Chọn các sản phẩm lẻ thuộc bộ này
+   */
+  comboItems?: (number | Product)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -621,6 +628,8 @@ export interface ProductsSelect<T extends boolean = true> {
   slug?: T;
   status?: T;
   displayLocation?: T;
+  isCombo?: T;
+  comboItems?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -773,6 +782,45 @@ export interface SiteSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about-page".
+ */
+export interface AboutPage {
+  id: number;
+  hero?: {
+    title?: string | null;
+    image?: (number | null) | Media;
+  };
+  story?: {
+    heading?: string | null;
+    content?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    image?: (number | null) | Media;
+  };
+  values?:
+    | {
+        title?: string | null;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
@@ -804,6 +852,35 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         zaloLink?: T;
         address?: T;
         facebookUrl?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about-page_select".
+ */
+export interface AboutPageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+      };
+  story?:
+    | T
+    | {
+        heading?: T;
+        content?: T;
+        image?: T;
+      };
+  values?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
       };
   updatedAt?: T;
   createdAt?: T;

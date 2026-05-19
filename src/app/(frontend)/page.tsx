@@ -32,7 +32,7 @@ export default async function HomePage() {
         where: {
           and: [
             { status: { equals: 'published' } },
-            { displayLocation: { contains: 'cleansing' } },
+            { isCombo: { equals: true } }, // CHỈ LẤY COMBO CHO MỤC NÀY
           ],
         },
         limit: 4,
@@ -196,10 +196,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 6. LÀM SẠCH LÀN DA */}
+      {/* 6. Combo */}
       <section className="container mx-auto px-6 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold font-serif">Làm sạch làn da</h2>
+          <h2 className="text-4xl font-bold font-serif">Combo</h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-10">
           {cleansingRes.docs.map((p) => (
@@ -252,7 +252,7 @@ export default async function HomePage() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="text-[9px] font-black uppercase tracking-widest text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
-                    {post.categories?.[0]?.name || 'Tin tức'}
+                    {post.categories?.[0]?.title || 'Tin tức'}
                   </span>
                   <span className="text-[9px] text-gray-400 font-bold uppercase">
                     {new Date(post.createdAt).toLocaleDateString('vi-VN')}

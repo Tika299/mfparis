@@ -251,5 +251,24 @@ export const Products: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'isCombo',
+      type: 'checkbox',
+      label: 'Đây là bộ sản phẩm (Combo)',
+      defaultValue: false,
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'comboItems',
+      type: 'relationship',
+      relationTo: 'products',
+      hasMany: true,
+      label: 'Sản phẩm trong Combo',
+      admin: {
+        position: 'sidebar',
+        condition: (data) => data?.isCombo === true, // Chỉ hiện khi tích vào ô Combo
+        description: 'Chọn các sản phẩm lẻ thuộc bộ này',
+      },
+    },
   ],
 }

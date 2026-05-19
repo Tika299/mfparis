@@ -50,6 +50,11 @@ export const ProductCard = ({ product }: { product: any }) => {
             -{discountPercent}%
           </div>
         )}
+        {product.isCombo && (
+          <span className="absolute top-3 right-3 z-10 bg-black text-white text-[9px] font-black px-2 py-1 rounded-full uppercase">
+            Combo Tiết Kiệm
+          </span>
+        )}
 
         <Link href={`/products/${product.slug}`} className="block h-full w-full">
           {/* Ảnh chính */}

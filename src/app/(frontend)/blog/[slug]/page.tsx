@@ -53,7 +53,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       },
     }),
   ])
-  console.log('Bài viết hiện tại:', post)
 
   return (
     <div className="bg-[#FDFBF9] min-h-screen pb-20 font-sans">

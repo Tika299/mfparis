@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { Star, ShieldCheck, Leaf, FlaskConical, Truck, Award } from 'lucide-react'
 import RichText from '@/components/RichText'
 import { RelatedProducts } from '@/components/RelatedProducts'
+import { OptimizedImage } from '@/components/OptimizedImage'
 
 // 1. Cấu hình SEO động (Next.js 15 - Params là Promise)
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -173,6 +174,25 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 </div>
               </div>
             </div>
+
+            {/* Thêm đoạn này vào dưới phần giá hoặc trên phần nút mua hàng */}
+            {product.isCombo && product.comboItems && (
+              <div className="bg-amber-50/50 border border-amber-100 rounded-3xl p-6 my-6">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-800 mb-4">
+                  Bộ sản phẩm bao gồm:
+                </h4>
+                <div className="space-y-3">
+                  {product.comboItems.map((item: any) => (
+                    <div key={item.id} className="flex items-center gap-3">
+                      <div className="w-10 h-10 relative rounded-lg overflow-hidden border border-white shadow-sm">
+                        <OptimizedImage media={item.images?.[0]?.image} size="thumbnail" />
+                      </div>
+                      <span className="text-xs font-bold text-gray-700">{item.title}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* THÔNG SỐ KỸ THUẬT ĐỘNG (Dynamic Specs) */}
             {product.specifications && product.specifications.length > 0 && (
