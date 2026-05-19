@@ -15,6 +15,7 @@ import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { Posts } from './collections/Posts'
 import { PostCategories } from './collections/PostCategories'
 import { AboutPage } from './globals/AboutPage'
+import { Messages } from './collections/Messages'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -25,8 +26,28 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      // Đăng ký trang mới
+      views: {
+        ChatCenter: {
+          Component: '@/components/Admin/ChatCenter#ChatCenter',
+          path: '/chat',
+        },
+      },
+      beforeDashboard: ['@/components/Admin/ChatDashboardCard#ChatDashboardCard'],
+    },
   },
-  collections: [Users, Media, Brands, Products, Categories, Orders, Posts, PostCategories],
+  collections: [
+    Users,
+    Media,
+    Brands,
+    Products,
+    Categories,
+    Orders,
+    Posts,
+    PostCategories,
+    Messages,
+  ],
   globals: [SiteSettings, AboutPage],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

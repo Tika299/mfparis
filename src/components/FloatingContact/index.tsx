@@ -1,18 +1,22 @@
 import React from 'react'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
+import { LiveChat } from '../LiveChat'
 
 export const FloatingContact = async () => {
   const payload = await getPayload({ config: configPromise })
   const settings = await payload.findGlobal({ slug: 'site-settings' })
 
-  // Lấy dữ liệu từ Admin (Site Settings -> Contact)
   const phone = settings.contact?.phone || '0123456789'
-  const zalo = settings.contact?.zaloLink || 'https://zalo.me/2731577726641619342'
+  const zalo = settings.contact?.zaloLink || 'https://zalo.me/...'
 
   return (
+    /* CONTAINER CHÍNH CỐ ĐỊNH GÓC PHẢI */
     <div className="fixed bottom-10 right-6 z-[999] flex flex-col gap-5 items-center">
-      {/* NÚT ZALO */}
+      {/* 1. NÚT LIVE CHAT (Component con tự quản lý khung chat của nó) */}
+      <LiveChat />
+
+      {/* 2. NÚT ZALO */}
       <a
         href={zalo}
         target="_blank"
@@ -26,7 +30,7 @@ export const FloatingContact = async () => {
         />
       </a>
 
-      {/* NÚT PHONE (MÀU XANH LÁ + RUNG) */}
+      {/* 3. NÚT PHONE */}
       <a
         href={`tel:${phone.replace(/\s+/g, '')}`}
         className="phone-wrapper w-14 h-14 bg-green-500 rounded-full flex items-center justify-center shadow-2xl hover:bg-green-600 transition-all duration-300"

@@ -1,6 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  // ... các cấu hình khác
+  content: [
+    './src/app/**/*.{js,ts,jsx,tsx}',
+    './src/components/**/*.{js,ts,jsx,tsx}',
+    './src/components/Admin/**/*.{js,ts,jsx,tsx}', // THÊM DÒNG NÀY để Tailwind không bỏ sót
+  ],
   plugins: [require('@tailwindcss/typography')],
   theme: {
     extend: {
