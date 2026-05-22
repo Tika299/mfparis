@@ -17,7 +17,7 @@ export default function CartPage() {
       <div className="container mx-auto py-40 text-center">
         <h2 className="text-2xl font-bold mb-4 uppercase">Giỏ hàng của bạn đang trống</h2>
         <Link href="/">
-          <Button>Tiếp tục mua sắm</Button>
+          <Button className="cursor-pointer">Tiếp tục mua sắm</Button>
         </Link>
       </div>
     )
@@ -48,21 +48,21 @@ export default function CartPage() {
                   <div className="flex items-center border">
                     <button
                       onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                      className="p-2"
+                      className={`p-2 ${item.quantity === 1 ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-200 cursor-pointer'}`}
                     >
                       <Minus size={14} />
                     </button>
                     <span className="px-4 text-sm">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="p-2"
+                      className="p-2 hover:bg-gray-200 cursor-pointer"
                     >
                       <Plus size={14} />
                     </button>
                   </div>
                   <button
                     onClick={() => removeItem(item.id)}
-                    className="text-gray-400 hover:text-red-600"
+                    className="text-gray-400 hover:text-red-600 cursor-pointer"
                   >
                     <Trash2 size={18} />
                   </button>

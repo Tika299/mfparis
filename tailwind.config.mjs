@@ -8,6 +8,10 @@ export default {
   plugins: [require('@tailwindcss/typography')],
   theme: {
     extend: {
+      primary: {
+        DEFAULT: '#b72828',
+        foreground: '#ffffff',
+      },
       typography: {
         DEFAULT: {
           css: {
@@ -17,7 +21,7 @@ export default {
               fontFamily: 'var(--font-serif)',
               fontStyle: 'italic',
               fontWeight: '700',
-              color: '#16423C', // Màu xanh đặc trưng của bạn
+              color: '#000000', // Màu xanh đặc trưng của bạn
             },
             h3: {
               fontFamily: 'var(--font-sans)',

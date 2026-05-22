@@ -17,6 +17,7 @@ import { Star, ShieldCheck, Leaf, FlaskConical, Truck, Award } from 'lucide-reac
 import RichText from '@/components/RichText'
 import { RelatedProducts } from '@/components/RelatedProducts'
 import { OptimizedImage } from '@/components/OptimizedImage'
+import { ExpandableContent } from '@/components/ExpandableContent'
 
 // 1. Cấu hình SEO động (Next.js 15 - Params là Promise)
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -266,10 +267,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </div>
 
           {/* Render HTML từ WordPress Description */}
-          <RichText
-            content={product.description}
-            className="prose prose-neutral max-w-none text-gray-600 leading-relaxed"
-          />
+          <ExpandableContent maxHeight={500}>
+            <RichText
+              content={product.description}
+              className="prose prose-neutral max-w-none text-gray-600 leading-relaxed"
+            />
+          </ExpandableContent>
         </div>
 
         {/* SECTION: CÓ THỂ BẠN CŨNG THÍCH (Gợi ý thêm - Bạn có thể code logic sau) */}

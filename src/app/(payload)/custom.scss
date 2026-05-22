@@ -12,6 +12,7 @@
     --color-primary-600: #113530;
     --color-success-500: #22c55e;
     --font-body: 'Be Vietnam Pro', sans-serif;
+    --primary-color: #b72828;
 }
 
 /* 1. Nền toàn cục */
@@ -36,7 +37,6 @@ body,
     font-size: 1.1rem !important;
     color: var(--color-primary-500) !important;
     letter-spacing: 0 !important;
-    margin-top: 15px;
 }
 
 .nav__link {
@@ -117,12 +117,6 @@ body,
     color: #1a1a1a !important;
 }
 
-/* Biến icon dấu cộng (+) thành màu đồng */
-.card__actions .btn {
-    background: #fdfbf9 !important;
-    border-color: #eee !important;
-}
-
 .card__actions .icon--plus {
     color: var(--color-primary-500) !important;
 }
@@ -199,7 +193,7 @@ body,
 .chat-card__icon-box {
     width: 64px;
     height: 64px;
-    background-color: #16423C;
+    background-color: var(--primary-color);
     color: #ffffff;
     border-radius: 20px;
     display: flex;
@@ -405,14 +399,14 @@ body,
                 }
 
                 &.is-active {
-                    background: #f0f7f4;
-                    border-left: 4px solid #16423c;
+                    background: #fef2f2;
+                    border-left: 4px solid var(--primary-color);
                 }
 
                 .avatar-circle {
                     width: 50px;
                     height: 50px;
-                    background: #16423c;
+                    background: var(--primary-color);
                     color: white;
                     border-radius: 50%;
                     display: flex;
@@ -549,7 +543,7 @@ body,
                 }
 
                 &.is-admin .message-bubble {
-                    background: #16423c;
+                    background: var(--primary-color);
                     color: white;
                     border-bottom-right-radius: 2px;
                 }
@@ -592,7 +586,7 @@ body,
                 .send-btn {
                     width: 40px;
                     height: 40px;
-                    background: #16423c;
+                    background: var(--primary-color);
                     color: white;
                     border: none;
                     border-radius: 10px;

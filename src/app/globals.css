@@ -49,14 +49,14 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: #fdfbf9;
+  --foreground: #1a1a1a;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #b72828;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -121,14 +121,27 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
+
   :root {
     --font-sans: var(--font-be-vietnam), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* src/app/(frontend)/globals.css */
+@layer components {
+  .container {
+    @apply mx-auto px-4 md:px-6;
+    max-width: 1240px;
+    /* Kích thước vàng cho TMĐT Việt Nam */
+    width: 100%;
   }
 }
 
@@ -148,7 +161,8 @@ body {
   background-color: #ffffff;
   color: #1a1a1a;
   letter-spacing: -0.01em;
-  @apply bg-[#fcfbf7] text-[#1a1a1a] antialiased;
+  @apply bg-[#F4F6F8] text-[#333];
+  /* Nền xám nhạt như Long Châu để nổi bật các khối trắng */
   font-family: var(--font-be-vietnam);
 }
 
@@ -160,6 +174,7 @@ body {
 ::-webkit-scrollbar {
   width: 5px;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #000;
 }
@@ -168,16 +183,19 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
 @layer components {
+
   /* Tiêu đề sản phẩm chính - Đẳng cấp Tạp chí */
   .heading-product {
     @apply font-serif font-bold tracking-tighter leading-[1.1];
-    font-size: clamp(1.875rem, 4vw, 3rem); /* Tự co giãn theo màn hình */
+    font-size: clamp(1.875rem, 4vw, 3rem);
+    /* Tự co giãn theo màn hình */
     color: #1a1a1a;
   }
 
@@ -201,33 +219,40 @@ body {
 .prose h2 {
   @apply font-sans text-3xl font-bold text-black mt-12 mb-6;
 }
+
 .prose h3 {
   @apply font-sans uppercase tracking-widest text-sm font-black text-gray-800 mt-8 mb-4;
 }
+
 .prose p {
   @apply text-gray-600 leading-relaxed mb-6;
 }
+
 .prose strong {
   @apply text-black;
 }
 
 /* Ép hiển thị danh sách cho cả HTML WordPress và Lexical JSON */
 .prose ul {
-  list-style-type: disc !important; /* Dấu chấm tròn */
-  padding-left: 1.5rem !important; /* Thụt lề trái */
+  list-style-type: disc !important;
+  /* Dấu chấm tròn */
+  padding-left: 1.5rem !important;
+  /* Thụt lề trái */
   margin-bottom: 1.5rem !important;
   display: block !important;
 }
 
 .prose ol {
-  list-style-type: decimal !important; /* Số thứ tự 1, 2, 3 */
+  list-style-type: decimal !important;
+  /* Số thứ tự 1, 2, 3 */
   padding-left: 1.5rem !important;
   margin-bottom: 1.5rem !important;
   display: block !important;
 }
 
 .prose li {
-  display: list-item !important; /* Bắt buộc hiển thị dạng list-item */
+  display: list-item !important;
+  /* Bắt buộc hiển thị dạng list-item */
   margin-bottom: 0.5rem !important;
   padding-left: 0.5rem !important;
   line-height: 1.6;
@@ -235,28 +260,35 @@ body {
 
 /* Đảm bảo dấu chấm có màu sắc phù hợp */
 .prose ul li::marker {
-  color: #16423c; /* Màu xanh đặc trưng của mfparis */
+  color: #16423c;
+  /* Màu xanh đặc trưng của mfparis */
 }
 
 @keyframes quick-ring {
   0% {
     transform: rotate(0) scale(1) skew(1deg);
   }
+
   10% {
     transform: rotate(-25deg) scale(1) skew(1deg);
   }
+
   20% {
     transform: rotate(25deg) scale(1) skew(1deg);
   }
+
   30% {
     transform: rotate(-25deg) scale(1) skew(1deg);
   }
+
   40% {
     transform: rotate(25deg) scale(1) skew(1deg);
   }
+
   50% {
     transform: rotate(0) scale(1) skew(1deg);
   }
+
   100% {
     transform: rotate(0) scale(1) skew(1deg);
   }
@@ -275,10 +307,18 @@ body {
   0% {
     box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
   }
+
   70% {
     box-shadow: 0 0 0 15px rgba(34, 197, 94, 0);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
   }
 }
+
+
+/* Nút bấm và các chi tiết nổi bật sẽ dùng màu đỏ */
+.text-primary { color: var(--primary); }
+.bg-primary { background-color: var(--primary); }
+.border-primary { border-color: var(--primary); }

@@ -99,7 +99,7 @@ export const LiveChat = () => {
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           'w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110',
-          isOpen ? 'bg-red-500 rotate-90 text-white' : 'bg-[#16423C] text-white',
+          isOpen ? 'bg-red-500 rotate-90 text-white' : 'bg-[#b72828] text-white',
         )}
       >
         {isOpen ? <X size={24} /> : <MessageCircle size={28} />}
@@ -107,7 +107,7 @@ export const LiveChat = () => {
 
       {isOpen && (
         <div className="absolute bottom-20 right-0 w-[320px] md:w-[380px] h-[520px] bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden border border-gray-100 animate-in slide-in-from-bottom-10 duration-300 z-[1000]">
-          <div className="bg-[#16423C] p-6 text-white text-center">
+          <div className="bg-[#b72828] p-6 text-white text-center">
             <h4 className="font-bold text-lg font-serif italic tracking-tight">MF Paris Support</h4>
             <div className="flex items-center justify-center gap-1.5 mt-1">
               <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
@@ -142,7 +142,7 @@ export const LiveChat = () => {
                     setIsRegistered(true)
                   }
                 }}
-                className="w-full bg-[#16423C] text-white py-4 rounded-2xl font-bold uppercase text-[10px] tracking-[0.2em]"
+                className="w-full bg-[#b72828] text-white py-4 rounded-2xl font-bold uppercase text-[10px] tracking-[0.2em]"
               >
                 Bắt đầu
               </button>
@@ -170,7 +170,7 @@ export const LiveChat = () => {
                       className={cn(
                         'p-3 rounded-2xl text-[13px] leading-relaxed shadow-sm',
                         m.sender === 'customer'
-                          ? 'bg-[#16423C] text-white rounded-tr-none'
+                          ? 'bg-[#b72828] text-white rounded-tr-none'
                           : 'bg-white text-gray-700 rounded-tl-none border border-gray-100',
                       )}
                     >
@@ -197,7 +197,7 @@ export const LiveChat = () => {
                 />
                 <button
                   onClick={handleSend}
-                  className="w-10 h-10 bg-[#16423C] text-white rounded-xl flex items-center justify-center hover:scale-105 transition-all"
+                  className="w-10 h-10 bg-[#b72828] text-white rounded-xl flex items-center justify-center hover:scale-105 transition-all"
                 >
                   <Send size={18} />
                 </button>
