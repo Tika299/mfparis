@@ -356,6 +356,11 @@ export interface Order {
   totalAmount: number;
   paymentMethod?: ('cod' | 'bank_transfer' | 'fundiin') | null;
   status?: ('pending' | 'confirmed' | 'shipping' | 'completed' | 'cancelled') | null;
+  fundiin?: {
+    transactionId?: string | null;
+    paymentStatus?: string | null;
+    orderToken?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -692,6 +697,13 @@ export interface OrdersSelect<T extends boolean = true> {
   totalAmount?: T;
   paymentMethod?: T;
   status?: T;
+  fundiin?:
+    | T
+    | {
+        transactionId?: T;
+        paymentStatus?: T;
+        orderToken?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

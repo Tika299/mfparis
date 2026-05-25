@@ -20,16 +20,16 @@ const sendOrderEmail = async ({ doc, operation, req }: any) => {
           </thead>
           <tbody>
             ${doc.items
-              .map(
-                (item: any) => `
+        .map(
+          (item: any) => `
               <tr>
                 <td style="padding: 8px; border: 1px solid #ddd;">${item.product.title || 'Sản phẩm'}</td>
                 <td style="text-align: center; padding: 8px; border: 1px solid #ddd;">${item.quantity}</td>
                 <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">${item.priceAtPurchase.toLocaleString()}₫</td>
               </tr>
             `,
-              )
-              .join('')}
+        )
+        .join('')}
           </tbody>
         </table>
 
@@ -135,6 +135,16 @@ export const Orders: CollectionConfig = {
         { label: 'Hoàn thành', value: 'completed' },
         { label: 'Đã hủy', value: 'cancelled' },
       ],
+    },
+    {
+      name: 'fundiin',
+      type: 'group',
+      fields: [
+        { name: 'transactionId', type: 'text', admin: { readOnly: true } },
+        { name: 'paymentStatus', type: 'text', admin: { readOnly: true } },
+        { name: 'orderToken', type: 'text', admin: { readOnly: true } },
+      ],
+      admin: { position: 'sidebar' }
     },
   ],
 }
