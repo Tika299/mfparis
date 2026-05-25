@@ -6,9 +6,11 @@ import { formatPrice } from '@/utilities/formatPrice'
 import { useCartStore } from '@/lib/store'
 import { toast } from 'sonner'
 import { ShoppingBag } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 export const ProductCard = ({ product }: { product: any }) => {
   const addItem = useCartStore((state) => state.addItem)
+  const router = useRouter()
 
   // 1. Xử lý ảnh (Ưu tiên bản nén size 'card')
   const mainMedia = product.images?.[0]?.image
@@ -25,7 +27,6 @@ export const ProductCard = ({ product }: { product: any }) => {
     e.preventDefault()
     e.stopPropagation()
 
-    // Lưu bản thumbnail (150px) vào giỏ hàng để load siêu nhanh
     const cartThumbnail = mainMedia?.sizes?.thumbnail?.url || mainMedia?.url || '/placeholder.jpg'
 
     addItem({
@@ -36,7 +37,24 @@ export const ProductCard = ({ product }: { product: any }) => {
       slug: product.slug,
       quantity: 1
     })
-    toast.success('Đã thêm vào giỏ hàng thành công')
+
+    // HIỂN THỊ TOAST TÙY CHỈNH
+    toast.success('Đã thêm vào giỏ hàng', {
+      description: product.title,
+      duration: 3000,
+      action: {
+        label: 'XEM GIỎ HÀNG',
+        onClick: () => router.push('/cart'), // Nhớ import useRouter từ next/navigation
+      },
+      // Tùy chỉnh màu sắc nút action cho đúng màu đỏ thương hiệu
+      actionButtonStyle: {
+        backgroundColor: '#b72828',
+        color: '#fff',
+        fontSize: '10px',
+        fontWeight: 'bold',
+        borderRadius: '8px',
+      }
+    })
   }
 
   return (
