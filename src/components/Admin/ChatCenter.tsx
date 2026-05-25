@@ -198,9 +198,9 @@ export const ChatCenter = () => {
         {/* SIDEBAR */}
         <div className="admin-chat-sidebar">
           <div className="sidebar-header">
-            <div className="sidebar-top">
+            <div className="sidebar-top" style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
               <Link href="/admin" className="back-btn"><ArrowLeft size={18} /></Link>
-              <h2 className="sidebar-title">Hộp thư hỗ trợ</h2>
+              <h2 className="sidebar-title" style={{ marginLeft: 10, marginBottom: 0 }}>Hộp thư hỗ trợ</h2>
             </div>
             <div className="sidebar-search">
               <Search className="search-icon" size={16} />
