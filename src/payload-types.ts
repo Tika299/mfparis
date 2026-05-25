@@ -64,7 +64,6 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
-    'chat-profiles': ChatProfileAuthOperations;
   };
   blocks: {};
   collections: {
@@ -77,7 +76,6 @@ export interface Config {
     posts: Post;
     'post-categories': PostCategory;
     messages: Message;
-    'chat-profiles': ChatProfile;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -94,7 +92,6 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     'post-categories': PostCategoriesSelect<false> | PostCategoriesSelect<true>;
     messages: MessagesSelect<false> | MessagesSelect<true>;
-    'chat-profiles': ChatProfilesSelect<false> | ChatProfilesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -116,7 +113,7 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User | ChatProfile;
+  user: User;
   jobs: {
     tasks: unknown;
     workflows: unknown;
@@ -138,22 +135,6 @@ export interface UserAuthOperations {
   unlock: {
     email: string;
     password: string;
-  };
-}
-export interface ChatProfileAuthOperations {
-  forgotPassword: {
-    username: string;
-  };
-  login: {
-    password: string;
-    username: string;
-  };
-  registerFirstUser: {
-    password: string;
-    username: string;
-  };
-  unlock: {
-    username: string;
   };
 }
 /**
@@ -439,39 +420,12 @@ export interface PostCategory {
  */
 export interface Message {
   id: number;
-  profile: number | ChatProfile;
+  sessionId: string;
   customerName: string;
   sender: 'customer' | 'admin';
   content: string;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "chat-profiles".
- */
-export interface ChatProfile {
-  id: number;
-  name: string;
-  updatedAt: string;
-  createdAt: string;
-  email?: string | null;
-  username: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'chat-profiles';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -532,21 +486,12 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'messages';
         value: number | Message;
-      } | null)
-    | ({
-        relationTo: 'chat-profiles';
-        value: number | ChatProfile;
       } | null);
   globalSlug?: string | null;
-  user:
-    | {
-        relationTo: 'users';
-        value: number | User;
-      }
-    | {
-        relationTo: 'chat-profiles';
-        value: number | ChatProfile;
-      };
+  user: {
+    relationTo: 'users';
+    value: number | User;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -556,15 +501,10 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user:
-    | {
-        relationTo: 'users';
-        value: number | User;
-      }
-    | {
-        relationTo: 'chat-profiles';
-        value: number | ChatProfile;
-      };
+  user: {
+    relationTo: 'users';
+    value: number | User;
+  };
   key?: string | null;
   value?:
     | {
@@ -802,36 +742,12 @@ export interface PostCategoriesSelect<T extends boolean = true> {
  * via the `definition` "messages_select".
  */
 export interface MessagesSelect<T extends boolean = true> {
-  profile?: T;
+  sessionId?: T;
   customerName?: T;
   sender?: T;
   content?: T;
   updatedAt?: T;
   createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "chat-profiles_select".
- */
-export interface ChatProfilesSelect<T extends boolean = true> {
-  name?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  username?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
-    | T
-    | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
-      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
