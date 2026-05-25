@@ -11,22 +11,30 @@ export const Messages: CollectionConfig = {
     create: () => true,
   },
   fields: [
-    { name: 'sessionId', type: 'text', required: true, index: true },
+    {
+      name: 'profile', // Thay cho sessionId
+      type: 'relationship',
+      relationTo: 'chat-profiles',
+      required: true,
+      index: true,
+    },
     { name: 'customerName', type: 'text', required: true },
     { name: 'sender', type: 'select', options: ['customer', 'admin'], required: true },
     { name: 'content', type: 'textarea', required: true },
   ],
   hooks: {
-    // Khi Admin bấm lưu tin nhắn trong trang Quản trị,
-    // tự động bắn tin nhắn đó sang Server Socket để khách nhận được ngay
     afterChange: [
       async ({ doc, operation }) => {
-        if (operation === 'create' && doc.sender === 'admin') {
-          await fetch('http://localhost:3001/broadcast-admin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(doc),
-          })
+        if (operation === 'create') {
+          // Lấy ID của profile để làm roomId cho Socket
+          const profileId = typeof doc.profile === 'object' ? doc.profile.id : doc.profile;
+          try {
+            await fetch('http://localhost:3001/broadcast-admin', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ...doc, sessionId: profileId }),
+            })
+          } catch (e) { console.error(e) }
         }
       },
     ],

@@ -210,7 +210,7 @@ body,
 }
 
 .chat-card__title {
-    font-family: 'Playfair Display', serif !important;
+    font-family: 'Be Vietnam Pro', serif !important;
     font-style: italic;
     font-size: 26px;
     font-weight: 700;
@@ -348,10 +348,8 @@ body,
             border-bottom: 1px solid #f9f9f9;
 
             .sidebar-title {
-                font-family: 'Playfair Display', serif;
-                font-style: italic;
+                font-family: 'Be Vietnam Pro', serif;
                 font-size: 24px;
-                color: #16423c;
                 margin: 0 0 20px 0;
             }
 
@@ -525,6 +523,17 @@ body,
                 .message-bubble {
                     max-width: 70%;
                     padding: 15px 20px;
+                    /* CÁC DÒNG QUAN TRỌNG ĐỂ FIX VẾT HỞ */
+                    border: none !important;
+                    /* Loại bỏ hoàn toàn border mặc định của Payload */
+                    outline: none !important;
+                    /* Loại bỏ viền focus */
+                    background-clip: padding-box;
+                    /* Ép màu nền tràn khít đến mép */
+                    -webkit-backface-visibility: hidden;
+                    /* Fix răng cưa trên Chrome/Safari */
+                    transform: translateZ(0);
+                    /* Ép xử lý bằng GPU để làm mịn các góc bo */
                     border-radius: 20px;
                     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
 

@@ -361,13 +361,6 @@ export default async function HomePage() {
             <CarouselPrevious className="absolute -left-2 md:-left-6 top-1/2 z-30 h-12 w-12 -translate-y-1/2 border-none bg-white shadow-xl text-gray-400 hover:bg-[#b72828] hover:text-white transition-all duration-300" />
 
             <CarouselNext className="absolute -right-2 md:-right-6 top-1/2 z-30 h-12 w-12 -translate-y-1/2 border-none bg-white shadow-xl text-gray-400 hover:bg-[#b72828] hover:text-white transition-all duration-300" />
-
-            {/* Pagination Dots giả lập (Có thể bỏ qua nếu nút đã hoạt động tốt) */}
-            <div className="mt-10 flex items-center justify-center gap-2">
-              <div className="h-1.5 w-8 rounded-full bg-[#b72828]"></div>
-              <div className="h-1.5 w-2 rounded-full bg-gray-300"></div>
-              <div className="h-1.5 w-2 rounded-full bg-gray-300"></div>
-            </div>
           </Carousel>
         </div>
       </section>

@@ -1,7 +1,8 @@
 'use client'
 import React, { useState, useEffect, useRef } from 'react'
 import { io } from 'socket.io-client'
-import { Send, User, Search, MessageCircle, Clock, MessageSquare } from 'lucide-react'
+import { Send, User, Search, MessageCircle, Clock, MessageSquare, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
 // Kết nối tới Socket Server (Port 3001)
 const socket = io('http://localhost:3001')
@@ -124,7 +125,12 @@ export const ChatCenter = () => {
         {/* CỘT TRÁI: DANH SÁCH KHÁCH */}
         <div className="admin-chat-sidebar">
           <div className="sidebar-header">
-            <h2 className="sidebar-title">Hộp thư hỗ trợ</h2>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+              <Link href="/admin" className="back-link">
+                <ArrowLeft size={16} />
+              </Link>
+              <h2 style={{ marginLeft: '10px' }}>Hộp thư hỗ trợ</h2>
+            </div>
             <div className="sidebar-search">
               <Search className="search-icon" size={16} />
               <input placeholder="Tìm khách hàng..." className="search-input" />
@@ -133,9 +139,9 @@ export const ChatCenter = () => {
 
           <div className="session-list">
             {sessions.length > 0 ? (
-              sessions.map((s) => (
+              sessions.map((s, index) => (
                 <div
-                  key={s.sessionId}
+                  key={`${s.sessionId}-${index}`}
                   onClick={() => selectSession(s.sessionId, s.customerName)}
                   className={`session-item ${activeSid === s.sessionId ? 'is-active' : ''}`}
                 >

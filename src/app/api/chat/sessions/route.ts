@@ -16,10 +16,11 @@ export async function GET() {
   const seenIds = new Set()
 
   for (const msg of messages.docs) {
-    if (!seenIds.has(msg.sessionId)) {
-      seenIds.add(msg.sessionId)
+    const pId = typeof msg.profile === 'object' ? msg.profile.id : msg.profile
+    if (!seenIds.has(pId)) {
+      seenIds.add(pId)
       sessions.push({
-        sessionId: msg.sessionId,
+        sessionId: pId,
         customerName: msg.customerName,
         lastMessage: msg.content,
         updatedAt: msg.createdAt,
