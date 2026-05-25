@@ -7,7 +7,7 @@ export async function GET(req: Request) {
   const payload = await getPayload({ config: configPromise })
   const history = await payload.find({
     collection: 'messages',
-    where: { sessionId: { equals: sid } },
+    where: { profile: { equals: sid } },
     sort: 'createdAt',
   })
   return Response.json(history.docs)

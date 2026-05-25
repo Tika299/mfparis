@@ -16,6 +16,7 @@ import { Posts } from './collections/Posts'
 import { PostCategories } from './collections/PostCategories'
 import { AboutPage } from './globals/AboutPage'
 import { Messages } from './collections/Messages'
+import { ChatProfiles } from './collections/ChatProfiles'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -47,6 +48,7 @@ export default buildConfig({
     Posts,
     PostCategories,
     Messages,
+    ChatProfiles,
   ],
   globals: [SiteSettings, AboutPage],
   editor: lexicalEditor(),
