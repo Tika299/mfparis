@@ -640,3 +640,24 @@ body,
         }
     }
 }
+
+.session-item.is-unread {
+  background-color: #fffafa !important; // Nền hồng nhạt
+  .session-name { font-weight: 900 !important; color: #000; }
+  .session-last-msg { font-weight: 700 !important; color: #333; }
+}
+
+.session-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.unread-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #ff4d4f; // Màu đỏ Zalo
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 77, 79, 0.4);
+  flex-shrink: 0;
+}

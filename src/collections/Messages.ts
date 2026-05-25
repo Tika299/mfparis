@@ -21,6 +21,12 @@ export const Messages: CollectionConfig = {
     { name: 'customerName', type: 'text', required: true },
     { name: 'sender', type: 'select', options: ['customer', 'admin'], required: true },
     { name: 'content', type: 'textarea', required: true },
+    {
+      name: 'isRead',
+      type: 'checkbox',
+      defaultValue: false, // Mặc định là chưa đọc
+      admin: { position: 'sidebar' },
+    },
   ],
   hooks: {
     afterChange: [

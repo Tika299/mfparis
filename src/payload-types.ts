@@ -443,6 +443,7 @@ export interface Message {
   customerName: string;
   sender: 'customer' | 'admin';
   content: string;
+  isRead?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -806,6 +807,7 @@ export interface MessagesSelect<T extends boolean = true> {
   customerName?: T;
   sender?: T;
   content?: T;
+  isRead?: T;
   updatedAt?: T;
   createdAt?: T;
 }

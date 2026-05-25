@@ -13,7 +13,7 @@ export const ChatDashboardCard = async () => {
   })
 
   return (
-    <div className="chat-card-wrapper">
+    <div className="chat-card-wrapper" style={{ marginTop: '20px' }}>
       {/* Khung Card chính */}
       <div className="chat-card">
         {/* Bên trái: Icon và Thông tin */}
