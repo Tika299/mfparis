@@ -72,13 +72,25 @@ export default function CheckoutPage() {
         const fundiinData = await fundiinRes.json()
 
         if (fundiinRes.ok && fundiinData.paymentUrl) {
-          clearCart() // Xóa giỏ hàng trước khi chuyển trang
-          window.location.href = fundiinData.paymentUrl
-          return
-        } else {
-          toast.error(fundiinData.error || 'Lỗi kết nối tới Fundiin')
-          setLoading(false)
-          return
+          // 1. Mở trang thanh toán Fundiin trong tab mới (_blank)
+          const paymentWindow = window.open(fundiinData.paymentUrl, '_blank');
+
+          if (paymentWindow) {
+            // 2. Nếu trình duyệt cho phép mở tab mới thành công
+            toast.success('Đang mở cổng thanh toán Fundiin...');
+
+            // 3. Chuyển trang hiện tại sang trang thông báo chờ (Tùy chọn)
+            // Hoặc giữ nguyên để khách có thể quay lại nhấn lại nếu lỡ tay đóng tab kia
+            const waitingUrl = `/checkout/waiting?orderId=${order.id}&url=${encodeURIComponent(fundiinData.paymentUrl)}`;
+            router.push(waitingUrl);
+          } else {
+            // Trường hợp bị trình duyệt chặn Pop-up
+            toast.error('Trình duyệt đã chặn cửa sổ thanh toán. Vui lòng nhấn vào liên kết để tiếp tục.');
+            // Hiển thị một nút bấm thủ công để khách click vào nếu bị chặn popup
+          }
+
+          clearCart(); // Xóa giỏ hàng
+          return;
         }
       }
 
