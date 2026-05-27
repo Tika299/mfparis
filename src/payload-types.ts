@@ -283,7 +283,7 @@ export interface Product {
     | null;
   shortDescription?: string | null;
   /**
-   * Bạn có thể dùng trình soạn thảo trực quan hoặc dán mã HTML vào.
+   * Dùng cho nội dung dài hiển thị dưới cùng trang web.
    */
   description?: {
     root: {
@@ -300,9 +300,6 @@ export interface Product {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * Thêm các thông số như: Nồng độ, Mùi hương, SPF, Calo, Thành phần...
-   */
   specifications?:
     | {
         label: string;
@@ -311,24 +308,36 @@ export interface Product {
       }[]
     | null;
   /**
-   * Tiêu đề hiển thị trên Google (Để trống sẽ lấy tên sản phẩm)
+   * Nội dung import từ WordPress sẽ tự động chia vào đây theo thẻ H2.
    */
+  accordions?:
+    | {
+        title: string;
+        content: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  isCombo?: boolean | null;
+  comboItems?: (number | Product)[] | null;
   seoTitle?: string | null;
-  /**
-   * Mô tả ngắn gọn khi tìm kiếm trên Google
-   */
   seoDescription?: string | null;
-  /**
-   * Tự động tạo từ tên, có thể chỉnh sửa thủ công
-   */
   slug: string;
   status?: ('draft' | 'published') | null;
   displayLocation?: ('best-seller' | 'cleansing' | 'new-arrival')[] | null;
-  isCombo?: boolean | null;
-  /**
-   * Chọn các sản phẩm lẻ thuộc bộ này
-   */
-  comboItems?: (number | Product)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -708,13 +717,20 @@ export interface ProductsSelect<T extends boolean = true> {
         value?: T;
         id?: T;
       };
+  accordions?:
+    | T
+    | {
+        title?: T;
+        content?: T;
+        id?: T;
+      };
+  isCombo?: T;
+  comboItems?: T;
   seoTitle?: T;
   seoDescription?: T;
   slug?: T;
   status?: T;
   displayLocation?: T;
-  isCombo?: T;
-  comboItems?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -27,19 +27,13 @@ export const Products: CollectionConfig = {
                   type: 'text',
                   required: true,
                   label: 'Tên sản phẩm',
-                  admin: {
-                    width: '70%',
-                    placeholder: 'Nhập tên sản phẩm (VD: Nước hoa Dior J’adore)',
-                  },
+                  admin: { width: '70%' },
                 },
                 {
                   name: 'sku',
                   type: 'text',
-                  label: 'Mã sản phẩm (SKU)',
-                  admin: {
-                    width: '30%',
-                    placeholder: 'VD: DIOR-JAD-100',
-                  },
+                  label: 'Mã SKU',
+                  admin: { width: '30%' },
                 },
               ],
             },
@@ -64,7 +58,7 @@ export const Products: CollectionConfig = {
                 },
               ],
             },
-            /* PHẦN GIÁ VÀ KHO HÀNG - ĐÃ FIX LỖI LỆCH HÀNG */
+            /* PHẦN GIÁ & KHO HÀNG - FIX LỖI LỆCH HÀNG */
             {
               name: 'price',
               type: 'group',
@@ -100,7 +94,7 @@ export const Products: CollectionConfig = {
             {
               name: 'images',
               type: 'array',
-              label: 'Bộ sưu tập hình ảnh (Tỷ lệ 1:1)',
+              label: 'Bộ sưu tập hình ảnh (Tỉ lệ 1:1)',
               minRows: 1,
               fields: [
                 {
@@ -114,26 +108,15 @@ export const Products: CollectionConfig = {
             {
               name: 'shortDescription',
               type: 'textarea',
-              label: 'Mô tả ngắn (Hiển thị cạnh giá tiền)',
-              admin: {
-                placeholder: 'Nhập mô tả tóm tắt về sản phẩm...',
-              },
+              label: 'Mô tả ngắn (Hiển thị đầu trang)',
             },
             {
               name: 'description',
               type: 'richText',
-              label: 'Nội dung mô tả chi tiết',
+              label: 'Mô tả chi tiết (Dạng khối)',
               admin: {
-                description: 'Bạn có thể dùng trình soạn thảo trực quan hoặc dán mã HTML vào.',
-                components: {
-                  // Thêm component xem trước vào sau ô nhập liệu
-                  afterInput: [
-                    {
-                      path: '@/components/Admin/RichTextPreview#RichTextPreview',
-                    },
-                  ],
-                },
-              },
+                description: 'Dùng cho nội dung dài hiển thị dưới cùng trang web.'
+              }
             },
           ],
         },
@@ -145,38 +128,13 @@ export const Products: CollectionConfig = {
             {
               name: 'specifications',
               type: 'array',
-              label: 'Thuộc tính sản phẩm',
-              labels: {
-                singular: 'Thông số',
-                plural: 'Các thông số',
-              },
-              admin: {
-                description: 'Thêm các thông số như: Nồng độ, Mùi hương, SPF, Calo, Thành phần...',
-              },
+              label: 'Thông số tùy chỉnh',
               fields: [
                 {
                   type: 'row',
                   fields: [
-                    {
-                      name: 'label',
-                      type: 'text',
-                      label: 'Tên thông số',
-                      required: true,
-                      admin: {
-                        width: '50%',
-                        placeholder: 'VD: Mùi hương',
-                      },
-                    },
-                    {
-                      name: 'value',
-                      type: 'text',
-                      label: 'Giá trị',
-                      required: true,
-                      admin: {
-                        width: '50%',
-                        placeholder: 'VD: Hương gỗ phương Đông',
-                      },
-                    },
+                    { name: 'label', type: 'text', label: 'Tên thông số', required: true, admin: { width: '50%' } },
+                    { name: 'value', type: 'text', label: 'Giá trị', required: true, admin: { width: '50%' } },
                   ],
                 },
               ],
@@ -184,26 +142,64 @@ export const Products: CollectionConfig = {
           ],
         },
 
-        /* TAB 3: CẤU HÌNH SEO */
+        /* TAB 3: CHI TIẾT DẠNG ACCORDION (KIỂU LONG CHÂU/HARAVAN) */
+        {
+          label: 'Chi tiết bổ sung',
+          fields: [
+            {
+              name: 'accordions',
+              type: 'array',
+              label: 'Các mục nội dung xổ xuống',
+              admin: {
+                description: 'Nội dung import từ WordPress sẽ tự động chia vào đây theo thẻ H2.'
+              },
+              fields: [
+                {
+                  name: 'title',
+                  type: 'text',
+                  label: 'Tiêu đề mục',
+                  required: true,
+                },
+                {
+                  name: 'content',
+                  type: 'richText',
+                  label: 'Nội dung mục',
+                  required: true,
+                },
+              ],
+            },
+          ],
+        },
+
+        /* TAB 4: COMBO SETTINGS */
+        {
+          label: 'Combo',
+          fields: [
+            {
+              name: 'isCombo',
+              type: 'checkbox',
+              label: 'Đây là bộ sản phẩm (Combo)',
+              defaultValue: false,
+            },
+            {
+              name: 'comboItems',
+              type: 'relationship',
+              relationTo: 'products',
+              hasMany: true,
+              label: 'Danh sách sản phẩm trong bộ',
+              admin: {
+                condition: (data) => data?.isCombo,
+              },
+            },
+          ],
+        },
+
+        /* TAB 5: SEO */
         {
           label: 'SEO',
           fields: [
-            {
-              name: 'seoTitle',
-              type: 'text',
-              label: 'SEO Title',
-              admin: {
-                description: 'Tiêu đề hiển thị trên Google (Để trống sẽ lấy tên sản phẩm)',
-              },
-            },
-            {
-              name: 'seoDescription',
-              type: 'textarea',
-              label: 'Meta Description',
-              admin: {
-                description: 'Mô tả ngắn gọn khi tìm kiếm trên Google',
-              },
-            },
+            { name: 'seoTitle', type: 'text', label: 'SEO Title' },
+            { name: 'seoDescription', type: 'textarea', label: 'Meta Description' },
           ],
         },
       ],
@@ -221,7 +217,6 @@ export const Products: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
-        description: 'Tự động tạo từ tên, có thể chỉnh sửa thủ công',
       },
     },
     {
@@ -230,12 +225,10 @@ export const Products: CollectionConfig = {
       label: 'Trạng thái',
       defaultValue: 'draft',
       options: [
-        { label: 'Nháp (Ẩn)', value: 'draft' },
-        { label: 'Đang bán (Hiện)', value: 'published' },
+        { label: 'Nháp', value: 'draft' },
+        { label: 'Đang bán', value: 'published' },
       ],
-      admin: {
-        position: 'sidebar',
-      },
+      admin: { position: 'sidebar' },
     },
     {
       name: 'displayLocation',
@@ -244,31 +237,10 @@ export const Products: CollectionConfig = {
       hasMany: true,
       options: [
         { label: 'Sản phẩm bán chạy', value: 'best-seller' },
-        { label: 'Làm sạch làn da', value: 'cleansing' },
+        { label: 'Sản phẩm combo', value: 'cleansing' },
         { label: 'Sản phẩm mới', value: 'new-arrival' },
       ],
-      admin: {
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'isCombo',
-      type: 'checkbox',
-      label: 'Đây là bộ sản phẩm (Combo)',
-      defaultValue: false,
       admin: { position: 'sidebar' },
-    },
-    {
-      name: 'comboItems',
-      type: 'relationship',
-      relationTo: 'products',
-      hasMany: true,
-      label: 'Sản phẩm trong Combo',
-      admin: {
-        position: 'sidebar',
-        condition: (data) => data?.isCombo === true, // Chỉ hiện khi tích vào ô Combo
-        description: 'Chọn các sản phẩm lẻ thuộc bộ này',
-      },
     },
   ],
 }

@@ -5,181 +5,203 @@
 @custom-variant dark (&:is(.dark *));
 @source "../../**/*.{js,ts,jsx,tsx,mdx}";
 
+/* --- 1. ĐỊNH NGHĨA THEME (Chuẩn Tailwind v4) --- */
 @theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
+  --font-heading: var(--font-playfair), 'Playfair Display', Georgia, serif;
+  --font-sans: var(--font-be-vietnam), 'Be Vietnam Pro', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --color-primary: #b72828;
+  --color-primary-foreground: #ffffff;
+  --color-background: #ffffff;
+  --color-foreground: #000000;
+
+  /* Khai báo biến border để Tailwind nhận diện */
   --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
+  --color-ring: var(--ring);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* --- 2. BIẾN GLOBAL (Base Variables) --- */
 :root {
-  --background: #fdfbf9;
-  --foreground: #1a1a1a;
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #b72828;
-  --primary-foreground: #ffffff;
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
+  --max-width: 1200px;
   --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
+  /* Màu xám nhạt cho border */
   --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Ép màu mặc định toàn trang */
+  --foreground: #000000;
+  --background: #FFFFFF;
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
-
+/* --- 3. CẤU HÌNH CƠ BẢN (Base Layer) --- */
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    /* FIX LỖI: Thay @apply border-border bằng CSS thuần */
+    border-color: var(--border);
   }
 
   body {
-    @apply bg-background text-foreground;
+    background-color: #f4f6f8;
+    color: #000000 !important;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
-  html {
-    @apply font-sans;
-  }
-
-  :root {
-    --font-sans: var(--font-be-vietnam), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    color: #000000 !important;
+    font-weight: 700;
   }
 }
 
-/* src/app/(frontend)/globals.css */
+/* --- 4. CÁC THÀNH PHẦN REUSABLE (Components) --- */
 @layer components {
-  .container {
-    @apply mx-auto px-4 md:px-6;
-    max-width: 1240px;
-    /* Kích thước vàng cho TMĐT Việt Nam */
+
+  /* Khung xương chuẩn UX 1200px */
+  .container-ux,
+  .container-custom {
+    @apply mx-auto px-4 sm:px-6 lg:px-8;
+    max-width: 1200px;
     width: 100%;
   }
+
+  .heading-product {
+    font-family: var(--font-heading);
+    color: #000000 !important;
+    font-style: normal;
+    @apply font-bold tracking-tight leading-[1.08];
+    font-size: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .heading-section {
+    font-family: var(--font-heading);
+    color: #000000 !important;
+    font-style: normal;
+    @apply font-bold tracking-tight text-center relative;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .sub-heading {
+    @apply uppercase tracking-[0.3em] text-[10px] font-black text-gray-400 mb-2 block;
+  }
+
+  .lc-card {
+    @apply bg-white rounded-xl shadow-sm border border-transparent transition-all duration-300;
+  }
+
+  .lc-card:hover {
+    @apply shadow-xl border-red-50;
+    transform: translateY(-4px);
+  }
+
+  .lc-sticky-nav {
+    @apply sticky top-[100px] z-20;
+  }
 }
 
-h1,
-h2,
-.font-serif {
+/* --- 5. TỐI ƯU NỘI DUNG TỪ WORDPRESS (Prose) --- */
+.prose {
+  color: #000000 !important;
+  max-width: 100% !important;
   font-family: var(--font-be-vietnam);
 }
 
-button,
-nav,
-a {
-  font-family: var(--font-be-vietnam);
+.prose p {
+  color: #000000 !important;
+  font-size: 16px;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
 }
 
-body {
-  background-color: #ffffff;
-  color: #1a1a1a;
-  letter-spacing: -0.01em;
-  @apply bg-[#F4F6F8] text-[#333];
-  /* Nền xám nhạt như Long Châu để nổi bật các khối trắng */
-  font-family: var(--font-be-vietnam);
+.prose h2,
+.prose h3 {
+  color: #000000 !important;
+  font-family: var(--font-heading);
+  @apply font-bold italic mt-12 mb-6;
 }
 
-.product-card:hover img {
-  transform: scale(1.05);
+.prose strong {
+  color: #000000 !important;
+  font-weight: 800;
 }
 
-/* Custom Scrollbar cho sang */
-::-webkit-scrollbar {
-  width: 5px;
+/* Fix hiển thị danh sách (List) */
+.prose ul {
+  list-style-type: disc !important;
+  padding-left: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+  display: block !important;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #000;
+.prose ol {
+  list-style-type: decimal !important;
+  padding-left: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+  display: block !important;
 }
 
-/* Ẩn scrollbar cho hàng thumbnail */
+.prose li {
+  display: list-item !important;
+  margin-bottom: 0.5rem !important;
+  color: #000000 !important;
+}
+
+.prose ul li::marker {
+  color: #b72828;
+}
+
+/* --- 6. UTILITIES & ANIMATIONS --- */
+
+/* Hiệu ứng rung cho nút Phone */
+@keyframes ring-anim {
+  0% {
+    transform: rotate(0) scale(1);
+  }
+
+  10% {
+    transform: rotate(-25deg) scale(1.1);
+  }
+
+  20% {
+    transform: rotate(25deg) scale(1.1);
+  }
+
+  30% {
+    transform: rotate(-25deg) scale(1.1);
+  }
+
+  40% {
+    transform: rotate(25deg) scale(1.1);
+  }
+
+  50% {
+    transform: rotate(0) scale(1);
+  }
+
+  100% {
+    transform: rotate(0) scale(1);
+  }
+}
+
+.animate-ring {
+  animation: ring-anim 1s infinite;
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -189,136 +211,21 @@ body {
   scrollbar-width: none;
 }
 
-@layer components {
-
-  /* Tiêu đề sản phẩm chính - Đẳng cấp Tạp chí */
-  .heading-product {
-    @apply font-serif font-bold tracking-tighter leading-[1.1];
-    font-size: clamp(1.875rem, 4vw, 3rem);
-    /* Tự co giãn theo màn hình */
-    color: #1a1a1a;
-  }
-
-  /* Tiêu đề Section (Sản phẩm bán chạy, Khám phá...) */
-  .heading-section {
-    @apply font-serif font-bold tracking-tight text-center relative;
-    font-size: clamp(1.5rem, 3vw, 2.5rem);
-  }
-
-  /* Gạch chân trang trí mỏng kiểu Pháp */
-  .heading-border {
-    @apply block w-12 h-[1px] bg-amber-700/40 mx-auto mt-4;
-  }
-
-  /* Nhãn phụ phía trên tiêu đề (Thương hiệu) */
-  .sub-heading {
-    @apply uppercase tracking-[0.3em] text-[10px] font-black text-amber-800/60 mb-2 block;
-  }
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
 }
 
-.prose h2 {
-  @apply font-sans text-3xl font-bold text-black mt-12 mb-6;
+::-webkit-scrollbar-thumb {
+  background: #000000;
+  border-radius: 10px;
 }
 
-.prose h3 {
-  @apply font-sans uppercase tracking-widest text-sm font-black text-gray-800 mt-8 mb-4;
+::-webkit-scrollbar-thumb:hover {
+  background: #b72828;
 }
 
-.prose p {
-  @apply text-gray-600 leading-relaxed mb-6;
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px;
 }
-
-.prose strong {
-  @apply text-black;
-}
-
-/* Ép hiển thị danh sách cho cả HTML WordPress và Lexical JSON */
-.prose ul {
-  list-style-type: disc !important;
-  /* Dấu chấm tròn */
-  padding-left: 1.5rem !important;
-  /* Thụt lề trái */
-  margin-bottom: 1.5rem !important;
-  display: block !important;
-}
-
-.prose ol {
-  list-style-type: decimal !important;
-  /* Số thứ tự 1, 2, 3 */
-  padding-left: 1.5rem !important;
-  margin-bottom: 1.5rem !important;
-  display: block !important;
-}
-
-.prose li {
-  display: list-item !important;
-  /* Bắt buộc hiển thị dạng list-item */
-  margin-bottom: 0.5rem !important;
-  padding-left: 0.5rem !important;
-  line-height: 1.6;
-}
-
-/* Đảm bảo dấu chấm có màu sắc phù hợp */
-.prose ul li::marker {
-  color: #16423c;
-  /* Màu xanh đặc trưng của mfparis */
-}
-
-@keyframes quick-ring {
-  0% {
-    transform: rotate(0) scale(1) skew(1deg);
-  }
-
-  10% {
-    transform: rotate(-25deg) scale(1) skew(1deg);
-  }
-
-  20% {
-    transform: rotate(25deg) scale(1) skew(1deg);
-  }
-
-  30% {
-    transform: rotate(-25deg) scale(1) skew(1deg);
-  }
-
-  40% {
-    transform: rotate(25deg) scale(1) skew(1deg);
-  }
-
-  50% {
-    transform: rotate(0) scale(1) skew(1deg);
-  }
-
-  100% {
-    transform: rotate(0) scale(1) skew(1deg);
-  }
-}
-
-.animate-ring {
-  animation: quick-ring 1s infinite;
-}
-
-.contact-shadow {
-  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
-  animation: pulse-green 2s infinite;
-}
-
-@keyframes pulse-green {
-  0% {
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
-  }
-
-  70% {
-    box-shadow: 0 0 0 15px rgba(34, 197, 94, 0);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
-  }
-}
-
-
-/* Nút bấm và các chi tiết nổi bật sẽ dùng màu đỏ */
-.text-primary { color: var(--primary); }
-.bg-primary { background-color: var(--primary); }
-.border-primary { border-color: var(--primary); }
