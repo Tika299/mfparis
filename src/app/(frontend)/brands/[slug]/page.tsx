@@ -10,10 +10,10 @@ export default async function BrandProductsPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>
-  searchParams: Promise<{ min?: string; max?: string; sort?: string }>
+  searchParams: Promise<{ min?: string; max?: string; sort?: string; category?: string }>
 }) {
   const { slug } = await params
-  const { min, max, sort } = await searchParams
+  const { min, max, sort, category } = await searchParams
   const payload = await getPayload({ config: configPromise })
 
   // 1. Lấy thông tin chi tiết của Brand hiện tại
@@ -27,14 +27,22 @@ export default async function BrandProductsPage({
 
   // 2. Xây dựng Query lọc: Sản phẩm thuộc Brand này + các bộ lọc từ URL
   const whereQueries: any = {
-    and: [{ status: { equals: 'published' } }, { brand: { equals: currentBrand.id } }],
+    and: [
+      { status: { equals: 'published' } },
+      { brand: { equals: currentBrand.id } }, // brand cố định theo slug
+    ],
   }
+
+  // category là filter cộng thêm
+  if (category) whereQueries.and.push({ 'categories.slug': { equals: category } })
 
   if (min) whereQueries.and.push({ 'price.basePrice': { greater_than_equal: Number(min) } })
   if (max) whereQueries.and.push({ 'price.basePrice': { less_than_equal: Number(max) } })
 
+
+
   // 3. Lấy dữ liệu đồng thời: Sản phẩm và Danh sách hãng (cho sidebar)
-  const [productsRes, allBrandsRes] = await Promise.all([
+  const [productsRes, allBrandsRes, categoriesRes] = await Promise.all([
     payload.find({
       collection: 'products',
       where: whereQueries,
@@ -43,6 +51,7 @@ export default async function BrandProductsPage({
       depth: 2,
     }),
     payload.find({ collection: 'brands', limit: 100 }),
+    payload.find({ collection: 'categories', limit: 100 }),
   ])
 
   return (
@@ -85,7 +94,7 @@ export default async function BrandProductsPage({
         <aside className="lg:col-span-3">
           <div className="sticky top-28 space-y-6">
             <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.02)] border border-gray-100">
-              <SearchFilters brands={allBrandsRes.docs} />
+              <SearchFilters brands={allBrandsRes.docs} categories={categoriesRes.docs} />
             </div>
 
             {/* Quảng cáo nhỏ hoặc Banner phụ (Tùy chọn) */}

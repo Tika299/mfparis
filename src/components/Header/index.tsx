@@ -59,7 +59,7 @@ export const Header = async () => {
                 key={item.id}
                 href={item.link}
                 className="
-        group relative font-heading text-[18px] font-bold
+        group relative font-heading text-[16px] font-[600]
         tracking-[0.02em] transition-colors duration-300
         hover:text-primary
       "

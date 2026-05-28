@@ -159,29 +159,158 @@ export const LiveChat = () => {
             {profile && <button onClick={() => { localStorage.removeItem('mf_chat_profile'); setProfile(null); setStep('ask'); socket.disconnect() }} className="absolute top-6 right-6 opacity-60"><LogOut size={16} /></button>}
           </div>
 
-          <div className="flex-grow flex flex-col overflow-hidden bg-[#FDFBF9]">
+          <div className="flex flex-1 flex-col overflow-hidden bg-[#FDFBF9]">
             {step === 'chat' ? (
               <>
-                <div ref={scrollRef} onScroll={handleScroll} className="flex-grow p-5 overflow-y-auto space-y-4 scroll-smooth">
-                  {isLoadingMore && <div className="flex justify-center py-2"><Loader2 className="animate-spin text-gray-300" size={16} /></div>}
+                <div ref={scrollRef} onScroll={handleScroll} className="flex-1 space-y-3 overflow-y-auto p-4 sm:p-5">
+                  {isLoadingMore && (
+                    <div className="flex justify-center py-2">
+                      <Loader2 className="animate-spin text-gray-300" size={16} />
+                    </div>
+                  )}
+
                   {messages.map((m, i) => (
-                    <div key={m.id || i} className={cn("flex flex-col max-w-[85%]", m.sender === 'customer' ? "ml-auto items-end" : "mr-auto items-start")}>
-                      <div className={cn("p-3 rounded-2xl text-[13px] shadow-sm", m.sender === 'customer' ? "bg-[#b72828] text-white rounded-tr-none" : "bg-white text-gray-700 rounded-tl-none border")}>{m.content}</div>
-                      <span className="text-[8px] text-gray-300 mt-1 uppercase font-bold">{new Date(m.createdAt || new Date()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    <div
+                      key={m.id || i}
+                      className={cn(
+                        'flex max-w-[88%] flex-col',
+                        m.sender === 'customer' ? 'ml-auto items-end' : 'mr-auto items-start',
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          'rounded-2xl p-3 text-[13px] shadow-sm',
+                          m.sender === 'customer'
+                            ? 'rounded-tr-none bg-[#b72828] text-white'
+                            : 'rounded-tl-none border bg-white text-gray-700',
+                        )}
+                      >
+                        {m.content}
+                      </div>
+                      <span className="mt-1 text-[9px] font-bold uppercase text-gray-300">
+                        {new Date(m.createdAt || new Date()).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
                     </div>
                   ))}
                 </div>
-                <div className="p-4 bg-white border-t flex gap-2">
-                  <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSendMessage()} className="flex-grow text-sm outline-none bg-gray-50 rounded-xl px-4 h-10" placeholder="Nhắn tin..." />
-                  <button onClick={handleSendMessage} className="w-10 h-10 bg-[#b72828] text-white rounded-xl flex items-center justify-center"><Send size={18} /></button>
+
+                <div data-enter-scope className="flex gap-2 border-t bg-white p-3 sm:p-4">
+                  <input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                    className="h-10 flex-1 rounded-xl bg-gray-50 px-4 text-sm outline-none"
+                    placeholder="Nhắn tin..."
+                  />
+                  <button
+                    data-enter-action
+                    onClick={handleSendMessage}
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#b72828] text-white"
+                  >
+                    <Send size={18} />
+                  </button>
                 </div>
               </>
             ) : (
-              <div className="p-10 flex flex-col items-center justify-center h-full space-y-6 text-center">
-                <User size={48} className="text-[#b72828]" />
-                <button onClick={() => setStep('login')} className="w-full py-4 border-2 border-[#b72828] text-[#b72828] rounded-2xl font-bold uppercase text-[10px]">Tôi đã có mã</button>
-                <button onClick={() => setStep('register')} className="w-full py-4 bg-[#b72828] text-white rounded-2xl font-bold uppercase text-[10px]">Tôi là khách mới</button>
-              </div>
+              <>
+                {/* 1. MÀN HÌNH HỎI */}
+                {step === 'ask' && (
+                  <div className="flex h-full flex-col items-center justify-center space-y-6 p-6 text-center sm:p-10">
+                    <User size={48} className="text-[#b72828]" />
+                    <div className="space-y-2">
+                      <h5 className="font-bold">Chào mừng bạn!</h5>
+                      <p className="text-xs text-gray-400">Bạn đã từng trò chuyện với chúng tôi chưa?</p>
+                    </div>
+                    <button
+                      onClick={() => setStep('login')}
+                      className="w-full rounded-2xl border-2 border-[#b72828] py-4 text-[10px] font-bold uppercase tracking-widest text-[#b72828] transition-all hover:bg-red-50"
+                    >
+                      Tôi đã có mã truy cập
+                    </button>
+                    <button
+                      onClick={() => setStep('register')}
+                      className="w-full rounded-2xl bg-[#b72828] py-4 text-[10px] font-bold uppercase tracking-widest text-white shadow-lg"
+                    >
+                      Tôi là khách mới
+                    </button>
+                  </div>
+                )}
+
+                {/* 2. MÀN HÌNH ĐĂNG NHẬP */}
+                {step === 'login' && (
+                  <div data-enter-scope className="space-y-4 p-6 sm:p-8">
+                    <button
+                      onClick={() => setStep('ask')}
+                      className="flex items-center gap-1 text-[10px] font-bold uppercase text-gray-400"
+                    >
+                      <ChevronLeft size={14} /> Quay lại
+                    </button>
+                    <h5 className="text-center font-bold">Tiếp tục trò chuyện</h5>
+                    <input
+                      className="w-full border-b py-3 text-sm outline-none focus:border-[#b72828]"
+                      placeholder="Tên đăng nhập"
+                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                    />
+                    <input
+                      type="password"
+                      className="w-full border-b py-3 text-sm outline-none focus:border-[#b72828]"
+                      placeholder="Mật khẩu"
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    />
+                    <button
+                      data-enter-action
+                      onClick={() => handleAuth('login')}
+                      disabled={isLoading}
+                      className="w-full rounded-2xl bg-[#b72828] py-4 text-[10px] font-bold uppercase tracking-widest text-white disabled:opacity-60"
+                    >
+                      {isLoading ? 'Đang xử lý...' : 'Đăng nhập'}
+                    </button>
+                    <p className="text-center text-[10px] leading-relaxed text-gray-400">
+                      Quên mật khẩu? Liên hệ <span className="font-bold text-[#b72828]">Hotline/Zalo</span> để được cấp lại.
+                    </p>
+                  </div>
+                )}
+
+                {/* 3. MÀN HÌNH ĐĂNG KÝ */}
+                {step === 'register' && (
+                  <div data-enter-scope className="space-y-4 overflow-y-auto p-6 sm:p-8">
+                    <button
+                      onClick={() => setStep('ask')}
+                      className="flex items-center gap-1 text-[10px] font-bold uppercase text-gray-400"
+                    >
+                      <ChevronLeft size={14} /> Quay lại
+                    </button>
+                    <h5 className="text-center font-bold">Tạo mã định danh</h5>
+                    <input
+                      className="w-full border-b py-2 text-sm outline-none focus:border-[#b72828]"
+                      placeholder="Họ tên của bạn"
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    />
+                    <input
+                      className="w-full border-b py-2 text-sm outline-none focus:border-[#b72828]"
+                      placeholder="Tên đăng nhập tự chọn"
+                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                    />
+                    <input
+                      type="password"
+                      className="w-full border-b py-2 text-sm outline-none focus:border-[#b72828]"
+                      placeholder="Mật khẩu tự chọn"
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    />
+                    <button
+                      data-enter-action
+                      onClick={() => handleAuth('register')}
+                      disabled={isLoading}
+                      className="w-full rounded-2xl bg-[#b72828] py-4 text-[10px] font-bold uppercase tracking-widest text-white disabled:opacity-60"
+                    >
+                      {isLoading ? 'Đang xử lý...' : 'Bắt đầu Chat'}
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

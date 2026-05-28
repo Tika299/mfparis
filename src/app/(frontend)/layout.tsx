@@ -4,6 +4,7 @@ import '../globals.css'
 import { Be_Vietnam_Pro, Playfair_Display } from 'next/font/google'
 import { FloatingContact } from '@/components/FloatingContact'
 import { Toaster } from 'sonner'
+import { GlobalEnterHandler } from '@/components/GlobalEnterHandler'
 
 const playfair = Playfair_Display({
   subsets: ['latin', 'vietnamese'],
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="vi" suppressHydrationWarning className={`${beVietnam.variable} ${playfair.variable}`}>
       <body className="font-sans antialiased text-[#1a1a1a]">
         <Header />
+        <GlobalEnterHandler />
         <main className="flex-grow">{children}</main>
         <Footer />
         {/* Cấu hình Toaster cho sang trọng */}
