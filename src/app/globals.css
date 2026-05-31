@@ -100,10 +100,10 @@
     @apply bg-white rounded-xl shadow-sm border border-transparent transition-all duration-300;
   }
 
-  .lc-card:hover {
+  /* .lc-card:hover {
     @apply shadow-xl border-red-50;
     transform: translateY(-4px);
-  }
+  } */
 
   .lc-sticky-nav {
     @apply sticky top-[100px] z-20;
