@@ -173,9 +173,9 @@ export default async function HomePage() {
               ))}
             </CarouselContent>
 
-            <CarouselPrevious className="absolute -left-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 border-none bg-white text-neutral-700 shadow-xl transition hover:bg-primary hover:text-white md:flex" />
+            <CarouselPrevious className="absolute -left-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 border-none bg-white text-neutral-700 shadow-xl transition hover:bg-primary hover:text-white md:flex transition-none hover:scale-100 active:scale-100" />
 
-            <CarouselNext className="absolute -right-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 border-none bg-white text-neutral-700 shadow-xl transition hover:bg-primary hover:text-white md:flex" />
+            <CarouselNext className="absolute -right-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 border-none bg-white text-neutral-700 shadow-xl transition hover:bg-primary hover:text-white md:flex transition-none hover:scale-100 active:scale-100" />
           </Carousel>
         </div>
       </section>
@@ -183,42 +183,63 @@ export default async function HomePage() {
       {/* ── 4. DANH MỤC NỔI BẬT ────────────────────────────────────────────── */}
       <section className="container-ux mt-8 md:mt-10">
         <div className="lc-card rounded-[2rem] p-5 sm:p-6 md:rounded-[2.5rem] md:p-8">
-
           {/* Header */}
           <div className="mb-8 flex items-center justify-between gap-4 px-1 md:mb-10 md:px-2">
             <div>
-              <span className="sub-heading">Browse</span>
-              <h2 className="font-heading text-2xl font-bold  md:text-3xl">
+              <span className="sub-heading text-neutral-400">Browse</span>
+              <h2 className="font-heading text-2xl font-bold md:text-3xl text-neutral-900">
                 Danh mục nổi bật
               </h2>
             </div>
             <Link
               href="/categories"
-              className="shrink-0 border-b border-primary text-xs font-black uppercase tracking-wider text-primary transition-colors hover:border-black hover:text-black"
+              className="shrink-0 border-b border-primary text-[11px] font-black uppercase tracking-wider text-primary transition-colors hover:border-black hover:text-black"
             >
               Khám phá
             </Link>
           </div>
 
-          {/* Grid danh mục */}
-          <div className="grid grid-cols-4 gap-5 sm:gap-6 md:gap-8 lg:grid-cols-8">
-            {categoriesRes.docs.map((cat: any) => (
-              <Link
-                key={cat.id}
-                href={`/categories/${cat.slug}`}
-                className="group flex min-w-0 flex-col items-center"
-              >
-                <div className="mb-3 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-gray-50 bg-[#FDFBF9] shadow-inner transition-all duration-500 group-hover:bg-red-50 md:h-20 md:w-20">
-                  <div className="relative h-10 w-10 overflow-hidden md:h-12 md:w-12">
-                    <OptimizedImage media={cat.image} size="thumbnail" alt={cat.name} />
-                  </div>
-                </div>
-                <span className="w-full truncate px-1 text-center text-[10px] font-black uppercase tracking-tight transition-colors group-hover:text-primary md:text-[11px]">
-                  {cat.name}
-                </span>
-              </Link>
-            ))}
-          </div>
+          {/* Slider Danh mục */}
+          <Carousel
+            opts={{
+              align: 'start',
+              loop: false,
+              dragFree: true,
+            }}
+            className="relative w-full"
+          >
+            <CarouselContent className="-ml-4 pb-2 md:-ml-5">
+              {categoriesRes.docs.map((cat: any) => (
+                <CarouselItem
+                  key={cat.id}
+                  className="pl-4 basis-[42%] sm:basis-[30%] md:pl-5 md:basis-[22%] lg:basis-[18%] xl:basis-[15%]"
+                >
+                  <Link
+                    href={`/categories/${cat.slug}`}
+                    className="group flex min-w-0 flex-col items-center rounded-2xl border border-transparent p-2.5 transition-colors hover:border-primary/20"
+                  >
+                    {/* Vòng ảnh lớn hơn, nền trắng cố định để không bị cảm giác ảnh đè nền */}
+                    <div className="mb-3 flex h-[86px] w-[86px] items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-white md:h-[102px] md:w-[102px]">
+                      <div className="relative h-[62px] w-[62px] overflow-hidden md:h-[74px] md:w-[74px]">
+                        <OptimizedImage
+                          media={cat.image}
+                          size="thumbnail"
+                          alt={cat.name}
+                          className="h-full w-full object-contain"
+                        />
+                      </div>
+                    </div>
+
+                    <span className="line-clamp-2 min-h-[32px] w-full px-1 text-center text-[11px] font-black uppercase tracking-tight text-neutral-800 transition-colors group-hover:text-primary md:text-[12px]">
+                      {cat.name}
+                    </span>
+                  </Link>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="absolute -left-4 top-1/2 z-20 hidden h-10 w-10 border-none bg-white hover:bg-primary hover:text-white md:flex" />
+            <CarouselNext className="absolute -right-4 top-1/2 z-20 hidden h-10 w-10 border-none bg-white hover:bg-primary hover:text-white md:flex" />
+          </Carousel>
         </div>
       </section>
 
@@ -276,9 +297,9 @@ export default async function HomePage() {
               </h2>
               <div className="mt-3 h-0.5 w-12 bg-primary" />
             </div>
-            <div className="flex gap-2">
-              <CarouselPrevious className="static h-10 w-10 translate-y-0 rounded-full border-neutral-200 text-neutral-700 shadow-sm transition-all hover:bg-primary hover:text-white" />
-              <CarouselNext className="static h-10 w-10 translate-y-0 rounded-full border-neutral-200 text-neutral-700 shadow-sm transition-all hover:bg-primary hover:text-white" />
+            <div className="flex gap-2 relative">
+              <CarouselPrevious className="absolute h-10 w-10 top-[26px] left-[-90px] rounded-full border-neutral-200 text-neutral-700 shadow-sm transition-all hover:bg-primary hover:text-white" />
+              <CarouselNext className="absolute h-10 w-10 top-[26px] left-[-42px] rounded-full border-neutral-200 text-neutral-700 shadow-sm transition-all hover:bg-primary hover:text-white" />
             </div>
           </div>
 

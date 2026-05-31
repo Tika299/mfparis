@@ -225,3 +225,25 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 100px;
 }
+
+/* Fix nút carousel không nhảy khi click */
+[data-slot="carousel-previous"],
+[data-slot="carousel-next"] {
+  transform: translateY(-50%) !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+[data-slot="carousel-previous"]:hover,
+[data-slot="carousel-next"]:hover,
+[data-slot="carousel-previous"]:active,
+[data-slot="carousel-next"]:active,
+[data-slot="carousel-previous"]:focus,
+[data-slot="carousel-next"]:focus,
+[data-slot="carousel-previous"]:focus-visible,
+[data-slot="carousel-next"]:focus-visible {
+  transform: translateY(-50%) !important;
+  transition: none !important;
+  animation: none !important;
+  box-shadow: none !important;
+}
