@@ -94,7 +94,7 @@ export default async function HomePage() {
       {/* ── 1. HERO SLIDER ──────────────────────────────────────────────────── */}
       <section className="container-ux pt-4 md:pt-6">
         <div className="overflow-hidden rounded-[2rem] md:rounded-[2.5rem] border border-white bg-white shadow-sm p-0">
-          <HeroSlider sliders={settings?.heroSliders} />
+          <HeroSlider sliders={settings?.heroSliders ?? []} />
         </div>
       </section>
 
@@ -168,7 +168,7 @@ export default async function HomePage() {
                   key={product.id}
                   className="basis-[88%] pl-5 sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
                 >
-                  <ProductCard product={product} variant="grid" />
+                  <ProductCard product={product} />
                 </CarouselItem>
               ))}
             </CarouselContent>
