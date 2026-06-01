@@ -22,9 +22,9 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
       )}
     >
       {/* 1. IMAGE AREA - Chiều cao đã được giảm xuống để card nhìn cân đối hơn */}
-      <div className="relative h-[260px] w-full overflow-hidden rounded-[26px] bg-[#f8fbff]">
+      <div className="relative h-[260px] w-full overflow-hidden rounded-[26px]">
         {/* Nền gradient nghệ thuật */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,#ffffff_0%,#f0f7ff_100%)]" />
+        <div className="absolute inset-0" />
 
         {/* Badge Giảm giá */}
         {isSale && (
@@ -56,7 +56,7 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
               media={product?.images?.[0]?.image}
               size="card"
               alt={product.title}
-              className="h-full w-full"
+              className="h-full w-full [&_img]:object-contain"
             />
           </div>
         </Link>

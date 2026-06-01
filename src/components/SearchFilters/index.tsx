@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { SlidersHorizontal, ChevronDown } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 type FilterItem = {
   id: string | number
@@ -99,13 +100,20 @@ export const SearchFilters = ({
     )
   }, [searchParams])
 
+  // CSS cho phần header của mỗi mục (Danh mục, Thương hiệu...)
   const sectionHeaderClass =
-    'flex w-full items-center justify-between border-b pb-2 text-[11px] font-black uppercase tracking-[0.2em] text-gray-500'
+    'flex w-full items-center justify-between border-b pb-2 text-[11px] font-black uppercase tracking-[0.2em] text-gray-500 sticky top-0 bg-white z-10'
+
   const collapseIconClass = (open: boolean) =>
     `transition-transform duration-200 ${open ? 'rotate-180' : ''}`
 
+  // Cập nhật class này để hỗ trợ cuộn bên trong nếu quá nhiều mục
   const chipsWrapClass = (open: boolean) =>
-    `${open ? 'max-h-[320px]' : 'max-h-0'} overflow-hidden transition-all duration-300`
+    cn(
+      'transition-all duration-300 ease-in-out',
+      open ? 'max-h-[350px] overflow-y-auto opacity-100 mt-3' : 'max-h-0 overflow-hidden opacity-0',
+      'scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent pr-2' // Thêm scrollbar nhẹ
+    )
 
   const filterBody = (
     <div className="space-y-6">
@@ -171,7 +179,7 @@ export const SearchFilters = ({
         </Button>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-1">
         <button
           type="button"
           onClick={() => setCategoryOpen((v) => !v)}
@@ -183,7 +191,7 @@ export const SearchFilters = ({
         </button>
 
         <div className={chipsWrapClass(categoryOpen)}>
-          <div className="flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-wrap gap-2 pb-2">
             {categories.length > 0 ? (
               categories.map((c) => {
                 const isActive = activeCategory === c.slug
@@ -191,10 +199,10 @@ export const SearchFilters = ({
                   <button
                     key={c.id}
                     onClick={() => updateFilters({ category: isActive ? null : c.slug })}
-                    className={`rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase ${isActive
-                      ? 'border-black bg-black text-white'
-                      : 'border-gray-200 bg-white text-gray-600'
-                      }`}
+                    className={cn(
+                      'rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase transition-all',
+                      isActive ? 'border-black bg-black text-white' : 'border-gray-100 bg-white text-gray-500 hover:border-gray-300'
+                    )}
                   >
                     {c.name}
                   </button>
@@ -207,7 +215,7 @@ export const SearchFilters = ({
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-1">
         <button
           type="button"
           onClick={() => setBrandOpen((v) => !v)}
@@ -219,17 +227,17 @@ export const SearchFilters = ({
         </button>
 
         <div className={chipsWrapClass(brandOpen)}>
-          <div className="flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-wrap gap-2 pb-2">
             {brands.map((b) => {
               const isActive = activeBrand === b.slug
               return (
                 <button
                   key={b.id}
                   onClick={() => updateFilters({ brand: isActive ? null : b.slug })}
-                  className={`rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase ${isActive
-                    ? 'border-black bg-black text-white'
-                    : 'border-gray-200 bg-white text-gray-600'
-                    }`}
+                  className={cn(
+                    'rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase transition-all',
+                    isActive ? 'border-black bg-black text-white' : 'border-gray-100 bg-white text-gray-500 hover:border-gray-300'
+                  )}
                 >
                   {b.name}
                 </button>

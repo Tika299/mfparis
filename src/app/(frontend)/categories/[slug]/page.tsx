@@ -74,7 +74,7 @@ export default async function CategoryPage({ params, searchParams }: any) {
 
           <main className="min-w-0 flex-1">
             {productsRes.docs.length > 0 ? (
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-5 xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {productsRes.docs.map((product: any) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
