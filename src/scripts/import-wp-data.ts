@@ -10,7 +10,7 @@ import pLimit from 'p-limit'
 /**
  * File: src/scripts/import-wp-data.ts
  *
- * JSON files cần đặt cùng thư mục với file này:
+ * Đặt các file JSON cùng thư mục với file này:
  * - brands.json
  * - product-categories.json
  * - post-categories.json
@@ -22,8 +22,14 @@ import pLimit from 'p-limit'
  * npm run import:wp:products
  * npm run import:wp:posts
  *
- * Nếu field ảnh đại diện bài viết đang required:
- * npm run import:wp:posts -- --placeholder-featured
+ * Test trước:
+ * npm run import:wp:products -- --limit=20
+ *
+ * Update lại sản phẩm đã có:
+ * npm run import:wp:products -- --update
+ *
+ * Chạy chậm hơn để tránh Cloudflare/server chặn ảnh:
+ * npm run import:wp:products -- --update --media-concurrency=1
  */
 
 type AnyRecord = Record<string, any>
@@ -31,7 +37,7 @@ type AnyRecord = Record<string, any>
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Load ENV trước khi import @payload-config
+// Bắt buộc load env trước khi dynamic import @payload-config
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 dotenv.config({ path: path.resolve(__dirname, '../../.env.local') })
 
@@ -51,10 +57,11 @@ const UPDATE_EXISTING = hasFlag('--update')
 const SKIP_MEDIA = hasFlag('--skip-media')
 const DRY_RUN = hasFlag('--dry-run')
 const USE_PLACEHOLDER_FEATURED = hasFlag('--placeholder-featured')
+const DISABLE_FALLBACK_BRAND = hasFlag('--no-fallback-brand')
 
-// Nếu muốn giữ nguyên toàn bộ JSON gốc WordPress/WooCommerce, thêm field wpId, wpLink, wpRaw vào collection rồi bật:
-// Windows CMD: set KEEP_RAW_WP=true && npm run import:wp:products
+// Nếu muốn giữ nguyên JSON gốc, thêm các field wpId, wpLink, wpRaw vào collection rồi bật:
 // Linux VPS: KEEP_RAW_WP=true npm run import:wp:products
+// Windows CMD: set KEEP_RAW_WP=true && npm run import:wp:products
 const KEEP_RAW_WP = process.env.KEEP_RAW_WP === 'true'
 
 const MEDIA_CONCURRENCY = Math.max(1, Number(getArg('--media-concurrency', '2')) || 2)
@@ -82,10 +89,30 @@ const formatSlug = (val: string): string =>
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .replace(/[đĐ]/g, 'd')
+        .replace(/&/g, ' va ')
         .replace(/([^0-9a-z-\s])/g, '')
         .replace(/(\s+)/g, '-')
         .replace(/-+/g, '-')
         .replace(/^-+|-+$/g, '')
+
+const makeSafeSlug = (val: string, fallbackId?: string | number): string => {
+    let slug = formatSlug(val)
+
+    if (!slug) {
+        slug = `item-${fallbackId || Date.now()}`
+    }
+
+    // Tránh slug quá dài gây lỗi validate/database index
+    if (slug.length > 150) {
+        slug = slug.slice(0, 150).replace(/-+$/g, '')
+    }
+
+    if (!slug) {
+        slug = `item-${fallbackId || Date.now()}`
+    }
+
+    return slug
+}
 
 const cleanDesc = (text: string) =>
     text ? String(text).replace(/\[html_block.*?\]/g, '').trim() : ''
@@ -138,8 +165,8 @@ const readJSON = <T = any>(filename: string): T[] => {
 }
 
 /**
- * Cách này bọc HTML thô vào Lexical JSON.
- * Nếu frontend của bạn render richText theo kiểu riêng, vẫn giữ được HTML gốc dưới dạng text.
+ * Bọc HTML thô vào Lexical JSON.
+ * Cách này ưu tiên giữ nội dung HTML gốc thay vì cố convert phức tạp.
  */
 const convertHTMLtoLexical = (html: string) => {
     return {
@@ -219,10 +246,8 @@ function parseHTMLToAccordions(html: string) {
 
 function extractImageFromSrcset(srcset: string | null) {
     if (!srcset) return ''
-
     const first = srcset.split(',')[0]?.trim()
     if (!first) return ''
-
     return first.split(/\s+/)[0] || ''
 }
 
@@ -239,7 +264,6 @@ function extractFirstImageFromHTML(html: string) {
     const dataSrcset = img.getAttribute('data-srcset') || img.getAttribute('srcset')
 
     if (dataSrc && dataSrc.startsWith('http')) return dataSrc
-
     if (src && src.startsWith('http') && !src.includes('/lazy.svg')) return src
 
     const fromSrcset = extractImageFromSrcset(dataSrcset)
@@ -258,12 +282,45 @@ async function findOne(payload: any, collection: string, where: AnyRecord) {
     return result.docs?.[0] || null
 }
 
-async function createOrUpdateBySlug(payload: any, collection: string, slug: string, data: AnyRecord) {
-    const existing = await findOne(payload, collection, {
+async function findBySlug(payload: any, collection: string, slug: string) {
+    return findOne(payload, collection, {
         slug: {
             equals: slug,
         },
     })
+}
+
+async function getAvailableSlug(
+    payload: any,
+    collection: string,
+    desiredSlug: string,
+    wpId?: string | number,
+    currentId?: string | number,
+) {
+    const baseSlug = makeSafeSlug(desiredSlug, wpId)
+    let candidate = baseSlug
+    let index = 2
+
+    while (true) {
+        const existing = await findBySlug(payload, collection, candidate)
+
+        if (!existing?.id) return candidate
+
+        // Khi update chính document đó thì giữ slug cũ
+        if (currentId && String(existing.id) === String(currentId)) return candidate
+
+        if (wpId && !candidate.endsWith(`-${wpId}`)) {
+            candidate = makeSafeSlug(`${baseSlug}-${wpId}`, wpId)
+        } else {
+            candidate = makeSafeSlug(`${baseSlug}-${index}`, wpId)
+            index++
+        }
+    }
+}
+
+async function createOrUpdateBySlug(payload: any, collection: string, slug: string, data: AnyRecord) {
+    const safeSlug = makeSafeSlug(slug)
+    const existing = await findBySlug(payload, collection, safeSlug)
 
     if (existing?.id) {
         if (!UPDATE_EXISTING) {
@@ -277,19 +334,25 @@ async function createOrUpdateBySlug(payload: any, collection: string, slug: stri
         const updated = await payload.update({
             collection: collection as any,
             id: existing.id,
-            data,
+            data: {
+                ...data,
+                slug: safeSlug,
+            },
         })
 
         return { id: updated.id, action: 'update' }
     }
 
     if (DRY_RUN) {
-        return { id: `dry-${slug}`, action: 'dry-create' }
+        return { id: `dry-${safeSlug}`, action: 'dry-create' }
     }
 
     const created = await payload.create({
         collection: collection as any,
-        data,
+        data: {
+            ...data,
+            slug: safeSlug,
+        },
     })
 
     return { id: created.id, action: 'create' }
@@ -329,7 +392,7 @@ async function uploadMedia(payload: any, url: string, alt: string) {
 
                 if (existing?.id) return existing.id
             } catch {
-                // Nếu media collection không cho search filename thì bỏ qua check trùng.
+                // Nếu collection media không query được filename thì bỏ qua check trùng.
             }
 
             const response = await fetchWithTimeout(url)
@@ -374,6 +437,113 @@ async function uploadMedia(payload: any, url: string, alt: string) {
     })
 }
 
+let cachedFallbackBrandId: string | number | undefined = undefined
+
+async function getFallbackBrand(payload: any) {
+    if (DISABLE_FALLBACK_BRAND) return undefined
+    if (cachedFallbackBrandId !== undefined) return cachedFallbackBrandId
+
+    const slug = 'khong-xac-dinh'
+    const existing = await findBySlug(payload, 'brands', slug)
+
+    if (existing?.id) {
+        cachedFallbackBrandId = existing.id
+        return cachedFallbackBrandId
+    }
+
+    if (DRY_RUN) {
+        cachedFallbackBrandId = 'dry-fallback-brand'
+        return cachedFallbackBrandId
+    }
+
+    const created = await payload.create({
+        collection: 'brands',
+        data: {
+            name: 'Không xác định',
+            slug,
+            description: 'Thương hiệu tạm dùng cho dữ liệu import chưa map được brand.',
+        } as any,
+    })
+
+    cachedFallbackBrandId = created.id
+    return cachedFallbackBrandId
+}
+
+async function validateBrandId(payload: any, brandId: any) {
+    if (!brandId) return undefined
+
+    try {
+        const found = await payload.findByID({
+            collection: 'brands',
+            id: brandId,
+        })
+
+        return found?.id ? found.id : undefined
+    } catch {
+        return undefined
+    }
+}
+
+async function ensureBrand(payload: any, brand: AnyRecord) {
+    if (!brand) return getFallbackBrand(payload)
+
+    try {
+        const slug = makeSafeSlug(brand.slug || brand.name || `brand-${brand.id}`, brand.id)
+
+        const existing = await findBySlug(payload, 'brands', slug)
+
+        if (existing?.id) {
+            return existing.id
+        }
+
+        const logoId = brand.image?.src ? await uploadMedia(payload, brand.image.src, brand.name) : null
+
+        const data = withWpRaw(
+            withoutUndefined({
+                name: brand.name || slug,
+                slug,
+                description: cleanDesc(brand.description || ''),
+                logo: logoId || undefined,
+            }),
+            brand,
+        )
+
+        const result = await createOrUpdateBySlug(payload, 'brands', slug, data)
+        const validId = await validateBrandId(payload, result.id)
+
+        return validId || getFallbackBrand(payload)
+    } catch (error: any) {
+        console.log(`   ⚠️ Không tạo/map được brand: ${brand?.name || brand?.slug || brand?.id || 'unknown'}`)
+        console.log(`   ${error.message}`)
+        return getFallbackBrand(payload)
+    }
+}
+
+async function ensureCategory(payload: any, category: AnyRecord) {
+    if (!category) return undefined
+
+    const slug = makeSafeSlug(category.slug || category.name || `category-${category.id}`, category.id)
+
+    const existing = await findBySlug(payload, 'categories', slug)
+
+    if (existing?.id) return existing.id
+
+    const result = await createOrUpdateBySlug(
+        payload,
+        'categories',
+        slug,
+        withWpRaw(
+            withoutUndefined({
+                name: category.name || slug,
+                slug,
+            }),
+            category,
+        ),
+    )
+
+    return result.id
+}
+
 async function createPlaceholderMedia(payload: any) {
     const filename = 'mfparis-placeholder-featured.png'
 
@@ -412,79 +582,20 @@ async function createPlaceholderMedia(payload: any) {
     return media.id
 }
 
-async function ensureBrand(payload: any, brand: AnyRecord) {
-    if (!brand) return undefined
-
-    const slug = brand.slug || formatSlug(brand.name)
-
-    const existing = await findOne(payload, 'brands', {
-        slug: {
-            equals: slug,
-        },
-    })
-
-    if (existing?.id) return existing.id
-
-    const result = await createOrUpdateBySlug(
-        payload,
-        'brands',
-        slug,
-        withWpRaw(
-            withoutUndefined({
-                name: brand.name,
-                slug,
-                description: cleanDesc(brand.description || ''),
-            }),
-            brand,
-        ),
-    )
-
-    return result.id
-}
-
-async function ensureCategory(payload: any, category: AnyRecord) {
-    if (!category) return undefined
-
-    const slug = category.slug || formatSlug(category.name)
-
-    const existing = await findOne(payload, 'categories', {
-        slug: {
-            equals: slug,
-        },
-    })
-
-    if (existing?.id) return existing.id
-
-    const result = await createOrUpdateBySlug(
-        payload,
-        'categories',
-        slug,
-        withWpRaw(
-            withoutUndefined({
-                name: category.name,
-                slug,
-            }),
-            category,
-        ),
-    )
-
-    return result.id
-}
-
 async function importBrands(payload: any) {
     const brandsData = readJSON<AnyRecord>(DATA_FILES.brands)
-    const brandMap = new Map<number, string>()
+    const brandMap = new Map<number, string | number>()
 
     console.log(`\n📦 Import Brands: ${brandsData.length}`)
 
     for (const item of brandsData) {
         try {
-            const slug = item.slug || formatSlug(item.name)
+            const slug = makeSafeSlug(item.slug || item.name || `brand-${item.id}`, item.id)
             const logoId = item.image?.src ? await uploadMedia(payload, item.image.src, item.name) : null
 
             const data = withWpRaw(
                 withoutUndefined({
-                    name: item.name,
+                    name: item.name || slug,
                     slug,
                     description: cleanDesc(item.description || ''),
                     logo: logoId || undefined,
@@ -501,32 +612,25 @@ async function importBrands(payload: any) {
         }
     }
 
+    await getFallbackBrand(payload)
+
     return brandMap
 }
 
 async function importProductCategories(payload: any) {
     const categoriesData = readJSON<AnyRecord>(DATA_FILES.productCategories)
-    const catMap = new Map<number, string>()
+    const catMap = new Map<number, string | number>()
 
     console.log(`\n📦 Import Product Categories: ${categoriesData.length}`)
 
     for (const item of categoriesData) {
         try {
-            const slug = item.slug || formatSlug(item.name)
+            const slug = makeSafeSlug(item.slug || item.name || `product-category-${item.id}`, item.id)
             const imageId = item.image?.src ? await uploadMedia(payload, item.image.src, item.name) : null
 
-            /**
-             * Giữ các field tương thích cao với collection categories hiện tại:
-             * - name
-             * - slug
-             * - image
-             *
-             * Nếu muốn lưu đủ field như parent, count, _links, image object gốc:
-             * thêm wpRaw vào collection và bật KEEP_RAW_WP=true.
-             */
             const data = withWpRaw(
                 withoutUndefined({
-                    name: item.name,
+                    name: item.name || slug,
                     slug,
                     image: imageId || undefined,
                 }),
@@ -542,7 +646,6 @@ async function importProductCategories(payload: any) {
         }
     }
 
-    // Cập nhật parent nếu collection categories có field parent.
     console.log('\n🔗 Cập nhật parent Product Categories nếu collection có field parent...')
 
     for (const item of categoriesData) {
@@ -574,17 +677,17 @@ async function importProductCategories(payload: any) {
 
 async function importPostCategories(payload: any) {
     const categoriesData = readJSON<AnyRecord>(DATA_FILES.postCategories)
-    const postCatMap = new Map<number, string>()
+    const postCatMap = new Map<number, string | number>()
 
     console.log(`\n📦 Import Post Categories: ${categoriesData.length}`)
 
     for (const item of categoriesData) {
         try {
-            const slug = item.slug || formatSlug(item.name)
+            const slug = makeSafeSlug(item.slug || item.name || `post-category-${item.id}`, item.id)
 
             const data = withWpRaw(
                 withoutUndefined({
-                    title: item.name,
+                    title: item.name || slug,
                     slug,
                 }),
                 item,
@@ -599,7 +702,6 @@ async function importPostCategories(payload: any) {
         }
     }
 
-    // Cập nhật parent nếu collection post-categories có field parent.
     console.log('\n🔗 Cập nhật parent Post Categories nếu collection có field parent...')
 
     for (const item of categoriesData) {
@@ -629,6 +731,84 @@ async function importPostCategories(payload: any) {
     return postCatMap
 }
 
+async function saveProductWithRetry(
+    payload: any,
+    existingProd: AnyRecord | null,
+    productData: AnyRecord,
+    item: AnyRecord,
+) {
+    let data = { ...productData }
+    let lastError: any = null
+
+    for (let attempt = 1; attempt <= 4; attempt++) {
+        try {
+            if (DRY_RUN) {
+                console.log(`   🧪 Dry-run Product: ${item.name}`)
+                return
+            }
+
+            if (existingProd?.id && UPDATE_EXISTING) {
+                await payload.update({
+                    collection: 'products',
+                    id: existingProd.id,
+                    data,
+                })
+            } else {
+                await payload.create({
+                    collection: 'products',
+                    data,
+                })
+            }
+
+            if (attempt > 1) {
+                console.log(`   ✅ Product sau retry: ${item.name}`)
+            } else {
+                console.log(`   ✅ Product: ${item.name}`)
+            }
+
+            return
+        } catch (error: any) {
+            lastError = error
+            const message = String(error?.message || '')
+
+            let changed = false
+
+            if (message.includes('slug')) {
+                const nextSlugBase = `${data.slug || item.slug || item.name}-${item.id || Date.now()}-${attempt}`
+                data.slug = await getAvailableSlug(payload, 'products', nextSlugBase, item.id, existingProd?.id)
+                console.log(`   ⚠️ Slug lỗi, thử slug mới: ${data.slug}`)
+                changed = true
+            }
+
+            if (message.includes('Thương hiệu') || message.toLowerCase().includes('brand')) {
+                const fallbackBrandId = await getFallbackBrand(payload)
+
+                if (fallbackBrandId && data.brand !== fallbackBrandId) {
+                    data.brand = fallbackBrandId
+                    console.log(`   ⚠️ Brand lỗi, đổi sang fallback brand.`)
+                } else {
+                    delete data.brand
+                    console.log(`   ⚠️ Brand lỗi, bỏ field brand.`)
+                }
+
+                changed = true
+            }
+
+            if (message.includes('Vị trí trang chủ') || message.includes('displayLocation')) {
+                delete data.displayLocation
+                console.log(`   ⚠️ Bỏ field displayLocation.`)
+                changed = true
+            }
+
+            if (!changed) {
+                break
+            }
+        }
+    }
+
+    throw lastError
+}
+
 async function importProducts(payload: any) {
     const productsData = readJSON<AnyRecord>(DATA_FILES.products)
 
@@ -636,26 +816,30 @@ async function importProducts(payload: any) {
 
     for (const item of productsData) {
         try {
-            const productSlug = item.slug || formatSlug(item.name)
-
-            const existingProd = await findOne(payload, 'products', {
-                slug: {
-                    equals: productSlug,
-                },
-            })
+            const baseSlug = makeSafeSlug(item.slug || item.name || `product-${item.id}`, item.id)
+            const existingProd = await findBySlug(payload, 'products', baseSlug)
 
             if (existingProd?.id && !UPDATE_EXISTING) {
                 console.log(`   ⏩ Product đã tồn tại: ${item.name}`)
                 continue
             }
 
-            let brandId: string | undefined = undefined
+            const productSlug = existingProd?.id
+                ? baseSlug
+                : await getAvailableSlug(payload, 'products', baseSlug, item.id)
+
+            let brandId: string | number | undefined = undefined
 
             if (item.brands && item.brands.length > 0) {
                 brandId = await ensureBrand(payload, item.brands[0])
+                brandId = await validateBrandId(payload, brandId)
             }
 
-            const categoryIds: string[] = []
+            if (!brandId) {
+                brandId = await getFallbackBrand(payload)
+            }
+
+            const categoryIds: Array<string | number> = []
 
             if (item.categories && item.categories.length > 0) {
                 for (const cat of item.categories) {
@@ -697,48 +881,40 @@ async function importProducts(payload: any) {
                         : 99
                     : 0
 
-            const data = withWpRaw(
-                withoutUndefined({
-                    title: item.name,
-                    sku: item.sku || '',
-                    slug: productSlug,
-                    brand: brandId,
-                    categories: categoryIds,
-                    price: {
-                        basePrice,
-                        salePrice,
-                        stock,
-                    },
-                    images: uploadedImages,
-                    specifications: specs,
-                    accordions: parsedAccordions,
-                    shortDescription: stripHTML(item.short_description || ''),
-                    description: convertHTMLtoLexical(wpDescription),
-                    status: 'published',
-                    //displayLocation: item.on_sale ? ['sale'] : ['new-arrival'],
-                }),
-                item,
-            )
-
-            if (DRY_RUN) {
-                console.log(`   🧪 Dry-run Product: ${item.name}`)
-                continue
+            const productData: AnyRecord = {
+                title: item.name || productSlug,
+                sku: item.sku || '',
+                slug: productSlug,
+                categories: categoryIds,
+                price: {
+                    basePrice,
+                    salePrice,
+                    stock,
+                },
+                specifications: specs,
+                accordions: parsedAccordions,
+                shortDescription: stripHTML(item.short_description || ''),
+                description: convertHTMLtoLexical(wpDescription),
+                status: 'published',
             }
 
-            if (existingProd?.id && UPDATE_EXISTING) {
-                await payload.update({
-                    collection: 'products',
-                    id: existingProd.id,
-                    data,
-                })
-            } else {
-                await payload.create({
-                    collection: 'products',
-                    data,
-                })
+            // Chỉ set brand khi có ID hợp lệ
+            if (brandId) {
+                productData.brand = brandId
             }
 
-            console.log(`   ✅ Product: ${item.name}`)
+            // Quan trọng: chỉ set images nếu tải được ảnh.
+            // Tránh chạy --update mà ảnh 403 làm gallery bị set thành [].
+            if (uploadedImages.length > 0) {
+                productData.images = uploadedImages
+            }
+
+            // Chắc chắn không gửi field Vị trí trang chủ.
+            delete productData.displayLocation
+
+            const data = withWpRaw(withoutUndefined(productData), item)
+
+            await saveProductWithRetry(payload, existingProd, data, item)
         } catch (error: any) {
             console.error(`   ❌ Product lỗi: ${item.name} - ${error.message}`)
         }
@@ -757,7 +933,7 @@ async function importPosts(payload: any) {
         wpCatIdToSlug.set(cat.id, cat.slug)
     }
 
-    let placeholderMediaId: string | null = null
+    let placeholderMediaId: string | number | null = null
 
     if (USE_PLACEHOLDER_FEATURED && !SKIP_MEDIA) {
         placeholderMediaId = await createPlaceholderMedia(payload)
@@ -767,20 +943,19 @@ async function importPosts(payload: any) {
     for (const item of postsData) {
         try {
             const title = item.title?.rendered || item.slug || `Post ${item.id}`
-            const postSlug = item.slug || formatSlug(title)
-
-            const existingPost = await findOne(payload, 'posts', {
-                slug: {
-                    equals: postSlug,
-                },
-            })
+            const baseSlug = makeSafeSlug(item.slug || title || `post-${item.id}`, item.id)
+            const existingPost = await findBySlug(payload, 'posts', baseSlug)
 
             if (existingPost?.id && !UPDATE_EXISTING) {
                 console.log(`   ⏩ Post đã tồn tại: ${title}`)
                 continue
             }
 
-            const postCategoryIds: string[] = []
+            const postSlug = existingPost?.id
+                ? baseSlug
+                : await getAvailableSlug(payload, 'posts', baseSlug, item.id)
+
+            const postCategoryIds: Array<string | number> = []
 
             if (item.categories && item.categories.length > 0) {
                 for (const wpCatId of item.categories) {
@@ -788,11 +963,7 @@ async function importPosts(payload: any) {
 
                     if (!slug) continue
 
-                    const existingCat = await findOne(payload, 'post-categories', {
-                        slug: {
-                            equals: slug,
-                        },
-                    })
+                    const existingCat = await findBySlug(payload, 'post-categories', makeSafeSlug(slug))
 
                     if (existingCat?.id) {
                         postCategoryIds.push(existingCat.id)
@@ -810,39 +981,66 @@ async function importPosts(payload: any) {
                 featuredImageId = placeholderMediaId
             }
 
-            const data = withWpRaw(
-                withoutUndefined({
-                    title,
-                    slug: postSlug,
-                    excerpt: stripHTML(excerptHTML),
-                    content: convertHTMLtoLexical(contentHTML),
-                    categories: postCategoryIds,
-                    featuredImage: featuredImageId || undefined,
-                    publishedAt: item.date || undefined,
-                    status: item.status === 'publish' ? 'published' : 'draft',
-                }),
-                item,
-            )
+            const postData: AnyRecord = {
+                title,
+                slug: postSlug,
+                excerpt: stripHTML(excerptHTML),
+                content: convertHTMLtoLexical(contentHTML),
+                categories: postCategoryIds,
+                publishedAt: item.date || undefined,
+                status: item.status === 'publish' ? 'published' : 'draft',
+            }
+
+            if (featuredImageId) {
+                postData.featuredImage = featuredImageId
+            }
+
+            const data = withWpRaw(withoutUndefined(postData), item)
 
             if (DRY_RUN) {
                 console.log(`   🧪 Dry-run Post: ${title}`)
                 continue
             }
 
-            if (existingPost?.id && UPDATE_EXISTING) {
-                await payload.update({
-                    collection: 'posts',
-                    id: existingPost.id,
-                    data,
-                })
-            } else {
-                await payload.create({
-                    collection: 'posts',
-                    data,
-                })
-            }
+            try {
+                if (existingPost?.id && UPDATE_EXISTING) {
+                    await payload.update({
+                        collection: 'posts',
+                        id: existingPost.id,
+                        data,
+                    })
+                } else {
+                    await payload.create({
+                        collection: 'posts',
+                        data,
+                    })
+                }
 
-            console.log(`   ✅ Post: ${title}`)
+                console.log(`   ✅ Post: ${title}`)
+            } catch (error: any) {
+                const message = String(error?.message || '')
+
+                if (message.includes('Ảnh đại diện') || message.includes('featuredImage')) {
+                    delete data.featuredImage
+
+                    if (existingPost?.id && UPDATE_EXISTING) {
+                        await payload.update({
+                            collection: 'posts',
+                            id: existingPost.id,
+                            data,
+                        })
+                    } else {
+                        await payload.create({
+                            collection: 'posts',
+                            data,
+                        })
+                    }
+
+                    console.log(`   ✅ Post không ảnh đại diện: ${title}`)
+                } else {
+                    throw error
+                }
+            }
         } catch (error: any) {
             console.error(`   ❌ Post lỗi: ${item.slug || item.id} - ${error.message}`)
         }
@@ -858,6 +1056,7 @@ async function run() {
     console.log(`👉 Dry-run: ${DRY_RUN ? 'Có' : 'Không'}`)
     console.log(`👉 Media concurrency: ${MEDIA_CONCURRENCY}`)
     console.log(`👉 Placeholder featured: ${USE_PLACEHOLDER_FEATURED ? 'Có' : 'Không'}`)
+    console.log(`👉 Fallback brand: ${DISABLE_FALLBACK_BRAND ? 'Tắt' : 'Bật'}`)
     console.log(`👉 Limit: ${ITEM_LIMIT || 'Không giới hạn'}`)
     console.log(`👉 Offset: ${ITEM_OFFSET}`)
 
