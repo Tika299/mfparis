@@ -715,7 +715,7 @@ async function importProducts(payload: any) {
                     shortDescription: stripHTML(item.short_description || ''),
                     description: convertHTMLtoLexical(wpDescription),
                     status: 'published',
-                    displayLocation: item.on_sale ? ['sale'] : ['new-arrival'],
+                    //displayLocation: item.on_sale ? ['sale'] : ['new-arrival'],
                 }),
                 item,
             )
