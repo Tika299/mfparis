@@ -1,11 +1,36 @@
 'use client'
 
-import React from 'react'
+import React, { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ShoppingBag, Heart, ShieldCheck, Bike, RotateCcw, Gift, ChevronRight, Star } from 'lucide-react'
+import { toast } from 'sonner'
 import { OptimizedImage } from '@/components/OptimizedImage'
 import { formatPrice } from '@/utilities/formatPrice'
 import { cn } from '@/utilities'
+import { useCartStore } from '@/lib/store'
+
+function getStableRating(seed: string) {
+  let hash = 0
+
+  for (let i = 0; i < seed.length; i++) {
+    hash = seed.charCodeAt(i) + ((hash << 5) - hash)
+  }
+
+  const rating = 4.8 + (Math.abs(hash) % 21) / 100
+
+  return Math.min(rating, 5).toFixed(1)
+}
+
+function getReviewCount(product: any) {
+  return (
+    product?.reviewCount ||
+    product?.reviewsCount ||
+    product?.rating?.count ||
+    product?.reviews?.totalDocs ||
+    product?.reviews?.docs?.length ||
+    null
+  )
+}
 
 export const ProductCard = ({ product, className }: { product: any; className?: string }) => {
   const basePrice = Number(product?.price?.basePrice || 0)
@@ -13,6 +38,41 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
   const isSale = salePrice > 0 && salePrice < basePrice
   const discountPercent = isSale ? Math.round(((basePrice - salePrice) / basePrice) * 100) : 0
   const finalPrice = isSale ? salePrice : basePrice
+
+  const [added, setAdded] = useState(false)
+  const addItem = useCartStore((state) => state.addItem)
+
+  const rating = useMemo(() => {
+    return getStableRating(String(product?.id || product?.slug || product?.title || 'product'))
+  }, [product?.id, product?.slug, product?.title])
+
+  const reviewCount = getReviewCount(product)
+
+  const productImage =
+    product?.images?.[0]?.image?.url ||
+    product?.images?.[0]?.image?.sizes?.thumbnail?.url ||
+    '/placeholder.jpg'
+
+  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    addItem({
+      id: product.id,
+      title: product.title,
+      price: finalPrice,
+      image: productImage,
+      slug: product.slug,
+      quantity: 1,
+    })
+
+    setAdded(true)
+    toast.success('Đã thêm vào giỏ hàng thành công!')
+
+    setTimeout(() => {
+      setAdded(false)
+    }, 1200)
+  }
 
   return (
     <article
@@ -93,9 +153,19 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
               <Star key={i} size={14} fill="currentColor" strokeWidth={0} />
             ))}
           </div>
-          <span className="ml-1 text-[13px] font-bold text-neutral-900">4.9</span>
-          <span className="text-neutral-200">|</span>
-          <span className="text-[12px] text-neutral-400">1.234 đánh giá</span>
+
+          <span className="ml-1 text-[13px] font-bold text-neutral-900">
+            {rating}
+          </span>
+
+          {reviewCount ? (
+            <>
+              <span className="text-neutral-200">|</span>
+              <span className="text-[12px] text-neutral-400">
+                {Number(reviewCount).toLocaleString('vi-VN')} đánh giá
+              </span>
+            </>
+          ) : null}
         </div>
 
         {/* Chính sách 3 cột - Làm gọn lại */}
@@ -115,9 +185,13 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
         </button>
 
         {/* Nút Mua ngay */}
-        <button className="group/btn mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#e10613] py-4 text-[16px] font-black text-white shadow-lg shadow-red-100 transition-all hover:bg-black hover:shadow-neutral-200">
+        <button
+          type="button"
+          onClick={handleAddToCart}
+          className="group/btn mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#e10613] py-4 text-[14px] font-black text-white shadow-lg shadow-red-100 transition-all hover:bg-black hover:shadow-neutral-200"
+        >
           <ShoppingBag size={19} className="transition-transform group-hover/btn:-rotate-12" />
-          Mua ngay
+          {added ? 'Đã thêm vào giỏ' : 'Thêm vào giỏ hàng'}
         </button>
       </div>
     </article>

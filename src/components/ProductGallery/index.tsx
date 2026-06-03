@@ -1,51 +1,125 @@
 'use client'
-import React, { useState } from 'react'
+
+import React, { useMemo, useState } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react'
 import { cn } from '@/utilities'
 
-export const ProductGallery = ({ images }: { images: any[] }) => {
-  const [activeIndex, setActiveIndex] = useState(0)
-  const totalImages = images?.length || 0
+function getMedia(item: any) {
+  if (!item) return null
 
-  // Giới hạn hiển thị tối đa 5 thumbnail, còn lại sẽ vào ô "Xem thêm"
-  const maxVisible = 5
-  const visibleThumbnails = images?.slice(0, maxVisible) || []
-  const remainingCount = totalImages - maxVisible
+  if (typeof item.image === 'object' && item.image !== null) {
+    return item.image
+  }
 
-  const nextImage = () => setActiveIndex((prev) => (prev === totalImages - 1 ? 0 : prev + 1))
-  const prevImage = () => setActiveIndex((prev) => (prev === 0 ? totalImages - 1 : prev - 1))
+  if (typeof item === 'object' && item.url) {
+    return item
+  }
+
+  return null
+}
+
+function getImageUrl(item: any, type: 'main' | 'thumb' = 'main') {
+  const media = getMedia(item)
+
+  if (!media) return ''
+
+  const sizes: Record<string, any> = media?.sizes || {}
+
+  const firstSizeUrl =
+    Object.values(sizes).find((size: any) => size?.url)?.url || ''
+
+  if (type === 'thumb') {
+    return (
+      sizes?.thumbnail?.url ||
+      sizes?.card?.url ||
+      sizes?.medium?.url ||
+      firstSizeUrl ||
+      media?.url ||
+      ''
+    )
+  }
 
   return (
-    <div className="flex flex-col gap-5 w-full">
-      {/* 1. KHUNG ẢNH CHÍNH (Tỉ lệ 1:1) */}
-      <div className="relative aspect-square w-full bg-white rounded-3xl overflow-hidden border border-gray-100 group shadow-sm">
-        {images && images[activeIndex] ? (
+    sizes?.card?.url ||
+    sizes?.medium?.url ||
+    sizes?.thumbnail?.url ||
+    firstSizeUrl ||
+    media?.url ||
+    ''
+  )
+}
+
+function getImageAlt(item: any, fallback = 'Product image') {
+  const media = getMedia(item)
+
+  return media?.alt || media?.filename || fallback
+}
+
+export const ProductGallery = ({ images }: { images: any[] }) => {
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  const validImages = useMemo(() => {
+    return Array.isArray(images)
+      ? images.filter((item) => Boolean(getImageUrl(item)))
+      : []
+  }, [images])
+
+  const totalImages = validImages.length
+
+  const maxVisible = 5
+  const visibleThumbnails = validImages.slice(0, maxVisible)
+  const remainingCount = totalImages - maxVisible
+
+  const activeImage = validImages[activeIndex]
+  const activeImageUrl = getImageUrl(activeImage, 'main')
+  const activeImageAlt = getImageAlt(activeImage)
+
+  const nextImage = () => {
+    if (totalImages <= 1) return
+    setActiveIndex((prev) => (prev === totalImages - 1 ? 0 : prev + 1))
+  }
+
+  const prevImage = () => {
+    if (totalImages <= 1) return
+    setActiveIndex((prev) => (prev === 0 ? totalImages - 1 : prev - 1))
+  }
+
+  return (
+    <div className="flex w-full flex-col gap-5">
+      {/* 1. KHUNG ẢNH CHÍNH */}
+      <div className="group relative aspect-square w-full overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm">
+        {activeImageUrl ? (
           <Image
-            src={images[activeIndex].image.url}
-            alt="Product image"
+            src={activeImageUrl}
+            alt={activeImageAlt}
             fill
             className="object-contain p-10 transition-all duration-500"
             priority
+            sizes="(max-width: 768px) 100vw, 700px"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300">
+          <div className="flex h-full w-full items-center justify-center bg-gray-50 text-gray-300">
             <ImageIcon size={48} />
           </div>
         )}
 
-        {/* Nút điều hướng ảnh chính */}
         {totalImages > 1 && (
           <>
             <button
+              type="button"
               onClick={prevImage}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-all hover:bg-white cursor-pointer"
+              className="absolute left-4 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/90 opacity-0 shadow-md backdrop-blur-md transition-all hover:bg-white group-hover:opacity-100"
+              aria-label="Ảnh trước"
             >
               <ChevronLeft size={20} className="text-gray-700" />
             </button>
+
             <button
+              type="button"
               onClick={nextImage}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-all hover:bg-white cursor-pointer"
+              className="absolute right-4 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/90 opacity-0 shadow-md backdrop-blur-md transition-all hover:bg-white group-hover:opacity-100"
+              aria-label="Ảnh sau"
             >
               <ChevronRight size={20} className="text-gray-700" />
             </button>
@@ -53,38 +127,56 @@ export const ProductGallery = ({ images }: { images: any[] }) => {
         )}
       </div>
 
-      {/* 2. HÀNG THUMBNAILS (Mẫu Long Châu) */}
-      <div className="flex gap-3 overflow-x-auto no-scrollbar py-1">
-        {visibleThumbnails.map((item, index) => (
-          <button
-            key={index}
-            onClick={() => setActiveIndex(index)}
-            className={cn(
-              'relative min-w-[75px] h-[75px] md:min-w-[85px] md:h-[85px] rounded-xl overflow-hidden border-2 bg-white transition-all shadow-sm',
-              activeIndex === index
-                ? 'border-blue-500'
-                : 'border-transparent hover:border-gray-200',
-            )}
-          >
-            <Image
-              src={item.image.url}
-              alt={`Thumb ${index}`}
-              fill
-              className="object-contain p-2"
-            />
-          </button>
-        ))}
+      {/* 2. HÀNG THUMBNAILS */}
+      {totalImages > 1 && (
+        <div className="no-scrollbar flex gap-3 overflow-x-auto py-1">
+          {visibleThumbnails.map((item, index) => {
+            const thumbUrl = getImageUrl(item, 'thumb')
+            const thumbAlt = getImageAlt(item, `Thumb ${index + 1}`)
 
-        {/* Ô "Xem thêm" nếu số lượng ảnh > 5 */}
-        {remainingCount > 0 && (
-          <button className="min-w-[75px] h-[75px] md:min-w-[85px] md:h-[85px] rounded-xl border-2 border-gray-100 bg-white flex flex-col items-center justify-center text-gray-500 hover:bg-gray-50 transition-all shadow-sm">
-            <ImageIcon size={20} className="mb-1 text-gray-400" />
-            <span className="text-[10px] font-bold uppercase tracking-tight text-center leading-tight">
-              Xem thêm <br /> {remainingCount} ảnh
-            </span>
-          </button>
-        )}
-      </div>
+            return (
+              <button
+                key={index}
+                type="button"
+                onClick={() => setActiveIndex(index)}
+                className={cn(
+                  'relative h-[75px] min-w-[75px] overflow-hidden rounded-xl border-2 bg-white shadow-sm transition-all md:h-[85px] md:min-w-[85px]',
+                  activeIndex === index
+                    ? 'border-blue-500'
+                    : 'border-transparent hover:border-gray-200',
+                )}
+                aria-label={`Xem ảnh ${index + 1}`}
+              >
+                {thumbUrl ? (
+                  <Image
+                    src={thumbUrl}
+                    alt={thumbAlt}
+                    fill
+                    className="object-contain p-2"
+                    sizes="85px"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-gray-300">
+                    <ImageIcon size={22} />
+                  </div>
+                )}
+              </button>
+            )
+          })}
+
+          {remainingCount > 0 && (
+            <button
+              type="button"
+              className="flex h-[75px] min-w-[75px] flex-col items-center justify-center rounded-xl border-2 border-gray-100 bg-white text-gray-500 shadow-sm transition-all hover:bg-gray-50 md:h-[85px] md:min-w-[85px]"
+            >
+              <ImageIcon size={20} className="mb-1 text-gray-400" />
+              <span className="text-center text-[10px] font-bold uppercase leading-tight tracking-tight">
+                Xem thêm <br /> {remainingCount} ảnh
+              </span>
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }
