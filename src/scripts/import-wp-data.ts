@@ -1,5 +1,4 @@
 import { getPayload } from 'payload'
-import configPromise from '@payload-config'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -633,6 +632,7 @@ async function run() {
     console.log(`👉 Skip media: ${SKIP_MEDIA ? 'Có' : 'Không'}`)
     console.log(`👉 Keep raw WP: ${KEEP_RAW_WP ? 'Có' : 'Không'}`)
 
+    const configPromise = (await import('@payload-config')).default
     const payload = await getPayload({ config: configPromise })
 
     if (ONLY === 'all' || ONLY === 'taxonomies' || ONLY === 'brands') {
