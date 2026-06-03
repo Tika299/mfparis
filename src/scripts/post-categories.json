@@ -14,7 +14,9 @@
         {
           "href": "https://mfparis.vn/wp-json/wp/v2/categories/448",
           "targetHints": {
-            "allow": ["GET"]
+            "allow": [
+              "GET"
+            ]
           }
         }
       ],
@@ -63,7 +65,9 @@
         {
           "href": "https://mfparis.vn/wp-json/wp/v2/categories/454",
           "targetHints": {
-            "allow": ["GET"]
+            "allow": [
+              "GET"
+            ]
           }
         }
       ],
@@ -112,7 +116,9 @@
         {
           "href": "https://mfparis.vn/wp-json/wp/v2/categories/455",
           "targetHints": {
-            "allow": ["GET"]
+            "allow": [
+              "GET"
+            ]
           }
         }
       ],
@@ -161,7 +167,9 @@
         {
           "href": "https://mfparis.vn/wp-json/wp/v2/categories/458",
           "targetHints": {
-            "allow": ["GET"]
+            "allow": [
+              "GET"
+            ]
           }
         }
       ],
@@ -210,7 +218,9 @@
         {
           "href": "https://mfparis.vn/wp-json/wp/v2/categories/7979",
           "targetHints": {
-            "allow": ["GET"]
+            "allow": [
+              "GET"
+            ]
           }
         }
       ],
@@ -253,7 +263,9 @@
         {
           "href": "https://mfparis.vn/wp-json/wp/v2/categories/451",
           "targetHints": {
-            "allow": ["GET"]
+            "allow": [
+              "GET"
+            ]
           }
         }
       ],
@@ -302,7 +314,9 @@
         {
           "href": "https://mfparis.vn/wp-json/wp/v2/categories/449",
           "targetHints": {
-            "allow": ["GET"]
+            "allow": [
+              "GET"
+            ]
           }
         }
       ],
@@ -351,7 +365,9 @@
         {
           "href": "https://mfparis.vn/wp-json/wp/v2/categories/453",
           "targetHints": {
-            "allow": ["GET"]
+            "allow": [
+              "GET"
+            ]
           }
         }
       ],
@@ -400,7 +416,9 @@
         {
           "href": "https://mfparis.vn/wp-json/wp/v2/categories/450",
           "targetHints": {
-            "allow": ["GET"]
+            "allow": [
+              "GET"
+            ]
           }
         }
       ],
@@ -449,7 +467,9 @@
         {
           "href": "https://mfparis.vn/wp-json/wp/v2/categories/214",
           "targetHints": {
-            "allow": ["GET"]
+            "allow": [
+              "GET"
+            ]
           }
         }
       ],
@@ -466,6 +486,813 @@
       "wp:post_type": [
         {
           "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=214"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 456,
+    "count": 4,
+    "description": "",
+    "link": "https://mfparis.vn/tap-chi-suc-khoe/dinh-duong/",
+    "name": "Dinh Dưỡng",
+    "slug": "dinh-duong",
+    "taxonomy": "category",
+    "parent": 91,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/456",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/91"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=456"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 452,
+    "count": 1,
+    "description": "",
+    "link": "https://mfparis.vn/goc-me-va-be/dinh-duong-cho-me/",
+    "name": "Dinh Dưỡng Cho Mẹ",
+    "slug": "dinh-duong-cho-me",
+    "taxonomy": "category",
+    "parent": 445,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/452",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/445"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=452"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 7656,
+    "count": 4,
+    "description": "",
+    "link": "https://mfparis.vn/tap-chi-lam-dep/giam-can/",
+    "name": "Giảm Cân",
+    "slug": "giam-can",
+    "taxonomy": "category",
+    "parent": 42,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/7656",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/42"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=7656"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 445,
+    "count": 6,
+    "description": "Góc mẹ và bé cùng nhau chia sẻ kinh nghiệm cho các mẹ cùng nhau tìm hiểu chăm sóc con nhỏ từ lúc mang thai đến lúc sinh con.",
+    "link": "https://mfparis.vn/goc-me-va-be/",
+    "name": "Góc Mẹ Và Bé",
+    "slug": "goc-me-va-be",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/445",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=445"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 7978,
+    "count": 1,
+    "description": "",
+    "link": "https://mfparis.vn/hair/",
+    "name": "Hair",
+    "slug": "hair",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/7978",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=7978"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 7980,
+    "count": 0,
+    "description": "",
+    "link": "https://mfparis.vn/makeup/",
+    "name": "Makeup",
+    "slug": "makeup",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/7980",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=7980"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 447,
+    "count": 14,
+    "description": "Mẹo Sử Dụng Nước Hoa đúng cách sẽ giúp bạn có thể mang hương thơm lâu hơn bền bỉ hơn và lan tỏa mùi hương đi khắp nơi chia sẻ cho mọi người.",
+    "link": "https://mfparis.vn/tap-chi-nuoc-hoa-mf/meo-su-dung-nuoc-hoa/",
+    "name": "Mẹo Sử Dụng Nước Hoa",
+    "slug": "meo-su-dung-nuoc-hoa",
+    "taxonomy": "category",
+    "parent": 45,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/447",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/45"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=447"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 446,
+    "count": 147,
+    "description": "<h1><strong>Review Nước Hoa</strong></h1>\r\n<strong>Review Nước Hoa</strong> cụm từ mà bạn đang tìm kiếm trước khi đưa ra quyết định mua một chai nước hoa nào. Ở đây chúng tôi đưa ra những nhận xét và chia sẻ về những chai nước hoa một cách tổng quát nhất để bạn cảm nhận về chai nước hoa xem nó có phù hợp với bạn hay không trước khi đưa ra quyết định mua hàng.",
+    "link": "https://mfparis.vn/review-nuoc-hoa/",
+    "name": "Review Nước Hoa",
+    "slug": "review-nuoc-hoa",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/446",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=446"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 7533,
+    "count": 4,
+    "description": "",
+    "link": "https://mfparis.vn/tap-chi-suc-khoe/sinh-ly/",
+    "name": "Sinh Lý",
+    "slug": "sinh-ly",
+    "taxonomy": "category",
+    "parent": 91,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/7533",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/91"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=7533"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 7981,
+    "count": 2,
+    "description": "",
+    "link": "https://mfparis.vn/skincare/",
+    "name": "Skincare",
+    "slug": "skincare",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/7981",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=7981"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 7982,
+    "count": 0,
+    "description": "",
+    "link": "https://mfparis.vn/sunscreen/",
+    "name": "Sunscreen",
+    "slug": "sunscreen",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/7982",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=7982"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 42,
+    "count": 35,
+    "description": "Tạp Chí Làm Đẹp nơi mang lại cho bạn kiến thức kinh nghiệm trong quá trình chăm sóc bản thân và những niềm vui trong quá trình làm đẹp của bạn thân cho mọi người cùng biết.",
+    "link": "https://mfparis.vn/tap-chi-lam-dep/",
+    "name": "Tạp Chí Làm Đẹp",
+    "slug": "tap-chi-lam-dep",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/42",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=42"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 45,
+    "count": 129,
+    "description": "Tạp Chí Nước Hoa nơi chia sẻ kiến thức về các loại nước hoa cho các tín đồ đam mê nước hoa cùng thưởng thức nhiều hương thơm và bàn luận về các câu chuyện bên trong chai nước hoa.",
+    "link": "https://mfparis.vn/tap-chi-nuoc-hoa-mf/",
+    "name": "Tạp Chí Nước Hoa",
+    "slug": "tap-chi-nuoc-hoa-mf",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/45",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=45"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 91,
+    "count": 25,
+    "description": "Tạp Chí Sức Khỏe nơi cho bạn những lựa chọn tốt nhất để có thể chăm sóc sức khỏe bản thân và mang lại cuộc sống vui khỏe bổ ích.",
+    "link": "https://mfparis.vn/tap-chi-suc-khoe/",
+    "name": "Tạp Chí Sức Khỏe",
+    "slug": "tap-chi-suc-khoe",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/91",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=91"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 457,
+    "count": 1,
+    "description": "",
+    "link": "https://mfparis.vn/tap-chi-suc-khoe/tuoi-gia/",
+    "name": "Tuổi Già",
+    "slug": "tuoi-gia",
+    "taxonomy": "category",
+    "parent": 91,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/457",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/91"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=457"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 1,
+    "count": 3,
+    "description": "",
+    "link": "https://mfparis.vn/uncategorized/",
+    "name": "Uncategorized",
+    "slug": "uncategorized",
+    "taxonomy": "category",
+    "parent": 0,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/1",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=1"
+        }
+      ],
+      "curies": [
+        {
+          "name": "wp",
+          "href": "https://api.w.org/{rel}",
+          "templated": true
+        }
+      ]
+    }
+  },
+  {
+    "id": 444,
+    "count": 25,
+    "description": "Cập nhật xu hướng nước hoa mới nhất để giúp mọi người đưa ra sự lựa chọn tốt nhất cho chai nước hoa mình yêu thích.",
+    "link": "https://mfparis.vn/tap-chi-nuoc-hoa-mf/xu-huong-nuoc-hoa/",
+    "name": "Xu Hướng Nước Hoa",
+    "slug": "xu-huong-nuoc-hoa",
+    "taxonomy": "category",
+    "parent": 45,
+    "meta": [],
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/444",
+          "targetHints": {
+            "allow": [
+              "GET"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+        }
+      ],
+      "about": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+        }
+      ],
+      "up": [
+        {
+          "embeddable": true,
+          "href": "https://mfparis.vn/wp-json/wp/v2/categories/45"
+        }
+      ],
+      "wp:post_type": [
+        {
+          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=444"
         }
       ],
       "curies": [
