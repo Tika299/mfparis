@@ -5,22 +5,35 @@ import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
 import fetch from 'node-fetch'
 import { JSDOM } from 'jsdom'
+import pLimit from 'p-limit'
+
+/**
+ * File: src/scripts/import-wp-data.ts
+ *
+ * JSON files cần đặt cùng thư mục với file này:
+ * - brands.json
+ * - product-categories.json
+ * - post-categories.json
+ * - products.json
+ * - posts.json
+ *
+ * Lệnh chạy:
+ * npm run import:wp:taxonomies
+ * npm run import:wp:products
+ * npm run import:wp:posts
+ *
+ * Nếu field ảnh đại diện bài viết đang required:
+ * npm run import:wp:posts -- --placeholder-featured
+ */
+
+type AnyRecord = Record<string, any>
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+// Load ENV trước khi import @payload-config
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
-
-const DATA_FILES = {
-    brands: 'brands.json',
-    productCategories: 'product-categories.json',
-    postCategories: 'post-categories.json',
-    products: 'products.json',
-    posts: 'posts.json',
-}
-
-const USER_AGENT =
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
+dotenv.config({ path: path.resolve(__dirname, '../../.env.local') })
 
 const args = process.argv.slice(2)
 
@@ -36,10 +49,30 @@ const ONLY = getArg('--only', 'all')
 
 const UPDATE_EXISTING = hasFlag('--update')
 const SKIP_MEDIA = hasFlag('--skip-media')
+const DRY_RUN = hasFlag('--dry-run')
+const USE_PLACEHOLDER_FEATURED = hasFlag('--placeholder-featured')
 
-// Muốn lưu nguyên bản toàn bộ dữ liệu WordPress vào Payload thì set KEEP_RAW_WP=true
-// Nhưng collection Payload của bạn phải có field wpId, wpRaw, wpLink.
+// Nếu muốn giữ nguyên toàn bộ JSON gốc WordPress/WooCommerce, thêm field wpId, wpLink, wpRaw vào collection rồi bật:
+// Windows CMD: set KEEP_RAW_WP=true && npm run import:wp:products
+// Linux VPS: KEEP_RAW_WP=true npm run import:wp:products
 const KEEP_RAW_WP = process.env.KEEP_RAW_WP === 'true'
+
+const MEDIA_CONCURRENCY = Math.max(1, Number(getArg('--media-concurrency', '2')) || 2)
+const ITEM_LIMIT = Math.max(0, Number(getArg('--limit', '0')) || 0)
+const ITEM_OFFSET = Math.max(0, Number(getArg('--offset', '0')) || 0)
+
+const mediaLimit = pLimit(MEDIA_CONCURRENCY)
+
+const DATA_FILES = {
+    brands: 'brands.json',
+    productCategories: 'product-categories.json',
+    postCategories: 'post-categories.json',
+    products: 'products.json',
+    posts: 'posts.json',
+}
+
+const USER_AGENT =
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -65,19 +98,24 @@ const toNumber = (value: any, fallback = 0) => {
     return Number.isFinite(number) ? number : fallback
 }
 
-const withoutUndefined = (obj: Record<string, any>) => {
+const withoutUndefined = (obj: AnyRecord) => {
     return Object.fromEntries(Object.entries(obj).filter(([, value]) => value !== undefined))
 }
 
-const withWpRaw = (data: Record<string, any>, item: any) => {
+const withWpRaw = (data: AnyRecord, item: AnyRecord) => {
     if (!KEEP_RAW_WP) return data
 
     return {
         ...data,
         wpId: item.id,
-        wpLink: item.link || item.permalink || '',
+        wpLink: item.link || item.permalink || item._links?.self?.[0]?.href || '',
         wpRaw: item,
     }
+}
+
+const applySlice = <T>(items: T[]) => {
+    const offsetItems = ITEM_OFFSET > 0 ? items.slice(ITEM_OFFSET) : items
+    return ITEM_LIMIT > 0 ? offsetItems.slice(0, ITEM_LIMIT) : offsetItems
 }
 
 const readJSON = <T = any>(filename: string): T[] => {
@@ -88,9 +126,21 @@ const readJSON = <T = any>(filename: string): T[] => {
         return []
     }
 
-    return JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+    const raw = fs.readFileSync(filePath, 'utf-8')
+    const data = JSON.parse(raw)
+
+    if (!Array.isArray(data)) {
+        console.warn(`⚠️ File không phải array JSON: ${filePath}`)
+        return []
+    }
+
+    return applySlice(data)
 }
 
+/**
+ * Cách này bọc HTML thô vào Lexical JSON.
+ * Nếu frontend của bạn render richText theo kiểu riêng, vẫn giữ được HTML gốc dưới dạng text.
+ */
 const convertHTMLtoLexical = (html: string) => {
     return {
         root: {
@@ -113,7 +163,7 @@ const convertHTMLtoLexical = (html: string) => {
                             format: 0,
                             mode: 'normal',
                             style: '',
-                            text: html || '',
+                            text: cleanDesc(html || ''),
                             type: 'text',
                             version: 1,
                         },
@@ -162,7 +212,18 @@ function parseHTMLToAccordions(html: string) {
         }
     })
 
-    return accordions
+    return accordions.length > 0
+        ? accordions
+        : [{ title: 'Mô tả', content: convertHTMLtoLexical(html) }]
+}
+
+function extractImageFromSrcset(srcset: string | null) {
+    if (!srcset) return ''
+
+    const first = srcset.split(',')[0]?.trim()
+    if (!first) return ''
+
+    return first.split(/\s+/)[0] || ''
 }
 
 function extractFirstImageFromHTML(html: string) {
@@ -173,10 +234,21 @@ function extractFirstImageFromHTML(html: string) {
 
     if (!img) return ''
 
-    return img.getAttribute('data-src') || img.getAttribute('src') || ''
+    const dataSrc = img.getAttribute('data-src') || img.getAttribute('data-lazy-src')
+    const src = img.getAttribute('src')
+    const dataSrcset = img.getAttribute('data-srcset') || img.getAttribute('srcset')
+
+    if (dataSrc && dataSrc.startsWith('http')) return dataSrc
+
+    if (src && src.startsWith('http') && !src.includes('/lazy.svg')) return src
+
+    const fromSrcset = extractImageFromSrcset(dataSrcset)
+    if (fromSrcset && fromSrcset.startsWith('http')) return fromSrcset
+
+    return ''
 }
 
-async function findOne(payload: any, collection: string, where: any) {
+async function findOne(payload: any, collection: string, where: AnyRecord) {
     const result = await payload.find({
         collection: collection as any,
         limit: 1,
@@ -186,70 +258,20 @@ async function findOne(payload: any, collection: string, where: any) {
     return result.docs?.[0] || null
 }
 
-async function uploadMedia(payload: any, url: string, alt: string) {
-    try {
-        if (!url || SKIP_MEDIA) return null
-
-        const filename = url.split('/').pop()?.split('?')[0] || `${Date.now()}.jpg`
-
-        try {
-            const existing = await findOne(payload, 'media', {
-                filename: { equals: filename },
-            })
-
-            if (existing?.id) {
-                return existing.id
-            }
-        } catch {
-            // Nếu media collection không cho tìm theo filename thì bỏ qua check trùng.
-        }
-
-        const response = await fetch(url, {
-            headers: {
-                'User-Agent': USER_AGENT,
-                Accept: 'image/*,*/*',
-            },
-        })
-
-        if (!response.ok) {
-            console.log(`   ⚠️ Không tải được ảnh: ${url}`)
-            return null
-        }
-
-        const buffer = Buffer.from(await response.arrayBuffer())
-        const mimetype = response.headers.get('content-type') || 'image/jpeg'
-
-        const media = await payload.create({
-            collection: 'media',
-            data: {
-                alt: alt || 'MF Paris',
-            },
-            file: {
-                data: buffer,
-                name: filename,
-                mimetype,
-                size: buffer.length,
-            },
-        })
-
-        await sleep(100)
-
-        return media.id
-    } catch (error: any) {
-        console.error(`   ❌ Lỗi upload ảnh: ${url}`)
-        console.error(`   ${error.message}`)
-        return null
-    }
-}
-
-async function createOrUpdateBySlug(payload: any, collection: string, slug: string, data: any) {
+async function createOrUpdateBySlug(payload: any, collection: string, slug: string, data: AnyRecord) {
     const existing = await findOne(payload, collection, {
-        slug: { equals: slug },
+        slug: {
+            equals: slug,
+        },
     })
 
     if (existing?.id) {
         if (!UPDATE_EXISTING) {
             return { id: existing.id, action: 'skip' }
+        }
+
+        if (DRY_RUN) {
+            return { id: existing.id, action: 'dry-update' }
         }
 
         const updated = await payload.update({
@@ -261,6 +283,10 @@ async function createOrUpdateBySlug(payload: any, collection: string, slug: stri
         return { id: updated.id, action: 'update' }
     }
 
+    if (DRY_RUN) {
+        return { id: `dry-${slug}`, action: 'dry-create' }
+    }
+
     const created = await payload.create({
         collection: collection as any,
         data,
@@ -269,8 +295,185 @@ async function createOrUpdateBySlug(payload: any, collection: string, slug: stri
     return { id: created.id, action: 'create' }
 }
 
+async function fetchWithTimeout(url: string, timeoutMs = 30000) {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), timeoutMs)
+
+    try {
+        return await fetch(url, {
+            signal: controller.signal,
+            headers: {
+                'User-Agent': USER_AGENT,
+                Accept: 'image/*,*/*',
+            },
+        })
+    } finally {
+        clearTimeout(timeout)
+    }
+}
+
+async function uploadMedia(payload: any, url: string, alt: string) {
+    return mediaLimit(async () => {
+        try {
+            if (!url || !url.startsWith('http')) return null
+            if (SKIP_MEDIA) return null
+
+            const filename = decodeURIComponent(url.split('/').pop()?.split('?')[0] || `${Date.now()}.jpg`)
+
+            try {
+                const existing = await findOne(payload, 'media', {
+                    filename: {
+                        equals: filename,
+                    },
+                })
+
+                if (existing?.id) return existing.id
+            } catch {
+                // Nếu media collection không cho search filename thì bỏ qua check trùng.
+            }
+
+            const response = await fetchWithTimeout(url)
+
+            if (!response.ok) {
+                console.log(`   ⚠️ Không tải được ảnh ${response.status}: ${url}`)
+                return null
+            }
+
+            const contentType = response.headers.get('content-type') || 'image/jpeg'
+
+            if (!contentType.startsWith('image/')) {
+                console.log(`   ⚠️ URL không phải ảnh: ${url}`)
+                return null
+            }
+
+            const buffer = Buffer.from(await response.arrayBuffer())
+
+            if (!buffer.length) return null
+
+            const media = await payload.create({
+                collection: 'media',
+                data: {
+                    alt: alt || 'MF Paris',
+                },
+                file: {
+                    data: buffer,
+                    name: filename,
+                    mimetype: contentType,
+                    size: buffer.length,
+                },
+            })
+
+            await sleep(50)
+
+            return media.id
+        } catch (error: any) {
+            console.log(`   ⚠️ Lỗi upload ảnh: ${url}`)
+            console.log(`   ${error.message}`)
+            return null
+        }
+    })
+}
+
+async function createPlaceholderMedia(payload: any) {
+    const filename = 'mfparis-placeholder-featured.png'
+
+    try {
+        const existing = await findOne(payload, 'media', {
+            filename: {
+                equals: filename,
+            },
+        })
+
+        if (existing?.id) return existing.id
+    } catch {
+        // Bỏ qua nếu không search được filename.
+    }
+
+    if (DRY_RUN) return 'dry-placeholder-media'
+
+    // 1x1 transparent PNG
+    const pngBase64 =
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII='
+    const buffer = Buffer.from(pngBase64, 'base64')
+
+    const media = await payload.create({
+        collection: 'media',
+        data: {
+            alt: 'MF Paris Placeholder',
+        },
+        file: {
+            data: buffer,
+            name: filename,
+            mimetype: 'image/png',
+            size: buffer.length,
+        },
+    })
+
+    return media.id
+}
+
+async function ensureBrand(payload: any, brand: AnyRecord) {
+    if (!brand) return undefined
+
+    const slug = brand.slug || formatSlug(brand.name)
+
+    const existing = await findOne(payload, 'brands', {
+        slug: {
+            equals: slug,
+        },
+    })
+
+    if (existing?.id) return existing.id
+
+    const result = await createOrUpdateBySlug(
+        payload,
+        'brands',
+        slug,
+        withWpRaw(
+            withoutUndefined({
+                name: brand.name,
+                slug,
+                description: cleanDesc(brand.description || ''),
+            }),
+            brand,
+        ),
+    )
+
+    return result.id
+}
+
+async function ensureCategory(payload: any, category: AnyRecord) {
+    if (!category) return undefined
+
+    const slug = category.slug || formatSlug(category.name)
+
+    const existing = await findOne(payload, 'categories', {
+        slug: {
+            equals: slug,
+        },
+    })
+
+    if (existing?.id) return existing.id
+
+    const result = await createOrUpdateBySlug(
+        payload,
+        'categories',
+        slug,
+        withWpRaw(
+            withoutUndefined({
+                name: category.name,
+                slug,
+            }),
+            category,
+        ),
+    )
+
+    return result.id
+}
+
 async function importBrands(payload: any) {
-    const brandsData = readJSON<any>(DATA_FILES.brands)
+    const brandsData = readJSON<AnyRecord>(DATA_FILES.brands)
+    const brandMap = new Map<number, string>()
 
     console.log(`\n📦 Import Brands: ${brandsData.length}`)
 
@@ -283,47 +486,55 @@ async function importBrands(payload: any) {
                 withoutUndefined({
                     name: item.name,
                     slug,
-                    description: cleanDesc(item.description),
+                    description: cleanDesc(item.description || ''),
                     logo: logoId || undefined,
                 }),
                 item,
             )
 
             const result = await createOrUpdateBySlug(payload, 'brands', slug, data)
+            brandMap.set(item.id, result.id)
 
             console.log(`   ${result.action === 'skip' ? '⏩' : '✅'} Brand: ${item.name}`)
         } catch (error: any) {
             console.error(`   ❌ Brand lỗi: ${item.name} - ${error.message}`)
         }
     }
+
+    return brandMap
 }
 
 async function importProductCategories(payload: any) {
-    const categoriesData = readJSON<any>(DATA_FILES.productCategories)
+    const categoriesData = readJSON<AnyRecord>(DATA_FILES.productCategories)
+    const catMap = new Map<number, string>()
 
     console.log(`\n📦 Import Product Categories: ${categoriesData.length}`)
-
-    const idMap = new Map<number, string>()
 
     for (const item of categoriesData) {
         try {
             const slug = item.slug || formatSlug(item.name)
             const imageId = item.image?.src ? await uploadMedia(payload, item.image.src, item.name) : null
 
+            /**
+             * Giữ các field tương thích cao với collection categories hiện tại:
+             * - name
+             * - slug
+             * - image
+             *
+             * Nếu muốn lưu đủ field như parent, count, _links, image object gốc:
+             * thêm wpRaw vào collection và bật KEEP_RAW_WP=true.
+             */
             const data = withWpRaw(
                 withoutUndefined({
                     name: item.name,
                     slug,
-                    description: cleanDesc(item.description),
                     image: imageId || undefined,
-                    menuOrder: item.menu_order ?? undefined,
                 }),
                 item,
             )
 
             const result = await createOrUpdateBySlug(payload, 'categories', slug, data)
-
-            idMap.set(item.id, result.id)
+            catMap.set(item.id, result.id)
 
             console.log(`   ${result.action === 'skip' ? '⏩' : '✅'} Product Category: ${item.name}`)
         } catch (error: any) {
@@ -331,18 +542,18 @@ async function importProductCategories(payload: any) {
         }
     }
 
-    // Cập nhật parent sau khi đã tạo hết category.
-    // Nếu collection categories chưa có field parent thì đoạn này sẽ tự bỏ qua.
-    console.log('\n🔗 Cập nhật parent cho Product Categories...')
+    // Cập nhật parent nếu collection categories có field parent.
+    console.log('\n🔗 Cập nhật parent Product Categories nếu collection có field parent...')
 
     for (const item of categoriesData) {
         try {
             if (!item.parent || item.parent === 0) continue
 
-            const currentId = idMap.get(item.id)
-            const parentId = idMap.get(item.parent)
+            const currentId = catMap.get(item.id)
+            const parentId = catMap.get(item.parent)
 
             if (!currentId || !parentId) continue
+            if (DRY_RUN) continue
 
             await payload.update({
                 collection: 'categories',
@@ -352,19 +563,20 @@ async function importProductCategories(payload: any) {
                 } as any,
             })
 
-            console.log(`   ✅ Parent: ${item.name}`)
+            console.log(`   ✅ Parent Product Category: ${item.name}`)
         } catch {
-            console.log(`   ⚠️ Bỏ qua parent: ${item.name}`)
+            console.log(`   ⚠️ Bỏ qua parent Product Category: ${item.name}`)
         }
     }
+
+    return catMap
 }
 
 async function importPostCategories(payload: any) {
-    const categoriesData = readJSON<any>(DATA_FILES.postCategories)
+    const categoriesData = readJSON<AnyRecord>(DATA_FILES.postCategories)
+    const postCatMap = new Map<number, string>()
 
     console.log(`\n📦 Import Post Categories: ${categoriesData.length}`)
-
-    const idMap = new Map<number, string>()
 
     for (const item of categoriesData) {
         try {
@@ -374,14 +586,12 @@ async function importPostCategories(payload: any) {
                 withoutUndefined({
                     title: item.name,
                     slug,
-                    description: cleanDesc(item.description),
                 }),
                 item,
             )
 
             const result = await createOrUpdateBySlug(payload, 'post-categories', slug, data)
-
-            idMap.set(item.id, result.id)
+            postCatMap.set(item.id, result.id)
 
             console.log(`   ${result.action === 'skip' ? '⏩' : '✅'} Post Category: ${item.name}`)
         } catch (error: any) {
@@ -389,16 +599,18 @@ async function importPostCategories(payload: any) {
         }
     }
 
-    console.log('\n🔗 Cập nhật parent cho Post Categories...')
+    // Cập nhật parent nếu collection post-categories có field parent.
+    console.log('\n🔗 Cập nhật parent Post Categories nếu collection có field parent...')
 
     for (const item of categoriesData) {
         try {
             if (!item.parent || item.parent === 0) continue
 
-            const currentId = idMap.get(item.id)
-            const parentId = idMap.get(item.parent)
+            const currentId = postCatMap.get(item.id)
+            const parentId = postCatMap.get(item.parent)
 
             if (!currentId || !parentId) continue
+            if (DRY_RUN) continue
 
             await payload.update({
                 collection: 'post-categories',
@@ -408,15 +620,17 @@ async function importPostCategories(payload: any) {
                 } as any,
             })
 
-            console.log(`   ✅ Parent: ${item.name}`)
+            console.log(`   ✅ Parent Post Category: ${item.name}`)
         } catch {
-            console.log(`   ⚠️ Bỏ qua parent: ${item.name}`)
+            console.log(`   ⚠️ Bỏ qua parent Post Category: ${item.name}`)
         }
     }
+
+    return postCatMap
 }
 
 async function importProducts(payload: any) {
-    const productsData = readJSON<any>(DATA_FILES.products)
+    const productsData = readJSON<AnyRecord>(DATA_FILES.products)
 
     console.log(`\n📦 Import Products: ${productsData.length}`)
 
@@ -425,7 +639,9 @@ async function importProducts(payload: any) {
             const productSlug = item.slug || formatSlug(item.name)
 
             const existingProd = await findOne(payload, 'products', {
-                slug: { equals: productSlug },
+                slug: {
+                    equals: productSlug,
+                },
             })
 
             if (existingProd?.id && !UPDATE_EXISTING) {
@@ -436,47 +652,34 @@ async function importProducts(payload: any) {
             let brandId: string | undefined = undefined
 
             if (item.brands && item.brands.length > 0) {
-                const brandSlug = item.brands[0].slug || formatSlug(item.brands[0].name)
-
-                const existingBrand = await findOne(payload, 'brands', {
-                    slug: { equals: brandSlug },
-                })
-
-                if (existingBrand?.id) {
-                    brandId = existingBrand.id
-                }
+                brandId = await ensureBrand(payload, item.brands[0])
             }
 
             const categoryIds: string[] = []
 
             if (item.categories && item.categories.length > 0) {
                 for (const cat of item.categories) {
-                    const catSlug = cat.slug || formatSlug(cat.name)
-
-                    const existingCat = await findOne(payload, 'categories', {
-                        slug: { equals: catSlug },
-                    })
-
-                    if (existingCat?.id) {
-                        categoryIds.push(existingCat.id)
-                    }
+                    const categoryId = await ensureCategory(payload, cat)
+                    if (categoryId) categoryIds.push(categoryId)
                 }
             }
 
             const uploadedImages: any[] = []
 
             if (item.images && item.images.length > 0) {
-                for (const img of item.images) {
-                    const mediaId = await uploadMedia(payload, img.src, img.alt || item.name)
+                const imageIds = await Promise.all(
+                    item.images.map((img: AnyRecord) => uploadMedia(payload, img.src, img.alt || item.name)),
+                )
 
-                    if (mediaId) {
-                        uploadedImages.push({ image: mediaId })
-                    }
-                }
+                imageIds
+                    .filter((id) => Boolean(id))
+                    .forEach((id) => {
+                        uploadedImages.push({ image: id })
+                    })
             }
 
             const specs =
-                item.attributes?.map((attr: any) => ({
+                item.attributes?.map((attr: AnyRecord) => ({
                     label: attr.name,
                     value: attr.options ? attr.options.join(', ') : '',
                 })) || []
@@ -484,9 +687,7 @@ async function importProducts(payload: any) {
             const wpDescription = item.description || ''
             const parsedAccordions = parseHTMLToAccordions(wpDescription)
 
-            const basePrice =
-                toNumber(item.regular_price, 0) || toNumber(item.price, 0)
-
+            const basePrice = toNumber(item.regular_price, 0) || toNumber(item.price, 0)
             const salePrice = item.sale_price ? toNumber(item.sale_price, 0) : undefined
 
             const stock =
@@ -519,6 +720,11 @@ async function importProducts(payload: any) {
                 item,
             )
 
+            if (DRY_RUN) {
+                console.log(`   🧪 Dry-run Product: ${item.name}`)
+                continue
+            }
+
             if (existingProd?.id && UPDATE_EXISTING) {
                 await payload.update({
                     collection: 'products',
@@ -540,8 +746,8 @@ async function importProducts(payload: any) {
 }
 
 async function importPosts(payload: any) {
-    const postsData = readJSON<any>(DATA_FILES.posts)
-    const postCategoriesData = readJSON<any>(DATA_FILES.postCategories)
+    const postsData = readJSON<AnyRecord>(DATA_FILES.posts)
+    const postCategoriesData = readJSON<AnyRecord>(DATA_FILES.postCategories)
 
     console.log(`\n📦 Import Posts: ${postsData.length}`)
 
@@ -551,13 +757,22 @@ async function importPosts(payload: any) {
         wpCatIdToSlug.set(cat.id, cat.slug)
     }
 
+    let placeholderMediaId: string | null = null
+
+    if (USE_PLACEHOLDER_FEATURED && !SKIP_MEDIA) {
+        placeholderMediaId = await createPlaceholderMedia(payload)
+        console.log(`🖼️ Placeholder featured image: ${placeholderMediaId}`)
+    }
+
     for (const item of postsData) {
         try {
-            const title = item.title?.rendered || item.slug
+            const title = item.title?.rendered || item.slug || `Post ${item.id}`
             const postSlug = item.slug || formatSlug(title)
 
             const existingPost = await findOne(payload, 'posts', {
-                slug: { equals: postSlug },
+                slug: {
+                    equals: postSlug,
+                },
             })
 
             if (existingPost?.id && !UPDATE_EXISTING) {
@@ -574,7 +789,9 @@ async function importPosts(payload: any) {
                     if (!slug) continue
 
                     const existingCat = await findOne(payload, 'post-categories', {
-                        slug: { equals: slug },
+                        slug: {
+                            equals: slug,
+                        },
                     })
 
                     if (existingCat?.id) {
@@ -587,9 +804,11 @@ async function importPosts(payload: any) {
             const excerptHTML = item.excerpt?.rendered || ''
 
             const firstImageUrl = extractFirstImageFromHTML(contentHTML)
-            const featuredImageId = firstImageUrl
-                ? await uploadMedia(payload, firstImageUrl, title)
-                : null
+            let featuredImageId = firstImageUrl ? await uploadMedia(payload, firstImageUrl, title) : null
+
+            if (!featuredImageId && USE_PLACEHOLDER_FEATURED && placeholderMediaId) {
+                featuredImageId = placeholderMediaId
+            }
 
             const data = withWpRaw(
                 withoutUndefined({
@@ -604,6 +823,11 @@ async function importPosts(payload: any) {
                 }),
                 item,
             )
+
+            if (DRY_RUN) {
+                console.log(`   🧪 Dry-run Post: ${title}`)
+                continue
+            }
 
             if (existingPost?.id && UPDATE_EXISTING) {
                 await payload.update({
@@ -631,6 +855,15 @@ async function run() {
     console.log(`👉 Update existing: ${UPDATE_EXISTING ? 'Có' : 'Không'}`)
     console.log(`👉 Skip media: ${SKIP_MEDIA ? 'Có' : 'Không'}`)
     console.log(`👉 Keep raw WP: ${KEEP_RAW_WP ? 'Có' : 'Không'}`)
+    console.log(`👉 Dry-run: ${DRY_RUN ? 'Có' : 'Không'}`)
+    console.log(`👉 Media concurrency: ${MEDIA_CONCURRENCY}`)
+    console.log(`👉 Placeholder featured: ${USE_PLACEHOLDER_FEATURED ? 'Có' : 'Không'}`)
+    console.log(`👉 Limit: ${ITEM_LIMIT || 'Không giới hạn'}`)
+    console.log(`👉 Offset: ${ITEM_OFFSET}`)
+
+    if (!process.env.PAYLOAD_SECRET) {
+        throw new Error('Thiếu PAYLOAD_SECRET trong .env hoặc .env.local')
+    }
 
     const configPromise = (await import('@payload-config')).default
     const payload = await getPayload({ config: configPromise })
@@ -659,4 +892,8 @@ async function run() {
     process.exit(0)
 }
 
-run()
+run().catch((error) => {
+    console.error('\n❌ IMPORT THẤT BẠI:')
+    console.error(error)
+    process.exit(1)
+})
