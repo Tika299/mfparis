@@ -991,8 +991,9 @@ async function importPosts(payload: any) {
                 status: item.status === 'publish' ? 'published' : 'draft',
             }
 
+            // Collection Posts của bạn dùng field thumbnail
             if (featuredImageId) {
-                postData.featuredImage = featuredImageId
+                postData.thumbnail = featuredImageId
             }
 
             const data = withWpRaw(withoutUndefined(postData), item)
@@ -1020,23 +1021,27 @@ async function importPosts(payload: any) {
             } catch (error: any) {
                 const message = String(error?.message || '')
 
-                if (message.includes('Ảnh đại diện') || message.includes('featuredImage')) {
-                    delete data.featuredImage
+                if (message.includes('Ảnh đại diện') || message.includes('thumbnail') || message.includes('featuredImage')) {
+                    if (placeholderMediaId) {
+                        data.thumbnail = placeholderMediaId
 
-                    if (existingPost?.id && UPDATE_EXISTING) {
-                        await payload.update({
-                            collection: 'posts',
-                            id: existingPost.id,
-                            data,
-                        })
+                        if (existingPost?.id && UPDATE_EXISTING) {
+                            await payload.update({
+                                collection: 'posts',
+                                id: existingPost.id,
+                                data,
+                            })
+                        } else {
+                            await payload.create({
+                                collection: 'posts',
+                                data,
+                            })
+                        }
+
+                        console.log(`   ✅ Post dùng ảnh placeholder: ${title}`)
                     } else {
-                        await payload.create({
-                            collection: 'posts',
-                            data,
-                        })
+                        throw error
                     }
-
-                    console.log(`   ✅ Post không ảnh đại diện: ${title}`)
                 } else {
                     throw error
                 }
