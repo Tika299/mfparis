@@ -8,6 +8,15 @@ export const Categories: CollectionConfig = {
     { name: 'name', type: 'text', required: true },
     { name: 'image', type: 'upload', relationTo: 'media' },
     {
+      name: 'description',
+      type: 'textarea',
+      label: 'Mô tả danh mục',
+      admin: {
+        rows: 8,
+        description: 'Dùng để import mô tả danh mục từ WooCommerce. Có thể chứa HTML.',
+      },
+    },
+    {
       name: 'slug',
       type: 'text',
       required: true,

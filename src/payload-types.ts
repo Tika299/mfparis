@@ -350,6 +350,10 @@ export interface Category {
   name: string;
   image?: (number | null) | Media;
   /**
+   * Dùng để import mô tả danh mục từ WooCommerce. Có thể chứa HTML.
+   */
+  description?: string | null;
+  /**
    * Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO
    */
   slug: string;
@@ -741,6 +745,7 @@ export interface ProductsSelect<T extends boolean = true> {
 export interface CategoriesSelect<T extends boolean = true> {
   name?: T;
   image?: T;
+  description?: T;
   slug?: T;
   parent?: T;
   updatedAt?: T;
