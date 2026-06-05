@@ -3,9 +3,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
-import { User, ShoppingBag, Phone, MapPin, Truck, ShieldCheck } from 'lucide-react'
+import { User, ShoppingBag, Truck, ShieldCheck } from 'lucide-react'
 import { SearchBar } from './SearchBar'
 import { CartCount } from './CartCount'
+import { MobileMenu } from '../MobileMenu'
 
 export const Header = async () => {
   const payload = await getPayload({ config: configPromise })
@@ -17,77 +18,94 @@ export const Header = async () => {
   const navItems = settings.header?.navItems || []
 
   return (
-    <header className="bg-white sticky top-0 z-[100] shadow-sm antialiased font-sans">
-      {/* 1. TOP BAR - Cung cấp niềm tin ngay lập tức */}
-      <div className="bg-primary text-primary-foreground py-2 border-b border-white/10 hidden md:block">
-        <div className="container-custom flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
-          <div className="flex gap-6">
-            <span className="flex items-center gap-2"><Truck size={12} /> Miễn phí vận chuyển cho đơn hàng từ 500k</span>
-            <span className="flex items-center gap-2"><ShieldCheck size={12} /> 100% Chính hãng Pháp</span>
+    <header className="sticky top-0 z-[100] bg-white shadow-sm antialiased font-sans">
+      {/* TOP BAR - Desktop / Tablet lớn */}
+      <div className="hidden bg-primary text-primary-foreground border-b border-white/10 md:block">
+        <div className="container-custom flex h-9 items-center justify-between text-[10px] font-bold uppercase tracking-widest">
+          <div className="flex items-center gap-4 lg:gap-6">
+            <span className="flex items-center gap-2 whitespace-nowrap">
+              <Truck size={12} /> Miễn phí vận chuyển từ 500k
+            </span>
+
+            <span className="hidden lg:flex items-center gap-2 whitespace-nowrap">
+              <ShieldCheck size={12} /> 100% Chính hãng Pháp
+            </span>
           </div>
-          <div className="flex gap-4">
-            <Link href="/about" className="hover:opacity-70 transition-opacity">Giới thiệu</Link>
-            <Link href="/blog" className="hover:opacity-70 transition-opacity">Tạp chí</Link>
+
+          <div className="flex items-center gap-4">
+            <Link href="/about" className="hover:opacity-70 transition-opacity">
+              Giới thiệu
+            </Link>
+            <Link href="/blog" className="hover:opacity-70 transition-opacity">
+              Tạp chí
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* 2. MAIN HEADER - Khung 1200px chuẩn UX */}
-      <div className="bg-white h-20">
-        <div className="container-custom h-full flex justify-between items-center gap-8">
+      {/* MAIN HEADER */}
+      <div className="bg-white">
+        <div className="container-custom flex h-16 items-center justify-between gap-3 md:h-18 lg:h-20 lg:gap-8">
+          {/* MOBILE MENU */}
+          <div className="flex lg:hidden">
+            <MobileMenu navItems={navItems.filter((item): item is { id: string; label: string; link: string } => item.id !== null && item.id !== undefined)} />
+          </div>
 
           {/* LOGO */}
-          <Link href="/" className="flex-shrink-0 group">
+          <Link href="/" className="flex shrink-0 items-center group">
             {logoUrl ? (
-              <Image src={logoUrl} alt={logoAlt} width={140} height={45} className="h-9 w-auto object-contain transition-transform group-hover:scale-105" priority />
+              <Image
+                src={logoUrl}
+                alt={logoAlt}
+                width={140}
+                height={45}
+                className="h-8 w-auto object-contain transition-transform group-hover:scale-105 sm:h-9 lg:h-10"
+                priority
+              />
             ) : (
               <div className="flex flex-col">
-                <span className="font-heading text-2xl font-bold tracking-tight uppercase leading-none text-primary">
+                <span className="font-heading text-xl font-bold tracking-tight uppercase leading-none text-primary sm:text-2xl">
                   MF PARIS
                 </span>
-                <span className="mt-1 font-sans text-[8px] font-bold uppercase tracking-[0.4em] text-gray-400">
+                <span className="mt-1 hidden font-sans text-[8px] font-bold uppercase tracking-[0.35em] text-gray-400 sm:block">
                   Authentic Service
                 </span>
               </div>
             )}
           </Link>
 
-          {/* DYNAMIC NAVIGATION - Playfair Display */}
-          <nav className="hidden lg:flex items-center gap-8">
+          {/* DESKTOP NAV */}
+          <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
             {navItems.map((item: any) => (
               <Link
                 key={item.id}
                 href={item.link}
-                className="
-        group relative font-heading text-[16px] font-[600]
-        tracking-[0.02em] transition-colors duration-300
-        hover:text-primary
-      "
+                className="group relative font-heading text-[15px] xl:text-[16px] font-[600] tracking-[0.02em] transition-colors duration-300 hover:text-primary whitespace-nowrap"
               >
                 {item.label}
-
-                <span
-                  className="
-          absolute -bottom-2 left-0 h-[2px] w-0
-          rounded-full bg-primary transition-all duration-300
-          group-hover:w-full
-        "
-                />
+                <span className="absolute -bottom-2 left-0 h-[2px] w-0 rounded-full bg-primary transition-all duration-300 group-hover:w-full" />
               </Link>
             ))}
           </nav>
 
-          {/* UTILITY ICONS */}
-          <div className="flex items-center gap-5 shrink-0">
+          {/* SEARCH - TABLET / DESKTOP */}
+          <div className="hidden md:flex flex-1 justify-end lg:max-w-[260px] xl:max-w-[320px]">
             <SearchBar />
+          </div>
 
-            <div className="h-6 w-px bg-gray-100 hidden md:block"></div>
+          {/* ICONS */}
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3 md:gap-4">
+            <div className="hidden h-6 w-px bg-gray-100 md:block" />
 
-            <Link href="/account" className="text-gray-700 transition-colors hover:text-primary">
+            <Link
+              href="/account"
+              className="hidden rounded-full p-2 text-gray-700 transition-colors hover:bg-red-50 hover:text-primary sm:flex"
+              aria-label="Tài khoản"
+            >
               <User size={20} strokeWidth={2} />
             </Link>
 
-            <Link href="/cart" className="relative group">
+            <Link href="/cart" className="relative group" aria-label="Giỏ hàng">
               <div className="rounded-full bg-gray-50 p-2.5 transition-colors group-hover:bg-red-50">
                 <ShoppingBag
                   size={20}
@@ -98,6 +116,11 @@ export const Header = async () => {
               <CartCount />
             </Link>
           </div>
+        </div>
+
+        {/* SEARCH MOBILE RIÊNG */}
+        <div className="border-t border-gray-100 px-4 py-3 md:hidden">
+          <SearchBar mobile />
         </div>
       </div>
     </header>
