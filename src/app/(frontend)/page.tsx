@@ -157,8 +157,7 @@ export default async function HomePage() {
           <Carousel
             opts={{
               align: 'start',
-              loop: false,
-              dragFree: true,
+              loop: true,
             }}
             className="relative"
           >
@@ -203,8 +202,7 @@ export default async function HomePage() {
           <Carousel
             opts={{
               align: 'start',
-              loop: false,
-              dragFree: true,
+              loop: true,
             }}
             className="relative w-full"
           >
