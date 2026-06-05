@@ -536,6 +536,7 @@ async function ensureCategory(payload: any, category: AnyRecord) {
             withoutUndefined({
                 name: category.name || slug,
                 slug,
+                description: cleanDesc(category.description || ''),
             }),
             category,
         ),
@@ -632,6 +633,7 @@ async function importProductCategories(payload: any) {
                 withoutUndefined({
                     name: item.name || slug,
                     slug,
+                    description: cleanDesc(item.description || ''),
                     image: imageId || undefined,
                 }),
                 item,
