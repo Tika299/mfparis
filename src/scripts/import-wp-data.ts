@@ -4,32 +4,26 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
 import fetch from 'node-fetch'
-import { JSDOM } from 'jsdom'
 import pLimit from 'p-limit'
 
 /**
  * File: src/scripts/import-wp-data.ts
  *
  * Đặt các file JSON cùng thư mục với file này:
- * - brands.json
- * - product-categories.json
+ * - brands.richtext.json
+ * - product-categories.richtext.json
  * - post-categories.json
- * - products.json
- * - posts.json
+ * - products.converted.json
+ * - posts.richtext.json
  *
  * Lệnh chạy:
- * npm run import:wp:taxonomies
- * npm run import:wp:products
- * npm run import:wp:posts
+ * npm run import:wp -- --only=brands --update
+ * npm run import:wp -- --only=product-categories --update
+ * npm run import:wp -- --only=products --update
+ * npm run import:wp -- --only=posts --update --placeholder-featured
  *
  * Test trước:
- * npm run import:wp:products -- --limit=20
- *
- * Update lại sản phẩm đã có:
- * npm run import:wp:products -- --update
- *
- * Chạy chậm hơn để tránh Cloudflare/server chặn ảnh:
- * npm run import:wp:products -- --update --media-concurrency=1
+ * npm run import:wp -- --only=products --update --limit=20 --skip-media
  */
 
 type AnyRecord = Record<string, any>
@@ -37,7 +31,6 @@ type AnyRecord = Record<string, any>
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Bắt buộc load env trước khi dynamic import @payload-config
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 dotenv.config({ path: path.resolve(__dirname, '../../.env.local') })
 
@@ -59,9 +52,6 @@ const DRY_RUN = hasFlag('--dry-run')
 const USE_PLACEHOLDER_FEATURED = hasFlag('--placeholder-featured')
 const DISABLE_FALLBACK_BRAND = hasFlag('--no-fallback-brand')
 
-// Nếu muốn giữ nguyên JSON gốc, thêm các field wpId, wpLink, wpRaw vào collection rồi bật:
-// Linux VPS: KEEP_RAW_WP=true npm run import:wp:products
-// Windows CMD: set KEEP_RAW_WP=true && npm run import:wp:products
 const KEEP_RAW_WP = process.env.KEEP_RAW_WP === 'true'
 
 const MEDIA_CONCURRENCY = Math.max(1, Number(getArg('--media-concurrency', '2')) || 2)
@@ -70,12 +60,14 @@ const ITEM_OFFSET = Math.max(0, Number(getArg('--offset', '0')) || 0)
 
 const mediaLimit = pLimit(MEDIA_CONCURRENCY)
 
+const WP_BASE_URL = 'https://mfparis.vn'
+
 const DATA_FILES = {
-    brands: 'brands.json',
-    productCategories: 'product-categories.json',
+    brands: 'brands.richtext.json',
+    productCategories: 'product-categories.richtext.json',
     postCategories: 'post-categories.json',
-    products: 'products.json',
-    posts: 'posts.json',
+    products: 'products.converted.json',
+    posts: 'posts.richtext.json',
 }
 
 const USER_AGENT =
@@ -102,7 +94,6 @@ const makeSafeSlug = (val: string, fallbackId?: string | number): string => {
         slug = `item-${fallbackId || Date.now()}`
     }
 
-    // Tránh slug quá dài gây lỗi validate/database index
     if (slug.length > 150) {
         slug = slug.slice(0, 150).replace(/-+$/g, '')
     }
@@ -113,9 +104,6 @@ const makeSafeSlug = (val: string, fallbackId?: string | number): string => {
 
     return slug
 }
-
-const cleanDesc = (text: string) =>
-    text ? String(text).replace(/\[html_block.*?\]/g, '').trim() : ''
 
 const stripHTML = (html: string) =>
     html ? String(html).replace(/<\/?[^>]+(>|$)/g, '').replace(/\s+/g, ' ').trim() : ''
@@ -164,33 +152,45 @@ const readJSON = <T = any>(filename: string): T[] => {
     return applySlice(data)
 }
 
-/**
- * Bọc HTML thô vào Lexical JSON.
- * Cách này ưu tiên giữ nội dung HTML gốc thay vì cố convert phức tạp.
- */
-const convertHTMLtoLexical = (html: string) => {
+const emptyRichText = () => ({
+    root: {
+        type: 'root',
+        format: '',
+        indent: 0,
+        version: 1,
+        children: [],
+        direction: null,
+    },
+})
+
+const plainTextToRichText = (text: string) => {
+    const value = String(text || '').trim()
+
+    if (!value) return emptyRichText()
+
     return {
         root: {
             type: 'root',
-            direction: 'ltr',
             format: '',
             indent: 0,
             version: 1,
+            direction: null,
             children: [
                 {
                     type: 'paragraph',
-                    direction: 'ltr',
                     format: '',
                     indent: 0,
-                    textFormat: 0,
                     version: 1,
+                    direction: null,
+                    textFormat: 0,
+                    textStyle: '',
                     children: [
                         {
                             detail: 0,
                             format: 0,
                             mode: 'normal',
                             style: '',
-                            text: cleanDesc(html || ''),
+                            text: value,
                             type: 'text',
                             version: 1,
                         },
@@ -198,78 +198,251 @@ const convertHTMLtoLexical = (html: string) => {
                 },
             ],
         },
-    } as any
+    }
 }
 
-function parseHTMLToAccordions(html: string) {
-    if (!html) return []
+const hasRichTextContent = (content: any) => {
+    return (
+        content &&
+        typeof content === 'object' &&
+        content.root &&
+        Array.isArray(content.root.children) &&
+        content.root.children.length > 0
+    )
+}
 
-    const dom = new JSDOM(html)
-    const doc = dom.window.document
-    const children = Array.from(doc.body.children)
+const extractTextFromLexicalNode = (node: any): string => {
+    if (!node) return ''
 
-    const accordions: any[] = []
-    let currentTitle = 'Mô tả sản phẩm'
-    let currentContent = ''
-
-    if (children.length === 0) {
-        return [{ title: currentTitle, content: convertHTMLtoLexical(html) }]
+    if (typeof node.text === 'string') {
+        return node.text
     }
 
-    children.forEach((child, index) => {
-        if (child.tagName === 'H2') {
-            if (currentContent.trim() !== '') {
-                accordions.push({
-                    title: currentTitle,
-                    content: convertHTMLtoLexical(currentContent),
-                })
-            }
-
-            currentTitle = child.textContent?.trim() || 'Thông tin'
-            currentContent = ''
-        } else {
-            currentContent += child.outerHTML
-        }
-
-        if (index === children.length - 1 && currentContent.trim() !== '') {
-            accordions.push({
-                title: currentTitle,
-                content: convertHTMLtoLexical(currentContent),
-            })
-        }
-    })
-
-    return accordions.length > 0
-        ? accordions
-        : [{ title: 'Mô tả', content: convertHTMLtoLexical(html) }]
-}
-
-function extractImageFromSrcset(srcset: string | null) {
-    if (!srcset) return ''
-    const first = srcset.split(',')[0]?.trim()
-    if (!first) return ''
-    return first.split(/\s+/)[0] || ''
-}
-
-function extractFirstImageFromHTML(html: string) {
-    if (!html) return ''
-
-    const dom = new JSDOM(html)
-    const img = dom.window.document.querySelector('img')
-
-    if (!img) return ''
-
-    const dataSrc = img.getAttribute('data-src') || img.getAttribute('data-lazy-src')
-    const src = img.getAttribute('src')
-    const dataSrcset = img.getAttribute('data-srcset') || img.getAttribute('srcset')
-
-    if (dataSrc && dataSrc.startsWith('http')) return dataSrc
-    if (src && src.startsWith('http') && !src.includes('/lazy.svg')) return src
-
-    const fromSrcset = extractImageFromSrcset(dataSrcset)
-    if (fromSrcset && fromSrcset.startsWith('http')) return fromSrcset
+    if (Array.isArray(node.children)) {
+        return node.children
+            .map((child: any) => extractTextFromLexicalNode(child))
+            .join(' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+    }
 
     return ''
+}
+
+const extractParagraphsFromRichText = (content: any): string[] => {
+    if (!hasRichTextContent(content)) return []
+
+    return content.root.children
+        .map((node: any) => extractTextFromLexicalNode(node))
+        .map((text: string) => text.trim())
+        .filter(Boolean)
+}
+
+const textToSafeRichText = (paragraphs: string[]) => {
+    const cleanParagraphs = paragraphs
+        .map((text) => String(text || '').replace(/\s+/g, ' ').trim())
+        .filter(Boolean)
+
+    if (cleanParagraphs.length === 0) return undefined
+
+    return {
+        root: {
+            type: 'root',
+            format: '',
+            indent: 0,
+            version: 1,
+            direction: null,
+            children: cleanParagraphs.map((text) => ({
+                type: 'paragraph',
+                format: '',
+                indent: 0,
+                version: 1,
+                direction: null,
+                textFormat: 0,
+                textStyle: '',
+                children: [
+                    {
+                        detail: 0,
+                        format: 0,
+                        mode: 'normal',
+                        style: '',
+                        text,
+                        type: 'text',
+                        version: 1,
+                    },
+                ],
+            })),
+        },
+    }
+}
+
+/**
+ * Dùng cho brand/category.
+ * Không đưa nguyên richText phức tạp vào Payload nữa.
+ * Convert về paragraph text an toàn để tránh lỗi field invalid.
+ */
+const cleanRichTextNode = (node: any): any => {
+    if (!node?.type) return null
+
+    // Bỏ upload vì đang là pending src từ WP, chưa phải media ID của Payload
+    if (node.type === 'upload') {
+        return null
+    }
+
+    // Nếu paragraph chứa upload bên trong thì lọc children
+    if (node.type === 'paragraph') {
+        const children = Array.isArray(node.children)
+            ? node.children
+                .map(cleanRichTextNode)
+                .filter(Boolean)
+            : []
+
+        // Nếu paragraph sau khi bỏ upload không còn text/link thì bỏ luôn paragraph
+        if (!children.length) return null
+
+        return {
+            ...node,
+            type: 'paragraph',
+            version: node.version || 1,
+            direction: node.direction ?? null,
+            format: node.format || '',
+            indent: node.indent || 0,
+            textFormat: node.textFormat || 0,
+            textStyle: node.textStyle || '',
+            children,
+        }
+    }
+
+    // Giữ heading h2/h3
+    if (node.type === 'heading') {
+        return {
+            ...node,
+            type: 'heading',
+            tag: node.tag || 'h2',
+            version: node.version || 1,
+            direction: node.direction ?? null,
+            format: node.format || '',
+            indent: node.indent || 0,
+            children: Array.isArray(node.children)
+                ? node.children.map(cleanRichTextNode).filter(Boolean)
+                : [],
+        }
+    }
+
+    // Giữ list
+    if (node.type === 'list') {
+        const children = Array.isArray(node.children)
+            ? node.children.map(cleanRichTextNode).filter(Boolean)
+            : []
+
+        if (!children.length) return null
+
+        return {
+            ...node,
+            type: 'list',
+            version: node.version || 1,
+            direction: node.direction ?? null,
+            format: node.format || '',
+            indent: node.indent || 0,
+            listType: node.listType || 'bullet',
+            tag: node.tag || 'ul',
+            start: node.start || 1,
+            children,
+        }
+    }
+
+    // Giữ listitem
+    if (node.type === 'listitem') {
+        return {
+            ...node,
+            type: 'listitem',
+            version: node.version || 1,
+            direction: node.direction ?? null,
+            format: node.format || '',
+            indent: node.indent || 0,
+            value: node.value || 1,
+            children: Array.isArray(node.children)
+                ? node.children.map(cleanRichTextNode).filter(Boolean)
+                : [],
+        }
+    }
+
+    // Giữ link nếu field editor có bật LinkFeature
+    if (node.type === 'link') {
+        return {
+            ...node,
+            type: 'link',
+            version: node.version || 3,
+            direction: node.direction ?? null,
+            format: node.format || '',
+            indent: node.indent || 0,
+            fields: {
+                linkType: node.fields?.linkType || 'custom',
+                newTab: Boolean(node.fields?.newTab),
+                url: node.fields?.url || '',
+            },
+            children: Array.isArray(node.children)
+                ? node.children.map(cleanRichTextNode).filter(Boolean)
+                : [],
+        }
+    }
+
+    // Giữ text
+    if (node.type === 'text') {
+        return {
+            detail: node.detail || 0,
+            format: node.format || 0,
+            mode: node.mode || 'normal',
+            style: node.style || '',
+            text: node.text || '',
+            type: 'text',
+            version: node.version || 1,
+        }
+    }
+
+    return null
+}
+
+const normalizeRichText = (content: any) => {
+    if (!hasRichTextContent(content)) return undefined
+
+    const children = content.root.children
+        .map(cleanRichTextNode)
+        .filter(Boolean)
+
+    if (!children.length) return undefined
+
+    return {
+        root: {
+            type: 'root',
+            format: '',
+            indent: 0,
+            version: 1,
+            direction: null,
+            children,
+        },
+    }
+}
+
+const normalizeProductAccordions = (accordions: any[] = []) => {
+    if (!Array.isArray(accordions)) return []
+
+    return accordions
+        .map((item) => {
+            if (!item?.title) return null
+            if (!hasRichTextContent(item?.content)) return null
+
+            return {
+                title: item.title,
+                content: item.content,
+            }
+        })
+        .filter(Boolean)
+}
+
+const getRankMathMeta = (item: AnyRecord, key: string) => {
+    const found = item.meta_data?.find((meta: AnyRecord) => meta.key === key)
+    return typeof found?.value === 'string' ? found.value : ''
 }
 
 async function findOne(payload: any, collection: string, where: AnyRecord) {
@@ -306,7 +479,6 @@ async function getAvailableSlug(
 
         if (!existing?.id) return candidate
 
-        // Khi update chính document đó thì giữ slug cũ
         if (currentId && String(existing.id) === String(currentId)) return candidate
 
         if (wpId && !candidate.endsWith(`-${wpId}`)) {
@@ -358,7 +530,7 @@ async function createOrUpdateBySlug(payload: any, collection: string, slug: stri
     return { id: created.id, action: 'create' }
 }
 
-async function fetchWithTimeout(url: string, timeoutMs = 30000) {
+async function fetchWithTimeout(url: string, timeoutMs = 30000, accept = 'image/*,*/*') {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), timeoutMs)
 
@@ -367,11 +539,45 @@ async function fetchWithTimeout(url: string, timeoutMs = 30000) {
             signal: controller.signal,
             headers: {
                 'User-Agent': USER_AGENT,
-                Accept: 'image/*,*/*',
+                Accept: accept,
             },
         })
     } finally {
         clearTimeout(timeout)
+    }
+}
+
+function extractImageFromSrcset(srcset: string | null) {
+    if (!srcset) return ''
+    const first = srcset.split(',')[0]?.trim()
+    if (!first) return ''
+    return first.split(/\s+/)[0] || ''
+}
+
+async function fetchWPFeaturedMediaUrl(mediaId: string | number | null | undefined) {
+    if (!mediaId || Number(mediaId) <= 0) return ''
+
+    try {
+        const url = `${WP_BASE_URL}/wp-json/wp/v2/media/${mediaId}?_fields=id,source_url,alt_text,media_details`
+        const response = await fetchWithTimeout(url, 30000, 'application/json,*/*')
+
+        if (!response.ok) return ''
+
+        const data: any = await response.json()
+
+        const sourceUrl = data?.source_url
+        if (typeof sourceUrl === 'string' && sourceUrl.startsWith('http')) {
+            return sourceUrl
+        }
+
+        const sizes = data?.media_details?.sizes || {}
+        const large = sizes?.large?.source_url
+        const full = sizes?.full?.source_url
+        const medium = sizes?.medium?.source_url
+
+        return large || full || medium || ''
+    } catch {
+        return ''
     }
 }
 
@@ -392,7 +598,7 @@ async function uploadMedia(payload: any, url: string, alt: string) {
 
                 if (existing?.id) return existing.id
             } catch {
-                // Nếu collection media không query được filename thì bỏ qua check trùng.
+                // Bỏ qua nếu collection media không query được filename.
             }
 
             const response = await fetchWithTimeout(url)
@@ -461,7 +667,7 @@ async function getFallbackBrand(payload: any) {
         data: {
             name: 'Không xác định',
             slug,
-            description: 'Thương hiệu tạm dùng cho dữ liệu import chưa map được brand.',
+            description: plainTextToRichText('Thương hiệu tạm dùng cho dữ liệu import chưa map được brand.'),
         } as any,
     })
 
@@ -502,7 +708,7 @@ async function ensureBrand(payload: any, brand: AnyRecord) {
             withoutUndefined({
                 name: brand.name || slug,
                 slug,
-                description: cleanDesc(brand.description || ''),
+                description: normalizeRichText(brand.description),
                 logo: logoId || undefined,
             }),
             brand,
@@ -536,7 +742,7 @@ async function ensureCategory(payload: any, category: AnyRecord) {
             withoutUndefined({
                 name: category.name || slug,
                 slug,
-                description: cleanDesc(category.description || ''),
+                description: normalizeRichText(category.description),
             }),
             category,
         ),
@@ -562,7 +768,6 @@ async function createPlaceholderMedia(payload: any) {
 
     if (DRY_RUN) return 'dry-placeholder-media'
 
-    // 1x1 transparent PNG
     const pngBase64 =
         'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII='
     const buffer = Buffer.from(pngBase64, 'base64')
@@ -598,13 +803,41 @@ async function importBrands(payload: any) {
                 withoutUndefined({
                     name: item.name || slug,
                     slug,
-                    description: cleanDesc(item.description || ''),
+                    description: normalizeRichText(item.description),
                     logo: logoId || undefined,
                 }),
                 item,
             )
 
-            const result = await createOrUpdateBySlug(payload, 'brands', slug, data)
+            let result
+
+            try {
+                result = await createOrUpdateBySlug(payload, 'brands', slug, data)
+            } catch (error: any) {
+                const message = String(error?.message || '')
+
+                if (message.includes('Mô tả thương hiệu') || message.includes('description')) {
+                    console.log(`   ⚠️ Brand lỗi mô tả: ${item.name}`)
+                    console.log(`   ${message}`)
+
+                    const cleanedDescription = normalizeRichText(item.description)
+
+                    const fallbackData = withWpRaw(
+                        withoutUndefined({
+                            name: item.name || slug,
+                            slug,
+                            description: cleanedDescription,
+                            logo: logoId || undefined,
+                        }),
+                        item,
+                    )
+
+                    result = await createOrUpdateBySlug(payload, 'brands', slug, fallbackData)
+                } else {
+                    throw error
+                }
+            }
+
             brandMap.set(item.id, result.id)
 
             console.log(`   ${result.action === 'skip' ? '⏩' : '✅'} Brand: ${item.name}`)
@@ -633,7 +866,7 @@ async function importProductCategories(payload: any) {
                 withoutUndefined({
                     name: item.name || slug,
                     slug,
-                    description: cleanDesc(item.description || ''),
+                    description: normalizeRichText(item.description),
                     image: imageId || undefined,
                 }),
                 item,
@@ -854,7 +1087,9 @@ async function importProducts(payload: any) {
 
             if (item.images && item.images.length > 0) {
                 const imageIds = await Promise.all(
-                    item.images.map((img: AnyRecord) => uploadMedia(payload, img.src, img.alt || item.name)),
+                    item.images.map((img: AnyRecord) =>
+                        uploadMedia(payload, img.src || img.thumbnail, img.alt || item.name),
+                    ),
                 )
 
                 imageIds
@@ -870,48 +1105,51 @@ async function importProducts(payload: any) {
                     value: attr.options ? attr.options.join(', ') : '',
                 })) || []
 
-            const wpDescription = item.description || ''
-            const parsedAccordions = parseHTMLToAccordions(wpDescription)
-
             const basePrice = toNumber(item.regular_price, 0) || toNumber(item.price, 0)
             const salePrice = item.sale_price ? toNumber(item.sale_price, 0) : undefined
 
             const stock =
-                item.stock_status === 'instock'
-                    ? item.manage_stock
-                        ? toNumber(item.stock_quantity, 0)
-                        : 99
-                    : 0
+                typeof item.stock === 'number'
+                    ? item.stock
+                    : item.stock_status === 'instock'
+                        ? item.manage_stock
+                            ? toNumber(item.stock_quantity, 0)
+                            : 99
+                        : 0
 
             const productData: AnyRecord = {
                 title: item.name || productSlug,
                 sku: item.sku || '',
                 slug: productSlug,
+
                 categories: categoryIds,
+
                 price: {
                     basePrice,
                     salePrice,
                     stock,
                 },
+
                 specifications: specs,
-                accordions: parsedAccordions,
-                shortDescription: stripHTML(item.short_description || ''),
-                description: convertHTMLtoLexical(wpDescription),
-                status: 'published',
+
+                accordions: normalizeProductAccordions(item.accordions || []),
+
+                shortDescription: item.shortDescription || stripHTML(item.short_description || ''),
+
+                seoTitle: item.seoTitle || '',
+                seoDescription: item.seoDescription || '',
+
+                status: item.status === 'publish' || item.status === 'published' ? 'published' : 'draft',
             }
 
-            // Chỉ set brand khi có ID hợp lệ
             if (brandId) {
                 productData.brand = brandId
             }
 
-            // Quan trọng: chỉ set images nếu tải được ảnh.
-            // Tránh chạy --update mà ảnh 403 làm gallery bị set thành [].
             if (uploadedImages.length > 0) {
                 productData.images = uploadedImages
             }
 
-            // Chắc chắn không gửi field Vị trí trang chủ.
             delete productData.displayLocation
 
             const data = withWpRaw(withoutUndefined(productData), item)
@@ -944,7 +1182,7 @@ async function importPosts(payload: any) {
 
     for (const item of postsData) {
         try {
-            const title = item.title?.rendered || item.slug || `Post ${item.id}`
+            const title = stripHTML(item.title?.rendered || item.title || item.slug || `Post ${item.id}`)
             const baseSlug = makeSafeSlug(item.slug || title || `post-${item.id}`, item.id)
             const existingPost = await findBySlug(payload, 'posts', baseSlug)
 
@@ -973,11 +1211,16 @@ async function importPosts(payload: any) {
                 }
             }
 
-            const contentHTML = item.content?.rendered || ''
-            const excerptHTML = item.excerpt?.rendered || ''
+            const content = normalizeRichText(item.content) || emptyRichText()
+            const excerpt = stripHTML(item.excerpt?.rendered || item.excerpt || '')
 
-            const firstImageUrl = extractFirstImageFromHTML(contentHTML)
-            let featuredImageId = firstImageUrl ? await uploadMedia(payload, firstImageUrl, title) : null
+            let featuredImageId: string | number | null = null
+
+            const featuredImageUrl = await fetchWPFeaturedMediaUrl(item.featured_media)
+
+            if (featuredImageUrl) {
+                featuredImageId = await uploadMedia(payload, featuredImageUrl, title)
+            }
 
             if (!featuredImageId && USE_PLACEHOLDER_FEATURED && placeholderMediaId) {
                 featuredImageId = placeholderMediaId
@@ -986,14 +1229,15 @@ async function importPosts(payload: any) {
             const postData: AnyRecord = {
                 title,
                 slug: postSlug,
-                excerpt: stripHTML(excerptHTML),
-                content: convertHTMLtoLexical(contentHTML),
+                excerpt,
+                content,
                 categories: postCategoryIds,
-                publishedAt: item.date || undefined,
-                status: item.status === 'publish' ? 'published' : 'draft',
+                seo: withoutUndefined({
+                    metaTitle: getRankMathMeta(item, 'rank_math_title') || undefined,
+                    metaDescription: getRankMathMeta(item, 'rank_math_description') || undefined,
+                }),
             }
 
-            // Collection Posts của bạn dùng field thumbnail
             if (featuredImageId) {
                 postData.thumbnail = featuredImageId
             }

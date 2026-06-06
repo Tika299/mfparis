@@ -9,11 +9,10 @@ export const Categories: CollectionConfig = {
     { name: 'image', type: 'upload', relationTo: 'media' },
     {
       name: 'description',
-      type: 'textarea',
+      type: 'richText',
       label: 'Mô tả danh mục',
       admin: {
-        rows: 8,
-        description: 'Dùng để import mô tả danh mục từ WooCommerce. Có thể chứa HTML.',
+        description: 'Mô tả danh mục đã được convert sang RichText.',
       },
     },
     {

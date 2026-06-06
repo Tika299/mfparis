@@ -275,31 +275,22 @@ export interface Product {
     salePrice?: number | null;
     stock?: number | null;
   };
+  /**
+   * Ảnh sản phẩm nên dùng tỉ lệ 1:1 để hiển thị đẹp.
+   */
   images?:
     | {
         image: number | Media;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Hiển thị ở phần đầu trang sản phẩm.
+   */
   shortDescription?: string | null;
   /**
-   * Dùng cho nội dung dài hiển thị dưới cùng trang web.
+   * Dùng cho dung tích, xuất xứ, nhóm hương, loại da, nồng độ...
    */
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
   specifications?:
     | {
         label: string;
@@ -308,11 +299,14 @@ export interface Product {
       }[]
     | null;
   /**
-   * Nội dung import từ WordPress sẽ tự động chia vào đây theo thẻ H2.
+   * Nội dung sản phẩm đã được tách theo thẻ H2 từ WordPress. Mỗi mục gồm tiêu đề và nội dung RichText.
    */
   accordions?:
     | {
         title: string;
+        /**
+         * Nội dung đã được convert từ HTML sang RichText.
+         */
         content: {
           root: {
             type: string;
@@ -335,6 +329,9 @@ export interface Product {
   comboItems?: (number | Product)[] | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
+  /**
+   * Tự động tạo từ tên sản phẩm, có thể chỉnh tay để tối ưu SEO.
+   */
   slug: string;
   status?: ('draft' | 'published') | null;
   displayLocation?: ('best-seller' | 'cleansing' | 'new-arrival')[] | null;
@@ -350,9 +347,23 @@ export interface Category {
   name: string;
   image?: (number | null) | Media;
   /**
-   * Dùng để import mô tả danh mục từ WooCommerce. Có thể chứa HTML.
+   * Mô tả danh mục đã được convert sang RichText.
    */
-  description?: string | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO
    */
@@ -713,7 +724,6 @@ export interface ProductsSelect<T extends boolean = true> {
         id?: T;
       };
   shortDescription?: T;
-  description?: T;
   specifications?:
     | T
     | {
