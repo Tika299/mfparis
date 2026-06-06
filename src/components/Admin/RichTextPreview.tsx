@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import { useField } from '@payloadcms/ui'
-import RichText from '@/components/RichText' // Dùng chính cái bạn đã có
+import { RichText } from '@/components/RichText'
 
 export const RichTextPreview: React.FC<{ path: string }> = ({ path }) => {
   // Lấy giá trị đang gõ trong ô mô tả

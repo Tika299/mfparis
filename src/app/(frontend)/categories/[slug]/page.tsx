@@ -4,10 +4,21 @@ import { ProductCard } from '@/components/ProductCard'
 import { notFound } from 'next/navigation'
 import { SearchFilters } from '@/components/SearchFilters'
 import Link from 'next/link'
+import { RichText } from '@/components/RichText'
+
+function hasRichTextContent(content: any) {
+  return (
+    content &&
+    typeof content === 'object' &&
+    Array.isArray(content.root?.children) &&
+    content.root.children.length > 0
+  )
+}
 
 export default async function CategoryPage({ params, searchParams }: any) {
   const { slug } = await params
-  const { brand, category, min, max, sort = '-createdAt', page = '1' } = await searchParams
+  const { brand, min, max, sort = '-createdAt', page = '1' } = await searchParams
+
   const payload = await getPayload({ config: configPromise })
 
   const currentPage = Math.max(1, Number(page) || 1)
@@ -17,6 +28,7 @@ export default async function CategoryPage({ params, searchParams }: any) {
     collection: 'categories',
     where: { slug: { equals: slug } },
     limit: 1,
+    depth: 2,
   })
 
   const currentCategory = categoryRes.docs[0]
@@ -25,15 +37,11 @@ export default async function CategoryPage({ params, searchParams }: any) {
   const whereQueries: any = {
     and: [
       { status: { equals: 'published' } },
-      { categories: { contains: currentCategory.id } }, // danh mục hiện tại từ slug
+      { categories: { contains: currentCategory.id } },
     ],
   }
 
-  // brand là lọc cộng thêm trong danh mục
   if (brand) whereQueries.and.push({ 'brand.slug': { equals: brand } })
-
-  // KHÔNG thêm filter category ở trang /categories/[slug]
-  // if (category) whereQueries.and.push({ 'categories.slug': { equals: category } }) // bỏ dòng này
   if (min) whereQueries.and.push({ 'price.basePrice': { greater_than_equal: Number(min) } })
   if (max) whereQueries.and.push({ 'price.basePrice': { less_than_equal: Number(max) } })
 
@@ -50,9 +58,7 @@ export default async function CategoryPage({ params, searchParams }: any) {
     payload.find({ collection: 'categories', limit: 100 }),
   ])
 
-  const hasDescription =
-    typeof currentCategory.description === 'string' &&
-    currentCategory.description.trim().length > 0
+  const hasDescription = hasRichTextContent(currentCategory.description)
 
   const buildPageHref = (pageNumber: number) => {
     const query = new URLSearchParams()
@@ -94,16 +100,24 @@ export default async function CategoryPage({ params, searchParams }: any) {
       </div>
 
       <div className="container-ux mt-4 md:mt-6 lg:mt-8">
-        {/* Tablet: filter ngang */}
-        <div className="mb-5 hidden md:block lg:hidden">
-          <SearchFilters brands={brandsRes.docs} categories={categoriesRes.docs} variant="horizontal" />
+        <div className="sticky top-28 z-40 mb-5 hidden md:block lg:hidden">
+          <SearchFilters
+            brands={brandsRes.docs}
+            categories={categoriesRes.docs}
+            variant="horizontal"
+            sticky={false}
+          />
         </div>
 
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-8">
-          {/* Desktop sidebar */}
-          <aside className="hidden lg:block lg:w-[250px] lg:shrink-0">
+          <aside className="hidden lg:sticky lg:top-24 lg:block lg:max-h-[calc(100dvh-7rem)] lg:w-[250px] lg:shrink-0 lg:self-start lg:overflow-y-auto">
             <div className="lc-card rounded-2xl p-5">
-              <SearchFilters brands={brandsRes.docs} categories={categoriesRes.docs} variant="sidebar" />
+              <SearchFilters
+                brands={brandsRes.docs}
+                categories={categoriesRes.docs}
+                variant="sidebar"
+                sticky={false}
+              />
             </div>
           </aside>
 
@@ -171,25 +185,32 @@ export default async function CategoryPage({ params, searchParams }: any) {
                 </p>
               </div>
             )}
-            {hasDescription && (
+
+            {hasDescription && currentCategory.description && (
               <section className="mt-10 rounded-2xl bg-white p-5 shadow-sm md:mt-12 md:p-8">
                 <h2 className="mb-4 text-xl font-bold md:text-2xl">
                   Giới thiệu về {currentCategory.name}
                 </h2>
 
-                <div
-                  className="category-description prose prose-sm max-w-none text-gray-700 md:prose-base prose-a:text-primary prose-a:font-semibold"
-                  dangerouslySetInnerHTML={{ __html: currentCategory.description || '' }}
-                />
+                <div className="category-description prose prose-sm max-w-none text-gray-700 md:prose-base prose-a:text-primary prose-a:font-semibold">
+                  <RichText
+                    data={currentCategory.description}
+                    showToc
+                    expandable
+                    maxHeight={1200} />
+                </div>
               </section>
             )}
           </main>
         </div>
       </div>
 
-      {/* Mobile: nút bộ lọc nổi */}
       <div className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 md:hidden">
-        <SearchFilters brands={brandsRes.docs} categories={categoriesRes.docs} variant="mobile-fab" />
+        <SearchFilters
+          brands={brandsRes.docs}
+          categories={categoriesRes.docs}
+          variant="mobile-fab"
+        />
       </div>
     </div>
   )

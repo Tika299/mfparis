@@ -1,4 +1,5 @@
-// D:\mfparis\src\app\(frontend)\products\[slug]\page.tsx
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { notFound } from 'next/navigation'

@@ -3,6 +3,7 @@ import React from 'react'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { LiveChat } from '../LiveChat'
+import { BackToTopButton } from '../BackToTopButton'
 
 export const FloatingContact = async () => {
   const payload = await getPayload({ config: configPromise })
@@ -13,6 +14,7 @@ export const FloatingContact = async () => {
 
   return (
     <div className="fixed bottom-4 right-3 z-[999] flex flex-col items-center gap-3 sm:bottom-5 sm:right-4 md:bottom-6 md:right-6 md:gap-4">
+      <BackToTopButton />
       <LiveChat />
 
       <a

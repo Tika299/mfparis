@@ -20,12 +20,14 @@ type SearchFiltersProps = {
   brands: FilterItem[]
   categories?: FilterItem[]
   variant?: 'sidebar' | 'horizontal' | 'mobile-fab'
+  sticky?: boolean
 }
 
 export const SearchFilters = ({
   brands,
   categories = [],
   variant = 'sidebar',
+  sticky = true,
 }: SearchFiltersProps) => {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -249,11 +251,28 @@ export const SearchFilters = ({
     </div>
   )
 
-  if (variant === 'sidebar') return filterBody
+  if (variant === 'sidebar') {
+    return (
+      <aside
+        className={cn(
+          'rounded-2xl border border-gray-100 bg-white p-4 shadow-sm',
+          sticky &&
+          'sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent',
+        )}
+      >
+        {filterBody}
+      </aside>
+    )
+  }
 
   if (variant === 'horizontal') {
     return (
-      <div className="lc-card flex flex-wrap items-center gap-2 rounded-2xl bg-white px-4 py-3">
+      <div
+        className={cn(
+          'lc-card flex flex-wrap items-center gap-2 rounded-2xl bg-white px-4 py-3',
+          sticky && 'sticky top-20 z-40 shadow-sm backdrop-blur',
+        )}
+      >
         <Select value={activeSort} onValueChange={(val) => updateFilters({ sort: val })}>
           <SelectTrigger className="h-9 min-w-[150px] rounded-xl border border-gray-200 bg-white text-[10px] font-black uppercase tracking-wider">
             <SelectValue placeholder="Sắp xếp" />

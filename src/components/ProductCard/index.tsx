@@ -101,12 +101,12 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
         </button>
 
         {/* Badge Chính hãng */}
-        <div className="absolute left-3 top-[52px] z-20">
+        {/* <div className="absolute left-3 top-[52px] z-20">
           <span className="flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[11px] font-bold text-[#e10613] shadow-sm ring-1 ring-red-50">
             <ShieldCheck size={12} className="fill-[#e10613] text-white" />
             Chính hãng
           </span>
-        </div>
+        </div> */}
 
         <Link href={`/products/${product.slug}`} className="relative flex h-full items-center justify-center">
 

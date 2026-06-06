@@ -128,7 +128,7 @@
 .prose h3 {
   color: #000000 !important;
   font-family: var(--font-heading);
-  @apply font-bold italic mt-12 mb-6;
+  @apply font-bold mt-12 mb-6;
 }
 
 .prose strong {
