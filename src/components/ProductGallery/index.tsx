@@ -94,7 +94,7 @@ export const ProductGallery = ({ images }: { images: any[] }) => {
             src={activeImageUrl}
             alt={activeImageAlt}
             fill
-            className="object-contain p-10 transition-all duration-500"
+            className="object-contain transition-all duration-500"
             priority
             sizes="(max-width: 768px) 100vw, 700px"
           />

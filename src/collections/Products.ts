@@ -1,5 +1,38 @@
 import { CollectionConfig } from 'payload'
+import type { CollectionBeforeChangeHook } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
+
+const syncVariantPrice: CollectionBeforeChangeHook = async ({ data }) => {
+  if (data?.productType !== 'variable') {
+    return data
+  }
+
+  const variants = Array.isArray(data?.variants)
+    ? data.variants.filter((variant: any) => variant?.isActive !== false)
+    : []
+
+  if (!variants.length) {
+    return data
+  }
+
+  const defaultVariant =
+    variants.find((variant: any) => variant?.isDefault) || variants[0]
+
+  const basePrice = Number(defaultVariant?.basePrice || 0)
+  const salePrice = Number(defaultVariant?.salePrice || 0)
+  const stock = variants.reduce((total: number, variant: any) => {
+    return total + Number(variant?.stock || 0)
+  }, 0)
+
+  data.price = {
+    ...(data.price || {}),
+    basePrice,
+    salePrice: salePrice > 0 ? salePrice : undefined,
+    stock,
+  }
+
+  return data
+}
 
 export const Products: CollectionConfig = {
   slug: 'products',
@@ -12,6 +45,10 @@ export const Products: CollectionConfig = {
 
   access: {
     read: () => true,
+  },
+
+  hooks: {
+    beforeChange: [syncVariantPrice],
   },
 
   fields: [
@@ -68,6 +105,25 @@ export const Products: CollectionConfig = {
                   },
                 },
               ],
+            },
+            {
+              name: 'productType',
+              type: 'select',
+              label: 'Loại sản phẩm',
+              defaultValue: 'simple',
+              options: [
+                {
+                  label: 'Sản phẩm thường',
+                  value: 'simple',
+                },
+                {
+                  label: 'Sản phẩm có biến thể',
+                  value: 'variable',
+                },
+              ],
+              admin: {
+                description: 'Chọn sản phẩm có biến thể nếu sản phẩm có nhiều dung tích, màu, quy cách...',
+              },
             },
 
             {
@@ -179,33 +235,122 @@ export const Products: CollectionConfig = {
         },
 
         {
-          label: 'Nội dung chi tiết',
+          label: 'Biến thể',
           fields: [
             {
-              name: 'accordions',
+              name: 'variants',
               type: 'array',
-              label: 'Các mục nội dung xổ xuống',
+              label: 'Danh sách biến thể',
               admin: {
                 description:
-                  'Nội dung sản phẩm đã được tách theo thẻ H2 từ WordPress. Mỗi mục gồm tiêu đề và nội dung RichText.',
+                  'Dùng cho các biến thể như 30ml, 50ml, 100ml, fullbox, tester, màu sắc, quy cách...',
+                condition: (data) => data?.productType === 'variable',
               },
               fields: [
                 {
-                  name: 'title',
-                  type: 'text',
-                  label: 'Tiêu đề mục',
-                  required: true,
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'name',
+                      type: 'text',
+                      label: 'Tên biến thể',
+                      required: true,
+                      admin: {
+                        width: '40%',
+                        placeholder: 'VD: 30ml, 50ml, 100ml',
+                      },
+                    },
+                    {
+                      name: 'sku',
+                      type: 'text',
+                      label: 'SKU biến thể',
+                      admin: {
+                        width: '30%',
+                      },
+                    },
+                    {
+                      name: 'isDefault',
+                      type: 'checkbox',
+                      label: 'Biến thể mặc định',
+                      defaultValue: false,
+                      admin: {
+                        width: '30%',
+                      },
+                    },
+                  ],
                 },
+
                 {
-                  name: 'content',
-                  type: 'richText',
-                  label: 'Nội dung mục',
-                  required: true,
-                  admin: {
-                    description: 'Nội dung đã được convert từ HTML sang RichText.',
-                  },
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'basePrice',
+                      type: 'number',
+                      label: 'Giá niêm yết',
+                      required: true,
+                      admin: {
+                        width: '33.33%',
+                      },
+                    },
+                    {
+                      name: 'salePrice',
+                      type: 'number',
+                      label: 'Giá khuyến mãi',
+                      admin: {
+                        width: '33.33%',
+                      },
+                    },
+                    {
+                      name: 'stock',
+                      type: 'number',
+                      label: 'Tồn kho',
+                      defaultValue: 0,
+                      admin: {
+                        width: '33.33%',
+                      },
+                    },
+                  ],
+                },
+
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'image',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: 'Ảnh riêng của biến thể',
+                      admin: {
+                        width: '50%',
+                      },
+                    },
+                    {
+                      name: 'isActive',
+                      type: 'checkbox',
+                      label: 'Đang bán',
+                      defaultValue: true,
+                      admin: {
+                        width: '50%',
+                      },
+                    },
+                  ],
                 },
               ],
+            },
+          ],
+        },
+
+        {
+          label: 'Nội dung chi tiết',
+          fields: [
+            {
+              name: 'description',
+              type: 'richText',
+              label: 'Mô tả sản phẩm',
+              admin: {
+                description:
+                  'Nội dung chi tiết sản phẩm được convert từ HTML WordPress sang RichText. Giữ H2, H3, list, link, bảng nếu editor hỗ trợ.',
+              },
             },
           ],
         },
@@ -300,7 +445,7 @@ export const Products: CollectionConfig = {
         },
         {
           label: 'Sản phẩm combo',
-          value: 'cleansing',
+          value: 'combo',
         },
         {
           label: 'Sản phẩm mới',

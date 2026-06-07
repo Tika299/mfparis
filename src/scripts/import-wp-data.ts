@@ -106,7 +106,12 @@ const makeSafeSlug = (val: string, fallbackId?: string | number): string => {
 }
 
 const stripHTML = (html: string) =>
-    html ? String(html).replace(/<\/?[^>]+(>|$)/g, '').replace(/\s+/g, ' ').trim() : ''
+    html
+        ? String(html)
+            .replace(/<\/?[^>]+(>|$)/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+        : ''
 
 const toNumber = (value: any, fallback = 0) => {
     const number = Number(value)
@@ -276,28 +281,18 @@ const textToSafeRichText = (paragraphs: string[]) => {
     }
 }
 
-/**
- * Dùng cho brand/category.
- * Không đưa nguyên richText phức tạp vào Payload nữa.
- * Convert về paragraph text an toàn để tránh lỗi field invalid.
- */
 const cleanRichTextNode = (node: any): any => {
     if (!node?.type) return null
 
-    // Bỏ upload vì đang là pending src từ WP, chưa phải media ID của Payload
     if (node.type === 'upload') {
         return null
     }
 
-    // Nếu paragraph chứa upload bên trong thì lọc children
     if (node.type === 'paragraph') {
         const children = Array.isArray(node.children)
-            ? node.children
-                .map(cleanRichTextNode)
-                .filter(Boolean)
+            ? node.children.map(cleanRichTextNode).filter(Boolean)
             : []
 
-        // Nếu paragraph sau khi bỏ upload không còn text/link thì bỏ luôn paragraph
         if (!children.length) return null
 
         return {
@@ -313,7 +308,6 @@ const cleanRichTextNode = (node: any): any => {
         }
     }
 
-    // Giữ heading h2/h3
     if (node.type === 'heading') {
         return {
             ...node,
@@ -329,7 +323,6 @@ const cleanRichTextNode = (node: any): any => {
         }
     }
 
-    // Giữ list
     if (node.type === 'list') {
         const children = Array.isArray(node.children)
             ? node.children.map(cleanRichTextNode).filter(Boolean)
@@ -351,7 +344,6 @@ const cleanRichTextNode = (node: any): any => {
         }
     }
 
-    // Giữ listitem
     if (node.type === 'listitem') {
         return {
             ...node,
@@ -367,7 +359,6 @@ const cleanRichTextNode = (node: any): any => {
         }
     }
 
-    // Giữ link nếu field editor có bật LinkFeature
     if (node.type === 'link') {
         return {
             ...node,
@@ -387,7 +378,6 @@ const cleanRichTextNode = (node: any): any => {
         }
     }
 
-    // Giữ text
     if (node.type === 'text') {
         return {
             detail: node.detail || 0,
@@ -403,12 +393,14 @@ const cleanRichTextNode = (node: any): any => {
     return null
 }
 
+/**
+ * Dùng cho brand/category/post.
+ * Có clean upload pending từ WordPress để tránh invalid field.
+ */
 const normalizeRichText = (content: any) => {
     if (!hasRichTextContent(content)) return undefined
 
-    const children = content.root.children
-        .map(cleanRichTextNode)
-        .filter(Boolean)
+    const children = content.root.children.map(cleanRichTextNode).filter(Boolean)
 
     if (!children.length) return undefined
 
@@ -424,20 +416,197 @@ const normalizeRichText = (content: any) => {
     }
 }
 
-const normalizeProductAccordions = (accordions: any[] = []) => {
-    if (!Array.isArray(accordions)) return []
+/**
+ * Dùng riêng cho product.description.
+ * Không clean mạnh để giữ block do convertHTMLToLexical tạo ra:
+ * heading, paragraph, list, quote, table, hr...
+ */
+const nodeToPlainText = (node: any): string => {
+    if (!node) return ''
 
-    return accordions
-        .map((item) => {
-            if (!item?.title) return null
-            if (!hasRichTextContent(item?.content)) return null
+    if (typeof node.text === 'string') {
+        return node.text
+    }
 
-            return {
-                title: item.title,
-                content: item.content,
-            }
-        })
+    if (Array.isArray(node.children)) {
+        return node.children
+            .map(nodeToPlainText)
+            .join(' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+    }
+
+    return ''
+}
+
+const plainTextBlockToParagraph = (text: string) => {
+    const value = String(text || '').replace(/\s+/g, ' ').trim()
+
+    if (!value) return null
+
+    return {
+        type: 'paragraph',
+        format: '',
+        indent: 0,
+        version: 1,
+        direction: null,
+        textFormat: 0,
+        textStyle: '',
+        children: [
+            {
+                detail: 0,
+                format: 0,
+                mode: 'normal',
+                style: '',
+                text: value,
+                type: 'text',
+                version: 1,
+            },
+        ],
+    }
+}
+
+const cleanProductRichTextNode = (node: any): any => {
+    if (!node?.type) return null
+
+    if (node.type === 'text') {
+        return {
+            detail: node.detail || 0,
+            format: node.format || 0,
+            mode: node.mode || 'normal',
+            style: node.style || '',
+            text: node.text || '',
+            type: 'text',
+            version: node.version || 1,
+        }
+    }
+
+    if (node.type === 'link') {
+        const children = Array.isArray(node.children)
+            ? node.children.map(cleanProductRichTextNode).filter(Boolean)
+            : []
+
+        if (!children.length) return null
+
+        return {
+            type: 'link',
+            version: node.version || 3,
+            direction: node.direction ?? null,
+            format: node.format || '',
+            indent: node.indent || 0,
+            fields: {
+                linkType: node.fields?.linkType || 'custom',
+                newTab: Boolean(node.fields?.newTab),
+                url: node.fields?.url || '',
+            },
+            children,
+        }
+    }
+
+    if (node.type === 'paragraph') {
+        const children = Array.isArray(node.children)
+            ? node.children.map(cleanProductRichTextNode).filter(Boolean)
+            : []
+
+        if (!children.length) return null
+
+        return {
+            type: 'paragraph',
+            format: node.format || '',
+            indent: node.indent || 0,
+            version: node.version || 1,
+            direction: node.direction ?? null,
+            textFormat: node.textFormat || 0,
+            textStyle: node.textStyle || '',
+            children,
+        }
+    }
+
+    if (node.type === 'heading') {
+        const children = Array.isArray(node.children)
+            ? node.children.map(cleanProductRichTextNode).filter(Boolean)
+            : []
+
+        if (!children.length) return null
+
+        return {
+            type: 'heading',
+            tag: node.tag || 'h2',
+            format: node.format || '',
+            indent: node.indent || 0,
+            version: node.version || 1,
+            direction: node.direction ?? null,
+            children,
+        }
+    }
+
+    if (node.type === 'list') {
+        const children = Array.isArray(node.children)
+            ? node.children.map(cleanProductRichTextNode).filter(Boolean)
+            : []
+
+        if (!children.length) return null
+
+        return {
+            type: 'list',
+            listType: node.listType || 'bullet',
+            tag: node.tag || 'ul',
+            start: node.start || 1,
+            format: node.format || '',
+            indent: node.indent || 0,
+            version: node.version || 1,
+            direction: node.direction ?? null,
+            children,
+        }
+    }
+
+    if (node.type === 'listitem') {
+        const children = Array.isArray(node.children)
+            ? node.children.map(cleanProductRichTextNode).filter(Boolean)
+            : []
+
+        if (!children.length) return null
+
+        return {
+            type: 'listitem',
+            value: node.value || 1,
+            format: node.format || '',
+            indent: node.indent || 0,
+            version: node.version || 1,
+            direction: node.direction ?? null,
+            children,
+        }
+    }
+
+    /**
+     * Các node dễ gây lỗi:
+     * table, tablerow, tablecell, quote, horizontalrule, upload, image...
+     * Không import thẳng nữa, chuyển về paragraph text để không mất nội dung.
+     */
+    const text = nodeToPlainText(node)
+
+    return plainTextBlockToParagraph(text)
+}
+
+const normalizeProductDescription = (content: any) => {
+    if (!hasRichTextContent(content)) return emptyRichText()
+
+    const children = content.root.children
+        .map(cleanProductRichTextNode)
         .filter(Boolean)
+
+    if (!children.length) return emptyRichText()
+
+    return {
+        root: {
+            type: 'root',
+            format: '',
+            indent: 0,
+            version: 1,
+            direction: null,
+            children,
+        },
+    }
 }
 
 const getRankMathMeta = (item: AnyRecord, key: string) => {
@@ -975,10 +1144,12 @@ async function saveProductWithRetry(
     let data = { ...productData }
     let lastError: any = null
 
+    const productName = item.title || item.name || item.slug || item.id || 'Không tên'
+
     for (let attempt = 1; attempt <= 4; attempt++) {
         try {
             if (DRY_RUN) {
-                console.log(`   🧪 Dry-run Product: ${item.name}`)
+                console.log(`   🧪 Dry-run Product: ${productName}`)
                 return
             }
 
@@ -996,9 +1167,9 @@ async function saveProductWithRetry(
             }
 
             if (attempt > 1) {
-                console.log(`   ✅ Product sau retry: ${item.name}`)
+                console.log(`   ✅ Product sau retry: ${productName}`)
             } else {
-                console.log(`   ✅ Product: ${item.name}`)
+                console.log(`   ✅ Product: ${productName}`)
             }
 
             return
@@ -1009,8 +1180,16 @@ async function saveProductWithRetry(
             let changed = false
 
             if (message.includes('slug')) {
-                const nextSlugBase = `${data.slug || item.slug || item.name}-${item.id || Date.now()}-${attempt}`
-                data.slug = await getAvailableSlug(payload, 'products', nextSlugBase, item.id, existingProd?.id)
+                const nextSlugBase = `${data.slug || item.slug || item.title || item.name}-${item.id || Date.now()}-${attempt}`
+
+                data.slug = await getAvailableSlug(
+                    payload,
+                    'products',
+                    nextSlugBase,
+                    item.id,
+                    existingProd?.id,
+                )
+
                 console.log(`   ⚠️ Slug lỗi, thử slug mới: ${data.slug}`)
                 changed = true
             }
@@ -1029,9 +1208,38 @@ async function saveProductWithRetry(
                 changed = true
             }
 
+            if (message.includes('Danh mục') || message.toLowerCase().includes('categories')) {
+                delete data.categories
+                console.log(`   ⚠️ Categories lỗi, bỏ field categories.`)
+                changed = true
+            }
+
+            if (message.includes('Bộ sưu tập hình ảnh') || message.includes('images')) {
+                delete data.images
+                console.log(`   ⚠️ Images lỗi, bỏ field images.`)
+                changed = true
+            }
+
+            if (message.includes('Danh sách biến thể') || message.includes('variants')) {
+                delete data.variants
+                data.productType = 'simple'
+                console.log(`   ⚠️ Variants lỗi, đổi về simple và bỏ variants.`)
+                changed = true
+            }
+
             if (message.includes('Vị trí trang chủ') || message.includes('displayLocation')) {
                 delete data.displayLocation
                 console.log(`   ⚠️ Bỏ field displayLocation.`)
+                changed = true
+            }
+
+            if (message.includes('Mô tả sản phẩm') || message.includes('description')) {
+                console.log(`   ⚠️ Description lỗi chi tiết:`)
+                console.log(`   ${message}`)
+
+                data.description = emptyRichText()
+                console.log(`   ⚠️ Description vẫn lỗi, đổi sang emptyRichText.`)
+
                 changed = true
             }
 
@@ -1049,13 +1257,170 @@ async function importProducts(payload: any) {
 
     console.log(`\n📦 Import Products: ${productsData.length}`)
 
+    const getProductName = (item: AnyRecord) => {
+        return item.title || item.name || item.slug || item.id || 'Không tên'
+    }
+
+    const getImageSource = (img: AnyRecord) => {
+        return img?.image?.src || img?.src || img?.thumbnail || ''
+    }
+
+    const getImageAlt = (img: AnyRecord, fallback: string) => {
+        return img?.image?.alt || img?.image?.name || img?.alt || img?.name || fallback
+    }
+
+    const uploadProductImages = async (item: AnyRecord) => {
+        const uploadedImages: any[] = []
+        const productName = getProductName(item)
+
+        if (!Array.isArray(item.images) || item.images.length === 0) {
+            return uploadedImages
+        }
+
+        const imageIds = await Promise.all(
+            item.images.map((img: AnyRecord) =>
+                uploadMedia(
+                    payload,
+                    getImageSource(img),
+                    getImageAlt(img, productName),
+                ),
+            ),
+        )
+
+        imageIds
+            .filter((id) => Boolean(id))
+            .forEach((id) => {
+                uploadedImages.push({ image: id })
+            })
+
+        return uploadedImages
+    }
+
+    const uploadVariantImage = async (variant: AnyRecord, productName: string) => {
+        const image = variant?.image
+
+        if (!image?.src) return undefined
+
+        const mediaId = await uploadMedia(
+            payload,
+            image.src,
+            image.alt || image.name || productName,
+        )
+
+        return mediaId || undefined
+    }
+
+    const normalizeProductVariants = async (item: AnyRecord) => {
+        const productName = getProductName(item)
+
+        if (!Array.isArray(item.variants) || item.variants.length === 0) {
+            return []
+        }
+
+        const variants = []
+
+        for (const [index, variant] of item.variants.entries()) {
+            const imageId = await uploadVariantImage(variant, productName)
+
+            variants.push(
+                withoutUndefined({
+                    name: variant.name || `Phân loại ${index + 1}`,
+                    sku: variant.sku || '',
+                    isDefault: Boolean(variant.isDefault),
+                    basePrice: toNumber(variant.basePrice, 0),
+                    salePrice:
+                        variant.salePrice === null ||
+                            variant.salePrice === undefined ||
+                            variant.salePrice === ''
+                            ? undefined
+                            : toNumber(variant.salePrice, 0),
+                    stock: toNumber(variant.stock, 0),
+                    image: imageId || undefined,
+                    isActive: variant.isActive !== false,
+                }),
+            )
+        }
+
+        const hasDefault = variants.some((variant) => variant.isDefault)
+
+        if (!hasDefault && variants.length > 0) {
+            variants[0].isDefault = true
+        }
+
+        return variants
+    }
+
+    const normalizePrice = (item: AnyRecord, variants: AnyRecord[]) => {
+        const itemPrice = item.price || {}
+
+        if (item.productType === 'variable' && variants.length > 0) {
+            const activeVariants = variants.filter((variant) => variant.isActive !== false)
+            const defaultVariant =
+                activeVariants.find((variant) => variant.isDefault) ||
+                activeVariants[0] ||
+                variants[0]
+
+            return {
+                basePrice: toNumber(itemPrice.basePrice, toNumber(defaultVariant?.basePrice, 0)),
+                salePrice:
+                    itemPrice.salePrice === null ||
+                        itemPrice.salePrice === undefined ||
+                        itemPrice.salePrice === ''
+                        ? undefined
+                        : toNumber(itemPrice.salePrice, 0),
+                stock: toNumber(
+                    itemPrice.stock,
+                    activeVariants.reduce((total, variant) => {
+                        return total + toNumber(variant.stock, 0)
+                    }, 0),
+                ),
+            }
+        }
+
+        return {
+            basePrice: toNumber(itemPrice.basePrice, 0),
+            salePrice:
+                itemPrice.salePrice === null ||
+                    itemPrice.salePrice === undefined ||
+                    itemPrice.salePrice === ''
+                    ? undefined
+                    : toNumber(itemPrice.salePrice, 0),
+            stock: toNumber(itemPrice.stock, 0),
+        }
+    }
+
+    const normalizeSpecifications = (item: AnyRecord) => {
+        if (!Array.isArray(item.specifications)) return []
+
+        return item.specifications
+            .map((spec: AnyRecord) => ({
+                label: spec.label || '',
+                value: spec.value || '',
+            }))
+            .filter((spec: AnyRecord) => spec.label && spec.value)
+    }
+
+    const normalizeDisplayLocation = (item: AnyRecord) => {
+        const allowedValues = ['best-seller', 'combo', 'new-arrival']
+
+        if (!Array.isArray(item.displayLocation)) return []
+
+        return item.displayLocation.filter((value: string) => allowedValues.includes(value))
+    }
+
     for (const item of productsData) {
+        const productName = getProductName(item)
+
         try {
-            const baseSlug = makeSafeSlug(item.slug || item.name || `product-${item.id}`, item.id)
+            const baseSlug = makeSafeSlug(
+                item.slug || productName || `product-${item.id}`,
+                item.id,
+            )
+
             const existingProd = await findBySlug(payload, 'products', baseSlug)
 
             if (existingProd?.id && !UPDATE_EXISTING) {
-                console.log(`   ⏩ Product đã tồn tại: ${item.name}`)
+                console.log(`   ⏩ Product đã tồn tại: ${productName}`)
                 continue
             }
 
@@ -1065,8 +1430,12 @@ async function importProducts(payload: any) {
 
             let brandId: string | number | undefined = undefined
 
-            if (item.brands && item.brands.length > 0) {
-                brandId = await ensureBrand(payload, item.brands[0])
+            /**
+             * File converted dùng field "brand": []
+             * Không còn dùng "brands" như WooCommerce gốc.
+             */
+            if (Array.isArray(item.brand) && item.brand.length > 0) {
+                brandId = await ensureBrand(payload, item.brand[0])
                 brandId = await validateBrandId(payload, brandId)
             }
 
@@ -1076,87 +1445,84 @@ async function importProducts(payload: any) {
 
             const categoryIds: Array<string | number> = []
 
-            if (item.categories && item.categories.length > 0) {
+            if (Array.isArray(item.categories) && item.categories.length > 0) {
                 for (const cat of item.categories) {
                     const categoryId = await ensureCategory(payload, cat)
                     if (categoryId) categoryIds.push(categoryId)
                 }
             }
 
-            const uploadedImages: any[] = []
+            const uploadedImages = await uploadProductImages(item)
 
-            if (item.images && item.images.length > 0) {
-                const imageIds = await Promise.all(
-                    item.images.map((img: AnyRecord) =>
-                        uploadMedia(payload, img.src || img.thumbnail, img.alt || item.name),
-                    ),
-                )
+            const productType =
+                item.productType === 'variable' && Array.isArray(item.variants) && item.variants.length > 0
+                    ? 'variable'
+                    : 'simple'
 
-                imageIds
-                    .filter((id) => Boolean(id))
-                    .forEach((id) => {
-                        uploadedImages.push({ image: id })
-                    })
-            }
+            const variants = productType === 'variable'
+                ? await normalizeProductVariants(item)
+                : []
 
-            const specs =
-                item.attributes?.map((attr: AnyRecord) => ({
-                    label: attr.name,
-                    value: attr.options ? attr.options.join(', ') : '',
-                })) || []
-
-            const basePrice = toNumber(item.regular_price, 0) || toNumber(item.price, 0)
-            const salePrice = item.sale_price ? toNumber(item.sale_price, 0) : undefined
-
-            const stock =
-                typeof item.stock === 'number'
-                    ? item.stock
-                    : item.stock_status === 'instock'
-                        ? item.manage_stock
-                            ? toNumber(item.stock_quantity, 0)
-                            : 99
-                        : 0
+            const price = normalizePrice(
+                {
+                    ...item,
+                    productType,
+                },
+                variants,
+            )
 
             const productData: AnyRecord = {
-                title: item.name || productSlug,
+                title: item.title || productName,
                 sku: item.sku || '',
                 slug: productSlug,
 
+                brand: brandId,
                 categories: categoryIds,
 
-                price: {
-                    basePrice,
-                    salePrice,
-                    stock,
-                },
+                productType,
 
-                specifications: specs,
+                price,
 
-                accordions: normalizeProductAccordions(item.accordions || []),
+                shortDescription: item.shortDescription || '',
 
-                shortDescription: item.shortDescription || stripHTML(item.short_description || ''),
+                specifications: normalizeSpecifications(item),
+
+                description: normalizeProductDescription(item.description),
+
+                isCombo: Boolean(item.isCombo),
+                comboItems: Array.isArray(item.comboItems) ? item.comboItems : [],
 
                 seoTitle: item.seoTitle || '',
                 seoDescription: item.seoDescription || '',
 
-                status: item.status === 'publish' || item.status === 'published' ? 'published' : 'draft',
-            }
+                status: item.status === 'published' || item.status === 'publish'
+                    ? 'published'
+                    : 'draft',
 
-            if (brandId) {
-                productData.brand = brandId
+                displayLocation: normalizeDisplayLocation(item),
             }
 
             if (uploadedImages.length > 0) {
                 productData.images = uploadedImages
             }
 
-            delete productData.displayLocation
+            if (productType === 'variable' && variants.length > 0) {
+                productData.variants = variants
+            }
+
+            /**
+             * Nếu chưa muốn import displayLocation thì giữ dòng này.
+             * Vì file converted hiện đang là [] nên có hay không đều được.
+             */
+            if (!productData.displayLocation?.length) {
+                delete productData.displayLocation
+            }
 
             const data = withWpRaw(withoutUndefined(productData), item)
 
             await saveProductWithRetry(payload, existingProd, data, item)
         } catch (error: any) {
-            console.error(`   ❌ Product lỗi: ${item.name} - ${error.message}`)
+            console.error(`   ❌ Product lỗi: ${productName} - ${error.message}`)
         }
     }
 }

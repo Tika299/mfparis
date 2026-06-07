@@ -4,17 +4,15 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { formatPrice } from '@/utilities/formatPrice'
 import { ProductGallery } from '@/components/ProductGallery'
 import { ProductPurchase } from '@/components/ProductPurchase'
 import { RelatedProducts } from '@/components/RelatedProducts'
-import { ProductAccordionContent, ProductQuickNav } from '@/components/ProductQuickNav'
+import { ProductQuickNav, ProductRichTextContent } from '@/components/ProductQuickNav'
 import {
   Star,
   ShieldCheck,
   Truck,
   ChevronRight,
-  CheckCircle2,
   Info,
   UserCheck,
 } from 'lucide-react'
@@ -67,13 +65,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     },
   })
 
-  const basePrice = product.price?.basePrice || 0
-  const salePrice = product.price?.salePrice
-  const discountPercent = salePrice ? Math.round(((basePrice - salePrice) / basePrice) * 100) : 0
-
   return (
     <div className="min-h-screen bg-[#F0F2F5] pb-20 lg:pb-12">
-      <ProductQuickNav accordions={product.accordions || []} />
+      <ProductQuickNav description={product.description} />
 
       {/* Breadcrumb */}
       <div className="border-b border-gray-100 bg-white">
@@ -91,8 +85,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
           {/* Hero Section */}
           <div className="grid grid-cols-1 overflow-hidden rounded-3xl bg-white shadow-sm lg:grid-cols-12">
-            <div className="lg:col-span-7 lg:border-r lg:border-gray-100">
-              <ProductGallery images={product.images} />
+            <div className="bg-white p-3 sm:p-4 md:p-6 lg:col-span-7 lg:border-r lg:border-gray-100 lg:p-8">
+              <div className="overflow-hidden rounded-2xl">
+                <ProductGallery images={product.images} />
+              </div>
             </div>
 
             <div className="flex flex-col p-5 md:p-8 lg:col-span-5 lg:p-10">
@@ -107,37 +103,17 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
                 <div className="mt-4 flex items-center gap-4">
                   <div className="flex items-center gap-1 text-yellow-500">
-                    <Star size={18} fill="currentColor" /> 5.0
+                    <Star size={18} fill="currentColor" />
+                    <Star size={18} fill="currentColor" />
+                    <Star size={18} fill="currentColor" />
+                    <Star size={18} fill="currentColor" />
+                    <Star size={18} fill="currentColor" />
+                    5.0
                   </div>
-                  <span className="text-gray-300">•</span>
-                  <span className="text-sm text-gray-500">SKU: {product.sku || 'N/A'}</span>
                 </div>
-              </div>
-
-              {/* Giá */}
-              <div className="mb-8 rounded-2xl bg-[#F8F9FB] p-6">
-                <div className="flex items-end gap-3">
-                  <span className="text-3xl font-black text-[#b72828] md:text-4xl">
-                    {formatPrice(salePrice || basePrice)}₫
-                  </span>
-                  {salePrice && (
-                    <span className="pb-1 text-lg text-gray-400 line-through">
-                      {formatPrice(basePrice)}₫
-                    </span>
-                  )}
-                </div>
-                {discountPercent > 0 && (
-                  <div className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#ffebeb] px-4 py-1.5 text-xs font-bold text-[#b72828]">
-                    <CheckCircle2 size={14} /> Tiết kiệm {discountPercent}%
-                  </div>
-                )}
               </div>
 
               <ProductPurchase product={product} />
-
-              <button className="mt-4 h-14 w-full rounded-full bg-[#b72828] text-sm font-black uppercase tracking-widest text-white transition hover:bg-black">
-                MUA NGAY BÂY GIỜ
-              </button>
 
               {Array.isArray(product.categories) && product.categories.length > 0 && (
                 <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -156,6 +132,32 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                       </Link>
                     )
                   })}
+                </div>
+              )}
+
+              {product.specifications.length > 0 && (
+                <div className="mt-5 rounded-2xl border border-gray-100 bg-[#F8F9FB] p-5">
+                  <div className="mb-4 flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#b72828]">
+                      <Info size={16} />
+                    </div>
+                    <h3 className="text-sm font-black uppercase tracking-wider text-gray-900">
+                      Thông số kỹ thuật
+                    </h3>
+                  </div>
+
+                  <div className="divide-y divide-gray-200">
+                    {product.specifications.map((spec: any, index: number) => (
+                      <div key={index} className="grid grid-cols-12 gap-3 py-3 text-sm">
+                        <div className="col-span-5 font-semibold text-gray-500">
+                          {spec.label}
+                        </div>
+                        <div className="col-span-7 font-bold text-gray-900">
+                          {spec.value}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -184,46 +186,27 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </div>
 
           {/* Nội dung chi tiết */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-            {/* Sidebar Mục lục - Desktop only */}
-            <aside className="hidden lg:col-span-3 lg:block">
-              <div className="sticky top-24 rounded-2xl border border-gray-100 bg-white p-2 shadow-sm">
-                <p className="flex items-center gap-2 border-b border-gray-100 px-5 py-4 text-xs font-black uppercase tracking-widest text-gray-400">
-                  <Info size={15} /> MỤC LỤC
-                </p>
-                <nav className="py-2">
-                  {(product.accordions || []).map((item: any, i: number) => (
-                    <a
-                      key={i}
-                      href={`#section-${i}`}
-                      className="block rounded-xl px-5 py-[14px] text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-[#b72828] transition-colors"
-                    >
-                      {item.title}
-                    </a>
-                  ))}
-                </nav>
-              </div>
-            </aside>
+          <div className="space-y-10">
+            <ProductRichTextContent description={product.description} />
 
-            {/* Main Content */}
-            <main className="lg:col-span-9">
-              <ProductAccordionContent accordions={product.accordions || []} />
+            {/* Tư vấn block */}
+            <div className="rounded-[2.5rem] bg-[#16423C] p-8 text-white md:p-10">
+              <div className="flex flex-col items-center gap-6 md:flex-row md:items-start">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-amber-400">
+                  <UserCheck size={32} />
+                </div>
 
-              {/* Tư vấn block */}
-              <div className="mt-10 rounded-[2.5rem] bg-[#16423C] p-8 text-white md:p-10">
-                <div className="flex flex-col items-center gap-6 md:flex-row md:items-start">
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-amber-400">
-                    <UserCheck size={32} />
-                  </div>
-                  <div className="text-center md:text-left">
-                    <h4 className="text-lg font-bold uppercase italic">Chuyên gia MF Paris tư vấn</h4>
-                    <p className="mt-3 text-[15px] leading-relaxed text-emerald-100/80">
-                      Nếu bạn có thắc mắc về cách sử dụng hoặc thành phần, hãy nhấn Chat ngay để được hỗ trợ 24/7.
-                    </p>
-                  </div>
+                <div className="text-center md:text-left">
+                  <h4 className="text-lg font-bold uppercase italic">
+                    Chuyên gia MF Paris tư vấn
+                  </h4>
+
+                  <p className="mt-3 text-[15px] leading-relaxed text-emerald-100/80">
+                    Nếu bạn có thắc mắc về cách sử dụng hoặc thành phần, hãy nhấn Chat ngay để được hỗ trợ 24/7.
+                  </p>
                 </div>
               </div>
-            </main>
+            </div>
           </div>
 
           <RelatedProducts products={relatedRes.docs} />
