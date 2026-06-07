@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { ChevronLeft, Loader2, ShieldCheck, Truck, CreditCard } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { FundiinCheckoutElement } from '@/components/FundiinCheckoutElement'
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -72,26 +73,16 @@ export default function CheckoutPage() {
         const fundiinData = await fundiinRes.json()
 
         if (fundiinRes.ok && fundiinData.paymentUrl) {
-          // 1. Mở trang thanh toán Fundiin trong tab mới (_blank)
-          const paymentWindow = window.open(fundiinData.paymentUrl, '_blank');
+          toast.success('Đang chuyển sang cổng thanh toán Fundiin...')
 
-          if (paymentWindow) {
-            // 2. Nếu trình duyệt cho phép mở tab mới thành công
-            toast.success('Đang mở cổng thanh toán Fundiin...');
+          clearCart()
 
-            // 3. Chuyển trang hiện tại sang trang thông báo chờ (Tùy chọn)
-            // Hoặc giữ nguyên để khách có thể quay lại nhấn lại nếu lỡ tay đóng tab kia
-            const waitingUrl = `/checkout/waiting?orderId=${order.id}&url=${encodeURIComponent(fundiinData.paymentUrl)}`;
-            router.push(waitingUrl);
-          } else {
-            // Trường hợp bị trình duyệt chặn Pop-up
-            toast.error('Trình duyệt đã chặn cửa sổ thanh toán. Vui lòng nhấn vào liên kết để tiếp tục.');
-            // Hiển thị một nút bấm thủ công để khách click vào nếu bị chặn popup
-          }
+          window.location.href = fundiinData.paymentUrl
 
-          clearCart(); // Xóa giỏ hàng
-          return;
+          return
         }
+
+        throw new Error(fundiinData?.message || 'Không thể khởi tạo thanh toán Fundiin')
       }
 
       // 4. Nếu là COD thì hoàn tất đơn hàng
@@ -170,22 +161,45 @@ export default function CheckoutPage() {
                 </Label>
 
                 {/* Lựa chọn FUNDIIN */}
-                <Label
-                  htmlFor="fundiin"
-                  className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all cursor-pointer ${paymentMethod === 'fundiin' ? 'border-[#b72828] bg-red-50/30' : 'border-gray-50 bg-gray-50'}`}
+                <div
+                  className={`rounded-2xl border-2 transition-all ${paymentMethod === 'fundiin'
+                    ? 'border-[#b72828] bg-red-50/30'
+                    : 'border-gray-50 bg-gray-50'
+                    }`}
                 >
-                  <div className="flex items-center gap-4">
-                    <RadioGroupItem value="fundiin" id="fundiin" className="text-[#b72828]" />
-                    <div>
-                      <p className="font-bold text-sm flex items-center gap-2">
-                        Mua trước trả sau với Fundiin
-                        <img src="https://fundiin.vn/wp-content/uploads/2022/01/logo-fundiin.png" alt="Fundiin" className="h-4" />
-                      </p>
-                      <p className="text-[10px] text-gray-400 uppercase tracking-tighter">Trả trước 0đ - Chia 3 kỳ hạn miễn lãi</p>
+                  <Label
+                    htmlFor="fundiin"
+                    className="flex cursor-pointer items-center justify-between p-5"
+                  >
+                    <div className="flex items-center gap-4">
+                      <RadioGroupItem value="fundiin" id="fundiin" className="text-[#b72828]" />
+
+                      <div>
+                        <p
+                          id="fundiin-payment-title"
+                          className="flex items-center gap-2 text-sm font-bold"
+                        >
+                          Mua trước trả sau với Fundiin
+                          <span className="rounded-md bg-[#00AEEF]/10 px-2 py-0.5 text-[10px] font-black text-[#00AEEF]">
+                            FUNDIIN
+                          </span>
+                        </p>
+
+                        <p className="text-[10px] uppercase tracking-tighter text-gray-400">
+                          Trả góp linh hoạt qua Fundiin
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <CreditCard size={20} className="text-gray-400" />
-                </Label>
+
+                    <CreditCard size={20} className="text-gray-400" />
+                  </Label>
+
+                  {paymentMethod === 'fundiin' && (
+                    <div className="px-5 pb-5">
+                      <FundiinCheckoutElement amount={totalPrice} />
+                    </div>
+                  )}
+                </div>
 
               </RadioGroup>
             </section>
@@ -234,7 +248,12 @@ export default function CheckoutPage() {
                 className="w-full h-16 bg-[#b72828] hover:bg-black text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-lg shadow-red-100 transition-all active:scale-95"
               >
                 {loading ? (
-                  <><Loader2 className="animate-spin mr-2" size={18} /> Đang xử lý...</>
+                  <>
+                    <Loader2 className="animate-spin mr-2" size={18} />
+                    Đang xử lý...
+                  </>
+                ) : paymentMethod === 'fundiin' ? (
+                  'Thanh toán qua Fundiin'
                 ) : (
                   'Xác nhận đặt hàng'
                 )}
