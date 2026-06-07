@@ -270,6 +270,10 @@ export interface Product {
   sku?: string | null;
   brand: number | Brand;
   categories?: (number | Category)[] | null;
+  /**
+   * Chọn sản phẩm có biến thể nếu sản phẩm có nhiều dung tích, màu, quy cách...
+   */
+  productType?: ('simple' | 'variable') | null;
   price: {
     basePrice: number;
     salePrice?: number | null;
@@ -299,32 +303,39 @@ export interface Product {
       }[]
     | null;
   /**
-   * Nội dung sản phẩm đã được tách theo thẻ H2 từ WordPress. Mỗi mục gồm tiêu đề và nội dung RichText.
+   * Dùng cho các biến thể như 30ml, 50ml, 100ml, fullbox, tester, màu sắc, quy cách...
    */
-  accordions?:
+  variants?:
     | {
-        title: string;
-        /**
-         * Nội dung đã được convert từ HTML sang RichText.
-         */
-        content: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
+        name: string;
+        sku?: string | null;
+        isDefault?: boolean | null;
+        basePrice: number;
+        salePrice?: number | null;
+        stock?: number | null;
+        image?: (number | null) | Media;
+        isActive?: boolean | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Nội dung chi tiết sản phẩm được convert từ HTML WordPress sang RichText. Giữ H2, H3, list, link, bảng nếu editor hỗ trợ.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   isCombo?: boolean | null;
   comboItems?: (number | Product)[] | null;
   seoTitle?: string | null;
@@ -334,7 +345,7 @@ export interface Product {
    */
   slug: string;
   status?: ('draft' | 'published') | null;
-  displayLocation?: ('best-seller' | 'cleansing' | 'new-arrival')[] | null;
+  displayLocation?: ('best-seller' | 'combo' | 'new-arrival')[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -710,6 +721,7 @@ export interface ProductsSelect<T extends boolean = true> {
   sku?: T;
   brand?: T;
   categories?: T;
+  productType?: T;
   price?:
     | T
     | {
@@ -731,13 +743,20 @@ export interface ProductsSelect<T extends boolean = true> {
         value?: T;
         id?: T;
       };
-  accordions?:
+  variants?:
     | T
     | {
-        title?: T;
-        content?: T;
+        name?: T;
+        sku?: T;
+        isDefault?: T;
+        basePrice?: T;
+        salePrice?: T;
+        stock?: T;
+        image?: T;
+        isActive?: T;
         id?: T;
       };
+  description?: T;
   isCombo?: T;
   comboItems?: T;
   seoTitle?: T;
