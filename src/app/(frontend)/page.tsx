@@ -49,6 +49,16 @@ const policies = [
   },
 ]
 
+const chunkByTwo = <T,>(items: T[]) => {
+  const chunks: T[][] = []
+
+  for (let i = 0; i < items.length; i += 2) {
+    chunks.push(items.slice(i, i + 2))
+  }
+
+  return chunks
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
@@ -83,10 +93,13 @@ export default async function HomePage() {
       },
       limit: 4,
     }),
-    payload.find({ collection: 'categories', limit: 8 }),
+    payload.find({ collection: 'categories', limit: 14 }),
     payload.find({ collection: 'brands', limit: 12 }),
     payload.find({ collection: 'posts', limit: 6 }),
   ])
+
+  const categoryPairs = chunkByTwo(categoriesRes.docs)
+  const brandPairs = chunkByTwo(brandsRes.docs)
 
   return (
     <main className="min-h-screen pb-16 antialiased">
@@ -207,31 +220,35 @@ export default async function HomePage() {
             className="relative w-full"
           >
             <CarouselContent className="-ml-4 pb-2 md:-ml-5">
-              {categoriesRes.docs.map((cat: any) => (
+              {categoryPairs.map((pair: any[], index: number) => (
                 <CarouselItem
-                  key={cat.id}
-                  className="pl-4 basis-[42%] sm:basis-[30%] md:pl-5 md:basis-[22%] lg:basis-[18%] xl:basis-[15%]"
+                  key={index}
+                  className="basis-[52%] pl-4 sm:basis-[38%] md:basis-[28%] md:pl-5 lg:basis-[22%] xl:basis-[18%]"
                 >
-                  <Link
-                    href={`/categories/${cat.slug}`}
-                    className="group flex min-w-0 flex-col items-center rounded-2xl border border-transparent p-2.5 transition-colors hover:border-primary/20"
-                  >
-                    {/* Vòng ảnh lớn hơn, nền trắng cố định để không bị cảm giác ảnh đè nền */}
-                    <div className="mb-3 flex h-[86px] w-[86px] items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-white md:h-[102px] md:w-[102px]">
-                      <div className="relative h-[62px] w-[62px] overflow-hidden md:h-[74px] md:w-[74px]">
-                        <OptimizedImage
-                          media={cat.image}
-                          size="thumbnail"
-                          alt={cat.name}
-                          className="h-full w-full object-contain"
-                        />
-                      </div>
-                    </div>
+                  <div className="grid grid-rows-2 gap-4">
+                    {pair.map((cat: any) => (
+                      <Link
+                        key={cat.id}
+                        href={`/categories/${cat.slug}`}
+                        className="group flex min-w-0 flex-col items-center rounded-2xl border border-transparent p-2.5 transition-colors hover:border-primary/20"
+                      >
+                        <div className="mb-3 flex h-[86px] w-[86px] items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-white md:h-[102px] md:w-[102px]">
+                          <div className="relative h-[62px] w-[62px] overflow-hidden md:h-[74px] md:w-[74px]">
+                            <OptimizedImage
+                              media={cat.image}
+                              size="thumbnail"
+                              alt={cat.name}
+                              className="h-full w-full object-contain"
+                            />
+                          </div>
+                        </div>
 
-                    <span className="line-clamp-2 min-h-[32px] w-full px-1 text-center text-[11px] font-black uppercase tracking-tight text-neutral-800 transition-colors group-hover:text-primary md:text-[12px]">
-                      {cat.name}
-                    </span>
-                  </Link>
+                        <span className="line-clamp-2 min-h-[32px] w-full px-1 text-center text-[11px] font-black uppercase tracking-tight text-neutral-800 transition-colors group-hover:text-primary md:text-[12px]">
+                          {cat.name}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -302,35 +319,41 @@ export default async function HomePage() {
           </div>
 
           {/* Brands */}
-          <CarouselContent className="-ml-4 items-center">
-            {brandsRes.docs.map((brand: any) => {
-              const logo = brand.logo
-              const hasLogo = logo && typeof logo === 'object' && logo.url
-              return (
-                <CarouselItem
-                  key={brand.id}
-                  className="basis-1/2 pl-4 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
-                >
-                  <Link
-                    href={`/brands/${brand.slug}`}
-                    className="group flex h-20 items-center justify-center rounded-2xl border border-neutral-50 bg-white px-4 opacity-50 grayscale transition duration-700 hover:border-primary/30 hover:opacity-100 hover:grayscale-0 hover:shadow-inner"
-                  >
-                    {hasLogo ? (
-                      <OptimizedImage
-                        media={logo}
-                        size="thumbnail"
-                        alt={brand.name}
-                        className="max-h-8 w-full object-contain"
-                      />
-                    ) : (
-                      <span className="text-center text-lg font-black  tracking-tighter text-neutral-700 group-hover:text-primary">
-                        {brand.name}
-                      </span>
-                    )}
-                  </Link>
-                </CarouselItem>
-              )
-            })}
+          <CarouselContent className="-ml-4">
+            {brandPairs.map((pair: any[], index: number) => (
+              <CarouselItem
+                key={index}
+                className="basis-1/2 pl-4 md:basis-1/3 lg:basis-1/4 xl:basis-1/5"
+              >
+                <div className="grid grid-rows-2 gap-4">
+                  {pair.map((brand: any) => {
+                    const logo = brand.logo
+                    const hasLogo = logo && typeof logo === 'object' && logo.url
+
+                    return (
+                      <Link
+                        key={brand.id}
+                        href={`/brands/${brand.slug}`}
+                        className="group flex h-20 items-center justify-center rounded-2xl border border-neutral-50 bg-white px-4 opacity-50 grayscale transition duration-700 hover:border-primary/30 hover:opacity-100 hover:grayscale-0 hover:shadow-inner"
+                      >
+                        {hasLogo ? (
+                          <OptimizedImage
+                            media={logo}
+                            size="thumbnail"
+                            alt={brand.name}
+                            className="max-h-8 w-full object-contain"
+                          />
+                        ) : (
+                          <span className="text-center text-lg font-black tracking-tighter text-neutral-700 group-hover:text-primary">
+                            {brand.name}
+                          </span>
+                        )}
+                      </Link>
+                    )
+                  })}
+                </div>
+              </CarouselItem>
+            ))}
           </CarouselContent>
         </Carousel>
       </section>
