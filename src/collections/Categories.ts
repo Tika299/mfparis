@@ -8,6 +8,14 @@ export const Categories: CollectionConfig = {
     { name: 'name', type: 'text', required: true },
     { name: 'image', type: 'upload', relationTo: 'media' },
     {
+      name: 'description',
+      type: 'richText',
+      label: 'Mô tả danh mục',
+      admin: {
+        description: 'Mô tả danh mục đã được convert sang RichText.',
+      },
+    },
+    {
       name: 'slug',
       type: 'text',
       required: true,

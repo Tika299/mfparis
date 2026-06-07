@@ -1,21 +1,60 @@
 import { CollectionConfig } from 'payload'
+import type { CollectionBeforeChangeHook } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
+
+const syncVariantPrice: CollectionBeforeChangeHook = async ({ data }) => {
+  if (data?.productType !== 'variable') {
+    return data
+  }
+
+  const variants = Array.isArray(data?.variants)
+    ? data.variants.filter((variant: any) => variant?.isActive !== false)
+    : []
+
+  if (!variants.length) {
+    return data
+  }
+
+  const defaultVariant =
+    variants.find((variant: any) => variant?.isDefault) || variants[0]
+
+  const basePrice = Number(defaultVariant?.basePrice || 0)
+  const salePrice = Number(defaultVariant?.salePrice || 0)
+  const stock = variants.reduce((total: number, variant: any) => {
+    return total + Number(variant?.stock || 0)
+  }, 0)
+
+  data.price = {
+    ...(data.price || {}),
+    basePrice,
+    salePrice: salePrice > 0 ? salePrice : undefined,
+    stock,
+  }
+
+  return data
+}
 
 export const Products: CollectionConfig = {
   slug: 'products',
+
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'brand', 'status', 'updatedAt'],
     group: 'Kinh doanh',
   },
+
   access: {
     read: () => true,
   },
+
+  hooks: {
+    beforeChange: [syncVariantPrice],
+  },
+
   fields: [
     {
       type: 'tabs',
       tabs: [
-        /* TAB 1: THÔNG TIN CHUNG */
         {
           label: 'Thông tin chung',
           fields: [
@@ -29,20 +68,19 @@ export const Products: CollectionConfig = {
                   label: 'Tên sản phẩm',
                   admin: {
                     width: '70%',
-                    placeholder: 'Nhập tên sản phẩm (VD: Nước hoa Dior J’adore)',
                   },
                 },
                 {
                   name: 'sku',
                   type: 'text',
-                  label: 'Mã sản phẩm (SKU)',
+                  label: 'Mã SKU',
                   admin: {
                     width: '30%',
-                    placeholder: 'VD: DIOR-JAD-100',
                   },
                 },
               ],
             },
+
             {
               type: 'row',
               fields: [
@@ -52,7 +90,9 @@ export const Products: CollectionConfig = {
                   relationTo: 'brands',
                   required: true,
                   label: 'Thương hiệu',
-                  admin: { width: '50%' },
+                  admin: {
+                    width: '50%',
+                  },
                 },
                 {
                   name: 'categories',
@@ -60,11 +100,32 @@ export const Products: CollectionConfig = {
                   relationTo: 'categories',
                   hasMany: true,
                   label: 'Danh mục sản phẩm',
-                  admin: { width: '50%' },
+                  admin: {
+                    width: '50%',
+                  },
                 },
               ],
             },
-            /* PHẦN GIÁ VÀ KHO HÀNG - ĐÃ FIX LỖI LỆCH HÀNG */
+            {
+              name: 'productType',
+              type: 'select',
+              label: 'Loại sản phẩm',
+              defaultValue: 'simple',
+              options: [
+                {
+                  label: 'Sản phẩm thường',
+                  value: 'simple',
+                },
+                {
+                  label: 'Sản phẩm có biến thể',
+                  value: 'variable',
+                },
+              ],
+              admin: {
+                description: 'Chọn sản phẩm có biến thể nếu sản phẩm có nhiều dung tích, màu, quy cách...',
+              },
+            },
+
             {
               name: 'price',
               type: 'group',
@@ -78,80 +139,71 @@ export const Products: CollectionConfig = {
                       type: 'number',
                       required: true,
                       label: 'Giá niêm yết (đ)',
-                      admin: { width: '33.33%' },
+                      admin: {
+                        width: '33.33%',
+                      },
                     },
                     {
                       name: 'salePrice',
                       type: 'number',
                       label: 'Giá khuyến mãi (đ)',
-                      admin: { width: '33.33%' },
+                      admin: {
+                        width: '33.33%',
+                      },
                     },
                     {
                       name: 'stock',
                       type: 'number',
                       label: 'Số lượng kho',
                       defaultValue: 0,
-                      admin: { width: '33.33%' },
+                      admin: {
+                        width: '33.33%',
+                      },
                     },
                   ],
                 },
               ],
             },
+
             {
               name: 'images',
               type: 'array',
-              label: 'Bộ sưu tập hình ảnh (Tỷ lệ 1:1)',
-              minRows: 1,
+              label: 'Bộ sưu tập hình ảnh',
+              admin: {
+                description: 'Ảnh sản phẩm nên dùng tỉ lệ 1:1 để hiển thị đẹp.',
+              },
               fields: [
                 {
                   name: 'image',
                   type: 'upload',
                   relationTo: 'media',
                   required: true,
+                  label: 'Ảnh',
                 },
               ],
             },
+
             {
               name: 'shortDescription',
               type: 'textarea',
-              label: 'Mô tả ngắn (Hiển thị cạnh giá tiền)',
+              label: 'Mô tả ngắn',
               admin: {
-                placeholder: 'Nhập mô tả tóm tắt về sản phẩm...',
-              },
-            },
-            {
-              name: 'description',
-              type: 'richText',
-              label: 'Nội dung mô tả chi tiết',
-              admin: {
-                description: 'Bạn có thể dùng trình soạn thảo trực quan hoặc dán mã HTML vào.',
-                components: {
-                  // Thêm component xem trước vào sau ô nhập liệu
-                  afterInput: [
-                    {
-                      path: '@/components/Admin/RichTextPreview#RichTextPreview',
-                    },
-                  ],
-                },
+                rows: 4,
+                description: 'Hiển thị ở phần đầu trang sản phẩm.',
               },
             },
           ],
         },
 
-        /* TAB 2: THÔNG SỐ KỸ THUẬT (DYNAMIC ATTRIBUTES) */
         {
           label: 'Thông số kỹ thuật',
           fields: [
             {
               name: 'specifications',
               type: 'array',
-              label: 'Thuộc tính sản phẩm',
-              labels: {
-                singular: 'Thông số',
-                plural: 'Các thông số',
-              },
+              label: 'Thông số tùy chỉnh',
               admin: {
-                description: 'Thêm các thông số như: Nồng độ, Mùi hương, SPF, Calo, Thành phần...',
+                description: 'Dùng cho dung tích, xuất xứ, nhóm hương, loại da, nồng độ...',
               },
               fields: [
                 {
@@ -164,7 +216,6 @@ export const Products: CollectionConfig = {
                       required: true,
                       admin: {
                         width: '50%',
-                        placeholder: 'VD: Mùi hương',
                       },
                     },
                     {
@@ -174,7 +225,6 @@ export const Products: CollectionConfig = {
                       required: true,
                       admin: {
                         width: '50%',
-                        placeholder: 'VD: Hương gỗ phương Đông',
                       },
                     },
                   ],
@@ -184,7 +234,149 @@ export const Products: CollectionConfig = {
           ],
         },
 
-        /* TAB 3: CẤU HÌNH SEO */
+        {
+          label: 'Biến thể',
+          fields: [
+            {
+              name: 'variants',
+              type: 'array',
+              label: 'Danh sách biến thể',
+              admin: {
+                description:
+                  'Dùng cho các biến thể như 30ml, 50ml, 100ml, fullbox, tester, màu sắc, quy cách...',
+                condition: (data) => data?.productType === 'variable',
+              },
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'name',
+                      type: 'text',
+                      label: 'Tên biến thể',
+                      required: true,
+                      admin: {
+                        width: '40%',
+                        placeholder: 'VD: 30ml, 50ml, 100ml',
+                      },
+                    },
+                    {
+                      name: 'sku',
+                      type: 'text',
+                      label: 'SKU biến thể',
+                      admin: {
+                        width: '30%',
+                      },
+                    },
+                    {
+                      name: 'isDefault',
+                      type: 'checkbox',
+                      label: 'Biến thể mặc định',
+                      defaultValue: false,
+                      admin: {
+                        width: '30%',
+                      },
+                    },
+                  ],
+                },
+
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'basePrice',
+                      type: 'number',
+                      label: 'Giá niêm yết',
+                      required: true,
+                      admin: {
+                        width: '33.33%',
+                      },
+                    },
+                    {
+                      name: 'salePrice',
+                      type: 'number',
+                      label: 'Giá khuyến mãi',
+                      admin: {
+                        width: '33.33%',
+                      },
+                    },
+                    {
+                      name: 'stock',
+                      type: 'number',
+                      label: 'Tồn kho',
+                      defaultValue: 0,
+                      admin: {
+                        width: '33.33%',
+                      },
+                    },
+                  ],
+                },
+
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'image',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: 'Ảnh riêng của biến thể',
+                      admin: {
+                        width: '50%',
+                      },
+                    },
+                    {
+                      name: 'isActive',
+                      type: 'checkbox',
+                      label: 'Đang bán',
+                      defaultValue: true,
+                      admin: {
+                        width: '50%',
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          label: 'Nội dung chi tiết',
+          fields: [
+            {
+              name: 'description',
+              type: 'richText',
+              label: 'Mô tả sản phẩm',
+              admin: {
+                description:
+                  'Nội dung chi tiết sản phẩm được convert từ HTML WordPress sang RichText. Giữ H2, H3, list, link, bảng nếu editor hỗ trợ.',
+              },
+            },
+          ],
+        },
+
+        {
+          label: 'Combo',
+          fields: [
+            {
+              name: 'isCombo',
+              type: 'checkbox',
+              label: 'Đây là bộ sản phẩm / combo',
+              defaultValue: false,
+            },
+            {
+              name: 'comboItems',
+              type: 'relationship',
+              relationTo: 'products',
+              hasMany: true,
+              label: 'Danh sách sản phẩm trong combo',
+              admin: {
+                condition: (data) => data?.isCombo,
+              },
+            },
+          ],
+        },
+
         {
           label: 'SEO',
           fields: [
@@ -192,16 +384,13 @@ export const Products: CollectionConfig = {
               name: 'seoTitle',
               type: 'text',
               label: 'SEO Title',
-              admin: {
-                description: 'Tiêu đề hiển thị trên Google (Để trống sẽ lấy tên sản phẩm)',
-              },
             },
             {
               name: 'seoDescription',
               type: 'textarea',
               label: 'Meta Description',
               admin: {
-                description: 'Mô tả ngắn gọn khi tìm kiếm trên Google',
+                rows: 4,
               },
             },
           ],
@@ -209,65 +398,62 @@ export const Products: CollectionConfig = {
       ],
     },
 
-    /* SIDEBAR (CỘT PHẢI) */
     {
       name: 'slug',
       type: 'text',
       required: true,
       unique: true,
-      label: 'Đường dẫn (Slug)',
+      label: 'Đường dẫn',
       hooks: {
         beforeValidate: [beforeChangeSlug],
       },
       admin: {
         position: 'sidebar',
-        description: 'Tự động tạo từ tên, có thể chỉnh sửa thủ công',
+        description: 'Tự động tạo từ tên sản phẩm, có thể chỉnh tay để tối ưu SEO.',
       },
     },
+
     {
       name: 'status',
       type: 'select',
       label: 'Trạng thái',
       defaultValue: 'draft',
       options: [
-        { label: 'Nháp (Ẩn)', value: 'draft' },
-        { label: 'Đang bán (Hiện)', value: 'published' },
+        {
+          label: 'Nháp',
+          value: 'draft',
+        },
+        {
+          label: 'Đang bán',
+          value: 'published',
+        },
       ],
       admin: {
         position: 'sidebar',
       },
     },
+
     {
       name: 'displayLocation',
       type: 'select',
       label: 'Vị trí trang chủ',
       hasMany: true,
       options: [
-        { label: 'Sản phẩm bán chạy', value: 'best-seller' },
-        { label: 'Làm sạch làn da', value: 'cleansing' },
-        { label: 'Sản phẩm mới', value: 'new-arrival' },
+        {
+          label: 'Sản phẩm bán chạy',
+          value: 'best-seller',
+        },
+        {
+          label: 'Sản phẩm combo',
+          value: 'combo',
+        },
+        {
+          label: 'Sản phẩm mới',
+          value: 'new-arrival',
+        },
       ],
       admin: {
         position: 'sidebar',
-      },
-    },
-    {
-      name: 'isCombo',
-      type: 'checkbox',
-      label: 'Đây là bộ sản phẩm (Combo)',
-      defaultValue: false,
-      admin: { position: 'sidebar' },
-    },
-    {
-      name: 'comboItems',
-      type: 'relationship',
-      relationTo: 'products',
-      hasMany: true,
-      label: 'Sản phẩm trong Combo',
-      admin: {
-        position: 'sidebar',
-        condition: (data) => data?.isCombo === true, // Chỉ hiện khi tích vào ô Combo
-        description: 'Chọn các sản phẩm lẻ thuộc bộ này',
       },
     },
   ],

@@ -270,20 +270,56 @@ export interface Product {
   sku?: string | null;
   brand: number | Brand;
   categories?: (number | Category)[] | null;
+  /**
+   * Chọn sản phẩm có biến thể nếu sản phẩm có nhiều dung tích, màu, quy cách...
+   */
+  productType?: ('simple' | 'variable') | null;
   price: {
     basePrice: number;
     salePrice?: number | null;
     stock?: number | null;
   };
+  /**
+   * Ảnh sản phẩm nên dùng tỉ lệ 1:1 để hiển thị đẹp.
+   */
   images?:
     | {
         image: number | Media;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Hiển thị ở phần đầu trang sản phẩm.
+   */
   shortDescription?: string | null;
   /**
-   * Bạn có thể dùng trình soạn thảo trực quan hoặc dán mã HTML vào.
+   * Dùng cho dung tích, xuất xứ, nhóm hương, loại da, nồng độ...
+   */
+  specifications?:
+    | {
+        label: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Dùng cho các biến thể như 30ml, 50ml, 100ml, fullbox, tester, màu sắc, quy cách...
+   */
+  variants?:
+    | {
+        name: string;
+        sku?: string | null;
+        isDefault?: boolean | null;
+        basePrice: number;
+        salePrice?: number | null;
+        stock?: number | null;
+        image?: (number | null) | Media;
+        isActive?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Nội dung chi tiết sản phẩm được convert từ HTML WordPress sang RichText. Giữ H2, H3, list, link, bảng nếu editor hỗ trợ.
    */
   description?: {
     root: {
@@ -300,35 +336,16 @@ export interface Product {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * Thêm các thông số như: Nồng độ, Mùi hương, SPF, Calo, Thành phần...
-   */
-  specifications?:
-    | {
-        label: string;
-        value: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Tiêu đề hiển thị trên Google (Để trống sẽ lấy tên sản phẩm)
-   */
+  isCombo?: boolean | null;
+  comboItems?: (number | Product)[] | null;
   seoTitle?: string | null;
-  /**
-   * Mô tả ngắn gọn khi tìm kiếm trên Google
-   */
   seoDescription?: string | null;
   /**
-   * Tự động tạo từ tên, có thể chỉnh sửa thủ công
+   * Tự động tạo từ tên sản phẩm, có thể chỉnh tay để tối ưu SEO.
    */
   slug: string;
   status?: ('draft' | 'published') | null;
-  displayLocation?: ('best-seller' | 'cleansing' | 'new-arrival')[] | null;
-  isCombo?: boolean | null;
-  /**
-   * Chọn các sản phẩm lẻ thuộc bộ này
-   */
-  comboItems?: (number | Product)[] | null;
+  displayLocation?: ('best-seller' | 'combo' | 'new-arrival')[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -340,6 +357,24 @@ export interface Category {
   id: number;
   name: string;
   image?: (number | null) | Media;
+  /**
+   * Mô tả danh mục đã được convert sang RichText.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO
    */
@@ -443,6 +478,7 @@ export interface Message {
   customerName: string;
   sender: 'customer' | 'admin';
   content: string;
+  isRead?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -685,6 +721,7 @@ export interface ProductsSelect<T extends boolean = true> {
   sku?: T;
   brand?: T;
   categories?: T;
+  productType?: T;
   price?:
     | T
     | {
@@ -699,7 +736,6 @@ export interface ProductsSelect<T extends boolean = true> {
         id?: T;
       };
   shortDescription?: T;
-  description?: T;
   specifications?:
     | T
     | {
@@ -707,13 +743,27 @@ export interface ProductsSelect<T extends boolean = true> {
         value?: T;
         id?: T;
       };
+  variants?:
+    | T
+    | {
+        name?: T;
+        sku?: T;
+        isDefault?: T;
+        basePrice?: T;
+        salePrice?: T;
+        stock?: T;
+        image?: T;
+        isActive?: T;
+        id?: T;
+      };
+  description?: T;
+  isCombo?: T;
+  comboItems?: T;
   seoTitle?: T;
   seoDescription?: T;
   slug?: T;
   status?: T;
   displayLocation?: T;
-  isCombo?: T;
-  comboItems?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -724,6 +774,7 @@ export interface ProductsSelect<T extends boolean = true> {
 export interface CategoriesSelect<T extends boolean = true> {
   name?: T;
   image?: T;
+  description?: T;
   slug?: T;
   parent?: T;
   updatedAt?: T;
@@ -806,6 +857,7 @@ export interface MessagesSelect<T extends boolean = true> {
   customerName?: T;
   sender?: T;
   content?: T;
+  isRead?: T;
   updatedAt?: T;
   createdAt?: T;
 }

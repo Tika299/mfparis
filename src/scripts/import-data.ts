@@ -5,13 +5,14 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
 import fetch from 'node-fetch'
+import { JSDOM } from 'jsdom'
 
-// 1. Cấu hình môi trường
+// 1. CẤU HÌNH MÔI TRƯỜNG
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 
-// 2. Hàm xóa dấu tiếng Việt để tạo Slug
+// 2. HÀM HỖ TRỢ XÓA DẤU TIẾNG VIỆT CHO SLUG
 const formatSlug = (val: string): string =>
   val
     .toLowerCase()
@@ -23,17 +24,18 @@ const formatSlug = (val: string): string =>
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '')
 
+// 3. HÀM BỌC HTML VÀO CẤU TRÚC LEXICAL (JSON) CỦA PAYLOAD 3.0
 const convertHTMLtoLexical = (html: string) => {
   return {
     root: {
       type: 'root',
-      direction: 'ltr', // Thêm dòng này (ltr = left to right)
-      format: '', // Thêm dòng này
+      direction: 'ltr',
+      format: '',
       indent: 0,
       version: 1,
       children: [
         {
-          type: 'paragraph', // Sử dụng paragraph thay vì node 'html' lạ
+          type: 'paragraph',
           direction: 'ltr',
           format: '',
           indent: 0,
@@ -45,7 +47,7 @@ const convertHTMLtoLexical = (html: string) => {
               format: 0,
               mode: 'normal',
               style: '',
-              text: html, // Chúng ta tạm thời để mã HTML vào đây
+              text: html, // Chứa mã HTML thô để RichText component render
               type: 'text',
               version: 1,
             },
@@ -53,137 +55,133 @@ const convertHTMLtoLexical = (html: string) => {
         },
       ],
     },
-  } as any // Cực kỳ quan trọng để sửa lỗi "is not assignable"
+  } as any
 }
 
-// 3. Hàm tải ảnh từ URL và upload vào Payload Media
+// 4. HÀM BÓC TÁCH HTML THEO THẺ H2 THÀNH ACCORDIONS
+function parseHTMLToAccordions(html: string) {
+  if (!html) return []
+  const dom = new JSDOM(html)
+  const doc = dom.window.document
+  const children = Array.from(doc.body.children)
+
+  const accordions: any[] = []
+  let currentTitle = 'Mô tả sản phẩm'
+  let currentContent = ''
+
+  if (children.length === 0) {
+    return [{ title: currentTitle, content: convertHTMLtoLexical(html) }]
+  }
+
+  children.forEach((child, index) => {
+    if (child.tagName === 'H2') {
+      if (currentContent.trim() !== '') {
+        accordions.push({
+          title: currentTitle,
+          content: convertHTMLtoLexical(currentContent),
+        })
+      }
+      currentTitle = child.textContent?.trim() || 'Thông tin'
+      currentContent = ''
+    } else {
+      currentContent += child.outerHTML
+    }
+
+    if (index === children.length - 1 && currentContent.trim() !== '') {
+      accordions.push({
+        title: currentTitle,
+        content: convertHTMLtoLexical(currentContent),
+      })
+    }
+  })
+
+  return accordions
+}
+
+// 5. HÀM TẢI ẢNH VÀ UPLOAD VÀO MEDIA
 async function uploadMedia(payload: any, url: string, alt: string) {
   try {
     const response = await fetch(url)
-    if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`)
-
-    const arrayBuffer = await response.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
-
-    const filename = url.split('/').pop()?.split('?')[0] || 'image.jpg'
-    const contentType = response.headers.get('content-type') || 'image/jpeg'
+    if (!response.ok) return null
+    const buffer = Buffer.from(await response.arrayBuffer())
+    const filename = url.split('/').pop()?.split('?')[0] || `${Date.now()}.jpg`
 
     const media = await payload.create({
       collection: 'media',
-      data: { alt: alt || 'MF Paris Product Image' },
+      data: { alt: alt || 'MF Paris' },
       file: {
         data: buffer,
         name: filename,
-        mimetype: contentType,
+        mimetype: response.headers.get('content-type') || 'image/jpeg',
         size: buffer.length,
       },
     })
     return media.id
   } catch (error: any) {
-    console.error(`   ❌ Lỗi tải ảnh (${url}):`, error.message)
-    return undefined
+    console.error(`   ❌ Lỗi tải ảnh: ${url}`)
+    return null
   }
 }
 
+// 6. LUỒNG XỬ LÝ CHÍNH
 async function run() {
-  console.log('🚀 Bắt đầu quá trình Migration dữ liệu...')
-
-  if (!process.env.PAYLOAD_SECRET) {
-    console.error('❌ LỖI: Thiếu PAYLOAD_SECRET trong file .env')
-    process.exit(1)
-  }
+  console.log('🚀 Bắt đầu quá trình Migration tổng lực cho mfparis.vn...')
 
   const payload = await getPayload({ config: configPromise })
 
-  // Đọc file dữ liệu JSON
   const dataPath = path.resolve(__dirname, 'data.json')
-  if (!fs.existsSync(dataPath)) {
-    console.error('❌ LỖI: Không tìm thấy file src/scripts/data.json')
-    process.exit(1)
-  }
-
   const productsData = JSON.parse(fs.readFileSync(dataPath, 'utf-8'))
-  console.log(`📦 Tìm thấy ${productsData.length} sản phẩm trong file JSON.`)
 
   for (const item of productsData) {
     try {
-      console.log(`\n--- Đang xử lý: ${item.name} ---`)
+      console.log(`\n📦 Đang xử lý: ${item.name}`)
 
-      // A. XỬ LÝ BRAND (THƯƠNG HIỆU)
+      // A. XỬ LÝ BRAND
       let brandId = undefined
       if (item.brands && item.brands.length > 0) {
         const bName = item.brands[0].name
         const bSlug = item.brands[0].slug || formatSlug(bName)
-
-        const existingBrand = await payload.find({
-          collection: 'brands',
-          where: { slug: { equals: bSlug } },
-        })
-
-        if (existingBrand.docs.length > 0) {
-          brandId = existingBrand.docs[0].id
-        } else {
-          const newBrand = await payload.create({
-            collection: 'brands',
-            data: { name: bName, slug: bSlug },
-          })
-          brandId = newBrand.id
-          console.log(`   ✅ Đã tạo Brand mới: ${bName}`)
-        }
+        const existing = await payload.find({ collection: 'brands', where: { slug: { equals: bSlug } } })
+        brandId = existing.docs.length > 0 ? existing.docs[0].id : (await payload.create({ collection: 'brands', data: { name: bName, slug: bSlug } })).id
       }
 
-      // B. XỬ LÝ CATEGORIES (DANH MỤC)
+      // B. XỬ LÝ CATEGORIES
       const categoryIds = []
       for (const cat of item.categories) {
         const cSlug = cat.slug || formatSlug(cat.name)
-        const existingCat = await payload.find({
-          collection: 'categories',
-          where: { slug: { equals: cSlug } },
-        })
-
-        if (existingCat.docs.length > 0) {
-          categoryIds.push(existingCat.docs[0].id)
-        } else {
-          const newCat = await payload.create({
-            collection: 'categories',
-            data: { name: cat.name, slug: cSlug },
-          })
-          categoryIds.push(newCat.id)
-          console.log(`   ✅ Đã tạo Danh mục mới: ${cat.name}`)
-        }
+        const existing = await payload.find({ collection: 'categories', where: { slug: { equals: cSlug } } })
+        const id = existing.docs.length > 0 ? existing.docs[0].id : (await payload.create({ collection: 'categories', data: { name: cat.name, slug: cSlug } })).id
+        categoryIds.push(id)
       }
 
       // C. XỬ LÝ MEDIA (HÌNH ẢNH)
-      const uploadedImageObjects = []
+      const uploadedImages = []
       if (item.images && item.images.length > 0) {
         for (const img of item.images) {
-          const mediaId = await uploadMedia(payload, img.src, img.alt || item.name)
-          if (mediaId) {
-            uploadedImageObjects.push({ image: mediaId })
-          }
+          const mid = await uploadMedia(payload, img.src, item.name)
+          if (mid) uploadedImages.push({ image: mid })
         }
       }
 
-      // D. XỬ LÝ ATTRIBUTES (THÔNG SỐ KỸ THUẬT)
-      const specs =
-        item.attributes?.map((attr: any) => ({
-          label: attr.name,
-          value: attr.options ? attr.options.join(', ') : '',
-        })) || []
+      // D. XỬ LÝ THÔNG SỐ (ATTRIBUTES)
+      const specs = item.attributes?.map((attr: any) => ({
+        label: attr.name,
+        value: attr.options ? attr.options.join(', ') : '',
+      })) || []
 
-      // E. KIỂM TRA TRÙNG LẶP SẢN PHẨM
+      // E. XỬ LÝ ACCORDIONS (MÔ TẢ CHIA MỤC)
+      const wpDescription = item.description || ''
+      const parsedAccordions = parseHTMLToAccordions(wpDescription)
+
+      // F. KIỂM TRA TRÙNG LẶP
       const productSlug = item.slug || formatSlug(item.name)
-      const existingProd = await payload.find({
-        collection: 'products',
-        where: { slug: { equals: productSlug } },
-      })
-
+      const existingProd = await payload.find({ collection: 'products', where: { slug: { equals: productSlug } } })
       if (existingProd.docs.length > 0) {
-        console.log(`   ⚠️ Bỏ qua: Sản phẩm đã tồn tại.`)
+        console.log(`   ⚠️ Sản phẩm đã tồn tại, bỏ qua.`)
         continue
       }
 
-      // F. TẠO SẢN PHẨM TRONG DATABASE
+      // G. TẠO SẢN PHẨM HOÀN CHỈNH
       await payload.create({
         collection: 'products',
         data: {
@@ -195,24 +193,25 @@ async function run() {
           price: {
             basePrice: Number(item.regular_price) || 0,
             salePrice: item.sale_price ? Number(item.sale_price) : undefined,
-            stock: item.manage_stock ? item.stock_quantity || 0 : 99,
+            stock: item.manage_stock ? (item.stock_quantity || 0) : 99,
           },
-          images: uploadedImageObjects,
+          images: uploadedImages,
           specifications: specs,
-          description: convertHTMLtoLexical(item.description || ''),
-          shortDescription: item.short_description?.replace(/<\/?[^>]+(>|$)/g, ''),
+          accordions: parsedAccordions, // Toàn bộ H2 sẽ bay vào đây
+          shortDescription: item.short_description?.replace(/<\/?[^>]+(>|$)/g, ""),
+          description: convertHTMLtoLexical(wpDescription), // Vẫn giữ 1 bản full ở đây
           status: 'published',
-          displayLocation: ['new-arrival'],
-        } as any, // THÊM "as any" Ở ĐÂY ĐỂ BỎ QUA KIỂM TRA TYPE KHẮT KHE
+          displayLocation: ['new-arrival']
+        } as any,
       })
 
-      console.log(`   ✨ HOÀN THÀNH: ${item.name}`)
+      console.log(`   ✅ Thành công: ${item.name}`)
     } catch (error: any) {
-      console.error(`   ❌ LỖI tại sản phẩm ${item.name}:`, error)
+      console.error(`   ❌ Lỗi:`, error.message)
     }
   }
 
-  console.log('\n\n🎉 CHÚC MỪNG: Quá trình Migration hoàn tất 100%!')
+  console.log('\n✨ MIGRATION HOÀN TẤT!')
   process.exit(0)
 }
 

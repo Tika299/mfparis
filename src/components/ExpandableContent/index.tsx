@@ -1,63 +1,110 @@
 'use client'
-import React, { useState, useRef, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { ChevronDown, ChevronUp } from 'lucide-react'
-import { cn } from '@/utilities'
 
-interface Props {
+import { useEffect, useRef, useState } from 'react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
+
+type ExpandableContentProps = {
   children: React.ReactNode
-  maxHeight?: number // Chiều cao giới hạn (mặc định 1000px)
+  maxHeight?: number
+  expanded?: boolean
+  onExpandedChange?: (expanded: boolean) => void
+  collapseScrollTargetId?: string
 }
 
-export const ExpandableContent = ({ children, maxHeight = 1000 }: Props) => {
-  const [isExpanded, setIsExpanded] = useState(false)
-  const [shouldShowButton, setShouldShowButton] = useState(false)
+export function ExpandableContent({
+  children,
+  maxHeight = 1100,
+  expanded,
+  onExpandedChange,
+  collapseScrollTargetId,
+}: ExpandableContentProps) {
   const contentRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    if (contentRef.current) {
-      // Nếu chiều cao thực tế lớn hơn giới hạn thì mới hiện nút
-      if (contentRef.current.scrollHeight > maxHeight) {
-        setShouldShowButton(true)
-      }
+  const [internalExpanded, setInternalExpanded] = useState(false)
+  const [canExpand, setCanExpand] = useState(false)
+
+  const isControlled = typeof expanded === 'boolean'
+  const isExpanded = isControlled ? expanded : internalExpanded
+
+  const setExpanded = (value: boolean) => {
+    if (!isControlled) {
+      setInternalExpanded(value)
     }
-  }, [maxHeight])
+
+    onExpandedChange?.(value)
+  }
+
+  useEffect(() => {
+    const element = contentRef.current
+    if (!element) return
+
+    const checkHeight = () => {
+      setCanExpand(element.scrollHeight > maxHeight + 40)
+    }
+
+    checkHeight()
+
+    const observer = new ResizeObserver(checkHeight)
+    observer.observe(element)
+
+    window.addEventListener('resize', checkHeight)
+
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', checkHeight)
+    }
+  }, [children, maxHeight])
+
+  const handleToggle = () => {
+    const nextExpanded = !isExpanded
+
+    setExpanded(nextExpanded)
+
+    if (!nextExpanded && collapseScrollTargetId) {
+      window.setTimeout(() => {
+        document.getElementById(collapseScrollTargetId)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        })
+      }, 80)
+    }
+  }
 
   return (
     <div className="relative">
       <div
         ref={contentRef}
-        className={cn(
-          'relative transition-all duration-700 ease-in-out overflow-hidden',
-          !isExpanded && shouldShowButton ? 'max-h-[1000px]' : 'max-h-full',
-        )}
-        style={{ maxHeight: !isExpanded && shouldShowButton ? `${maxHeight}px` : 'none' }}
+        className="overflow-hidden transition-[max-height] duration-500 ease-in-out"
+        style={{
+          maxHeight: isExpanded || !canExpand ? 'none' : `${maxHeight}px`,
+        }}
       >
         {children}
-
-        {/* Hiệu ứng mờ dần ở đáy khi chưa mở rộng */}
-        {!isExpanded && shouldShowButton && (
-          <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white via-white/80 to-transparent z-10" />
-        )}
       </div>
 
-      {shouldShowButton && (
-        <div className="flex justify-center mt-8 relative z-20">
-          <Button
-            onClick={() => setIsExpanded(!isExpanded)}
-            variant="outline"
-            className="rounded-full px-10 h-12 border-[#E54D2E] text-[#E54D2E] hover:bg-orange-50 font-bold uppercase text-[11px] tracking-widest shadow-md cursor-pointer"
+      {canExpand && !isExpanded && (
+        <div className="pointer-events-none absolute bottom-16 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
+      )}
+
+      {canExpand && (
+        <div className="mt-8 flex justify-center">
+          <button
+            type="button"
+            onClick={handleToggle}
+            className="inline-flex h-12 items-center gap-2 rounded-full bg-[#b72828] px-7 text-sm font-black uppercase tracking-wider text-white shadow-sm transition hover:bg-black"
           >
             {isExpanded ? (
               <>
-                Thu gọn bài viết <ChevronUp className="ml-2" size={16} />
+                Thu gọn nội dung
+                <ChevronUp size={17} />
               </>
             ) : (
               <>
-                Xem thêm nội dung <ChevronDown className="ml-2" size={16} />
+                Xem thêm nội dung
+                <ChevronDown size={17} />
               </>
             )}
-          </Button>
+          </button>
         </div>
       )}
     </div>

@@ -1,24 +1,33 @@
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import '../globals.css'
-import { Be_Vietnam_Pro } from 'next/font/google' // Thay đổi ở đây
+import { Be_Vietnam_Pro, Playfair_Display } from 'next/font/google'
 import { FloatingContact } from '@/components/FloatingContact'
 import { Toaster } from 'sonner'
+import { GlobalEnterHandler } from '@/components/GlobalEnterHandler'
+
+const playfair = Playfair_Display({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['600', '700', '800', '900'],
+  variable: '--font-playfair',
+  display: 'swap',
+})
 
 // Cấu hình Be Vietnam Pro
-const beVietnamPro = Be_Vietnam_Pro({
+const beVietnam = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
-  weight: ['100', '300', '400', '500', '600', '700', '800', '900'],
+  weight: ['400', '500', '600', '700', '800'],
   variable: '--font-be-vietnam',
   display: 'swap',
 })
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" suppressHydrationWarning className={`${beVietnamPro.variable}`}>
+    <html lang="vi" suppressHydrationWarning className={`${beVietnam.variable} ${playfair.variable}`}>
       <body className="font-sans antialiased text-[#1a1a1a]">
         <Header />
-        <main>{children}</main>
+        <GlobalEnterHandler />
+        <main className="flex-grow">{children}</main>
         <Footer />
         {/* Cấu hình Toaster cho sang trọng */}
         <Toaster
@@ -31,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               borderRadius: '1.2rem',
               fontFamily: 'var(--font-be-vietnam)',
             },
-            className: "border-gray-100 shadow-2xl",
+            className: "top-center border-gray-100 shadow-2xl",
           }}
         />
         {/* NÚT LIÊN HỆ GÓC TRÁI MÀN HÌNH */}
