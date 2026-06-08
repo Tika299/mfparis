@@ -40,6 +40,9 @@ next-env.d.ts
 
 .env
 
+media/
+public/media/
+
 
 # Playwright
 node_modules/
