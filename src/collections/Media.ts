@@ -3,38 +3,45 @@ import path from 'path'
 
 export const Media: CollectionConfig = {
   slug: 'media',
+
   upload: {
-    staticDir: 'media', // Ảnh sẽ lưu trong thư mục /media ở gốc dự án
+    // Local: ./media
+    // Production Coolify: /app/media
+    staticDir: process.env.MEDIA_DIR || path.resolve(process.cwd(), 'media'),
+
     imageSizes: [
       {
-        name: 'thumbnail', // Dùng cho ảnh giỏ hàng, tìm kiếm nhanh
+        name: 'thumbnail',
         width: 150,
         height: 150,
         position: 'centre',
       },
       {
-        name: 'card', // Dùng cho danh sách sản phẩm (Tỉ lệ 1:1)
+        name: 'card',
         width: 600,
         height: 600,
         position: 'centre',
       },
       {
-        name: 'large', // Dùng cho ảnh chính trang chi tiết
+        name: 'large',
         width: 1200,
-        height: undefined, // Tự động theo tỉ lệ ảnh gốc
+        position: 'centre',
       },
     ],
+
     adminThumbnail: 'thumbnail',
     mimeTypes: ['image/*'],
   },
+
   access: {
     read: () => true,
   },
+
   fields: [
     {
       name: 'alt',
       type: 'text',
-      required: true, // Bắt buộc nhập Alt text để Google Index ảnh tốt
+      required: true,
       label: 'Mô tả hình ảnh (SEO)',
     },
   ],

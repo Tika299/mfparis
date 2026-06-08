@@ -7,6 +7,7 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   images: {
     formats: ['image/avif', 'image/webp'], // Ưu tiên AVIF, nếu máy cũ không hỗ trợ sẽ dùng WebP
     deviceSizes: [640, 750, 828, 1080, 1200, 1920], // Tạo các bản nén phù hợp với từng loại màn hình
