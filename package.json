@@ -17,6 +17,7 @@
     "migrate:status": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:status",
     "coolify:build": "npm run migrate && npm run build",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
+    "socket": "node chat-server.js",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
