@@ -2,7 +2,8 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
-   CREATE TYPE "public"."enum_products_display_location" AS ENUM('best-seller', 'cleansing', 'new-arrival');
+   CREATE TYPE "public"."enum_products_display_location" AS ENUM('best-seller', 'combo', 'new-arrival');
+  CREATE TYPE "public"."enum_products_product_type" AS ENUM('simple', 'variable');
   CREATE TYPE "public"."enum_products_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum_orders_payment_method" AS ENUM('cod', 'bank_transfer', 'fundiin');
   CREATE TYPE "public"."enum_orders_status" AS ENUM('pending', 'confirmed', 'shipping', 'completed', 'cancelled');
@@ -88,12 +89,18 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"value" varchar NOT NULL
   );
   
-  CREATE TABLE "products_accordions" (
+  CREATE TABLE "products_variants" (
   	"_order" integer NOT NULL,
   	"_parent_id" integer NOT NULL,
   	"id" varchar PRIMARY KEY NOT NULL,
-  	"title" varchar NOT NULL,
-  	"content" jsonb NOT NULL
+  	"name" varchar,
+  	"sku" varchar,
+  	"is_default" boolean DEFAULT false,
+  	"base_price" numeric,
+  	"sale_price" numeric,
+  	"stock" numeric DEFAULT 0,
+  	"image_id" integer,
+  	"is_active" boolean DEFAULT true
   );
   
   CREATE TABLE "products_display_location" (
@@ -108,6 +115,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"title" varchar NOT NULL,
   	"sku" varchar,
   	"brand_id" integer NOT NULL,
+  	"product_type" "enum_products_product_type" DEFAULT 'simple',
   	"price_base_price" numeric NOT NULL,
   	"price_sale_price" numeric,
   	"price_stock" numeric DEFAULT 0,
@@ -135,6 +143,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"id" serial PRIMARY KEY NOT NULL,
   	"name" varchar NOT NULL,
   	"image_id" integer,
+  	"description" jsonb,
   	"slug" varchar NOT NULL,
   	"parent_id" integer,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
@@ -341,7 +350,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "products_images" ADD CONSTRAINT "products_images_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "products_images" ADD CONSTRAINT "products_images_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "products_specifications" ADD CONSTRAINT "products_specifications_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;
-  ALTER TABLE "products_accordions" ADD CONSTRAINT "products_accordions_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "products_variants" ADD CONSTRAINT "products_variants_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "products_variants" ADD CONSTRAINT "products_variants_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "products_display_location" ADD CONSTRAINT "products_display_location_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "products" ADD CONSTRAINT "products_brand_id_brands_id_fk" FOREIGN KEY ("brand_id") REFERENCES "public"."brands"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "products_rels" ADD CONSTRAINT "products_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."products"("id") ON DELETE cascade ON UPDATE no action;
@@ -400,8 +410,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "products_images_image_idx" ON "products_images" USING btree ("image_id");
   CREATE INDEX "products_specifications_order_idx" ON "products_specifications" USING btree ("_order");
   CREATE INDEX "products_specifications_parent_id_idx" ON "products_specifications" USING btree ("_parent_id");
-  CREATE INDEX "products_accordions_order_idx" ON "products_accordions" USING btree ("_order");
-  CREATE INDEX "products_accordions_parent_id_idx" ON "products_accordions" USING btree ("_parent_id");
+  CREATE INDEX "products_variants_order_idx" ON "products_variants" USING btree ("_order");
+  CREATE INDEX "products_variants_parent_id_idx" ON "products_variants" USING btree ("_parent_id");
+  CREATE INDEX "products_variants_image_idx" ON "products_variants" USING btree ("image_id");
   CREATE INDEX "products_display_location_order_idx" ON "products_display_location" USING btree ("order");
   CREATE INDEX "products_display_location_parent_idx" ON "products_display_location" USING btree ("parent_id");
   CREATE INDEX "products_brand_idx" ON "products" USING btree ("brand_id");
@@ -492,7 +503,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "brands" CASCADE;
   DROP TABLE "products_images" CASCADE;
   DROP TABLE "products_specifications" CASCADE;
-  DROP TABLE "products_accordions" CASCADE;
+  DROP TABLE "products_variants" CASCADE;
   DROP TABLE "products_display_location" CASCADE;
   DROP TABLE "products" CASCADE;
   DROP TABLE "products_rels" CASCADE;
@@ -517,6 +528,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "about_page_values" CASCADE;
   DROP TABLE "about_page" CASCADE;
   DROP TYPE "public"."enum_products_display_location";
+  DROP TYPE "public"."enum_products_product_type";
   DROP TYPE "public"."enum_products_status";
   DROP TYPE "public"."enum_orders_payment_method";
   DROP TYPE "public"."enum_orders_status";

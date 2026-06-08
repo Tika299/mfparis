@@ -1,9 +1,9 @@
-import * as migration_20260601_171242_initial_schema from './20260601_171242_initial_schema';
+import * as migration_20260608_083719 from './20260608_083719';
 
 export const migrations = [
   {
-    up: migration_20260601_171242_initial_schema.up,
-    down: migration_20260601_171242_initial_schema.down,
-    name: '20260601_171242_initial_schema'
+    up: migration_20260608_083719.up,
+    down: migration_20260608_083719.down,
+    name: '20260608_083719'
   },
 ];

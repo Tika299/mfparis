@@ -840,8 +840,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.products_accordions": {
-      "name": "products_accordions",
+    "public.products_variants": {
+      "name": "products_variants",
       "schema": "",
       "columns": {
         "_order": {
@@ -862,22 +862,61 @@
           "primaryKey": true,
           "notNull": true
         },
-        "title": {
-          "name": "title",
+        "name": {
+          "name": "name",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
-        "content": {
-          "name": "content",
-          "type": "jsonb",
+        "sku": {
+          "name": "sku",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "is_default": {
+          "name": "is_default",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "base_price": {
+          "name": "base_price",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sale_price": {
+          "name": "sale_price",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stock": {
+          "name": "stock",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "image_id": {
+          "name": "image_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
         }
       },
       "indexes": {
-        "products_accordions_order_idx": {
-          "name": "products_accordions_order_idx",
+        "products_variants_order_idx": {
+          "name": "products_variants_order_idx",
           "columns": [
             {
               "expression": "_order",
@@ -891,8 +930,8 @@
           "method": "btree",
           "with": {}
         },
-        "products_accordions_parent_id_idx": {
-          "name": "products_accordions_parent_id_idx",
+        "products_variants_parent_id_idx": {
+          "name": "products_variants_parent_id_idx",
           "columns": [
             {
               "expression": "_parent_id",
@@ -905,12 +944,40 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "products_variants_image_idx": {
+          "name": "products_variants_image_idx",
+          "columns": [
+            {
+              "expression": "image_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
-        "products_accordions_parent_id_fk": {
-          "name": "products_accordions_parent_id_fk",
-          "tableFrom": "products_accordions",
+        "products_variants_image_id_media_id_fk": {
+          "name": "products_variants_image_id_media_id_fk",
+          "tableFrom": "products_variants",
+          "tableTo": "media",
+          "columnsFrom": [
+            "image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "products_variants_parent_id_fk": {
+          "name": "products_variants_parent_id_fk",
+          "tableFrom": "products_variants",
           "tableTo": "products",
           "columnsFrom": [
             "_parent_id"
@@ -1038,6 +1105,14 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "product_type": {
+          "name": "product_type",
+          "type": "enum_products_product_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'simple'"
         },
         "price_base_price": {
           "name": "price_base_price",
@@ -1385,6 +1460,12 @@
         "image_id": {
           "name": "image_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
@@ -4026,8 +4107,16 @@
       "schema": "public",
       "values": [
         "best-seller",
-        "cleansing",
+        "combo",
         "new-arrival"
+      ]
+    },
+    "public.enum_products_product_type": {
+      "name": "enum_products_product_type",
+      "schema": "public",
+      "values": [
+        "simple",
+        "variable"
       ]
     },
     "public.enum_products_status": {
@@ -4077,6 +4166,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "26181dd3-a8a0-4f24-8e06-3c97c57a62fc",
+  "id": "3fc9ecbe-8c48-407b-9e8b-0954de8a1992",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }
