@@ -52,14 +52,15 @@ export const Header = async () => {
           </div>
 
           {/* LOGO */}
-          <Link href="/" className="flex shrink-0 items-center group">
+          <Link href="/" className="group flex h-full shrink-0 items-center">
             {logoUrl ? (
               <Image
                 src={logoUrl}
                 alt={logoAlt}
-                width={140}
-                height={45}
-                className="h-8 w-auto object-contain transition-transform group-hover:scale-105 sm:h-9 lg:h-10"
+                width={100}
+                height={80}
+                sizes="(max-width: 640px) 150px, (max-width: 1024px) 180px, 220px"
+                className="block h-[100%] w-[150px] object-contain object-left transition-transform duration-300 group-hover:scale-105 sm:w-[180px] lg:h-14 lg:w-[220px]"
                 priority
               />
             ) : (
