@@ -247,3 +247,22 @@ html {
   animation: none !important;
   box-shadow: none !important;
 }
+
+/* --- BLOG PAGE UX/UI --- */
+.blog-page-bg {
+  background:
+    radial-gradient(circle at top left, rgba(183, 40, 40, 0.08), transparent 34rem),
+    linear-gradient(180deg, #fff 0%, #faf7f5 42%, #fff 100%);
+}
+
+.blog-card {
+  will-change: transform;
+}
+
+.blog-card h2 {
+  letter-spacing: -0.02em;
+}
+
+.blog-card img {
+  transform-origin: center;
+}

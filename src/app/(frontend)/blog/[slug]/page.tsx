@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import RichText from '@/components/RichText'
 import { ExpandableContent } from '@/components/ExpandableContent'
+import RelatedPostsCarousel from '@/components/Blog/RelatedPostsCarousel'
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -47,7 +48,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     // Lấy 4 bài cùng danh mục (Bottom) - Loại trừ bài hiện tại
     payload.find({
       collection: 'posts',
-      limit: 4,
+      limit: 8,
+      depth: 1,
+      sort: '-createdAt',
       where: {
         and: [{ slug: { not_equals: slug } }, { categories: { in: categoryIds } }],
       },
@@ -107,8 +110,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </header>
 
               {/* ẢNH ĐẠI DIỆN 16:9 */}
-              <div className="relative aspect-video w-full rounded-[2rem] overflow-hidden mb-12 shadow-xl">
-                <OptimizedImage media={post.thumbnail} size="large" alt={post.title} priority />
+              <div className="relative aspect-video w-full overflow-hidden rounded-[2rem] bg-[#f4f0ed] mb-12 shadow-xl">
+                <OptimizedImage
+                  media={post.thumbnail}
+                  size="large"
+                  alt={post.title}
+                  priority
+                  className="h-full w-full object-cover object-center"
+                />
               </div>
 
               {/* NỘI DUNG CHI TIẾT */}
@@ -152,44 +161,29 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </article>
 
             {/* PHẦN BÀI VIẾT LIÊN QUAN (NẰM DƯỚI BÀI VIẾT CHÍNH) */}
-            <section className="mt-16">
-              <h3 className="text-2xl font-bold text-gray-900 mb-8 font-serif italic">
-                Bài viết bạn có thể thích
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {relatedPosts.docs.map((rPost: any) => (
-                  <Link href={`/blog/${rPost.slug}`} key={rPost.id} className="group flex flex-col">
-                    <div className="relative aspect-video rounded-3xl overflow-hidden mb-4 shadow-sm">
-                      <OptimizedImage
-                        media={rPost.thumbnail}
-                        size="card"
-                        alt={rPost.title}
-                        className="group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-                    <h4 className="font-bold text-sm leading-snug group-hover:text-[#E54D2E] transition-colors line-clamp-2">
-                      {rPost.title}
-                    </h4>
-                  </Link>
-                ))}
-              </div>
-            </section>
+            {relatedPosts.docs.length > 0 && (
+              <RelatedPostsCarousel posts={relatedPosts.docs} />
+            )}
           </div>
 
           {/* CỘT PHẢI: SIDEBAR (4 CỘT) */}
           <aside className="lg:col-span-4 space-y-10">
             {/* Search */}
-            <div className="relative group">
+            <form action="/blog" className="relative group flex items-center">
               <input
+                name="q"
                 type="text"
                 placeholder="Tìm bài viết..."
-                className="w-full h-12 bg-white border border-gray-100 rounded-2xl pl-5 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-orange-100 transition-all shadow-sm"
+                className="h-12 w-full rounded-2xl border border-gray-100 bg-white pl-5 pr-12 text-sm shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-100"
               />
-              <Search
-                size={20}
-                className="absolute right-4 top-3.5 text-gray-300 group-focus-within:text-orange-500"
-              />
-            </div>
+              <button
+                type="submit"
+                className="absolute right-3 top-2.5 flex h-7 w-7 items-center justify-center rounded-full text-gray-300 transition-colors hover:bg-red-50 hover:text-primary"
+                aria-label="Tìm bài viết"
+              >
+                <Search size={18} />
+              </button>
+            </form>
 
             {/* BÀI VIẾT MỚI NHẤT (NỔI BẬT) */}
             <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
@@ -203,12 +197,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     key={fPost.id}
                     className="flex gap-4 group items-center"
                   >
-                    <div className="relative w-20 h-20 flex-shrink-0 rounded-2xl overflow-hidden border border-gray-50">
+                    <div className="relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-2xl border border-gray-50 bg-[#f4f0ed]">
                       <OptimizedImage
                         media={fPost.thumbnail}
                         size="thumbnail"
                         alt={fPost.title}
-                        className="group-hover:scale-110 transition-transform duration-500"
+                        className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
@@ -221,27 +215,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     </div>
                   </Link>
                 ))}
-              </div>
-            </div>
-
-            {/* Newsletter */}
-            <div className="bg-[#16423C] rounded-[2.5rem] p-10 text-center text-white space-y-6 shadow-xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-10 -mt-10" />
-              <h3 className="text-xl font-bold font-serif italic">
-                Gia nhập cộng đồng <br /> MF Paris
-              </h3>
-              <p className="text-xs text-emerald-100/60 leading-relaxed uppercase tracking-widest font-medium">
-                Nhận bí quyết làm đẹp <br /> và ưu đãi đặc quyền
-              </p>
-              <div className="space-y-3">
-                <input
-                  type="email"
-                  placeholder="Email của bạn..."
-                  className="w-full h-12 rounded-xl bg-white/10 border border-white/10 text-sm px-4 focus:outline-none focus:bg-white/20 text-white placeholder:text-emerald-100/30"
-                />
-                <button className="w-full h-12 bg-white text-[#16423C] text-[11px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-orange-50 transition-all">
-                  Đăng ký ngay
-                </button>
               </div>
             </div>
           </aside>

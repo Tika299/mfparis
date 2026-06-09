@@ -9,13 +9,14 @@ const dirname = path.dirname(__filename)
 const nextConfig: NextConfig = {
   output: 'standalone',
   images: {
-    formats: ['image/avif', 'image/webp'], // Ưu tiên AVIF, nếu máy cũ không hỗ trợ sẽ dùng WebP
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920], // Tạo các bản nén phù hợp với từng loại màn hình
-    minimumCacheTTL: 31536000, // Lưu ảnh trong cache trình duyệt 1 năm (Google rất thích điều này)
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [360, 640, 828, 1080, 1200, 1600],
+    imageSizes: [96, 160, 320],
+    minimumCacheTTL: 2592000,
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'images.unsplash.com', // Thêm dòng này để cho phép ảnh từ Unsplash
+        hostname: 'images.unsplash.com',
       },
       {
         protocol: 'http',
@@ -25,10 +26,9 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '**.supabase.co', // Cho phép nếu bạn dùng Supabase
+        hostname: '**.supabase.co',
       },
     ],
-    // Hỗ trợ thêm các đường dẫn ảnh nội bộ từ Payload CMS
     localPatterns: [
       {
         pathname: '/api/media/**',
