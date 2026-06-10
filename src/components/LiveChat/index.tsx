@@ -6,8 +6,9 @@ import {
   ChevronLeft, Loader2, LogOut, MessageSquareDot
 } from 'lucide-react'
 import { cn } from '@/utilities'
+const socketURL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001'
 
-const socket = io(process.env.SOCKET_SERVER_URL, {
+const socket = io(socketURL, {
   autoConnect: false,
   reconnection: true,
   transports: ['websocket']
