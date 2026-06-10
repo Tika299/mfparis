@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+media
+public/media
+.env
+.env.local
+npm-debug.log
+.DS_Store
