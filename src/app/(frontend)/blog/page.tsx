@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Search, Sparkles, X } from 'lucide-react'
 
 export const metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://maraisdefrance.vn'),
   title: 'Blog | MF Paris Chính Hãng',
   description: 'Cập nhật kiến thức nước hoa, mỹ phẩm, chăm sóc da và sức khỏe từ MF Paris.',
 }

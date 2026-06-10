@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react'
 import { OptimizedImage } from '@/components/OptimizedImage'
 
 export const metadata = {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://maraisdefrance.vn'),
     title: 'Danh mục sản phẩm | MF Paris Chính Hãng',
     description: 'Khám phá các dòng sản phẩm nước hoa, mỹ phẩm và thực phẩm chức năng cao cấp từ Pháp tại MF Paris.',
 }

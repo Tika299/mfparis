@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { CheckCircle2, Heart, Award, Sparkles } from 'lucide-react'
 
 export const metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://maraisdefrance.vn'),
   title: 'Giới thiệu về MF Paris | Tinh hoa làm đẹp Pháp',
   description:
     'Khám phá hành trình mang những giá trị làm đẹp tinh túy nhất từ Pháp về Việt Nam của MF Paris.',

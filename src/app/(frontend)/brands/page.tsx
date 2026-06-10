@@ -11,6 +11,7 @@ type PageProps = {
 }
 
 export const metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://maraisdefrance.vn'),
   title: 'Thương hiệu | MF Paris Chính Hãng',
   description: 'Khám phá các thương hiệu nước hoa, mỹ phẩm và thực phẩm chức năng chính hãng tại MF Paris.',
 }
