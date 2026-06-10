@@ -7,6 +7,70 @@ export async function POST(req: Request) {
     const payload = await getPayload({ config: configPromise })
     const data = await req.json()
 
+    for (const item of data.items) {
+      const productId = item.product
+      const variantId = item.variantId
+      const quantity = Number(item.quantity || 0)
+
+      if (!productId || quantity <= 0) {
+        return NextResponse.json(
+          { error: 'Dữ liệu sản phẩm không hợp lệ' },
+          { status: 400 },
+        )
+      }
+
+      const product: any = await payload.findByID({
+        collection: 'products',
+        id: productId,
+        depth: 0,
+      })
+
+      if (!product) {
+        return NextResponse.json(
+          { error: 'Không tìm thấy sản phẩm' },
+          { status: 404 },
+        )
+      }
+
+      if (variantId) {
+        const variant = product.variants?.find(
+          (variant: any) => String(variant.id) === String(variantId),
+        )
+
+        const stock = Number(variant?.stock || 0)
+
+        if (!variant || stock <= 0) {
+          return NextResponse.json(
+            { error: `${product.title} - phân loại đã hết hàng` },
+            { status: 400 },
+          )
+        }
+
+        if (quantity > stock) {
+          return NextResponse.json(
+            { error: `${product.title} chỉ còn ${stock} sản phẩm` },
+            { status: 400 },
+          )
+        }
+      } else {
+        const stock = Number(product?.price?.stock || 0)
+
+        if (stock <= 0) {
+          return NextResponse.json(
+            { error: `${product.title} đã hết hàng` },
+            { status: 400 },
+          )
+        }
+
+        if (quantity > stock) {
+          return NextResponse.json(
+            { error: `${product.title} chỉ còn ${stock} sản phẩm` },
+            { status: 400 },
+          )
+        }
+      }
+    }
+
     // Tạo bản ghi mới trong collection 'orders'
     const order = await payload.create({
       collection: 'orders',

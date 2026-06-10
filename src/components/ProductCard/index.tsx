@@ -33,11 +33,62 @@ function getReviewCount(product: any) {
 }
 
 export const ProductCard = ({ product, className }: { product: any; className?: string }) => {
-  const basePrice = Number(product?.price?.basePrice || 0)
-  const salePrice = Number(product?.price?.salePrice || 0)
+
+  const getActiveVariants = (product: any) => {
+    if (product?.productType !== 'variable') return []
+
+    return Array.isArray(product?.variants)
+      ? product.variants.filter((variant: any) => variant?.isActive !== false)
+      : []
+  }
+
+  const getUploadUrl = (upload: any) => {
+    if (!upload) return ''
+
+    if (typeof upload === 'string') return upload
+
+    if (typeof upload === 'object' && upload.url) return upload.url
+
+    return ''
+  }
+
+  const getVariantPrice = (variant: any) => {
+    const salePrice = Number(variant?.salePrice || 0)
+    const basePrice = Number(variant?.basePrice || variant?.price || 0)
+
+    return salePrice > 0 ? salePrice : basePrice
+  }
+
+  const variants = getActiveVariants(product)
+  const isVariableProduct = product?.productType === 'variable' && variants.length > 0
+
+  const defaultVariant =
+    variants.find((variant: any) => variant?.isDefault && Number(variant?.stock || 0) > 0) ||
+    variants.find((variant: any) => Number(variant?.stock || 0) > 0) ||
+    variants[0]
+
+  const basePrice = isVariableProduct
+    ? Number(defaultVariant?.basePrice || 0)
+    : Number(product?.price?.basePrice || 0)
+
+  const salePrice = isVariableProduct
+    ? Number(defaultVariant?.salePrice || 0)
+    : Number(product?.price?.salePrice || 0)
   const isSale = salePrice > 0 && salePrice < basePrice
   const discountPercent = isSale ? Math.round(((basePrice - salePrice) / basePrice) * 100) : 0
   const finalPrice = isSale ? salePrice : basePrice
+
+  const stock = isVariableProduct
+    ? Number(defaultVariant?.stock || 0)
+    : Number(product?.price?.stock || 0)
+
+  const isOutOfStock = stock <= 0
+
+  const productImage =
+    getUploadUrl(defaultVariant?.image) ||
+    product?.images?.[0]?.image?.url ||
+    product?.images?.[0]?.image?.sizes?.thumbnail?.url ||
+    '/placeholder.jpg'
 
   const [added, setAdded] = useState(false)
   const addItem = useCartStore((state) => state.addItem)
@@ -48,22 +99,54 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
 
   const reviewCount = getReviewCount(product)
 
-  const productImage =
-    product?.images?.[0]?.image?.url ||
-    product?.images?.[0]?.image?.sizes?.thumbnail?.url ||
-    '/placeholder.jpg'
-
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     e.stopPropagation()
 
+    if (isOutOfStock) {
+      toast.error('Sản phẩm hiện đã hết hàng')
+      return
+    }
+
+    const cartItemId = isVariableProduct
+      ? `${product.id}-${defaultVariant?.id}`
+      : product.id
+
     addItem({
-      id: product.id,
-      title: product.title,
+      id: cartItemId,
+
+      productId: product.id,
+      variantId: defaultVariant?.id,
+      variantName: defaultVariant?.name,
+
+      baseTitle: product.title,
+      title: defaultVariant?.name
+        ? `${product.title} - ${defaultVariant.name}`
+        : product.title,
+
       price: finalPrice,
       image: productImage,
       slug: product.slug,
       quantity: 1,
+      sku: defaultVariant?.sku || product?.sku,
+
+      stock,
+
+      variants: variants.map((variant: any) => {
+        const variantBasePrice = Number(variant?.basePrice || 0)
+        const variantSalePrice = Number(variant?.salePrice || 0)
+
+        return {
+          id: variant.id,
+          name: variant.name,
+          sku: variant.sku,
+          basePrice: variantBasePrice,
+          salePrice: variantSalePrice,
+          price: getVariantPrice(variant),
+          stock: Number(variant?.stock || 0),
+          image: getUploadUrl(variant?.image) || productImage,
+        }
+      }),
     })
 
     setAdded(true)
@@ -91,6 +174,14 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
           <div className="absolute left-3 top-3 z-20">
             <span className="flex h-8 items-center justify-center rounded-full bg-[#e10613] px-3 text-[13px] font-black text-white shadow-lg shadow-red-200">
               -{discountPercent}%
+            </span>
+          </div>
+        )}
+
+        {isOutOfStock && (
+          <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/70 backdrop-blur-[1px]">
+            <span className="rounded-full bg-black px-4 py-2 text-[12px] font-black uppercase tracking-widest text-white">
+              Hết hàng
             </span>
           </div>
         )}
@@ -188,10 +279,11 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
         <button
           type="button"
           onClick={handleAddToCart}
-          className="group/btn mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#e10613] py-4 text-[14px] font-black text-white shadow-lg shadow-red-100 transition-all hover:bg-black hover:shadow-neutral-200"
+          disabled={isOutOfStock}
+          className="group/btn mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#e10613] py-4 text-[14px] font-black text-white shadow-lg shadow-red-100 transition-all hover:bg-black hover:shadow-neutral-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:shadow-none"
         >
           <ShoppingBag size={19} className="transition-transform group-hover/btn:-rotate-12" />
-          {added ? 'Đã thêm vào giỏ' : 'Thêm vào giỏ hàng'}
+          {isOutOfStock ? 'Hết hàng' : added ? 'Đã thêm vào giỏ' : 'Thêm vào giỏ hàng'}
         </button>
       </div>
     </article>

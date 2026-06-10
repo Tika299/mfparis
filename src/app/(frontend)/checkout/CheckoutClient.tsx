@@ -17,11 +17,21 @@ export default function CheckoutPage() {
     const [isClient, setIsClient] = useState(false)
     const [loading, setLoading] = useState(false)
     const [paymentMethod, setPaymentMethod] = useState('cod')
+    const syncItems = useCartStore((state: any) => state.syncItems)
 
     // Lấy dữ liệu từ Zustand Store
     const items = useCartStore((state) => state.items)
     const clearCart = useCartStore((state) => state.clearCart)
     const totalPrice = items.reduce((acc, item) => acc + item.price * item.quantity, 0)
+
+    const invalidItems = items.filter((item: any) => {
+        const stock = Number(item.stock || 0)
+        const quantity = Number(item.quantity || 0)
+
+        return stock <= 0 || quantity > stock
+    })
+
+    const hasInvalidItems = invalidItems.length > 0
 
     // Xử lý lỗi Hydration khi sử dụng LocalStorage
     useEffect(() => {
@@ -31,8 +41,35 @@ export default function CheckoutPage() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (items.length === 0) return
-
         setLoading(true)
+
+        const validateRes = await fetch('/api/cart/validate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ items }),
+        })
+
+        const validateData = await validateRes.json()
+
+        if (!validateRes.ok) {
+            toast.error(validateData?.error || 'Không thể kiểm tra tồn kho')
+            setLoading(false)
+            return
+        }
+
+        if (Array.isArray(validateData.items)) {
+            syncItems(validateData.items)
+        }
+
+        if (validateData.invalidItems?.length > 0) {
+            toast.error('Một số sản phẩm đã hết hàng hoặc vượt tồn kho')
+            router.push('/cart')
+            setLoading(false)
+            return
+        }
+
         const formData = new FormData(e.currentTarget)
 
         // 1. Chuẩn bị dữ liệu đơn hàng
@@ -41,10 +78,12 @@ export default function CheckoutPage() {
             phone: formData.get('phone'),
             address: formData.get('address'),
             province: formData.get('province'),
-            items: items.map(item => ({
-                product: item.id,
-                quantity: item.quantity,
-                priceAtPurchase: item.price
+            items: items.map((item: any) => ({
+                product: item.productId || item.id,
+                variantId: item.variantId || null,
+                variantName: item.variantName || null,
+                quantity: Number(item.quantity),
+                priceAtPurchase: Number(item.price),
             })),
             totalAmount: totalPrice,
             paymentMethod: paymentMethod,
@@ -244,8 +283,8 @@ export default function CheckoutPage() {
 
                             <Button
                                 type="submit"
-                                disabled={loading}
-                                className="w-full h-16 bg-[#b72828] hover:bg-black text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-lg shadow-red-100 transition-all active:scale-95"
+                                disabled={loading || hasInvalidItems}
+                                className="w-full h-16 bg-[#b72828] hover:bg-black text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-lg shadow-red-100 transition-all active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:shadow-none"
                             >
                                 {loading ? (
                                     <>

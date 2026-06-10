@@ -45,26 +45,29 @@ export const Header = async () => {
 
       {/* MAIN HEADER */}
       <div className="bg-white">
-        <div className="container-custom flex h-16 items-center justify-between gap-3 md:h-18 lg:h-20 lg:gap-8">
+        <div className="container-custom relative flex h-16 items-center justify-between gap-3 md:h-18 lg:h-20 lg:gap-8">
           {/* MOBILE MENU */}
-          <div className="flex lg:hidden">
+          <div className="relative z-20 flex lg:hidden">
             <MobileMenu navItems={navItems.filter((item): item is { id: string; label: string; link: string } => item.id !== null && item.id !== undefined)} />
           </div>
 
           {/* LOGO */}
-          <Link href="/" className="group flex h-full shrink-0 items-center">
+          <Link
+            href="/"
+            className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center lg:static lg:h-full lg:shrink-0 lg:translate-x-0 lg:translate-y-0 lg:justify-start"
+          >
             {logoUrl ? (
               <Image
                 src={logoUrl}
                 alt={logoAlt}
-                width={100}
-                height={80}
-                sizes="(max-width: 640px) 150px, (max-width: 1024px) 180px, 220px"
-                className="block h-[100%] w-[150px] object-contain object-left transition-transform duration-300 group-hover:scale-105 sm:w-[180px] lg:h-14 lg:w-[220px]"
+                width={180}
+                height={140}
+                sizes="(max-width: 640px) 76px, (max-width: 1024px) 86px, 150px"
+                className="block h-auto w-[76px] object-contain object-center transition-transform duration-300 hover:scale-105 sm:w-[82px] md:w-[88px] lg:w-[110px] lg:object-left"
                 priority
               />
             ) : (
-              <div className="flex flex-col">
+              <div className="flex flex-col items-center lg:items-start">
                 <span className="font-heading text-xl font-bold tracking-tight uppercase leading-none text-primary sm:text-2xl">
                   MF PARIS
                 </span>
@@ -90,12 +93,12 @@ export const Header = async () => {
           </nav>
 
           {/* SEARCH - TABLET / DESKTOP */}
-          <div className="hidden md:flex flex-1 justify-end lg:max-w-[260px] xl:max-w-[320px]">
+          <div className="hidden lg:flex flex-1 justify-end lg:max-w-[260px] xl:max-w-[320px]">
             <SearchBar />
           </div>
 
           {/* ICONS */}
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3 md:gap-4">
+          <div className="relative z-20 flex shrink-0 items-center gap-2 sm:gap-3 md:gap-4">
             <div className="hidden h-6 w-px bg-gray-100 md:block" />
 
             <Link
@@ -120,7 +123,7 @@ export const Header = async () => {
         </div>
 
         {/* SEARCH MOBILE RIÊNG */}
-        <div className="border-t border-gray-100 px-4 py-3 md:hidden">
+        <div className="border-t border-gray-100 px-4 py-3 lg:hidden">
           <SearchBar mobile />
         </div>
       </div>
