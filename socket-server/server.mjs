@@ -77,10 +77,25 @@ app.post('/broadcast-admin', (req, res) => {
         sessionId: sid,
     }
 
+    console.log('📨 Received broadcast request:', {
+        sid,
+        sender: payload.sender,
+        content: payload.content,
+        id: payload.id,
+        hasToken: Boolean(req.headers['x-socket-token']),
+    })
+
     io.to(String(sid)).emit('receive-msg', payload)
     io.to('admins').emit('receive-msg', payload)
 
-    console.log(`📢 Broadcasted to room [${sid}] and [admins]`)
+    const sidRoom = io.sockets.adapter.rooms.get(String(sid))
+    const adminsRoom = io.sockets.adapter.rooms.get('admins')
+
+    console.log('📢 Broadcasted:', {
+        sid: String(sid),
+        sidClients: sidRoom?.size || 0,
+        adminsClients: adminsRoom?.size || 0,
+    })
 
     return res.status(200).json({
         ok: true,

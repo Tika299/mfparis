@@ -31,16 +31,64 @@ export const Messages: CollectionConfig = {
   hooks: {
     afterChange: [
       async ({ doc, operation }) => {
-        if (operation === 'create') {
-          // Lấy ID của profile để làm roomId cho Socket
-          const profileId = typeof doc.profile === 'object' ? doc.profile.id : doc.profile;
-          try {
-            await fetch(`${process.env.SOCKET_SERVER_URL}/broadcast-admin`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ ...doc, sessionId: profileId }),
+        if (operation !== 'create') return
+
+        const socketServerUrl = process.env.SOCKET_SERVER_URL?.replace(/\/$/, '')
+        const socketToken = process.env.SOCKET_INTERNAL_TOKEN
+
+        const profileId =
+          typeof doc.profile === 'object'
+            ? doc.profile.id
+            : doc.profile
+
+        if (!socketServerUrl) {
+          console.warn('⚠️ Missing SOCKET_SERVER_URL, skip socket broadcast')
+          return
+        }
+
+        if (!profileId) {
+          console.warn('⚠️ Missing profileId, skip socket broadcast', {
+            messageId: doc.id,
+            profile: doc.profile,
+          })
+          return
+        }
+
+        try {
+          const res = await fetch(`${socketServerUrl}/broadcast-admin`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-socket-token': socketToken || '',
+            },
+            body: JSON.stringify({
+              ...doc,
+              sessionId: String(profileId),
+            }),
+            cache: 'no-store',
+          })
+
+          const text = await res.text()
+
+          console.log('🔌 Socket broadcast response:', {
+            status: res.status,
+            text,
+            messageId: doc.id,
+            sessionId: String(profileId),
+            sender: doc.sender,
+          })
+
+          if (!res.ok) {
+            console.error('❌ Socket broadcast failed:', {
+              status: res.status,
+              text,
             })
-          } catch (e) { console.error(e) }
+          }
+        } catch (error: any) {
+          console.error('❌ Socket broadcast fetch error:', {
+            message: error?.message,
+            cause: error?.cause,
+          })
         }
       },
     ],

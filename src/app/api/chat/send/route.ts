@@ -1,29 +1,48 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
 export async function POST(req: Request) {
   try {
     const payload = await getPayload({ config: configPromise })
-    const body = await req.json() // Lấy dữ liệu từ frontend gửi lên
+    const body = await req.json()
 
-    // LOG để bạn kiểm tra dữ liệu gửi lên có đúng ID không
-    // console.log("Dữ liệu nhận được:", body)
+    if (!body.sessionId || !body.sender || !body.content) {
+      return Response.json(
+        {
+          error: 'Missing sessionId, sender or content',
+        },
+        { status: 400 },
+      )
+    }
 
     const msg = await payload.create({
       collection: 'messages',
       data: {
-        // QUAN TRỌNG: Đổi sessionId thành profile để khớp với Schema mới
         profile: body.sessionId,
-        customerName: body.customerName,
+        customerName: body.customerName || 'Khách hàng',
         sender: body.sender,
         content: body.content,
-      } as any, // Dùng as any để bypass kiểm tra type nghiêm ngặt của Payload
+      } as any,
+      depth: 0,
     })
 
-    return Response.json(msg)
+    return Response.json({
+      success: true,
+      doc: msg,
+    })
   } catch (error: any) {
-    // In ra chi tiết lỗi Validation nếu có
-    console.error("❌ CHI TIẾT LỖI VALIDATION:", JSON.stringify(error.data, null, 2))
-    return Response.json({ error: error.message }, { status: 500 })
+    console.error('❌ CHAT SEND ERROR:', error)
+    console.error('❌ CHI TIẾT LỖI VALIDATION:', JSON.stringify(error.data, null, 2))
+
+    return Response.json(
+      {
+        error: error.message || 'Không thể gửi tin nhắn',
+        details: error.data || null,
+      },
+      { status: 500 },
+    )
   }
 }
