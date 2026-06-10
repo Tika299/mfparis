@@ -209,16 +209,16 @@ export async function POST(req: Request) {
         const bodyString = JSON.stringify(fundiinBody)
 
         const signature = crypto
-            .createHmac('sha256', FUNDIIN_SECRET_KEY)
+            .createHmac('sha256', FUNDIIN_SECRET_KEY ?? '')
             .update(bodyString)
             .digest('hex')
 
-        const response = await fetch(`${FUNDIIN_API_URL.replace(/\/$/, '')}/v2/payments`, {
+        const response = await fetch(`${(FUNDIIN_API_URL ?? '').replace(/\/$/, '')}/v2/payments`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Request-Time': requestTime,
-                'Client-Id': FUNDIIN_CLIENT_ID,
+                'Client-Id': FUNDIIN_CLIENT_ID ?? '',
                 Signature: signature,
                 'Idempotency-Key': idempotencyKey,
             },
