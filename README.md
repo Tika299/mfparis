@@ -1,67 +1,105 @@
-# Payload Blank Template
+# 🇫🇷 MF PARIS - High-End E-commerce Platform
 
-This template comes configured with the bare minimum to get started on anything you need.
+**MF PARIS** (`mfparis.vn`) là nền tảng thương mại điện tử chuyên biệt về Nước hoa, Mỹ phẩm và Thực phẩm chức năng cao cấp từ Pháp. Dự án được chuyển đổi từ WordPress sang hệ sinh thái **Next.js 15 + Payload CMS 3.0**, tối ưu hóa cho tốc độ, bảo mật và trải nghiệm người dùng đẳng cấp (Luxury UX).
 
-## Quick start
+## 🚀 Tech Stack
 
-This template can be deployed directly from our Cloud hosting and it will setup MongoDB and cloud S3 object storage for media.
+*   **Frontend:** Next.js 15 (App Router), React 19, Tailwind CSS v4.
+*   **CMS & Backend:** Payload CMS 3.0 (Headless CMS running on Next.js).
+*   **Database:** PostgreSQL (Hosted on Supabase/VPS).
+*   **Realtime Chat:** Socket.io (Dedicated Chat Server on Node.js v25).
+*   **State Management:** Zustand (Cart & User Sessions).
+*   **Payment:** Fundiin API V2 Integration (Buy Now Pay Later).
+*   **Media:** Sharp (Image Processing), AVIF/WebP Format, 10.000+ images.
+*   **CI/CD:** GitHub Actions (Automated Deployment to VPS).
 
-## Quick Start - local setup
+## ✨ Tính năng nổi bật
 
-To spin up this template locally, follow these steps:
+### 🎨 Luxury UX/UI (Chuẩn Vietnix 1200px)
+*   Giao diện thiết kế theo phong cách **Minimalist Luxury**, ép khung 1200px giúp tối ưu thị giác.
+*   Hệ thống Typography kết hợp **Be Vietnam Pro** (nội dung) và **Playfair Display** (tiêu đề).
+*   Thẻ sản phẩm tỉ lệ **1:1** với hiệu ứng **Hover Image Swap**.
 
-### Clone
+### 💬 Hệ thống Chat Realtime (Định danh)
+*   Server Socket.io riêng biệt chạy trên VPS port 3001.
+*   Cơ chế **Identity-first**: Khách hàng đăng ký/đăng nhập bằng mã định danh để đồng bộ tin nhắn xuyên thiết bị.
+*   **Admin Chat Center**: Giao diện quản trị tập trung (Zalo-style) cho phép trả lời khách hàng ngay lập tức.
+*   Thông báo âm thanh và badge đỏ cho tin nhắn chưa đọc.
 
-After you click the `Deploy` button above, you'll want to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
+### 📦 Quản lý Sản phẩm Thông minh
+*   **Dynamic Attributes**: Tự định nghĩa thông số (Nồng độ, SPF, Calo...) linh hoạt cho từng loại sản phẩm.
+*   **Combo Savings**: Cho phép tạo bộ sản phẩm để tăng giá trị đơn hàng.
+*   **Auto-Accordion**: Tự động bóc tách nội dung WordPress cũ theo thẻ `<h2>` để tạo mục lục nội dung chuyên nghiệp.
 
-### Development
+### 💳 Thanh toán Fundiin V2
+*   Tích hợp sâu API Fundiin V2 (camelCase structure).
+*   Cơ chế **Waiting Page**: Mở tab thanh toán mới và giữ chân người dùng tại website để tăng tỷ lệ quay lại.
+*   Tự động tính toán chữ ký bảo mật **HmacSHA256**.
 
-1. First [clone the repo](#clone) if you have not done so already
-2. `cd my-project && cp .env.example .env` to copy the example environment variables. You'll need to add the `MONGODB_URL` from your Cloud project to your `.env` if you want to use S3 storage and the MongoDB database that was created for you.
+## 🛠 Cấu trúc thư mục (Directory Structure)
 
-3. `pnpm install && pnpm dev` to install dependencies and start the dev server
-4. open `http://localhost:3000` to open the app in your browser
+```text
+src/
+├── app/
+│   ├── (frontend)/       # Giao diện người dùng (Route Group)
+│   │   ├── products/     # Trang danh sách & chi tiết sản phẩm
+│   │   ├── categories/   # Quản lý danh mục
+│   │   ├── blog/         # Tạp chí làm đẹp 16:9
+│   │   └── checkout/     # Quy trình thanh toán & Fundiin
+│   └── (payload)/        # Hệ thống quản trị Admin
+├── collections/          # Định nghĩa Schema (Products, Brands, Messages...)
+├── components/           # UI Components (OptimizedImage, RelatedProducts...)
+├── hooks/                # Logic xử lý tự động (Slug, Auth...)
+├── lib/                  # Zustand stores & Global state
+├── scripts/              # Script Migration (Import 2000+ SP từ WordPress)
+└── utilities/            # Hàm tiện ích (Format price, Clean HTML...)
+chat-server.js            # Server WebSocket (Socket.io)
+```
 
-That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
+## 🏗 Quy trình Triển khai (Deployment)
 
-#### Docker (Optional)
+### 1. GitHub Actions (CI/CD)
+Mỗi khi có code mới được `push` lên branch `main`, GitHub Actions sẽ:
+*   Linting & Type check.
+*   Build ứng dụng Next.js.
+*   Tự động deploy bản build sang VPS thông qua SSH.
 
-If you prefer to use Docker for local development instead of a local MongoDB instance, the provided docker-compose.yml file can be used.
+### 2. VPS Configuration (Ubuntu 24.04 LTS)
+*   **Web Server:** Chạy Next.js qua Docker hoặc PM2 tại port 3000.
+*   **WebSocket Server:** Chạy `chat-server.js` tại port 3001 (Quản lý bởi PM2).
+*   **Reverse Proxy:** Nginx cấu hình hỗ trợ `Upgrade` header cho Websocket và SSL (Certbot).
 
-To do so, follow these steps:
+## 📥 Hướng dẫn Migration từ WordPress
 
-- Modify the `MONGODB_URL` in your `.env` file to `mongodb://127.0.0.1/<dbname>`
-- Modify the `docker-compose.yml` file's `MONGODB_URL` to match the above `<dbname>`
-- Run `docker-compose up` to start the database, optionally pass `-d` to run in the background.
+1.  Chuẩn bị các file JSON từ WordPress (`products.json`, `brands.json`...).
+2.  Lưu vào `src/scripts/`.
+3.  Chạy lệnh:
+    ```bash
+    # Import Thương hiệu và Danh mục
+    npm run import-tax
+    
+    # Import 2000+ Sản phẩm (Tự động tải ảnh & bóc tách Accordion)
+    npm run import-wp
+    ```
 
-## How it works
+## 🔐 Biến môi trường (.env)
 
-The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:
+```env
+# Database
+DATABASE_URI=postgresql://user:pass@host:port/db
 
-### Collections
+# Payload
+PAYLOAD_SECRET=your_secret_key
+NEXT_PUBLIC_SERVER_URL=https://mfparis.vn
 
-See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
+# Socket
+NEXT_PUBLIC_SOCKET_URL=https://mfparis.vn:3001
 
-- #### Users (Authentication)
+# Fundiin
+FUNDIIN_MERCHANT_ID=xxx
+FUNDIIN_SECRET_KEY=xxx
+FUNDIIN_API_URL=https://gateway.fundiin.vn
+```
 
-  Users are auth-enabled collections that have access to the admin panel.
-
-  For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/3.x/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
-
-- #### Media
-
-  This is the uploads enabled collection. It features pre-configured sizes, focal point and manual resizing to help you manage your pictures.
-
-### Docker
-
-Alternatively, you can use [Docker](https://www.docker.com) to spin up this template locally. To do so, follow these steps:
-
-1. Follow [steps 1 and 2 from above](#development), the docker-compose file will automatically use the `.env` file in your project root
-1. Next run `docker-compose up`
-1. Follow [steps 4 and 5 from above](#development) to login and create your first admin user
-
-That's it! The Docker instance will help you get up and running quickly while also standardizing the development environment across your teams.
-
-## Questions
-
-If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
+---
+© 2024 **MF PARIS**. Designed for Excellence. Standardized for UX.
