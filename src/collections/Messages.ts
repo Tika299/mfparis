@@ -35,7 +35,7 @@ export const Messages: CollectionConfig = {
           // Lấy ID của profile để làm roomId cho Socket
           const profileId = typeof doc.profile === 'object' ? doc.profile.id : doc.profile;
           try {
-            await fetch('http://localhost:3001/broadcast-admin', {
+            await fetch(`${process.env.SOCKET_SERVER_URL}/broadcast-admin`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ ...doc, sessionId: profileId }),

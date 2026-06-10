@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/utilities'
 
-const socket = io('http://localhost:3001', {
+const socket = io(process.env.SOCKET_SERVER_URL, {
   autoConnect: false,
   reconnection: true,
   transports: ['websocket']

@@ -7,7 +7,7 @@ import Link from 'next/link'
 // Nạp file SCSS của Admin
 import '../../app/(payload)/custom.scss'
 
-const socket = io('http://localhost:3001', {
+const socket = io(process.env.SOCKET_SERVER_URL, {
   autoConnect: false,
   reconnection: true
 })
