@@ -75,6 +75,7 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
     : Number(product?.price?.salePrice || 0)
 
   const finalPrice = salePrice > 0 ? salePrice : basePrice
+  const isContactPrice = finalPrice <= 0
 
   const stock = isVariableProduct
     ? Number(selectedVariant?.stock || 0)
@@ -107,6 +108,11 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
 
   const handleAddToCart = () => {
     if (isOutOfStock) return
+
+    if (isContactPrice) {
+      window.location.href = 'https://zalo.me/2731577726641619342'
+      return
+    }
 
     const cartItemId = isVariableProduct
       ? `${product.id}-${selectedVariant?.id}`
@@ -152,6 +158,13 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
   }
 
   const handleBuyNow = () => {
+    if (isOutOfStock) return
+
+    if (isContactPrice) {
+      window.location.href = 'https://zalo.me/2731577726641619342'
+      return
+    }
+
     handleAddToCart()
     router.push('/cart')
   }
@@ -162,7 +175,7 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
       <div className="rounded-2xl bg-[#F8F9FB] p-6">
         <div className="flex flex-wrap items-end gap-3">
           <span className="text-2xl font-black text-[#b72828] md:text-3xl">
-            {formatPrice(finalPrice)}₫
+            {isContactPrice ? 'Liên hệ' : `${formatPrice(finalPrice)}₫`}
           </span>
 
           {salePrice > 0 && basePrice > salePrice && (
@@ -235,7 +248,7 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
                   </p>
 
                   <p className="mt-1 text-xs font-black text-[#b72828]">
-                    {formatPrice(variantFinalPrice)}₫
+                    {variantFinalPrice <= 0 ? 'Liên hệ' : `${formatPrice(variantFinalPrice)}₫`}
                   </p>
 
                   <p className="mt-1 text-[11px] text-gray-500">
@@ -289,7 +302,7 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
           className="flex h-14 items-center justify-center gap-2 rounded-full border border-[#b72828] bg-white text-sm font-black uppercase tracking-widest text-[#b72828] transition hover:bg-[#fff5f5] disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-400"
         >
           <ShoppingCart size={18} />
-          Thêm giỏ
+          {isContactPrice ? 'Liên hệ' : 'Thêm giỏ'}
         </button>
 
         <button
@@ -299,7 +312,7 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
           className="flex h-14 items-center justify-center gap-2 rounded-full bg-[#b72828] text-sm font-black uppercase tracking-widest text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-gray-300"
         >
           <ShoppingBag size={18} />
-          Mua ngay
+          {isContactPrice ? 'Liên hệ tư vấn' : 'Mua ngay'}
         </button>
       </div>
 

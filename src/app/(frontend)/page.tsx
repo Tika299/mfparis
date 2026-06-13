@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { ProductCard } from '@/components/ProductCard'
@@ -19,6 +21,8 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel'
 import Link from 'next/link'
+import { HomeProductTabs } from '@/components/HomeProductTabs'
+import { FlashSaleSection } from '@/components/FlashSaleSection'
 
 // ─── Dữ liệu tĩnh ────────────────────────────────────────────────────────────
 
@@ -66,13 +70,27 @@ export default async function HomePage() {
 
   const [
     settings,
+    flashSaleRes,
     bestSellersRes,
-    cleansingRes,
+    newArrivalsRes,
+    comboProductsRes,
     categoriesRes,
     brandsRes,
     postsRes,
   ] = await Promise.all([
     payload.findGlobal({ slug: 'site-settings' }),
+    payload.find({
+      collection: 'products',
+      where: {
+        and: [
+          { status: { equals: 'published' } },
+          { displayLocation: { contains: 'flash-sale' } },
+        ],
+      },
+      depth: 2,
+      sort: '-updatedAt',
+      limit: 12,
+    }),
     payload.find({
       collection: 'products',
       where: {
@@ -88,10 +106,21 @@ export default async function HomePage() {
       where: {
         and: [
           { status: { equals: 'published' } },
-          { isCombo: { equals: true } },
+          { displayLocation: { contains: 'new-arrival' } },
         ],
       },
-      limit: 4,
+      sort: '-createdAt',
+      limit: 8,
+    }),
+    payload.find({
+      collection: 'products',
+      where: {
+        and: [
+          { status: { equals: 'published' } },
+          { displayLocation: { contains: 'combo' } },
+        ],
+      },
+      limit: 8,
     }),
     payload.find({ collection: 'categories', limit: 14 }),
     payload.find({ collection: 'brands', limit: 12 }),
@@ -140,57 +169,22 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── 3. FLASH SALE ─────────────────────────────────────────────────────── */}
+      {settings?.flashSale?.enabled !== false && (
+        <FlashSaleSection
+          products={flashSaleRes.docs}
+          categories={categoriesRes.docs}
+          endTime={settings?.flashSale?.endTime || '2026-06-30T23:59:59+07:00'}
+          vouchers={settings?.flashSale?.vouchers || []}
+        />
+      )}
+
       {/* ── 3. SẢN PHẨM BÁN CHẠY ───────────────────────────────────────────── */}
-      <section className="container-ux mt-8 md:mt-10">
-        <div className="lc-card rounded-[2rem] p-4 sm:p-5 md:rounded-[2.5rem] md:p-8">
-          {/* Header */}
-          <div className="mb-6 flex items-center justify-between gap-4 px-1 md:mb-8 md:px-2">
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-red-100">
-                <Zap size={20} fill="currentColor" />
-              </div>
-
-              <div className="min-w-0">
-                <span className="sub-heading">Best Seller</span>
-                <h2 className="font-heading text-xl font-bold leading-tight md:text-2xl">
-                  Sản phẩm bán chạy
-                </h2>
-              </div>
-            </div>
-
-            <Link
-              href="/products"
-              className="flex shrink-0 items-center gap-1 rounded-full border border-primary/10 bg-primary/5 px-4 py-2 text-[11px] font-black uppercase tracking-wider text-primary transition-colors hover:bg-primary hover:text-white"
-            >
-              Xem tất cả <ChevronRight size={15} />
-            </Link>
-          </div>
-
-          {/* Slider */}
-          <Carousel
-            opts={{
-              align: 'start',
-              loop: true,
-            }}
-            className="relative"
-          >
-            <CarouselContent className="-ml-5 pb-4">
-              {bestSellersRes.docs.map((product) => (
-                <CarouselItem
-                  key={product.id}
-                  className="basis-[88%] pl-5 sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
-                >
-                  <ProductCard product={product} />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-
-            <CarouselPrevious className="absolute -left-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 border-none bg-white text-neutral-700 shadow-xl transition hover:bg-primary hover:text-white md:flex transition-none hover:scale-100 active:scale-100" />
-
-            <CarouselNext className="absolute -right-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 border-none bg-white text-neutral-700 shadow-xl transition hover:bg-primary hover:text-white md:flex transition-none hover:scale-100 active:scale-100" />
-          </Carousel>
-        </div>
-      </section>
+      <HomeProductTabs
+        bestSellers={bestSellersRes.docs}
+        newArrivals={newArrivalsRes.docs}
+        combos={comboProductsRes.docs}
+      />
 
       {/* ── 4. DANH MỤC NỔI BẬT ────────────────────────────────────────────── */}
       <section className="container-ux mt-8 md:mt-10">
@@ -259,14 +253,11 @@ export default async function HomePage() {
       </section>
 
       {/* ── 5. COMBO TIẾT KIỆM ─────────────────────────────────────────────── */}
-      <section className="container-ux mt-10 md:mt-12">
-        {/*
-          Dùng bg-[#faf7f5] + border-neutral-100 theo đúng thiết kế gốc —
-          lc-card dùng bg-white, section này chủ ý có màu nền khác để tạo contrast.
-        */}
+      {/* <section className="container-ux mt-10 md:mt-12">
+        
         <div className="rounded-[2rem] border border-neutral-100 bg-[#faf7f5] p-5 shadow-sm md:rounded-[2.5rem] md:p-12">
 
-          {/* Header */}
+          
           <div className="mb-8 flex flex-col gap-5 px-1 md:mb-10 md:flex-row md:items-end md:justify-between md:px-2">
             <div className="max-w-2xl">
               <span className="sub-heading text-primary">Expert Choice</span>
@@ -283,7 +274,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Grid combo */}
+          
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {cleansingRes.docs.map((product) => (
               <div
@@ -295,7 +286,7 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ── 6. THƯƠNG HIỆU ĐỐI TÁC ─────────────────────────────────────────── */}
       <section className="container-ux mt-10 md:mt-12">

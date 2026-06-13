@@ -110,6 +110,7 @@ export async function POST(req: Request) {
 
                 const isOutOfStock = latestStock <= 0
                 const isOverStock = quantity > latestStock
+                const isContactPrice = latestPrice <= 0
 
                 checkedItems.push({
                     ...item,
@@ -131,14 +132,18 @@ export async function POST(req: Request) {
                     quantity: isOutOfStock ? quantity : Math.min(quantity, latestStock),
 
                     variants: latestVariants,
-                    isAvailable: !isOutOfStock,
+                    isAvailable: !isOutOfStock && !isContactPrice,
                     isOutOfStock,
                     isOverStock,
+                    isContactPrice,
+
                     reason: isOutOfStock
                         ? 'Sản phẩm đã hết hàng'
-                        : isOverStock
-                            ? `Chỉ còn ${latestStock} sản phẩm`
-                            : null,
+                        : isContactPrice
+                            ? 'Sản phẩm cần liên hệ để báo giá'
+                            : isOverStock
+                                ? `Chỉ còn ${latestStock} sản phẩm`
+                                : null,
                 })
             } catch {
                 checkedItems.push({
@@ -151,7 +156,11 @@ export async function POST(req: Request) {
         }
 
         const invalidItems = checkedItems.filter(
-            (item) => item.isOutOfStock || item.isOverStock || item.isAvailable === false,
+            (item) =>
+                item.isOutOfStock ||
+                item.isOverStock ||
+                item.isContactPrice ||
+                item.isAvailable === false,
         )
 
         return NextResponse.json({

@@ -53,7 +53,7 @@ const sendOrderEmail = async ({ doc, operation, req }: any) => {
 
     try {
       await payload.sendEmail({
-        to: 'vukofa9120@gmail.com', // Email bạn muốn nhận thông báo
+        to: 'mfparisvn@gmail.com', // Email bạn muốn nhận thông báo
         subject: `[MF PARIS] Đơn hàng mới #${doc.id} - ${doc.customerInfo.fullName}`,
         html: htmlEmail,
       })
@@ -145,6 +145,28 @@ export const Orders: CollectionConfig = {
         { name: 'orderToken', type: 'text', admin: { readOnly: true } },
       ],
       admin: { position: 'sidebar' }
+    },
+    {
+      name: 'subtotalAmount',
+      type: 'number',
+      label: 'Tạm tính',
+    },
+    {
+      name: 'discountAmount',
+      type: 'number',
+      label: 'Giảm giá',
+      defaultValue: 0,
+    },
+    {
+      name: 'voucherCode',
+      type: 'text',
+      label: 'Mã voucher',
+    },
+    {
+      name: 'voucherId',
+      type: 'relationship',
+      relationTo: 'vouchers',
+      label: 'Voucher đã dùng',
     },
   ],
 }

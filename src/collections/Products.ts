@@ -451,6 +451,10 @@ export const Products: CollectionConfig = {
           label: 'Sản phẩm mới',
           value: 'new-arrival',
         },
+        {
+          label: 'Flash Sale',
+          value: 'flash-sale',
+        },
       ],
       admin: {
         position: 'sidebar',

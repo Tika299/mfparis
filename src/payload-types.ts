@@ -78,6 +78,7 @@ export interface Config {
     'post-categories': PostCategory;
     messages: Message;
     'chat-profiles': ChatProfile;
+    vouchers: Voucher;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -95,6 +96,7 @@ export interface Config {
     'post-categories': PostCategoriesSelect<false> | PostCategoriesSelect<true>;
     messages: MessagesSelect<false> | MessagesSelect<true>;
     'chat-profiles': ChatProfilesSelect<false> | ChatProfilesSelect<true>;
+    vouchers: VouchersSelect<false> | VouchersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -345,7 +347,7 @@ export interface Product {
    */
   slug: string;
   status?: ('draft' | 'published') | null;
-  displayLocation?: ('best-seller' | 'combo' | 'new-arrival')[] | null;
+  displayLocation?: ('best-seller' | 'combo' | 'new-arrival' | 'flash-sale')[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -415,6 +417,42 @@ export interface Order {
     paymentStatus?: string | null;
     orderToken?: string | null;
   };
+  subtotalAmount?: number | null;
+  discountAmount?: number | null;
+  voucherCode?: string | null;
+  voucherId?: (number | null) | Voucher;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vouchers".
+ */
+export interface Voucher {
+  id: number;
+  /**
+   * VD: FLASH15, MDF50K, FREESHIP
+   */
+  code: string;
+  title?: string | null;
+  status?: ('active' | 'inactive') | null;
+  type: 'fixed' | 'percent';
+  /**
+   * Nếu fixed: nhập 50000. Nếu percent: nhập 10 tương ứng 10%.
+   */
+  value: number;
+  minOrderAmount?: number | null;
+  /**
+   * Chỉ cần dùng cho voucher phần trăm. VD: giảm 10% tối đa 100.000đ.
+   */
+  maxDiscountAmount?: number | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  /**
+   * Để trống hoặc 0 nếu không giới hạn.
+   */
+  usageLimit?: number | null;
+  usedCount?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -572,6 +610,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'chat-profiles';
         value: number | ChatProfile;
+      } | null)
+    | ({
+        relationTo: 'vouchers';
+        value: number | Voucher;
       } | null);
   globalSlug?: string | null;
   user:
@@ -815,6 +857,10 @@ export interface OrdersSelect<T extends boolean = true> {
         paymentStatus?: T;
         orderToken?: T;
       };
+  subtotalAmount?: T;
+  discountAmount?: T;
+  voucherCode?: T;
+  voucherId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -887,6 +933,25 @@ export interface ChatProfilesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vouchers_select".
+ */
+export interface VouchersSelect<T extends boolean = true> {
+  code?: T;
+  title?: T;
+  status?: T;
+  type?: T;
+  value?: T;
+  minOrderAmount?: T;
+  maxDiscountAmount?: T;
+  startsAt?: T;
+  endsAt?: T;
+  usageLimit?: T;
+  usedCount?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -955,6 +1020,18 @@ export interface SiteSetting {
     zaloLink?: string | null;
     address?: string | null;
     facebookUrl?: string | null;
+  };
+  flashSale?: {
+    enabled?: boolean | null;
+    endTime?: string | null;
+    vouchers?:
+      | {
+          title?: string | null;
+          value?: string | null;
+          sub?: string | null;
+          id?: string | null;
+        }[]
+      | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1031,6 +1108,20 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         zaloLink?: T;
         address?: T;
         facebookUrl?: T;
+      };
+  flashSale?:
+    | T
+    | {
+        enabled?: T;
+        endTime?: T;
+        vouchers?:
+          | T
+          | {
+              title?: T;
+              value?: T;
+              sub?: T;
+              id?: T;
+            };
       };
   updatedAt?: T;
   createdAt?: T;

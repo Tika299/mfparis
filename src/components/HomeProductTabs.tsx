@@ -1,0 +1,130 @@
+'use client'
+
+import Link from 'next/link'
+import { ChevronRight, Flame, Sparkles, PackageCheck } from 'lucide-react'
+import { ProductCard } from '@/components/ProductCard'
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from '@/components/ui/carousel'
+
+type HomeProductTabsProps = {
+    bestSellers: any[]
+    newArrivals: any[]
+    combos: any[]
+}
+
+type ProductSectionProps = {
+    title: string
+    subLabel: string
+    products: any[]
+    icon: any
+    href?: string
+}
+
+export function HomeProductTabs({
+    bestSellers,
+    newArrivals,
+    combos,
+}: HomeProductTabsProps) {
+    return (
+        <>
+            <HomeProductSection
+                title="Sản phẩm bán chạy"
+                subLabel="Best Seller"
+                products={bestSellers}
+                icon={Flame}
+                href="/products"
+            />
+
+            <HomeProductSection
+                title="Sản phẩm mới"
+                subLabel="New Arrival"
+                products={newArrivals}
+                icon={Sparkles}
+                href="/products"
+            />
+
+            <HomeProductSection
+                title="Combo tiết kiệm"
+                subLabel="Combo Deal"
+                products={combos}
+                icon={PackageCheck}
+                href="/products?isCombo=true"
+            />
+        </>
+    )
+}
+
+function HomeProductSection({
+    title,
+    subLabel,
+    products,
+    icon: Icon,
+    href = '/products',
+}: ProductSectionProps) {
+    if (!products?.length) return null
+
+    return (
+        <section className="container-ux mt-8 md:mt-10">
+            <div className="lc-card rounded-[2rem] p-4 sm:p-5 md:rounded-[2.5rem] md:p-8">
+                <div className="mb-6 flex flex-col gap-5 px-1 md:mb-8 md:flex-row md:items-center md:justify-between md:px-2">
+                    <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-red-100">
+                            <Icon size={20} fill="currentColor" />
+                        </div>
+
+                        <div className="min-w-0">
+                            <span className="sub-heading">{subLabel}</span>
+                            <h2 className="font-heading text-xl font-bold leading-tight md:text-2xl">
+                                {title}
+                            </h2>
+                        </div>
+                    </div>
+
+                    <Link
+                        href={href}
+                        className="hidden shrink-0 items-center gap-1 rounded-full border border-primary/10 bg-primary/5 px-4 py-2 text-[11px] font-black uppercase tracking-wider text-primary transition-colors hover:bg-primary hover:text-white md:flex"
+                    >
+                        Xem tất cả <ChevronRight size={15} />
+                    </Link>
+                </div>
+
+                <Carousel
+                    opts={{
+                        align: 'start',
+                        loop: products.length > 4,
+                    }}
+                    className="relative"
+                >
+                    <CarouselContent className="-ml-4 pb-4 md:-ml-5">
+                        {products.map((product) => (
+                            <CarouselItem
+                                key={product.id}
+                                className="basis-[78%] pl-4 sm:basis-1/2 md:basis-1/2 md:pl-5 lg:basis-1/3 xl:basis-1/4"
+                            >
+                                <ProductCard product={product} />
+                            </CarouselItem>
+                        ))}
+                    </CarouselContent>
+
+                    <CarouselPrevious className="absolute -left-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 border-none bg-white text-neutral-700 shadow-xl transition hover:bg-primary hover:text-white md:flex" />
+
+                    <CarouselNext className="absolute -right-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 border-none bg-white text-neutral-700 shadow-xl transition hover:bg-primary hover:text-white md:flex" />
+                </Carousel>
+
+                <div className="mt-6 md:hidden">
+                    <Link
+                        href={href}
+                        className="flex h-12 w-full items-center justify-center rounded-full bg-black text-[11px] font-black uppercase tracking-widest text-white"
+                    >
+                        Xem tất cả sản phẩm
+                    </Link>
+                </div>
+            </div>
+        </section>
+    )
+}

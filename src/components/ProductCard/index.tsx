@@ -77,6 +77,7 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
   const isSale = salePrice > 0 && salePrice < basePrice
   const discountPercent = isSale ? Math.round(((basePrice - salePrice) / basePrice) * 100) : 0
   const finalPrice = isSale ? salePrice : basePrice
+  const isContactPrice = finalPrice <= 0
 
   const stock = isVariableProduct
     ? Number(defaultVariant?.stock || 0)
@@ -105,6 +106,11 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
 
     if (isOutOfStock) {
       toast.error('Sản phẩm hiện đã hết hàng')
+      return
+    }
+
+    if (isContactPrice) {
+      window.location.href = 'https://zalo.me/2731577726641619342'
       return
     }
 
@@ -228,7 +234,7 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
         {/* Giá tiền */}
         <div className="mt-4 flex items-baseline gap-2">
           <span className="text-[20px] font-black tracking-tight text-[#e10613]">
-            {formatPrice(finalPrice)}đ
+            {isContactPrice ? 'Liên hệ' : `${formatPrice(finalPrice)}đ`}
           </span>
           {isSale && (
             <span className="text-[14px] font-medium text-neutral-300 line-through">
@@ -283,7 +289,13 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
           className="group/btn mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#e10613] py-4 text-[14px] font-black text-white shadow-lg shadow-red-100 transition-all hover:bg-black hover:shadow-neutral-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:shadow-none"
         >
           <ShoppingBag size={19} className="transition-transform group-hover/btn:-rotate-12" />
-          {isOutOfStock ? 'Hết hàng' : added ? 'Đã thêm vào giỏ' : 'Thêm vào giỏ hàng'}
+          {isOutOfStock
+            ? 'Hết hàng'
+            : isContactPrice
+              ? 'Liên hệ'
+              : added
+                ? 'Đã thêm vào giỏ'
+                : 'Thêm vào giỏ hàng'}
         </button>
       </div>
     </article>

@@ -17,18 +17,31 @@ export default function CheckoutPage() {
     const [isClient, setIsClient] = useState(false)
     const [loading, setLoading] = useState(false)
     const [paymentMethod, setPaymentMethod] = useState('cod')
+    const [voucherCode, setVoucherCode] = useState('')
+    const [voucherData, setVoucherData] = useState<any>(null)
+    const [applyingVoucher, setApplyingVoucher] = useState(false)
     const syncItems = useCartStore((state: any) => state.syncItems)
 
     // Lấy dữ liệu từ Zustand Store
     const items = useCartStore((state) => state.items)
     const clearCart = useCartStore((state) => state.clearCart)
     const totalPrice = items.reduce((acc, item) => acc + item.price * item.quantity, 0)
+    const discountAmount = Number(voucherData?.discountAmount || 0)
+    const finalTotalPrice = Math.max(0, totalPrice - discountAmount)
 
     const invalidItems = items.filter((item: any) => {
         const stock = Number(item.stock || 0)
         const quantity = Number(item.quantity || 0)
+        const price = Number(item.price || 0)
 
-        return stock <= 0 || quantity > stock
+        return (
+            item.isAvailable === false ||
+            item.isOutOfStock === true ||
+            item.isContactPrice === true ||
+            stock <= 0 ||
+            quantity > stock ||
+            price <= 0
+        )
     })
 
     const hasInvalidItems = invalidItems.length > 0
@@ -52,6 +65,13 @@ export default function CheckoutPage() {
         })
 
         const validateData = await validateRes.json()
+        const validatedItems = Array.isArray(validateData.items) ? validateData.items : []
+        if (validatedItems.length === 0) {
+            toast.error('Giỏ hàng không hợp lệ')
+            router.push('/cart')
+            setLoading(false)
+            return
+        }
 
         if (!validateRes.ok) {
             toast.error(validateData?.error || 'Không thể kiểm tra tồn kho')
@@ -64,29 +84,57 @@ export default function CheckoutPage() {
         }
 
         if (validateData.invalidItems?.length > 0) {
-            toast.error('Một số sản phẩm đã hết hàng hoặc vượt tồn kho')
+            toast.error('Một số sản phẩm đã hết hàng, vượt tồn kho hoặc cần liên hệ báo giá')
             router.push('/cart')
             setLoading(false)
             return
         }
 
+        const purchasableItems = validatedItems.filter((item: any) => {
+            const price = Number(item.latestPrice || item.price || 0)
+            const stock = Number(item.latestStock || item.stock || 0)
+            const quantity = Number(item.quantity || 0)
+
+            return (
+                item.isAvailable !== false &&
+                item.isOutOfStock !== true &&
+                item.isContactPrice !== true &&
+                price > 0 &&
+                stock > 0 &&
+                quantity > 0 &&
+                quantity <= stock
+            )
+        })
+
+        if (purchasableItems.length === 0) {
+            toast.error('Không có sản phẩm hợp lệ để thanh toán')
+            router.push('/cart')
+            setLoading(false)
+            return
+        }
+
+        const validatedTotalPrice = purchasableItems.reduce(
+            (total: number, item: any) =>
+                total + Number(item.latestPrice || item.price || 0) * Number(item.quantity || 0),
+            0,
+        )
+
         const formData = new FormData(e.currentTarget)
 
-        // 1. Chuẩn bị dữ liệu đơn hàng
         const orderData = {
             fullName: formData.get('fullName'),
             phone: formData.get('phone'),
             address: formData.get('address'),
             province: formData.get('province'),
-            items: items.map((item: any) => ({
+            items: purchasableItems.map((item: any) => ({
                 product: item.productId || item.id,
                 variantId: item.variantId || null,
                 variantName: item.variantName || null,
                 quantity: Number(item.quantity),
-                priceAtPurchase: Number(item.price),
+                priceAtPurchase: Number(item.latestPrice || item.price),
             })),
-            totalAmount: totalPrice,
-            paymentMethod: paymentMethod,
+            paymentMethod,
+            voucherCode: voucherData?.voucher?.code || null,
         }
 
         try {
@@ -133,6 +181,46 @@ export default function CheckoutPage() {
             console.error(error)
             toast.error('Có lỗi xảy ra, vui lòng thử lại!')
             setLoading(false)
+        }
+    }
+
+    // Áp dụng voucher code
+    const handleApplyVoucher = async () => {
+        try {
+            if (!voucherCode.trim()) {
+                toast.error('Vui lòng nhập mã voucher')
+                return
+            }
+
+            setApplyingVoucher(true)
+
+            const res = await fetch('/api/vouchers/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    code: voucherCode,
+                    subtotalAmount: totalPrice,
+                }),
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                setVoucherData(null)
+                toast.error(data?.error || 'Không thể áp dụng voucher')
+                return
+            }
+
+            setVoucherData(data)
+            setVoucherCode(data?.voucher?.code || voucherCode.toUpperCase())
+            toast.success('Đã áp dụng voucher')
+        } catch (error) {
+            console.error(error)
+            toast.error('Không thể áp dụng voucher')
+        } finally {
+            setApplyingVoucher(false)
         }
     }
 
@@ -235,7 +323,7 @@ export default function CheckoutPage() {
 
                                     {paymentMethod === 'fundiin' && (
                                         <div className="px-5 pb-5">
-                                            <FundiinCheckoutElement amount={totalPrice} />
+                                            <FundiinCheckoutElement amount={finalTotalPrice} />
                                         </div>
                                     )}
                                 </div>
@@ -271,13 +359,63 @@ export default function CheckoutPage() {
                                     <span className="text-gray-400">Tạm tính</span>
                                     <span className="font-bold text-gray-800">{formatPrice(totalPrice)}₫</span>
                                 </div>
+
+                                <div className="rounded-2xl bg-gray-50 p-3">
+                                    <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                        Mã voucher
+                                    </p>
+
+                                    <div className="flex gap-2">
+                                        <Input
+                                            value={voucherCode}
+                                            onChange={(event) => {
+                                                setVoucherCode(event.target.value.toUpperCase())
+                                                setVoucherData(null)
+                                            }}
+                                            placeholder="Nhập mã giảm giá"
+                                            className="h-11 rounded-xl bg-white text-sm font-bold uppercase"
+                                        />
+
+                                        <Button
+                                            type="button"
+                                            onClick={handleApplyVoucher}
+                                            disabled={applyingVoucher || loading}
+                                            className="h-11 shrink-0 rounded-xl bg-black px-4 text-[11px] font-black uppercase"
+                                        >
+                                            {applyingVoucher ? 'Đang áp dụng' : 'Áp dụng'}
+                                        </Button>
+                                    </div>
+
+                                    {voucherData?.discountAmount > 0 && (
+                                        <p className="mt-2 text-xs font-bold text-emerald-600">
+                                            Đã giảm {formatPrice(voucherData.discountAmount)}₫
+                                        </p>
+                                    )}
+                                </div>
+
+                                {discountAmount > 0 && (
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-400">Voucher</span>
+                                        <span className="font-bold text-emerald-600">
+                                            -{formatPrice(discountAmount)}₫
+                                        </span>
+                                    </div>
+                                )}
+
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-400">Phí vận chuyển</span>
-                                    <span className="text-emerald-600 font-bold uppercase text-[10px]">Miễn phí</span>
+                                    <span className="text-emerald-600 font-bold uppercase text-[10px]">
+                                        {finalTotalPrice >= 500000 ? 'Miễn phí' : 'Báo giá sau'}
+                                    </span>
                                 </div>
+
                                 <div className="flex justify-between items-center pt-4">
-                                    <span className="text-lg font-black uppercase tracking-widest text-[#b72828]">Tổng cộng</span>
-                                    <span className="text-2xl font-black text-[#b72828] tracking-tighter">{formatPrice(totalPrice)}₫</span>
+                                    <span className="text-lg font-black uppercase tracking-widest text-[#b72828]">
+                                        Tổng cộng
+                                    </span>
+                                    <span className="text-2xl font-black text-[#b72828] tracking-tighter">
+                                        {formatPrice(finalTotalPrice)}₫
+                                    </span>
                                 </div>
                             </div>
 

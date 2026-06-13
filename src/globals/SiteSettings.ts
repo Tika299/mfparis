@@ -90,5 +90,55 @@ export const SiteSettings: GlobalConfig = {
         { name: 'facebookUrl', type: 'text' },
       ],
     },
+    {
+      name: 'flashSale',
+      type: 'group',
+      label: 'Flash Sale',
+      fields: [
+        {
+          name: 'enabled',
+          type: 'checkbox',
+          label: 'Bật Flash Sale',
+          defaultValue: true,
+        },
+        {
+          name: 'endTime',
+          type: 'date',
+          label: 'Thời gian kết thúc',
+          admin: {
+            date: {
+              pickerAppearance: 'dayAndTime',
+              displayFormat: 'dd/MM/yyyy HH:mm',
+            },
+          },
+        },
+        {
+          name: 'vouchers',
+          type: 'array',
+          label: 'Danh sách voucher',
+          maxRows: 4,
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              label: 'Tiêu đề',
+              defaultValue: 'Voucher',
+            },
+            {
+              name: 'value',
+              type: 'text',
+              label: 'Giá trị',
+              defaultValue: '15K',
+            },
+            {
+              name: 'sub',
+              type: 'text',
+              label: 'Điều kiện',
+              defaultValue: 'Đơn từ 799K',
+            },
+          ],
+        },
+      ],
+    },
   ],
 }

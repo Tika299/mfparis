@@ -17,6 +17,7 @@ import { PostCategories } from './collections/PostCategories'
 import { AboutPage } from './globals/AboutPage'
 import { Messages } from './collections/Messages'
 import { ChatProfiles } from './collections/ChatProfiles'
+import { Vouchers } from './collections/Vouchers'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -49,6 +50,7 @@ export default buildConfig({
     PostCategories,
     Messages,
     ChatProfiles,
+    Vouchers,
   ],
   globals: [SiteSettings, AboutPage],
   editor: lexicalEditor(),

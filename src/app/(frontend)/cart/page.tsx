@@ -97,12 +97,15 @@ export default function CartPage() {
   const invalidItems = items.filter((item: any) => {
     const stock = Number(item.stock || 0)
     const quantity = Number(item.quantity || 0)
+    const price = Number(item.price || 0)
 
     return (
       item.isAvailable === false ||
       item.isOutOfStock === true ||
+      item.isContactPrice === true ||
       stock <= 0 ||
-      quantity > stock
+      quantity > stock ||
+      price <= 0
     )
   })
 
@@ -122,6 +125,7 @@ export default function CartPage() {
 
     const price = getVariantPrice(variant)
     const stock = Number(variant?.stock || 0)
+    const isContactPrice = price <= 0
     const baseTitle = item.baseTitle || item.title
 
     changeVariant(item.id, {
@@ -140,6 +144,9 @@ export default function CartPage() {
       stock,
 
       quantity: 1,
+      isContactPrice,
+      isAvailable: stock > 0 && !isContactPrice,
+      isOutOfStock: stock <= 0,
 
       variants: item.variants || [],
     })
@@ -239,8 +246,9 @@ export default function CartPage() {
                       >
                         {item.variants.map((variant: any) => {
                           const variantStock = Number(variant?.stock || 0)
-                          const disabled = variantStock <= 0
                           const price = getVariantPrice(variant)
+                          const isContactPrice = price <= 0
+                          const disabled = variantStock <= 0 || isContactPrice
 
                           return (
                             <option
@@ -248,8 +256,8 @@ export default function CartPage() {
                               value={variant.id}
                               disabled={disabled}
                             >
-                              {variant.name} - {formatMoney(price)}₫
-                              {disabled ? ' - Hết hàng' : ''}
+                              {variant.name} - {isContactPrice ? 'Liên hệ' : `${formatMoney(price)}₫`}
+                              {variantStock <= 0 ? ' - Hết hàng' : ''}
                             </option>
                           )
                         })}
@@ -260,7 +268,7 @@ export default function CartPage() {
                   <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <p className="text-lg font-black text-[#b72828]">
-                        {formatMoney(item.price)}₫
+                        {Number(item.price || 0) <= 0 || item.isContactPrice ? 'Liên hệ' : `${formatMoney(item.price)}₫`}
                       </p>
 
                       {stock > 0 && (
@@ -298,7 +306,9 @@ export default function CartPage() {
                   <div className="mt-3 flex justify-between border-t border-gray-100 pt-3 text-sm">
                     <span className="text-gray-500">Thành tiền</span>
                     <span className="font-black text-gray-950">
-                      {formatMoney(item.price * item.quantity)}₫
+                      {Number(item.price || 0) <= 0 || item.isContactPrice
+                        ? 'Liên hệ'
+                        : `${formatMoney(item.price * item.quantity)}₫`}
                     </span>
                   </div>
                 </div>
