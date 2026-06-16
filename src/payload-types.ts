@@ -83,6 +83,7 @@ export interface Config {
     attributes: Attribute;
     'attribute-values': AttributeValue;
     carts: Cart;
+    'fragrance-notes': FragranceNote;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -105,6 +106,7 @@ export interface Config {
     attributes: AttributesSelect<false> | AttributesSelect<true>;
     'attribute-values': AttributeValuesSelect<false> | AttributeValuesSelect<true>;
     carts: CartsSelect<false> | CartsSelect<true>;
+    'fragrance-notes': FragranceNotesSelect<false> | FragranceNotesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -336,6 +338,28 @@ export interface Product {
         id?: string | null;
       }[]
     | null;
+  fragranceProfile?: {
+    /**
+     * Chọn các nốt hương xuất hiện đầu tiên sau khi xịt.
+     */
+    topNotes?: (number | FragranceNote)[] | null;
+    /**
+     * Chọn các nốt hương tạo nên phần lõi của mùi hương.
+     */
+    middleNotes?: (number | FragranceNote)[] | null;
+    /**
+     * Chọn các nốt hương lưu lại lâu nhất trên da.
+     */
+    baseNotes?: (number | FragranceNote)[] | null;
+    /**
+     * Chấm theo thang điểm 0–10.
+     */
+    longevityScore?: number | null;
+    /**
+     * Chấm theo thang điểm 0–10.
+     */
+    sillageScore?: number | null;
+  };
   /**
    * Dùng cho các biến thể như 30ml, 50ml, 100ml, fullbox, tester, màu sắc, quy cách...
    */
@@ -496,6 +520,31 @@ export interface AttributeValue {
         id?: string | null;
       }[]
     | null;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Thư viện nốt hương và icon dùng lại cho nhiều sản phẩm nước hoa.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fragrance-notes".
+ */
+export interface FragranceNote {
+  id: number;
+  name: string;
+  /**
+   * Tự tạo từ tên nốt hương. Có thể chỉnh tay.
+   */
+  slug: string;
+  /**
+   * Ưu tiên PNG nền trong suốt, icon nét đen đơn sắc.
+   */
+  icon: number | Media;
+  /**
+   * Không bắt buộc. Ví dụ: Hương hoa trắng thanh lịch, mềm mại.
+   */
+  description?: string | null;
   isActive?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -816,6 +865,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'carts';
         value: number | Cart;
+      } | null)
+    | ({
+        relationTo: 'fragrance-notes';
+        value: number | FragranceNote;
       } | null);
   globalSlug?: string | null;
   user:
@@ -998,6 +1051,15 @@ export interface ProductsSelect<T extends boolean = true> {
         booleanValue?: T;
         textValue?: T;
         id?: T;
+      };
+  fragranceProfile?:
+    | T
+    | {
+        topNotes?: T;
+        middleNotes?: T;
+        baseNotes?: T;
+        longevityScore?: T;
+        sillageScore?: T;
       };
   variants?:
     | T
@@ -1271,6 +1333,19 @@ export interface CartsSelect<T extends boolean = true> {
   expiresAt?: T;
   convertedOrder?: T;
   mergedIntoCart?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fragrance-notes_select".
+ */
+export interface FragranceNotesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  icon?: T;
+  description?: T;
+  isActive?: T;
   updatedAt?: T;
   createdAt?: T;
 }

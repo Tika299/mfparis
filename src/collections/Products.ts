@@ -365,7 +365,110 @@ export const Products: CollectionConfig = {
             },
           ],
         },
+        {
+          label: 'Hồ sơ nước hoa',
+          fields: [
+            {
+              name: 'fragranceProfile',
+              type: 'group',
+              label: 'Kiến trúc mùi hương',
 
+              fields: [
+                {
+                  name: 'topNotes',
+                  type: 'relationship',
+                  relationTo: 'fragrance-notes',
+                  hasMany: true,
+                  label: 'Hương đầu',
+
+                  filterOptions: {
+                    isActive: {
+                      equals: true,
+                    },
+                  },
+
+                  admin: {
+                    description:
+                      'Chọn các nốt hương xuất hiện đầu tiên sau khi xịt.',
+                  },
+                },
+
+                {
+                  name: 'middleNotes',
+                  type: 'relationship',
+                  relationTo: 'fragrance-notes',
+                  hasMany: true,
+                  label: 'Hương giữa',
+
+                  filterOptions: {
+                    isActive: {
+                      equals: true,
+                    },
+                  },
+
+                  admin: {
+                    description:
+                      'Chọn các nốt hương tạo nên phần lõi của mùi hương.',
+                  },
+                },
+
+                {
+                  name: 'baseNotes',
+                  type: 'relationship',
+                  relationTo: 'fragrance-notes',
+                  hasMany: true,
+                  label: 'Hương cuối',
+
+                  filterOptions: {
+                    isActive: {
+                      equals: true,
+                    },
+                  },
+
+                  admin: {
+                    description:
+                      'Chọn các nốt hương lưu lại lâu nhất trên da.',
+                  },
+                },
+
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'longevityScore',
+                      type: 'number',
+                      label: 'Độ lưu hương',
+                      min: 0,
+                      max: 10,
+
+                      admin: {
+                        width: '50%',
+                        step: 0.5,
+                        description:
+                          'Chấm theo thang điểm 0–10.',
+                      },
+                    },
+
+                    {
+                      name: 'sillageScore',
+                      type: 'number',
+                      label: 'Độ tỏa hương',
+                      min: 0,
+                      max: 10,
+
+                      admin: {
+                        width: '50%',
+                        step: 0.5,
+                        description:
+                          'Chấm theo thang điểm 0–10.',
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
         {
           label: 'Biến thể',
           fields: [

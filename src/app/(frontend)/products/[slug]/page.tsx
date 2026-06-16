@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import type { Where } from 'payload'
 import type { JSX } from 'react'
+import FragranceProfile from '@/components/product/FragranceProfile'
 
 import configPromise from '@payload-config'
 import {
@@ -1131,6 +1132,12 @@ export default async function ProductPage({
           </div>
 
           <div className="space-y-10">
+            <FragranceProfile
+              data={product.fragranceProfile}
+              scoreMax={10}
+              title="Kiến trúc mùi hương"
+              eyebrow="Fragrance profile"
+            />
             <ProductRichTextContent
               description={product.description}
             />
