@@ -103,9 +103,63 @@ export const Orders: CollectionConfig = {
       type: 'array',
       label: 'Danh sách sản phẩm',
       fields: [
-        { name: 'product', type: 'relationship', relationTo: 'products', required: true },
-        { name: 'quantity', type: 'number', required: true },
-        { name: 'priceAtPurchase', type: 'number', required: true, label: 'Giá lúc mua' },
+        {
+          name: 'product',
+          type: 'relationship',
+          relationTo: 'products',
+          required: true,
+          label: 'Sản phẩm',
+        },
+        {
+          name: 'variantId',
+          type: 'text',
+          label: 'Variant ID',
+          admin: {
+            description:
+              'ID của biến thể trong products.variants tại thời điểm mua.',
+          },
+        },
+        {
+          name: 'productTitleSnapshot',
+          type: 'text',
+          required: true,
+          label: 'Tên sản phẩm lúc mua',
+        },
+        {
+          name: 'variantNameSnapshot',
+          type: 'text',
+          label: 'Tên biến thể lúc mua',
+        },
+        {
+          name: 'skuSnapshot',
+          type: 'text',
+          label: 'SKU lúc mua',
+        },
+        {
+          name: 'quantity',
+          type: 'number',
+          required: true,
+          min: 1,
+          label: 'Số lượng',
+          validate: (value: unknown) => {
+            if (
+              typeof value !== 'number' ||
+              !Number.isInteger(value) ||
+              value <= 0
+            ) {
+              return 'Số lượng phải là số nguyên lớn hơn 0.'
+            }
+
+            return true
+          },
+        },
+        {
+          name: 'priceAtPurchase',
+          type: 'number',
+          required: true,
+          min: 0,
+          label: 'Giá lúc mua',
+        },
       ],
     },
     {

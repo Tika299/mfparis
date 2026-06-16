@@ -79,7 +79,10 @@ function normalizeItems(rawItems: any[]) {
   return Array.from(groupedItems.values())
 }
 
-async function validateAndBuildOrderItem(payload: any, item: any) {
+async function validateAndBuildOrderItem(
+  payload: any,
+  item: any,
+) {
   const { productId, variantId, quantity } = item
 
   const product: any = await payload.findByID({
@@ -92,74 +95,167 @@ async function validateAndBuildOrderItem(payload: any, item: any) {
     throw new Error('Không tìm thấy sản phẩm')
   }
 
-  if (product?.status && product.status !== 'published') {
-    throw new Error(`${product.title} hiện không còn được bán`)
+  if (
+    product?.status &&
+    product.status !== 'published'
+  ) {
+    throw new Error(
+      `${product.title} hiện không còn được bán`,
+    )
   }
 
-  const activeVariants = Array.isArray(product?.variants)
-    ? product.variants.filter((variant: any) => variant?.isActive !== false)
+  const activeVariants = Array.isArray(
+    product?.variants,
+  )
+    ? product.variants.filter(
+      (variant: any) =>
+        variant?.isActive !== false,
+    )
     : []
 
-  const isVariableProduct = product?.productType === 'variable'
+  const isVariableProduct =
+    product?.productType === 'variable'
 
   let latestPrice = 0
   let latestStock = 0
-  let variantName: string | null = null
+
+  // Snapshot dùng để lưu vào Orders
+  let variantNameSnapshot: string | null = null
+  let skuSnapshot: string | null =
+    product?.sku
+      ? String(product.sku)
+      : null
 
   if (isVariableProduct) {
     if (!variantId) {
-      throw new Error(`${product.title} cần chọn phân loại`)
+      throw new Error(
+        `${product.title} cần chọn phân loại`,
+      )
     }
 
     const variant = activeVariants.find(
-      (variant: any) => String(variant.id) === String(variantId),
+      (candidate: any) =>
+        String(candidate.id) ===
+        String(variantId),
     )
 
     if (!variant) {
-      throw new Error(`${product.title} - phân loại đã ngừng bán`)
+      throw new Error(
+        `${product.title} - phân loại đã ngừng bán`,
+      )
     }
 
-    const basePrice = Number(variant?.basePrice || variant?.price || 0)
-    const salePrice = Number(variant?.salePrice || 0)
+    const basePrice = Number(
+      variant?.basePrice ||
+      variant?.price ||
+      0,
+    )
 
-    latestPrice = getFinalPrice(basePrice, salePrice)
-    latestStock = Number(variant?.stock || 0)
-    variantName = variant?.name || null
+    const salePrice = Number(
+      variant?.salePrice || 0,
+    )
+
+    latestPrice = getFinalPrice(
+      basePrice,
+      salePrice,
+    )
+
+    latestStock = Number(
+      variant?.stock || 0,
+    )
+
+    variantNameSnapshot =
+      variant?.name
+        ? String(variant.name)
+        : null
+
+    // Ưu tiên SKU của variant.
+    // Nếu variant không có SKU thì lấy SKU sản phẩm.
+    skuSnapshot =
+      variant?.sku
+        ? String(variant.sku)
+        : product?.sku
+          ? String(product.sku)
+          : null
   } else {
     if (variantId) {
-      throw new Error(`${product.title} không có phân loại hợp lệ`)
+      throw new Error(
+        `${product.title} không có phân loại hợp lệ`,
+      )
     }
 
-    const basePrice = Number(product?.price?.basePrice || 0)
-    const salePrice = Number(product?.price?.salePrice || 0)
+    const basePrice = Number(
+      product?.price?.basePrice || 0,
+    )
 
-    latestPrice = getFinalPrice(basePrice, salePrice)
-    latestStock = Number(product?.price?.stock || 0)
+    const salePrice = Number(
+      product?.price?.salePrice || 0,
+    )
+
+    latestPrice = getFinalPrice(
+      basePrice,
+      salePrice,
+    )
+
+    latestStock = Number(
+      product?.price?.stock || 0,
+    )
   }
 
+  const itemDisplayName =
+    variantNameSnapshot
+      ? `${product.title} - ${variantNameSnapshot}`
+      : product.title
+
   if (latestPrice <= 0) {
-    throw new Error(`${product.title}${variantName ? ` - ${variantName}` : ''} cần liên hệ để báo giá`)
+    throw new Error(
+      `${itemDisplayName} cần liên hệ để báo giá`,
+    )
   }
 
   if (latestStock <= 0) {
-    throw new Error(`${product.title}${variantName ? ` - ${variantName}` : ''} đã hết hàng`)
+    throw new Error(
+      `${itemDisplayName} đã hết hàng`,
+    )
   }
 
   if (quantity > latestStock) {
-    throw new Error(`${product.title}${variantName ? ` - ${variantName}` : ''} chỉ còn ${latestStock} sản phẩm`)
+    throw new Error(
+      `${itemDisplayName} chỉ còn ${latestStock} sản phẩm`,
+    )
   }
 
   return {
     orderItem: {
+      // Quan hệ tới Products
       product: product.id,
+
+      // ID row trong products.variants
       variantId: variantId || null,
-      variantName,
+
+      // Snapshot để đơn cũ không bị thay đổi
+      // khi tên sản phẩm hoặc variant được sửa
+      productTitleSnapshot: String(
+        product.title || 'Sản phẩm',
+      ),
+
+      variantNameSnapshot,
+
+      skuSnapshot,
+
       quantity,
+
+      // Giá được server đọc lại từ Products
       priceAtPurchase: latestPrice,
     },
+
     lineTotal: latestPrice * quantity,
   }
 }
+
+
+
+
 
 export async function POST(req: Request) {
   try {

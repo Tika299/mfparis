@@ -1,6 +1,49 @@
-import { CollectionConfig } from 'payload'
-import type { CollectionBeforeChangeHook } from 'payload'
+import type {
+  CollectionBeforeChangeHook,
+  CollectionConfig,
+  Where,
+} from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
+import { trackProductSlugHistory } from '@/collections/hooks/trackSlugHistory'
+import { productSeoLifecycleFields } from '@/collections/fields/productSeoLifecycleFields'
+
+type EntityID = string | number
+
+type RelationshipReference =
+  | EntityID
+  | {
+    id?: EntityID | null
+  }
+
+type ProductAttributeSiblingData = {
+  attribute?: RelationshipReference | null
+}
+
+function getRelationshipID(
+  value: unknown,
+): EntityID | undefined {
+  if (
+    typeof value === 'string' ||
+    typeof value === 'number'
+  ) {
+    return value
+  }
+
+  if (
+    typeof value !== 'object' ||
+    value === null ||
+    !('id' in value)
+  ) {
+    return undefined
+  }
+
+  const id = value.id
+
+  return typeof id === 'string' ||
+    typeof id === 'number'
+    ? id
+    : undefined
+}
 
 const syncVariantPrice: CollectionBeforeChangeHook = async ({ data }) => {
   if (data?.productType !== 'variable') {
@@ -48,10 +91,12 @@ export const Products: CollectionConfig = {
   },
 
   hooks: {
+    afterChange: [trackProductSlugHistory],
     beforeChange: [syncVariantPrice],
   },
 
   fields: [
+    ...productSeoLifecycleFields,
     {
       type: 'tabs',
       tabs: [
@@ -233,6 +278,93 @@ export const Products: CollectionConfig = {
             },
           ],
         },
+        {
+          label: 'Thuộc tính & Bộ lọc',
+          fields: [
+            {
+              name: 'productAttributes',
+              type: 'array',
+              label: 'Thuộc tính có cấu trúc',
+              admin: {
+                description:
+                  'Dữ liệu dùng cho bộ lọc danh mục, tìm kiếm và so sánh sản phẩm.',
+                initCollapsed: false,
+              },
+              fields: [
+                {
+                  name: 'attribute',
+                  type: 'relationship',
+                  relationTo: 'attributes',
+                  required: true,
+                  label: 'Thuộc tính',
+                  filterOptions: {
+                    isActive: {
+                      equals: true,
+                    },
+                  },
+                },
+                {
+                  name: 'values',
+                  type: 'relationship',
+                  relationTo: 'attribute-values',
+                  hasMany: true,
+                  label: 'Giá trị lựa chọn',
+
+                  filterOptions: ({
+                    siblingData,
+                  }): Where => {
+                    const currentRow =
+                      siblingData as ProductAttributeSiblingData
+
+                    const attributeID =
+                      getRelationshipID(
+                        currentRow.attribute,
+                      )
+
+                    const conditions: Where[] = [
+                      {
+                        isActive: {
+                          equals: true,
+                        },
+                      },
+                    ]
+
+                    if (attributeID !== undefined) {
+                      conditions.unshift({
+                        attribute: {
+                          equals: attributeID,
+                        },
+                      })
+                    }
+
+                    return {
+                      and: conditions,
+                    }
+                  },
+                },
+                {
+                  name: 'numericValue',
+                  type: 'number',
+                  label: 'Giá trị số trực tiếp',
+                  admin: {
+                    description:
+                      'Dùng khi sản phẩm có giá trị riêng, ví dụ độ lưu hương 7 giờ.',
+                  },
+                },
+                {
+                  name: 'booleanValue',
+                  type: 'checkbox',
+                  label: 'Giá trị đúng/sai',
+                },
+                {
+                  name: 'textValue',
+                  type: 'text',
+                  label: 'Giá trị văn bản',
+                },
+              ],
+            },
+          ],
+        },
 
         {
           label: 'Biến thể',
@@ -275,6 +407,22 @@ export const Products: CollectionConfig = {
                       defaultValue: false,
                       admin: {
                         width: '30%',
+                      },
+                    },
+                    {
+                      name: 'optionValues',
+                      type: 'relationship',
+                      relationTo: 'attribute-values',
+                      hasMany: true,
+                      label: 'Giá trị thuộc tính của biến thể',
+                      admin: {
+                        description:
+                          'Ví dụ: 50ml, màu đỏ, fullbox hoặc tester.',
+                      },
+                      filterOptions: {
+                        isActive: {
+                          equals: true,
+                        },
                       },
                     },
                   ],

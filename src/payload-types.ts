@@ -79,6 +79,10 @@ export interface Config {
     messages: Message;
     'chat-profiles': ChatProfile;
     vouchers: Voucher;
+    redirects: Redirect;
+    attributes: Attribute;
+    'attribute-values': AttributeValue;
+    carts: Cart;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -97,6 +101,10 @@ export interface Config {
     messages: MessagesSelect<false> | MessagesSelect<true>;
     'chat-profiles': ChatProfilesSelect<false> | ChatProfilesSelect<true>;
     vouchers: VouchersSelect<false> | VouchersSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    attributes: AttributesSelect<false> | AttributesSelect<true>;
+    'attribute-values': AttributeValuesSelect<false> | AttributeValuesSelect<true>;
+    carts: CartsSelect<false> | CartsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -268,6 +276,14 @@ export interface Brand {
  */
 export interface Product {
   id: number;
+  /**
+   * Quyết định cách trang chi tiết sản phẩm được render, index và chuyển hướng.
+   */
+  seoStatus: 'active' | 'temporarily_out_of_stock' | 'discontinued_keep_page' | 'discontinued_redirect';
+  /**
+   * Sản phẩm được chuyển hướng đến khi trạng thái là discontinued_redirect.
+   */
+  relatedProduct?: (number | null) | Product;
   title: string;
   sku?: string | null;
   brand: number | Brand;
@@ -305,6 +321,22 @@ export interface Product {
       }[]
     | null;
   /**
+   * Dữ liệu dùng cho bộ lọc danh mục, tìm kiếm và so sánh sản phẩm.
+   */
+  productAttributes?:
+    | {
+        attribute: number | Attribute;
+        values?: (number | AttributeValue)[] | null;
+        /**
+         * Dùng khi sản phẩm có giá trị riêng, ví dụ độ lưu hương 7 giờ.
+         */
+        numericValue?: number | null;
+        booleanValue?: boolean | null;
+        textValue?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Dùng cho các biến thể như 30ml, 50ml, 100ml, fullbox, tester, màu sắc, quy cách...
    */
   variants?:
@@ -312,6 +344,10 @@ export interface Product {
         name: string;
         sku?: string | null;
         isDefault?: boolean | null;
+        /**
+         * Ví dụ: 50ml, màu đỏ, fullbox hoặc tester.
+         */
+        optionValues?: (number | AttributeValue)[] | null;
         basePrice: number;
         salePrice?: number | null;
         stock?: number | null;
@@ -386,6 +422,85 @@ export interface Category {
   createdAt: string;
 }
 /**
+ * Định nghĩa các thuộc tính có cấu trúc như nhóm hương, độ lưu hương, loại da và dung tích.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attributes".
+ */
+export interface Attribute {
+  id: number;
+  name: string;
+  /**
+   * Khóa ổn định dùng cho API và URL bộ lọc.
+   */
+  slug: string;
+  description?: string | null;
+  scope: 'general' | 'fragrance' | 'beauty';
+  valueType: 'select' | 'multi_select' | 'number' | 'range' | 'boolean' | 'text';
+  unit?: string | null;
+  sortOrder?: number | null;
+  /**
+   * Để trống nếu thuộc tính có thể áp dụng cho mọi danh mục.
+   */
+  applicableCategories?: (number | Category)[] | null;
+  filterable?: boolean | null;
+  comparable?: boolean | null;
+  variantOption?: boolean | null;
+  allowsMultiple?: boolean | null;
+  displayStyle?: ('checkbox' | 'radio' | 'dropdown' | 'chips' | 'range' | 'color') | null;
+  validation?: {
+    min?: number | null;
+    max?: number | null;
+    step?: number | null;
+  };
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Các giá trị chuẩn hóa phục vụ bộ lọc: Floral, Woody, 6 giờ, Da dầu...
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attribute-values".
+ */
+export interface AttributeValue {
+  id: number;
+  attribute: number | Attribute;
+  label: string;
+  /**
+   * Hook bảo đảm slug không trùng trong cùng một Attribute.
+   */
+  slug: string;
+  description?: string | null;
+  /**
+   * Dùng cho độ lưu hương, dung tích, chỉ số hoặc range.
+   */
+  numericValue?: number | null;
+  booleanValue?: boolean | null;
+  /**
+   * Hỗ trợ tìm kiếm/import: woody, gỗ, hương gỗ.
+   */
+  aliases?:
+    | {
+        alias: string;
+        id?: string | null;
+      }[]
+    | null;
+  colorHex?: string | null;
+  image?: (number | null) | Media;
+  sortOrder?: number | null;
+  metadata?:
+    | {
+        key: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders".
  */
@@ -404,6 +519,13 @@ export interface Order {
   items?:
     | {
         product: number | Product;
+        /**
+         * ID của biến thể trong products.variants tại thời điểm mua.
+         */
+        variantId?: string | null;
+        productTitleSnapshot: string;
+        variantNameSnapshot?: string | null;
+        skuSnapshot?: string | null;
         quantity: number;
         priceAtPurchase: number;
         id?: string | null;
@@ -548,6 +670,70 @@ export interface ChatProfile {
   collection: 'chat-profiles';
 }
 /**
+ * Quản lý các URL cũ từ WordPress và lịch sử thay đổi slug.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  /**
+   * Ví dụ: /cua-hang/nuoc-hoa-chanel/. Có thể dán URL đầy đủ của maraisdefrance.vn.
+   */
+  from: string;
+  /**
+   * Ví dụ: /products/nuoc-hoa-chanel. URL nội bộ sẽ tự động được loại bỏ domain.
+   */
+  to: string;
+  /**
+   * Dùng 301 cho migration hoặc thay đổi slug lâu dài. Dùng 302 cho chuyển hướng tạm thời.
+   */
+  type: '301' | '302';
+  /**
+   * Tắt để tạm ngừng chuyển hướng mà không xóa bản ghi.
+   */
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "carts".
+ */
+export interface Cart {
+  id: number;
+  user?: (number | null) | User;
+  guestId?: string | null;
+  status: 'active' | 'abandoned' | 'converted' | 'merged' | 'expired';
+  items?:
+    | {
+        product: number | Product;
+        /**
+         * ID row trong products.variants; bắt buộc với variable product.
+         */
+        variantId?: string | null;
+        quantity: number;
+        productTitleSnapshot?: string | null;
+        variantNameSnapshot?: string | null;
+        skuSnapshot?: string | null;
+        unitPriceSnapshot?: number | null;
+        stockSnapshot?: number | null;
+        lineTotal?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  voucher?: (number | null) | Voucher;
+  subtotalAmount?: number | null;
+  discountAmount?: number | null;
+  totalAmount?: number | null;
+  lastActivityAt?: string | null;
+  expiresAt?: string | null;
+  convertedOrder?: (number | null) | Order;
+  mergedIntoCart?: (number | null) | Cart;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -614,6 +800,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'vouchers';
         value: number | Voucher;
+      } | null)
+    | ({
+        relationTo: 'redirects';
+        value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'attributes';
+        value: number | Attribute;
+      } | null)
+    | ({
+        relationTo: 'attribute-values';
+        value: number | AttributeValue;
+      } | null)
+    | ({
+        relationTo: 'carts';
+        value: number | Cart;
       } | null);
   globalSlug?: string | null;
   user:
@@ -759,6 +961,8 @@ export interface BrandsSelect<T extends boolean = true> {
  * via the `definition` "products_select".
  */
 export interface ProductsSelect<T extends boolean = true> {
+  seoStatus?: T;
+  relatedProduct?: T;
   title?: T;
   sku?: T;
   brand?: T;
@@ -785,12 +989,23 @@ export interface ProductsSelect<T extends boolean = true> {
         value?: T;
         id?: T;
       };
+  productAttributes?:
+    | T
+    | {
+        attribute?: T;
+        values?: T;
+        numericValue?: T;
+        booleanValue?: T;
+        textValue?: T;
+        id?: T;
+      };
   variants?:
     | T
     | {
         name?: T;
         sku?: T;
         isDefault?: T;
+        optionValues?: T;
         basePrice?: T;
         salePrice?: T;
         stock?: T;
@@ -843,6 +1058,10 @@ export interface OrdersSelect<T extends boolean = true> {
     | T
     | {
         product?: T;
+        variantId?: T;
+        productTitleSnapshot?: T;
+        variantNameSnapshot?: T;
+        skuSnapshot?: T;
         quantity?: T;
         priceAtPurchase?: T;
         id?: T;
@@ -947,6 +1166,111 @@ export interface VouchersSelect<T extends boolean = true> {
   endsAt?: T;
   usageLimit?: T;
   usedCount?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  to?: T;
+  type?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attributes_select".
+ */
+export interface AttributesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  scope?: T;
+  valueType?: T;
+  unit?: T;
+  sortOrder?: T;
+  applicableCategories?: T;
+  filterable?: T;
+  comparable?: T;
+  variantOption?: T;
+  allowsMultiple?: T;
+  displayStyle?: T;
+  validation?:
+    | T
+    | {
+        min?: T;
+        max?: T;
+        step?: T;
+      };
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "attribute-values_select".
+ */
+export interface AttributeValuesSelect<T extends boolean = true> {
+  attribute?: T;
+  label?: T;
+  slug?: T;
+  description?: T;
+  numericValue?: T;
+  booleanValue?: T;
+  aliases?:
+    | T
+    | {
+        alias?: T;
+        id?: T;
+      };
+  colorHex?: T;
+  image?: T;
+  sortOrder?: T;
+  metadata?:
+    | T
+    | {
+        key?: T;
+        value?: T;
+        id?: T;
+      };
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "carts_select".
+ */
+export interface CartsSelect<T extends boolean = true> {
+  user?: T;
+  guestId?: T;
+  status?: T;
+  items?:
+    | T
+    | {
+        product?: T;
+        variantId?: T;
+        quantity?: T;
+        productTitleSnapshot?: T;
+        variantNameSnapshot?: T;
+        skuSnapshot?: T;
+        unitPriceSnapshot?: T;
+        stockSnapshot?: T;
+        lineTotal?: T;
+        id?: T;
+      };
+  voucher?: T;
+  subtotalAmount?: T;
+  discountAmount?: T;
+  totalAmount?: T;
+  lastActivityAt?: T;
+  expiresAt?: T;
+  convertedOrder?: T;
+  mergedIntoCart?: T;
   updatedAt?: T;
   createdAt?: T;
 }

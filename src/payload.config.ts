@@ -18,6 +18,10 @@ import { AboutPage } from './globals/AboutPage'
 import { Messages } from './collections/Messages'
 import { ChatProfiles } from './collections/ChatProfiles'
 import { Vouchers } from './collections/Vouchers'
+import { Redirects } from '@/collections/Redirects'
+import { Attributes } from '@/collections/Attributes'
+import { AttributeValues } from '@/collections/AttributeValues'
+import { Carts } from '@/collections/Carts'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -51,6 +55,10 @@ export default buildConfig({
     Messages,
     ChatProfiles,
     Vouchers,
+    Redirects,
+    Attributes,
+    AttributeValues,
+    Carts,
   ],
   globals: [SiteSettings, AboutPage],
   editor: lexicalEditor(),

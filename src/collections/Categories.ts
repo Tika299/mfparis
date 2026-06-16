@@ -1,8 +1,12 @@
 import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
+import { trackCategorySlugHistory } from '@/collections/hooks/trackSlugHistory'
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
+  hooks: {
+    afterChange: [trackCategorySlugHistory],
+  },
   admin: { useAsTitle: 'name' },
   fields: [
     { name: 'name', type: 'text', required: true },

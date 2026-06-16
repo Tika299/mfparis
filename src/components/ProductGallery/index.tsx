@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react'
 import { cn } from '@/utilities'
+import { Product } from '@/payload-types'
 
 function getMedia(item: any) {
   if (!item) return null
@@ -56,7 +57,15 @@ function getImageAlt(item: any, fallback = 'Product image') {
   return media?.alt || media?.filename || fallback
 }
 
-export const ProductGallery = ({ images }: { images: any[] }) => {
+type ProductGalleryImages = NonNullable<
+  Product['images']
+>
+
+type ProductGalleryProps = Readonly<{
+  images: ProductGalleryImages
+}>
+
+export const ProductGallery = ({ images }: ProductGalleryProps) => {
   const [activeIndex, setActiveIndex] = useState(0)
 
   const validImages = useMemo(() => {
