@@ -1,6 +1,7 @@
 import * as migration_20260608_121434 from './20260608_121434';
 import * as migration_20260615_091211_redirects_manager from './20260615_091211_redirects_manager';
 import * as migration_20260616_075715_add_carts_and_product_attributes from './20260616_075715_add_carts_and_product_attributes';
+import * as migration_20260617_094038 from './20260617_094038';
 
 export const migrations = [
   {
@@ -16,6 +17,11 @@ export const migrations = [
   {
     up: migration_20260616_075715_add_carts_and_product_attributes.up,
     down: migration_20260616_075715_add_carts_and_product_attributes.down,
-    name: '20260616_075715_add_carts_and_product_attributes'
+    name: '20260616_075715_add_carts_and_product_attributes',
+  },
+  {
+    up: migration_20260617_094038.up,
+    down: migration_20260617_094038.down,
+    name: '20260617_094038'
   },
 ];
