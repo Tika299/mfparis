@@ -665,6 +665,54 @@ export const Products: CollectionConfig = {
     },
 
     {
+      name: 'averageRating',
+      label: 'Điểm đánh giá trung bình',
+      type: 'number',
+      min: 0,
+      max: 5,
+      defaultValue: 0,
+      index: true,
+
+      /**
+       * Không cho request thông thường tự ghi đè.
+       * Hook Reviews sử dụng overrideAccess: true nên vẫn cập nhật được.
+       */
+      access: {
+        create: () => false,
+        update: () => false,
+      },
+
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+        step: 0.01,
+        description:
+          'Được tính tự động từ các review đã duyệt.',
+      },
+    },
+    {
+      name: 'reviewCount',
+      label: 'Tổng số đánh giá',
+      type: 'number',
+      min: 0,
+      defaultValue: 0,
+      index: true,
+
+      access: {
+        create: () => false,
+        update: () => false,
+      },
+
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+        step: 1,
+        description:
+          'Tổng số review đã duyệt của sản phẩm.',
+      },
+    },
+
+    {
       name: 'status',
       type: 'select',
       label: 'Trạng thái',

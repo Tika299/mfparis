@@ -1,164 +1,348 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, {
+  useState,
+  type MouseEvent,
+} from 'react'
+import type {
+  Media,
+  Product,
+} from '@/payload-types'
 import Link from 'next/link'
-import { ShoppingBag, Heart, ShieldCheck, Bike, RotateCcw, Gift, ChevronRight, Star } from 'lucide-react'
+import { ShoppingBag, Settings, Heart, ShieldCheck, Bike, RotateCcw, Gift, ChevronRight, Star } from 'lucide-react'
 import { toast } from 'sonner'
 import { OptimizedImage } from '@/components/OptimizedImage'
 import { formatPrice } from '@/utilities/formatPrice'
 import { cn } from '@/utilities'
 import { useCartStore } from '@/lib/store'
+import { useRouter } from 'next/navigation'
 
-function getStableRating(seed: string) {
-  let hash = 0
+type ProductVariant =
+  NonNullable<Product['variants']>[number]
 
-  for (let i = 0; i < seed.length; i++) {
-    hash = seed.charCodeAt(i) + ((hash << 5) - hash)
+type MediaRelationship =
+  | number
+  | Media
+  | null
+  | undefined
+
+type ProductCardProps = Readonly<{
+  product: Product
+  className?: string
+}>
+
+function getActiveVariants(
+  product: Product,
+): ProductVariant[] {
+  if (
+    product.productType !== 'variable' ||
+    !Array.isArray(product.variants)
+  ) {
+    return []
   }
 
-  const rating = 4.8 + (Math.abs(hash) % 21) / 100
-
-  return Math.min(rating, 5).toFixed(1)
-}
-
-function getReviewCount(product: any) {
-  return (
-    product?.reviewCount ||
-    product?.reviewsCount ||
-    product?.rating?.count ||
-    product?.reviews?.totalDocs ||
-    product?.reviews?.docs?.length ||
-    null
+  return product.variants.filter(
+    (variant) => variant.isActive !== false,
   )
 }
 
-export const ProductCard = ({ product, className }: { product: any; className?: string }) => {
-
-  const getActiveVariants = (product: any) => {
-    if (product?.productType !== 'variable') return []
-
-    return Array.isArray(product?.variants)
-      ? product.variants.filter((variant: any) => variant?.isActive !== false)
-      : []
-  }
-
-  const getUploadUrl = (upload: any) => {
-    if (!upload) return ''
-
-    if (typeof upload === 'string') return upload
-
-    if (typeof upload === 'object' && upload.url) return upload.url
-
+function getUploadUrl(
+  upload: MediaRelationship,
+): string {
+  if (
+    !upload ||
+    typeof upload !== 'object'
+  ) {
     return ''
   }
 
-  const getVariantPrice = (variant: any) => {
-    const salePrice = Number(variant?.salePrice || 0)
-    const basePrice = Number(variant?.basePrice || variant?.price || 0)
+  return (
+    upload.sizes?.card?.url ??
+    upload.url ??
+    upload.sizes?.thumbnail?.url ??
+    ''
+  )
+}
 
-    return salePrice > 0 ? salePrice : basePrice
+function getVariantPrice(
+  variant: ProductVariant,
+): number {
+  const basePrice = Number(
+    variant.basePrice ?? 0,
+  )
+
+  const salePrice = Number(
+    variant.salePrice ?? 0,
+  )
+
+  const hasValidSalePrice =
+    basePrice > 0 &&
+    salePrice > 0 &&
+    salePrice < basePrice
+
+  return hasValidSalePrice
+    ? salePrice
+    : basePrice
+}
+
+function getVariantCartId(
+  variant: ProductVariant,
+  index: number,
+): string {
+  const variantId =
+    typeof variant.id === 'string'
+      ? variant.id.trim()
+      : ''
+
+  if (variantId) {
+    return variantId
   }
 
-  const variants = getActiveVariants(product)
+  const sku = variant.sku?.trim()
+
+  if (sku) {
+    return `sku-${sku}`
+  }
+
+  const name = variant.name?.trim()
+
+  if (name) {
+    return `name-${encodeURIComponent(name)}`
+  }
+
+  return `variant-${index + 1}`
+}
+
+function normalizeRating(
+  value: number | null | undefined,
+): number | null {
+  if (
+    typeof value !== 'number' ||
+    !Number.isFinite(value)
+  ) {
+    return null
+  }
+
+  return Math.min(5, Math.max(0, value))
+}
+
+function normalizeReviewCount(
+  value: number | null | undefined,
+): number | null {
+  if (
+    typeof value !== 'number' ||
+    !Number.isFinite(value)
+  ) {
+    return null
+  }
+
+  return Math.max(0, Math.floor(value))
+}
+
+function RatingStars({
+  rating,
+}: Readonly<{
+  rating: number
+}>) {
+  const normalizedRating = Math.min(
+    5,
+    Math.max(0, rating),
+  )
+
+  const filledStarCount = Math.round(
+    normalizedRating,
+  )
+
+  return (
+    <span
+      role="img"
+      aria-label={`${normalizedRating.toLocaleString(
+        'vi-VN',
+        {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 1,
+        },
+      )} trên 5 sao`}
+      className="inline-flex shrink-0 items-center gap-0.5 leading-none"
+    >
+      {Array.from(
+        { length: 5 },
+        (_, index) => {
+          const isFilled =
+            index < filledStarCount
+
+          const starColor = isFilled
+            ? '#FFB800'
+            : '#E5E7EB'
+
+          return (
+            <Star
+              key={index}
+              aria-hidden="true"
+              size={15}
+              strokeWidth={1.5}
+              color={starColor}
+              fill={starColor}
+              style={{
+                color: starColor,
+                fill: starColor,
+                flexShrink: 0,
+                display: 'block',
+              }}
+            />
+          )
+        },
+      )}
+    </span>
+  )
+}
+
+export const ProductCard = ({
+  product,
+  className,
+}: ProductCardProps) => {
+
+  const variants: ProductVariant[] =
+    getActiveVariants(product)
   const isVariableProduct = product?.productType === 'variable' && variants.length > 0
 
   const defaultVariant =
-    variants.find((variant: any) => variant?.isDefault && Number(variant?.stock || 0) > 0) ||
-    variants.find((variant: any) => Number(variant?.stock || 0) > 0) ||
+    variants.find(
+      (variant) =>
+        variant.isDefault === true &&
+        Number(variant.stock ?? 0) > 0,
+    ) ??
+    variants.find(
+      (variant) =>
+        Number(variant.stock ?? 0) > 0,
+    ) ??
     variants[0]
 
   const basePrice = isVariableProduct
-    ? Number(defaultVariant?.basePrice || 0)
-    : Number(product?.price?.basePrice || 0)
+    ? Number(defaultVariant?.basePrice ?? 0)
+    : Number(product.price?.basePrice ?? 0)
 
   const salePrice = isVariableProduct
-    ? Number(defaultVariant?.salePrice || 0)
-    : Number(product?.price?.salePrice || 0)
-  const isSale = salePrice > 0 && salePrice < basePrice
-  const discountPercent = isSale ? Math.round(((basePrice - salePrice) / basePrice) * 100) : 0
-  const finalPrice = isSale ? salePrice : basePrice
+    ? Number(defaultVariant?.salePrice ?? 0)
+    : Number(product.price?.salePrice ?? 0)
+
+  const isSale =
+    basePrice > 0 &&
+    salePrice > 0 &&
+    salePrice < basePrice
+
+  const discountPercent = isSale
+    ? Math.round(
+      ((basePrice - salePrice) / basePrice) * 100,
+    )
+    : 0
+
+  const finalPrice = isSale
+    ? salePrice
+    : basePrice
   const isContactPrice = finalPrice <= 0
 
   const stock = isVariableProduct
-    ? Number(defaultVariant?.stock || 0)
-    : Number(product?.price?.stock || 0)
+    ? Number(defaultVariant?.stock ?? 0)
+    : Number(product.price?.stock ?? 0)
 
   const isOutOfStock = stock <= 0
 
+  const firstProductImage =
+    product.images?.[0]?.image
+
   const productImage =
     getUploadUrl(defaultVariant?.image) ||
-    product?.images?.[0]?.image?.url ||
-    product?.images?.[0]?.image?.sizes?.thumbnail?.url ||
+    getUploadUrl(firstProductImage) ||
     '/placeholder.jpg'
 
+  const router = useRouter()
+
   const [added, setAdded] = useState(false)
-  const addItem = useCartStore((state) => state.addItem)
 
-  const rating = useMemo(() => {
-    return getStableRating(String(product?.id || product?.slug || product?.title || 'product'))
-  }, [product?.id, product?.slug, product?.title])
+  const addItem = useCartStore(
+    (state) => state.addItem,
+  )
 
-  const reviewCount = getReviewCount(product)
+  const rating = normalizeRating(
+    product.averageRating,
+  )
 
-  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const reviewCount = normalizeReviewCount(
+    product.reviewCount,
+  )
 
+  const shouldShowRating =
+    rating !== null &&
+    rating > 0 &&
+    reviewCount !== null &&
+    reviewCount > 0
+
+  const handleAddToCart = (
+    event: MouseEvent<HTMLButtonElement>,
+  ): void => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    /**
+     * Sản phẩm có biến thể:
+     * Không tự động thêm defaultVariant vào giỏ.
+     * Chuyển người dùng đến trang chi tiết để chọn phân loại.
+     */
+    if (isVariableProduct) {
+      router.push(`/products/${product.slug}`)
+      return
+    }
+
+    /**
+     * Từ đây trở xuống chỉ xử lý sản phẩm đơn.
+     */
     if (isOutOfStock) {
       toast.error('Sản phẩm hiện đã hết hàng')
       return
     }
 
     if (isContactPrice) {
-      window.location.href = 'https://zalo.me/2731577726641619342'
+      window.location.href =
+        'https://zalo.me/2731577726641619342'
+
       return
     }
 
-    const cartItemId = isVariableProduct
-      ? `${product.id}-${defaultVariant?.id}`
-      : product.id
+    const productId = String(product.id)
 
     addItem({
-      id: cartItemId,
+      id: productId,
 
-      productId: product.id,
-      variantId: defaultVariant?.id,
-      variantName: defaultVariant?.name,
+      productId,
+      variantId: undefined,
+      variantName: undefined,
 
       baseTitle: product.title,
-      title: defaultVariant?.name
-        ? `${product.title} - ${defaultVariant.name}`
-        : product.title,
+      title: product.title,
 
       price: finalPrice,
       image: productImage,
       slug: product.slug,
       quantity: 1,
-      sku: defaultVariant?.sku || product?.sku,
 
+      sku: product.sku ?? undefined,
       stock,
 
-      variants: variants.map((variant: any) => {
-        const variantBasePrice = Number(variant?.basePrice || 0)
-        const variantSalePrice = Number(variant?.salePrice || 0)
-
-        return {
-          id: variant.id,
-          name: variant.name,
-          sku: variant.sku,
-          basePrice: variantBasePrice,
-          salePrice: variantSalePrice,
-          price: getVariantPrice(variant),
-          stock: Number(variant?.stock || 0),
-          image: getUploadUrl(variant?.image) || productImage,
-        }
-      }),
+      /**
+       * Sản phẩm đơn không có danh sách
+       * phân loại cần lựa chọn.
+       */
+      variants: [],
     })
 
     setAdded(true)
-    toast.success('Đã thêm vào giỏ hàng thành công!')
 
-    setTimeout(() => {
+    toast.success(
+      'Đã thêm vào giỏ hàng thành công!',
+    )
+
+    window.setTimeout(() => {
       setAdded(false)
     }, 1200)
   }
@@ -193,8 +377,15 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
         )}
 
         {/* Nút Yêu thích */}
-        <button className="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 text-neutral-400 backdrop-blur-md transition hover:text-[#e10613]">
-          <Heart size={20} strokeWidth={2} />
+        <button
+          type="button"
+          aria-label={`Thêm ${product.title} vào danh sách yêu thích`}
+          className="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 text-neutral-400 backdrop-blur-md transition hover:text-[#e10613]"
+        >
+          <Heart
+            size={20}
+            strokeWidth={2}
+          />
         </button>
 
         {/* Badge Chính hãng */}
@@ -221,9 +412,7 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
 
       {/* 2. CONTENT AREA */}
       <div className="flex flex-1 flex-col px-3 pb-3 pt-5">
-        <p className="mb-1.5 text-[11px] font-black uppercase tracking-widest text-[#b38756]">
-          {product?.brand?.name || "NATURE'S WAY"}
-        </p>
+        {product.brand && typeof product.brand === 'object' && product.brand.name ? (<p className="mb-1.5 text-[11px] font-black uppercase tracking-widest text-[#b38756]"> {product.brand.name} </p>) : null}
 
         <Link href={`/products/${product.slug}`}>
           <h3 className="line-clamp-2 min-h-[44px] text-[17px] font-bold leading-tight text-neutral-900 transition hover:text-[#e10613]">
@@ -244,26 +433,29 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
         </div>
 
         {/* Đánh giá */}
-        <div className="mt-3 flex items-center gap-1 border-b border-neutral-50 pb-4">
-          <div className="flex gap-0.5 text-[#ffb800]">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} size={14} fill="currentColor" strokeWidth={0} />
-            ))}
+        {shouldShowRating ? (
+          <div className="mt-3 flex items-center gap-1 border-b border-neutral-50 pb-4">
+            <RatingStars rating={rating} />
+
+            <span className="ml-1 text-[13px] font-bold text-neutral-900">
+              {rating.toLocaleString('vi-VN', {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1,
+              })}
+            </span>
+
+            <span className="text-neutral-200">
+              |
+            </span>
+
+            <span className="text-[12px] text-neutral-400">
+              {reviewCount.toLocaleString(
+                'vi-VN',
+              )}{' '}
+              đánh giá
+            </span>
           </div>
-
-          <span className="ml-1 text-[13px] font-bold text-neutral-900">
-            {rating}
-          </span>
-
-          {reviewCount ? (
-            <>
-              <span className="text-neutral-200">|</span>
-              <span className="text-[12px] text-neutral-400">
-                {Number(reviewCount).toLocaleString('vi-VN')} đánh giá
-              </span>
-            </>
-          ) : null}
-        </div>
+        ) : null}
 
         {/* Chính sách 3 cột - Làm gọn lại */}
         <div className="grid grid-cols-3 py-4">
@@ -285,17 +477,40 @@ export const ProductCard = ({ product, className }: { product: any; className?: 
         <button
           type="button"
           onClick={handleAddToCart}
-          disabled={isOutOfStock}
+          disabled={
+            !isVariableProduct &&
+            isOutOfStock
+          }
+          aria-label={
+            isVariableProduct
+              ? `Chọn phân loại cho ${product.title}`
+              : `Thêm ${product.title} vào giỏ hàng`
+          }
           className="group/btn mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#e10613] py-4 text-[14px] font-black text-white shadow-lg shadow-red-100 transition-all hover:bg-black hover:shadow-neutral-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:shadow-none"
         >
-          <ShoppingBag size={19} className="transition-transform group-hover/btn:-rotate-12" />
-          {isOutOfStock
-            ? 'Hết hàng'
-            : isContactPrice
-              ? 'Liên hệ'
-              : added
-                ? 'Đã thêm vào giỏ'
-                : 'Thêm vào giỏ hàng'}
+          {isVariableProduct ? (
+            <Settings
+              aria-hidden="true"
+              size={19}
+              className="transition-transform duration-300 group-hover/btn:rotate-90"
+            />
+          ) : (
+            <ShoppingBag
+              aria-hidden="true"
+              size={19}
+              className="transition-transform group-hover/btn:-rotate-12"
+            />
+          )}
+
+          {isVariableProduct
+            ? 'Chọn phân loại'
+            : isOutOfStock
+              ? 'Hết hàng'
+              : isContactPrice
+                ? 'Liên hệ'
+                : added
+                  ? 'Đã thêm vào giỏ'
+                  : 'Thêm vào giỏ hàng'}
         </button>
       </div>
     </article>

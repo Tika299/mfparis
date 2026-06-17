@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { ChevronRight, Clock, ShieldCheck, Truck, Zap } from 'lucide-react'
 import { ProductCard } from '@/components/ProductCard'
@@ -12,13 +12,15 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from '@/components/ui/carousel'
+import { toast } from 'sonner'
 
-type FlashSaleVoucher = {
-    id?: string | null
-    title?: string | null
-    value?: string | null
-    sub?: string | null
-}
+type FlashSaleVoucher = Readonly<{
+    id: string | number
+    code: string
+    title: string
+    value: string
+    sub: string
+}>
 
 type FlashSaleSectionProps = {
     products: any[]
@@ -26,6 +28,14 @@ type FlashSaleSectionProps = {
     endTime: string
     vouchers?: FlashSaleVoucher[]
 }
+
+type VoucherBoxProps = Readonly<{
+    code: string
+    title: string
+    value: string
+    sub: string
+}>
+
 
 function getTimeLeft(endTime: string) {
     const end = new Date(endTime).getTime()
@@ -55,14 +65,30 @@ export function FlashSaleSection({
     vouchers = [],
 }: FlashSaleSectionProps) {
     const [activeCategory, setActiveCategory] = useState('all')
-    const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(endTime))
+    type TimeLeft = ReturnType<typeof getTimeLeft>
+
+    const [timeLeft, setTimeLeft] =
+        useState<TimeLeft | null>(null)
 
     useEffect(() => {
-        const timer = window.setInterval(() => {
+        const updateCountdown = (): void => {
             setTimeLeft(getTimeLeft(endTime))
-        }, 1000)
+        }
 
-        return () => window.clearInterval(timer)
+        /**
+         * Chỉ bắt đầu tính thời gian sau khi component
+         * đã mount trên trình duyệt.
+         */
+        updateCountdown()
+
+        const timer = window.setInterval(
+            updateCountdown,
+            1000,
+        )
+
+        return () => {
+            window.clearInterval(timer)
+        }
     }, [endTime])
 
     const availableCategories = useMemo(() => {
@@ -89,33 +115,15 @@ export function FlashSaleSection({
 
     const heroProducts = products.slice(0, 4)
 
-    const voucherItems =
-        vouchers.length > 0
-            ? vouchers
-            : [
-                {
-                    title: 'Voucher',
-                    value: '15K',
-                    sub: 'Đơn từ 799K',
-                },
-                {
-                    title: 'Voucher',
-                    value: '35K',
-                    sub: 'Đơn từ 1.499K',
-                },
-                {
-                    title: 'Voucher',
-                    value: '70K',
-                    sub: 'Đơn từ 2.499K',
-                },
-                {
-                    title: 'Theo dõi shop',
-                    value: 'Nhận 10K',
-                    sub: 'Ưu đãi thành viên',
-                },
-            ]
+    const voucherItems = vouchers
 
-    if (!products?.length || timeLeft.isEnded) return null
+    if (!products?.length) {
+        return null
+    }
+
+    if (timeLeft?.isEnded) {
+        return null
+    }
 
     return (
         <section className="container-ux mt-8 md:mt-10">
@@ -149,11 +157,40 @@ export function FlashSaleSection({
                                 </div>
 
                                 <div className="flex items-center gap-2 sm:gap-3">
-                                    <TimeBox value={pad(timeLeft.hours)} label="Giờ" />
-                                    <span className="text-xl font-black sm:text-2xl">:</span>
-                                    <TimeBox value={pad(timeLeft.minutes)} label="Phút" />
-                                    <span className="text-xl font-black sm:text-2xl">:</span>
-                                    <TimeBox value={pad(timeLeft.seconds)} label="Giây" />
+                                    <TimeBox
+                                        value={
+                                            timeLeft
+                                                ? pad(timeLeft.hours)
+                                                : '--'
+                                        }
+                                        label="Giờ"
+                                    />
+
+                                    <span className="text-xl font-black sm:text-2xl">
+                                        :
+                                    </span>
+
+                                    <TimeBox
+                                        value={
+                                            timeLeft
+                                                ? pad(timeLeft.minutes)
+                                                : '--'
+                                        }
+                                        label="Phút"
+                                    />
+
+                                    <span className="text-xl font-black sm:text-2xl">
+                                        :
+                                    </span>
+
+                                    <TimeBox
+                                        value={
+                                            timeLeft
+                                                ? pad(timeLeft.seconds)
+                                                : '--'
+                                        }
+                                        label="Giây"
+                                    />
                                 </div>
                             </div>
 
@@ -217,7 +254,11 @@ export function FlashSaleSection({
                     <div className="relative z-10 mt-8 grid grid-cols-2 gap-3 rounded-3xl bg-white p-3 text-[#b72828] shadow-xl md:grid-cols-3 lg:grid-cols-5">
                         {voucherItems.slice(0, 4).map((voucher, index) => (
                             <VoucherBox
-                                key={index}
+                                key={
+                                    voucher.id ??
+                                    `${voucher.code ?? 'voucher'}-${index}`
+                                }
+                                code={voucher.code?.trim() ?? ''}
                                 title={voucher.title || 'Voucher'}
                                 value={voucher.value || ''}
                                 sub={voucher.sub || ''}
@@ -357,28 +398,143 @@ function TimeBox({ value, label }: { value: string; label: string }) {
 }
 
 function VoucherBox({
+    code,
     title,
     value,
     sub,
-}: {
-    title: string
-    value: string
-    sub: string
-}) {
+}: VoucherBoxProps) {
+    const [isCopied, setIsCopied] =
+        useState(false)
+
+    const resetTimerRef = useRef<
+        number | null
+    >(null)
+
+    useEffect(() => {
+        return () => {
+            if (resetTimerRef.current !== null) {
+                window.clearTimeout(
+                    resetTimerRef.current,
+                )
+            }
+        }
+    }, [])
+
+    const handleCopyVoucher =
+        async (): Promise<void> => {
+            const normalizedCode = code
+                .trim()
+                .toUpperCase()
+
+            if (!normalizedCode) {
+                toast.error(
+                    'Voucher này chưa được thiết lập mã.',
+                )
+
+                return
+            }
+
+            try {
+                await navigator.clipboard.writeText(
+                    normalizedCode,
+                )
+
+                setIsCopied(true)
+
+                toast.success(
+                    `Đã lưu mã: ${normalizedCode}`,
+                )
+
+                if (resetTimerRef.current !== null) {
+                    window.clearTimeout(
+                        resetTimerRef.current,
+                    )
+                }
+
+                resetTimerRef.current =
+                    window.setTimeout(() => {
+                        setIsCopied(false)
+                        resetTimerRef.current = null
+                    }, 3000)
+            } catch (error: unknown) {
+                console.error(
+                    '[VoucherBox] Copy voucher failed:',
+                    error,
+                )
+
+                toast.error(
+                    'Không thể sao chép mã. Vui lòng thử lại.',
+                )
+            }
+        }
+
     return (
-        <div className="rounded-2xl border border-red-100 bg-white px-3 py-3 text-center sm:px-4">
-            <p className="text-[9px] font-black uppercase tracking-widest text-red-400 sm:text-[10px]">
+        <button
+            type="button"
+            onClick={() => {
+                void handleCopyVoucher()
+            }}
+            disabled={!code.trim()}
+            aria-label={
+                isCopied
+                    ? `Đã lưu mã ${code}`
+                    : `Lưu mã voucher ${code}`
+            }
+            className={[
+                'group relative w-full overflow-hidden rounded-2xl border px-3 py-3 text-center transition-all duration-300 sm:px-4',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b72828] focus-visible:ring-offset-2',
+                'disabled:cursor-not-allowed disabled:opacity-60',
+                isCopied
+                    ? 'border-emerald-200 bg-emerald-50 shadow-inner'
+                    : 'border-red-100 bg-white hover:-translate-y-0.5 hover:border-[#b72828]/30 hover:shadow-md',
+            ].join(' ')}
+        >
+            <p
+                className={[
+                    'text-[9px] font-black uppercase tracking-widest transition-colors sm:text-[10px]',
+                    isCopied
+                        ? 'text-emerald-600'
+                        : 'text-red-400',
+                ].join(' ')}
+            >
                 {title}
             </p>
-            <p className="mt-1 text-xl font-black uppercase leading-none text-[#b72828] sm:text-2xl">
+
+            <p
+                className={[
+                    'mt-1 text-xl font-black uppercase leading-none transition-colors sm:text-2xl',
+                    isCopied
+                        ? 'text-emerald-700'
+                        : 'text-[#b72828]',
+                ].join(' ')}
+            >
                 {value}
             </p>
+
             <p className="mt-1 text-[9px] font-bold uppercase text-gray-600 sm:text-[10px]">
                 {sub}
             </p>
-        </div>
+
+            {code.trim() ? (
+                <p className="mt-2 truncate font-mono text-[10px] font-black uppercase tracking-wider text-gray-500">
+                    Mã: {code}
+                </p>
+            ) : null}
+
+            <span
+                className={[
+                    'mt-2 inline-flex min-h-7 items-center justify-center rounded-full px-3 text-[10px] font-black uppercase tracking-wider transition-all',
+                    isCopied
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-red-50 text-[#b72828] group-hover:bg-[#b72828] group-hover:text-white',
+                ].join(' ')}
+            >
+                {isCopied ? 'Đã lưu' : 'Lưu mã'}
+            </span>
+        </button>
     )
 }
+
 
 function MiniTrust({
     icon,

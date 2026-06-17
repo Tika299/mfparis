@@ -35,6 +35,10 @@ import type {
   Product,
 } from '@/payload-types'
 import { SITE_ORIGIN } from '@/utilities/seo'
+import {
+  ProductReviews,
+  type ProductReviewItem,
+} from '@/components/product/ProductReviews'
 
 export const revalidate = 300
 export const dynamicParams = true
@@ -48,6 +52,8 @@ const MAX_REDIRECT_HOPS = 5
 const PRODUCTS_CACHE_TAG = 'products'
 const BRANDS_CACHE_TAG = 'brands'
 const CATEGORIES_CACHE_TAG = 'categories'
+const REVIEWS_CACHE_TAG = 'reviews'
+const APPROVED_REVIEWS_LIMIT = 20
 
 type ProductPageProps = Readonly<{
   params: Promise<{
@@ -654,6 +660,239 @@ async function loadRelatedProducts(
   )
 }
 
+function normalizeAverageRating(
+  value: unknown,
+): number | null {
+  if (
+    typeof value !== 'number' ||
+    !Number.isFinite(value) ||
+    value <= 0
+  ) {
+    return null
+  }
+
+  return Math.min(5, value)
+}
+
+function normalizeReviewCount(
+  value: unknown,
+): number {
+  if (
+    typeof value !== 'number' ||
+    !Number.isFinite(value) ||
+    value <= 0
+  ) {
+    return 0
+  }
+
+  return Math.floor(value)
+}
+
+function getOptionalString(
+  value: unknown,
+): string | null {
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const normalizedValue = value.trim()
+
+  return normalizedValue || null
+}
+
+function normalizeReviewUser(
+  value: unknown,
+): ProductReviewItem['user'] {
+  if (isRelationshipID(value)) {
+    return value
+  }
+
+  if (!isRecord(value)) {
+    return null
+  }
+
+  const id = getRelationshipID(value)
+
+  if (id === null) {
+    return null
+  }
+
+  return {
+    id,
+    name: getOptionalString(value.name),
+    displayName: getOptionalString(
+      value.displayName,
+    ),
+    firstName: getOptionalString(
+      value.firstName,
+    ),
+    lastName: getOptionalString(
+      value.lastName,
+    ),
+  }
+}
+
+function toProductReviewItem(
+  value: unknown,
+): ProductReviewItem | null {
+  if (!isRecord(value)) {
+    return null
+  }
+
+  const id = getRelationshipID(value.id)
+  const rating = Number(value.rating)
+
+  if (
+    id === null ||
+    !Number.isFinite(rating) ||
+    rating < 1 ||
+    rating > 5
+  ) {
+    return null
+  }
+
+  return {
+    id,
+    rating,
+    comment: getOptionalString(
+      value.comment,
+    ),
+    createdAt: getOptionalString(
+      value.createdAt,
+    ),
+    updatedAt: getOptionalString(
+      value.updatedAt,
+    ),
+    user: normalizeReviewUser(
+      value.user,
+    ),
+  }
+}
+
+const getApprovedReviews = cache(
+  async (
+    productID: Product['id'],
+  ): Promise<ProductReviewItem[]> => {
+    const cachedQuery = unstable_cache(
+      async (): Promise<ProductReviewItem[]> => {
+        const payload = await getPayload({
+          config: configPromise,
+        })
+
+        const result = await payload.find({
+          collection: 'reviews',
+
+          where: {
+            and: [
+              {
+                product: {
+                  equals: productID,
+                },
+              },
+              {
+                status: {
+                  equals: 'approved',
+                },
+              },
+            ],
+          },
+
+          sort: '-createdAt',
+          limit: APPROVED_REVIEWS_LIMIT,
+          depth: 1,
+
+          /**
+           * Áp dụng access.read của Reviews.
+           * Public chỉ được đọc review approved.
+           */
+          overrideAccess: false,
+
+          select: {
+            rating: true,
+            comment: true,
+            user: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        })
+
+        return result.docs
+          .map(toProductReviewItem)
+          .filter(
+            (
+              review,
+            ): review is ProductReviewItem =>
+              review !== null,
+          )
+      },
+      [
+        'mfparis-approved-reviews-v1',
+        String(productID),
+      ],
+      {
+        revalidate:
+          PRODUCT_REVALIDATE_SECONDS,
+        tags: [
+          REVIEWS_CACHE_TAG,
+          `reviews:product:${productID}`,
+        ],
+      },
+    )
+
+    return cachedQuery()
+  },
+)
+
+function ProductRatingStars({
+  rating,
+}: Readonly<{
+  rating: number
+}>): JSX.Element {
+  const normalizedRating = Math.min(
+    5,
+    Math.max(0, rating),
+  )
+
+  /**
+   * Chỉ làm tròn phần hiển thị ngôi sao.
+   * Con số điểm bên cạnh vẫn giữ chính xác.
+   *
+   * Ví dụ:
+   * 4.2 hiển thị 4 sao
+   * 4.8 hiển thị 5 sao
+   */
+  const filledStarCount = Math.round(
+    normalizedRating,
+  )
+
+  return (
+    <span
+      role="img"
+      aria-label={`${normalizedRating.toLocaleString(
+        'vi-VN',
+        {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 1,
+        },
+      )} trên 5 sao`}
+      className="inline-flex shrink-0 items-center gap-1 leading-none"
+    >
+      {Array.from(
+        { length: 5 },
+        (_, index) => {
+          const isFilled =
+            index < filledStarCount
+
+          return (
+            <Star key={index} aria-hidden="true" size={18} strokeWidth={1.5} color={isFilled ? '#F6A800' : '#E5E7EB'} fill={isFilled ? '#F6A800' : '#E5E7EB'} style={{ color: isFilled ? '#F6A800' : '#E5E7EB', fill: isFilled ? '#F6A800' : '#E5E7EB', flexShrink: 0, }} />
+          )
+        },
+      )}
+    </span>
+  )
+}
+
+
 function StockAlertForm({
   product,
 }: Readonly<{
@@ -907,11 +1146,38 @@ export default async function ProductPage({
       ? DISCONTINUED_RELATED_PRODUCTS_LIMIT
       : DEFAULT_RELATED_PRODUCTS_LIMIT
 
-  const relatedProducts =
-    await loadRelatedProducts(
+  const [
+    relatedProducts,
+    approvedReviews,
+  ] = await Promise.all([
+    loadRelatedProducts(
       product,
       relatedProductsLimit,
-    )
+    ),
+
+    getApprovedReviews(product.id),
+  ])
+
+  const averageRating =
+    typeof product.averageRating === 'number' &&
+      Number.isFinite(product.averageRating) &&
+      product.averageRating > 0
+      ? Math.min(5, product.averageRating)
+      : null
+
+  const reviewCount =
+    typeof product.reviewCount === 'number' &&
+      Number.isFinite(product.reviewCount) &&
+      product.reviewCount > 0
+      ? Math.floor(product.reviewCount)
+      : 0
+
+  const displayRating =
+    averageRating !== null &&
+      reviewCount > 0
+      ? averageRating
+      : null
+
 
   return (
     <div
@@ -991,27 +1257,55 @@ export default async function ProductPage({
                   {product.title}
                 </h1>
 
-                <div className="mt-4 flex items-center gap-4">
-                  <div
-                    className="flex items-center gap-1 text-yellow-500"
-                    aria-label="Đánh giá 5 trên 5 sao"
-                  >
-                    {Array.from(
-                      { length: 5 },
-                      (_, index) => (
-                        <Star
-                          key={index}
-                          aria-hidden="true"
-                          size={18}
-                          fill="currentColor"
-                        />
-                      ),
-                    )}
+                <div className="mt-4 min-h-6">
+                  {displayRating !== null ? (
+                    <Link
+                      href="#product-reviews-heading"
+                      aria-label={`${displayRating.toLocaleString(
+                        'vi-VN',
+                        {
+                          minimumFractionDigits: 1,
+                          maximumFractionDigits: 1,
+                        },
+                      )} trên 5 sao từ ${reviewCount.toLocaleString(
+                        'vi-VN',
+                      )} đánh giá`}
+                      className="inline-flex w-fit flex-nowrap items-center gap-2 whitespace-nowrap rounded-md leading-none outline-none transition-opacity hover:opacity-75 focus-visible:ring-2 focus-visible:ring-[#B72828] focus-visible:ring-offset-2"
+                    >
+                      <ProductRatingStars
+                        rating={displayRating}
+                      />
 
-                    <span className="ml-1 text-sm font-bold text-gray-700">
-                      5.0
-                    </span>
-                  </div>
+                      <span className="shrink-0 text-sm font-black tabular-nums text-gray-900">
+                        {displayRating.toLocaleString(
+                          'vi-VN',
+                          {
+                            minimumFractionDigits: 1,
+                            maximumFractionDigits: 1,
+                          },
+                        )}
+                      </span>
+
+                      <span
+                        aria-hidden="true"
+                        className="h-4 w-px shrink-0 bg-gray-200"
+                      />
+
+                      <span className="shrink-0 text-sm font-medium text-gray-500">
+                        {reviewCount.toLocaleString(
+                          'vi-VN',
+                        )}{' '}
+                        đánh giá
+                      </span>
+                    </Link>
+                  ) : (
+                    <Link
+                      href="#product-reviews-heading"
+                      className="inline-flex items-center text-sm font-medium text-gray-500 transition-colors hover:text-[#B72828]"
+                    >
+                      Chưa có đánh giá · Viết đánh giá đầu tiên
+                    </Link>
+                  )}
                 </div>
               </div>
 
@@ -1140,6 +1434,11 @@ export default async function ProductPage({
             />
             <ProductRichTextContent
               description={product.description}
+            />
+
+            <ProductReviews
+              productId={product.id}
+              reviews={approvedReviews}
             />
 
             <div className="rounded-[2.5rem] bg-[#16423C] p-8 text-white md:p-10">

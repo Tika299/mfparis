@@ -84,6 +84,7 @@ export interface Config {
     'attribute-values': AttributeValue;
     carts: Cart;
     'fragrance-notes': FragranceNote;
+    reviews: Review;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -107,6 +108,7 @@ export interface Config {
     'attribute-values': AttributeValuesSelect<false> | AttributeValuesSelect<true>;
     carts: CartsSelect<false> | CartsSelect<true>;
     'fragrance-notes': FragranceNotesSelect<false> | FragranceNotesSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -406,6 +408,14 @@ export interface Product {
    * Tự động tạo từ tên sản phẩm, có thể chỉnh tay để tối ưu SEO.
    */
   slug: string;
+  /**
+   * Được tính tự động từ các review đã duyệt.
+   */
+  averageRating?: number | null;
+  /**
+   * Tổng số review đã duyệt của sản phẩm.
+   */
+  reviewCount?: number | null;
   status?: ('draft' | 'published') | null;
   displayLocation?: ('best-seller' | 'combo' | 'new-arrival' | 'flash-sale')[] | null;
   updatedAt: string;
@@ -784,6 +794,32 @@ export interface Cart {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  /**
+   * Sản phẩm được khách hàng đánh giá.
+   */
+  product: number | Product;
+  /**
+   * Tự động lấy từ người đang đăng nhập. Để trống nếu khách gửi ẩn danh.
+   */
+  user?: (number | null) | User;
+  /**
+   * Điểm đánh giá từ 1 đến 5 sao.
+   */
+  rating: number;
+  comment?: string | null;
+  /**
+   * Chỉ review đã duyệt mới được tính vào điểm trung bình của sản phẩm.
+   */
+  status: 'pending' | 'approved' | 'rejected';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -869,6 +905,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'fragrance-notes';
         value: number | FragranceNote;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: number | Review;
       } | null);
   globalSlug?: string | null;
   user:
@@ -1081,6 +1121,8 @@ export interface ProductsSelect<T extends boolean = true> {
   seoTitle?: T;
   seoDescription?: T;
   slug?: T;
+  averageRating?: T;
+  reviewCount?: T;
   status?: T;
   displayLocation?: T;
   updatedAt?: T;
@@ -1351,6 +1393,19 @@ export interface FragranceNotesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  product?: T;
+  user?: T;
+  rating?: T;
+  comment?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1423,14 +1478,10 @@ export interface SiteSetting {
   flashSale?: {
     enabled?: boolean | null;
     endTime?: string | null;
-    vouchers?:
-      | {
-          title?: string | null;
-          value?: string | null;
-          sub?: string | null;
-          id?: string | null;
-        }[]
-      | null;
+    /**
+     * Chọn tối đa 4 voucher từ kho voucher. Có thể kéo thả để thay đổi thứ tự hiển thị.
+     */
+    vouchers?: (number | Voucher)[] | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1513,14 +1564,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
     | {
         enabled?: T;
         endTime?: T;
-        vouchers?:
-          | T
-          | {
-              title?: T;
-              value?: T;
-              sub?: T;
-              id?: T;
-            };
+        vouchers?: T;
       };
   updatedAt?: T;
   createdAt?: T;

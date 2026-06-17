@@ -412,7 +412,7 @@ function ScoreItem({
         {label}
       </p>
 
-      <p className="font-sans text-xl text-[#1D1915]">
+      <p className="font-sans text-xl font-medium text-[#1D1915]">
         {Number.isInteger(score)
           ? score
           : score.toFixed(1)}

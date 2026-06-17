@@ -23,6 +23,7 @@ import { Attributes } from '@/collections/Attributes'
 import { AttributeValues } from '@/collections/AttributeValues'
 import { Carts } from '@/collections/Carts'
 import { FragranceNotes } from './collections/FragranceNotes'
+import { Reviews } from '@/collections/Reviews'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -61,6 +62,7 @@ export default buildConfig({
     AttributeValues,
     Carts,
     FragranceNotes,
+    Reviews,
   ],
   globals: [SiteSettings, AboutPage],
   editor: lexicalEditor(),

@@ -23,6 +23,7 @@ import {
 import Link from 'next/link'
 import { HomeProductTabs } from '@/components/HomeProductTabs'
 import { FlashSaleSection } from '@/components/FlashSaleSection'
+import type { Voucher } from '@/payload-types'
 
 // ─── Dữ liệu tĩnh ────────────────────────────────────────────────────────────
 
@@ -63,6 +64,163 @@ const chunkByTwo = <T,>(items: T[]) => {
   return chunks
 }
 
+type FlashSaleVoucherDTO = Readonly<{
+  id: Voucher['id']
+  code: string
+  title: string
+  value: string
+  sub: string
+}>
+
+function isPopulatedVoucher(
+  value: number | Voucher,
+): value is Voucher {
+  return (
+    typeof value === 'object' &&
+    value !== null
+  )
+}
+
+function formatCompactVND(
+  amount: number,
+): string {
+  if (amount >= 1_000_000) {
+    return `${(
+      amount / 1_000_000
+    ).toLocaleString('vi-VN', {
+      maximumFractionDigits: 1,
+    })
+      } TR`
+  }
+
+  if (amount >= 1_000) {
+    return `${(
+      amount / 1_000
+    ).toLocaleString('vi-VN', {
+      maximumFractionDigits: 0,
+    })
+      } K`
+  }
+
+  return `${amount.toLocaleString(
+    'vi-VN',
+  )
+    } Đ`
+}
+
+function isVoucherAvailable(
+  voucher: Voucher,
+  currentTime: number,
+): boolean {
+  if (voucher.status !== 'active') {
+    return false
+  }
+
+  if (voucher.startsAt) {
+    const startsAt =
+      new Date(voucher.startsAt).getTime()
+
+    if (
+      Number.isFinite(startsAt) &&
+      startsAt > currentTime
+    ) {
+      return false
+    }
+  }
+
+  if (voucher.endsAt) {
+    const endsAt =
+      new Date(voucher.endsAt).getTime()
+
+    if (
+      Number.isFinite(endsAt) &&
+      endsAt <= currentTime
+    ) {
+      return false
+    }
+  }
+
+  const usageLimit = Number(
+    voucher.usageLimit ?? 0,
+  )
+
+  const usedCount = Number(
+    voucher.usedCount ?? 0,
+  )
+
+  if (
+    usageLimit > 0 &&
+    usedCount >= usageLimit
+  ) {
+    return false
+  }
+
+  return true
+}
+
+function toFlashSaleVoucherDTO(
+  voucher: Voucher,
+): FlashSaleVoucherDTO | null {
+  const code = voucher.code
+    ?.trim()
+    .toUpperCase()
+
+  const discountValue = Number(
+    voucher.value ?? 0,
+  )
+
+  if (
+    !code ||
+    !Number.isFinite(discountValue) ||
+    discountValue <= 0
+  ) {
+    return null
+  }
+
+  const value =
+    voucher.type === 'percent'
+      ? `${discountValue.toLocaleString(
+        'vi-VN',
+      )
+      }% `
+      : formatCompactVND(discountValue)
+
+  const minimumOrderAmount = Number(
+    voucher.minOrderAmount ?? 0,
+  )
+
+  const maximumDiscountAmount = Number(
+    voucher.maxDiscountAmount ?? 0,
+  )
+
+  let sub =
+    minimumOrderAmount > 0
+      ? `Đơn từ ${formatCompactVND(
+        minimumOrderAmount,
+      )
+      } `
+      : 'Không yêu cầu đơn tối thiểu'
+
+  if (
+    voucher.type === 'percent' &&
+    maximumDiscountAmount > 0
+  ) {
+    sub += ` · Tối đa ${formatCompactVND(
+      maximumDiscountAmount,
+    )
+      } `
+  }
+
+  return {
+    id: voucher.id,
+    code,
+    title:
+      voucher.title?.trim() || 'Voucher',
+    value,
+    sub,
+  }
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
@@ -78,7 +236,10 @@ export default async function HomePage() {
     brandsRes,
     postsRes,
   ] = await Promise.all([
-    payload.findGlobal({ slug: 'site-settings' }),
+    payload.findGlobal({
+      slug: 'site-settings',
+      depth: 1,
+    }),
     payload.find({
       collection: 'products',
       where: {
@@ -130,6 +291,28 @@ export default async function HomePage() {
   const categoryPairs = chunkByTwo(categoriesRes.docs)
   const brandPairs = chunkByTwo(brandsRes.docs)
 
+  const currentTime = Date.now()
+
+  const flashSaleVouchers =
+    (
+      settings.flashSale?.vouchers ?? []
+    )
+      .filter(isPopulatedVoucher)
+      .filter((voucher) =>
+        isVoucherAvailable(
+          voucher,
+          currentTime,
+        ),
+      )
+      .map(toFlashSaleVoucherDTO)
+      .filter(
+        (
+          voucher,
+        ): voucher is FlashSaleVoucherDTO =>
+          voucher !== null,
+      )
+      .slice(0, 4)
+
   return (
     <main className="min-h-screen pb-16 antialiased">
 
@@ -149,11 +332,11 @@ export default async function HomePage() {
             return (
               <div
                 key={item.title}
-                className={`flex items-center gap-3 lg:justify-center ${!isLast ? 'lg:border-r lg:border-gray-100' : ''
-                  }`}
+                className={`flex items - center gap - 3 lg: justify - center ${!isLast ? 'lg:border-r lg:border-gray-100' : ''
+                  } `}
               >
                 <div
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${item.iconClass}`}
+                  className={`flex h - 10 w - 10 shrink - 0 items - center justify - center rounded - full ${item.iconClass} `}
                 >
                   <Icon size={20} />
                 </div>
@@ -174,8 +357,11 @@ export default async function HomePage() {
         <FlashSaleSection
           products={flashSaleRes.docs}
           categories={categoriesRes.docs}
-          endTime={settings?.flashSale?.endTime || '2026-06-30T23:59:59+07:00'}
-          vouchers={settings?.flashSale?.vouchers || []}
+          endTime={
+            settings.flashSale?.endTime ||
+            '2026-06-30T23:59:59+07:00'
+          }
+          vouchers={flashSaleVouchers}
         />
       )}
 
@@ -223,7 +409,7 @@ export default async function HomePage() {
                     {pair.map((cat: any) => (
                       <Link
                         key={cat.id}
-                        href={`/categories/${cat.slug}`}
+                        href={`/ categories / ${cat.slug} `}
                         className="group flex min-w-0 flex-col items-center rounded-2xl border border-transparent p-2.5 transition-colors hover:border-primary/20"
                       >
                         <div className="mb-3 flex h-[86px] w-[86px] items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-white md:h-[102px] md:w-[102px]">
@@ -324,7 +510,7 @@ export default async function HomePage() {
                     return (
                       <Link
                         key={brand.id}
-                        href={`/brands/${brand.slug}`}
+                        href={`/ brands / ${brand.slug} `}
                         className="group flex h-20 items-center justify-center rounded-2xl border border-neutral-50 bg-white px-4 opacity-50 grayscale transition duration-700 hover:border-primary/30 hover:opacity-100 hover:grayscale-0 hover:shadow-inner"
                       >
                         {hasLogo ? (
@@ -385,7 +571,7 @@ export default async function HomePage() {
                       className="basis-full pl-6 sm:basis-1/2 md:pl-8 lg:basis-1/3"
                     >
                       <article className="group h-full">
-                        <Link href={`/blog/${post.slug}`} className="block h-full">
+                        <Link href={`/ blog / ${post.slug} `} className="block h-full">
 
                           {/* Thumbnail */}
                           <div className="relative aspect-video overflow-hidden rounded-[1.5rem] bg-neutral-100 shadow-md md:rounded-[2rem]">

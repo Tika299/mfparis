@@ -114,29 +114,25 @@ export const SiteSettings: GlobalConfig = {
         },
         {
           name: 'vouchers',
-          type: 'array',
-          label: 'Danh sách voucher',
+          type: 'relationship',
+          relationTo: 'vouchers',
+          hasMany: true,
           maxRows: 4,
-          fields: [
-            {
-              name: 'title',
-              type: 'text',
-              label: 'Tiêu đề',
-              defaultValue: 'Voucher',
+          label: 'Voucher hiển thị tại Flash Sale',
+
+          filterOptions: {
+            status: {
+              equals: 'active',
             },
-            {
-              name: 'value',
-              type: 'text',
-              label: 'Giá trị',
-              defaultValue: '15K',
-            },
-            {
-              name: 'sub',
-              type: 'text',
-              label: 'Điều kiện',
-              defaultValue: 'Đơn từ 799K',
-            },
-          ],
+          },
+
+          admin: {
+            isSortable: true,
+            allowCreate: true,
+            allowEdit: true,
+            description:
+              'Chọn tối đa 4 voucher từ kho voucher. Có thể kéo thả để thay đổi thứ tự hiển thị.',
+          },
         },
       ],
     },
