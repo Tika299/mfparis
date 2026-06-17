@@ -114,7 +114,27 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "products" ADD COLUMN "related_product_id" integer;
   ALTER TABLE "products_rels" ADD COLUMN "attribute_values_id" integer;
   ALTER TABLE "orders_items" ADD COLUMN "variant_id" varchar;
-  ALTER TABLE "orders_items" ADD COLUMN "product_title_snapshot" varchar NOT NULL;
+  
+ALTER TABLE "orders_items"
+ADD COLUMN "product_title_snapshot" varchar;
+
+UPDATE "orders_items" AS "order_item"
+SET "product_title_snapshot" = COALESCE(
+  "product"."title",
+  'Sản phẩm'
+)
+FROM "products" AS "product"
+WHERE
+  "order_item"."product_id" = "product"."id"
+  AND "order_item"."product_title_snapshot" IS NULL;
+
+UPDATE "orders_items"
+SET "product_title_snapshot" = 'Sản phẩm'
+WHERE "product_title_snapshot" IS NULL;
+
+ALTER TABLE "orders_items"
+ALTER COLUMN "product_title_snapshot" SET NOT NULL;
+
   ALTER TABLE "orders_items" ADD COLUMN "variant_name_snapshot" varchar;
   ALTER TABLE "orders_items" ADD COLUMN "sku_snapshot" varchar;
   ALTER TABLE "payload_locked_documents_rels" ADD COLUMN "attributes_id" integer;
