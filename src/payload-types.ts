@@ -85,6 +85,7 @@ export interface Config {
     carts: Cart;
     'fragrance-notes': FragranceNote;
     reviews: Review;
+    'voucher-redemptions': VoucherRedemption;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -109,6 +110,7 @@ export interface Config {
     carts: CartsSelect<false> | CartsSelect<true>;
     'fragrance-notes': FragranceNotesSelect<false> | FragranceNotesSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
+    'voucher-redemptions': VoucherRedemptionsSelect<false> | VoucherRedemptionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -592,7 +594,7 @@ export interface Order {
     | null;
   totalAmount: number;
   paymentMethod?: ('cod' | 'bank_transfer' | 'fundiin') | null;
-  status?: ('pending' | 'confirmed' | 'shipping' | 'completed' | 'cancelled') | null;
+  status?: ('pending' | 'confirmed' | 'shipping' | 'completed' | 'cancelled' | 'failed') | null;
   fundiin?: {
     transactionId?: string | null;
     paymentStatus?: string | null;
@@ -612,27 +614,41 @@ export interface Order {
 export interface Voucher {
   id: number;
   /**
-   * VD: FLASH15, MDF50K, FREESHIP
+   * VD: FLASH15, MDF50K, FREESHIP. Mã sẽ tự động được trim và chuyển thành chữ in hoa.
    */
   code: string;
   title?: string | null;
-  status?: ('active' | 'inactive') | null;
+  status: 'active' | 'draft' | 'inactive';
+  /**
+   * Chỉ voucher công khai mới được hiển thị cho khách hàng. API checkout nội bộ vẫn có thể xác thực voucher riêng tư bằng overrideAccess.
+   */
+  isPublic: boolean;
   type: 'fixed' | 'percent';
   /**
    * Nếu fixed: nhập 50000. Nếu percent: nhập 10 tương ứng 10%.
    */
   value: number;
+  /**
+   * Nhập 0 nếu voucher không yêu cầu giá trị đơn tối thiểu.
+   */
   minOrderAmount?: number | null;
   /**
-   * Chỉ cần dùng cho voucher phần trăm. VD: giảm 10% tối đa 100.000đ.
+   * Chỉ cần dùng cho voucher phần trăm. Ví dụ giảm 10% tối đa 100.000đ. Nhập 0 nếu không giới hạn.
    */
   maxDiscountAmount?: number | null;
   startsAt?: string | null;
   endsAt?: string | null;
   /**
-   * Để trống hoặc 0 nếu không giới hạn.
+   * Để 0 nếu không giới hạn tổng lượt dùng.
    */
   usageLimit?: number | null;
+  /**
+   * Ví dụ nhập 1 để mỗi tài khoản hoặc email chỉ được dùng một lần. Để 0 nếu không giới hạn.
+   */
+  usageLimitPerCustomer?: number | null;
+  /**
+   * Chỉ được cập nhật bởi Voucher Service khi redemption chuyển sang completed.
+   */
   usedCount?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -819,6 +835,32 @@ export interface Review {
   createdAt: string;
 }
 /**
+ * Sổ lịch sử giữ lượt, hoàn tất và hủy voucher. Không chỉnh sửa thủ công.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "voucher-redemptions".
+ */
+export interface VoucherRedemption {
+  id: number;
+  voucher: number | Voucher;
+  order: number | Order;
+  /**
+   * Có thể để trống nếu khách mua hàng không đăng nhập.
+   */
+  customer?: (number | null) | User;
+  /**
+   * Bắt buộc khi redemption không có customer.
+   */
+  email?: string | null;
+  discountAmount: number;
+  status: 'held' | 'completed' | 'cancelled';
+  heldAt?: string | null;
+  completedAt?: string | null;
+  cancelledAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -909,6 +951,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'reviews';
         value: number | Review;
+      } | null)
+    | ({
+        relationTo: 'voucher-redemptions';
+        value: number | VoucherRedemption;
       } | null);
   globalSlug?: string | null;
   user:
@@ -1262,6 +1308,7 @@ export interface VouchersSelect<T extends boolean = true> {
   code?: T;
   title?: T;
   status?: T;
+  isPublic?: T;
   type?: T;
   value?: T;
   minOrderAmount?: T;
@@ -1269,6 +1316,7 @@ export interface VouchersSelect<T extends boolean = true> {
   startsAt?: T;
   endsAt?: T;
   usageLimit?: T;
+  usageLimitPerCustomer?: T;
   usedCount?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1401,6 +1449,23 @@ export interface ReviewsSelect<T extends boolean = true> {
   rating?: T;
   comment?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "voucher-redemptions_select".
+ */
+export interface VoucherRedemptionsSelect<T extends boolean = true> {
+  voucher?: T;
+  order?: T;
+  customer?: T;
+  email?: T;
+  discountAmount?: T;
+  status?: T;
+  heldAt?: T;
+  completedAt?: T;
+  cancelledAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

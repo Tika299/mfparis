@@ -24,6 +24,7 @@ import { AttributeValues } from '@/collections/AttributeValues'
 import { Carts } from '@/collections/Carts'
 import { FragranceNotes } from './collections/FragranceNotes'
 import { Reviews } from '@/collections/Reviews'
+import { VoucherRedemptions } from '@/collections/VoucherRedemptions'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -63,6 +64,7 @@ export default buildConfig({
     Carts,
     FragranceNotes,
     Reviews,
+    VoucherRedemptions,
   ],
   globals: [SiteSettings, AboutPage],
   editor: lexicalEditor(),
@@ -70,11 +72,12 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  db: postgresAdapter({
-    pool: {
-      connectionString: process.env.DATABASE_URL || '',
-    },
-  }),
+  db: postgresAdapter(
+    {
+      pool: { connectionString: process.env.DATABASE_URL, },
+      transactionOptions: { isolationLevel: 'serializable', },
+    }
+  ),
   sharp,
   plugins: [],
   email: nodemailerAdapter({

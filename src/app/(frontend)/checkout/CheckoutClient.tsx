@@ -12,6 +12,31 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 import { FundiinCheckoutElement } from '@/components/FundiinCheckoutElement'
 
+type ValidatedCheckoutItem = Readonly<{
+    id: string | number
+    productId?: string | number | null
+    variantId?: string | null
+    variantName?: string | null
+    baseTitle?: string | null
+    title?: string | null
+    sku?: string | null
+    image?: string | null
+    quantity: number
+    price?: number | null
+    latestPrice?: number | null
+    stock?: number | null
+    latestStock?: number | null
+    isAvailable?: boolean
+    isOutOfStock?: boolean
+    isContactPrice?: boolean
+}>
+
+type CartValidationResponse = Readonly<{
+    items?: ValidatedCheckoutItem[]
+    invalidItems?: ValidatedCheckoutItem[]
+    error?: string
+}>
+
 export default function CheckoutPage() {
     const router = useRouter()
     const [isClient, setIsClient] = useState(false)
@@ -51,135 +76,298 @@ export default function CheckoutPage() {
         setIsClient(true)
     }, [])
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        if (items.length === 0) return
+    const handleSubmit = async (
+        event: React.FormEvent<HTMLFormElement>,
+    ): Promise<void> => {
+        event.preventDefault()
+
+        if (items.length === 0) {
+            return
+        }
+
+        /**
+         * Phải đọc form ngay, trước câu lệnh await đầu tiên.
+         * Không sử dụng event.currentTarget sau khi đã await.
+         */
+        const formElement = event.currentTarget
+        const formData = new FormData(formElement)
+
+        const fullName = String(
+            formData.get('fullName') ?? '',
+        ).trim()
+
+        const phone = String(
+            formData.get('phone') ?? '',
+        ).trim()
+
+        const email = String(
+            formData.get('email') ?? '',
+        ).trim()
+
+        const address = String(
+            formData.get('address') ?? '',
+        ).trim()
+
+        const province = String(
+            formData.get('province') ?? '',
+        ).trim()
+
+        const district = String(
+            formData.get('district') ?? '',
+        ).trim()
+
+        const ward = String(
+            formData.get('ward') ?? '',
+        ).trim()
+
         setLoading(true)
 
-        const validateRes = await fetch('/api/cart/validate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ items }),
-        })
-
-        const validateData = await validateRes.json()
-        const validatedItems = Array.isArray(validateData.items) ? validateData.items : []
-        if (validatedItems.length === 0) {
-            toast.error('Giỏ hàng không hợp lệ')
-            router.push('/cart')
-            setLoading(false)
-            return
-        }
-
-        if (!validateRes.ok) {
-            toast.error(validateData?.error || 'Không thể kiểm tra tồn kho')
-            setLoading(false)
-            return
-        }
-
-        if (Array.isArray(validateData.items)) {
-            syncItems(validateData.items)
-        }
-
-        if (validateData.invalidItems?.length > 0) {
-            toast.error('Một số sản phẩm đã hết hàng, vượt tồn kho hoặc cần liên hệ báo giá')
-            router.push('/cart')
-            setLoading(false)
-            return
-        }
-
-        const purchasableItems = validatedItems.filter((item: any) => {
-            const price = Number(item.latestPrice || item.price || 0)
-            const stock = Number(item.latestStock || item.stock || 0)
-            const quantity = Number(item.quantity || 0)
-
-            return (
-                item.isAvailable !== false &&
-                item.isOutOfStock !== true &&
-                item.isContactPrice !== true &&
-                price > 0 &&
-                stock > 0 &&
-                quantity > 0 &&
-                quantity <= stock
-            )
-        })
-
-        if (purchasableItems.length === 0) {
-            toast.error('Không có sản phẩm hợp lệ để thanh toán')
-            router.push('/cart')
-            setLoading(false)
-            return
-        }
-
-        const validatedTotalPrice = purchasableItems.reduce(
-            (total: number, item: any) =>
-                total + Number(item.latestPrice || item.price || 0) * Number(item.quantity || 0),
-            0,
-        )
-
-        const formData = new FormData(e.currentTarget)
-
-        const orderData = {
-            fullName: formData.get('fullName'),
-            phone: formData.get('phone'),
-            address: formData.get('address'),
-            province: formData.get('province'),
-            items: purchasableItems.map((item: any) => ({
-                product: item.productId || item.id,
-                variantId: item.variantId || null,
-                variantName: item.variantName || null,
-                quantity: Number(item.quantity),
-                priceAtPurchase: Number(item.latestPrice || item.price),
-            })),
-            paymentMethod,
-            voucherCode: voucherData?.voucher?.code || null,
-        }
-
         try {
-            // 2. Tạo đơn hàng trong hệ thống Payload CMS
-            const res = await fetch('/api/create-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderData),
-            })
-
-            if (!res.ok) throw new Error('Không thể tạo đơn hàng')
-            const order = await res.json()
-
-            // 3. Xử lý theo phương thức thanh toán
-            if (paymentMethod === 'fundiin') {
-                // Gọi API khởi tạo Fundiin
-                const fundiinRes = await fetch('/api/payments/fundiin', {
+            const validateRes = await fetch(
+                '/api/cart/validate',
+                {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }, // Sửa lỗi 400 ở đây
-                    body: JSON.stringify({ orderId: order.id }),
-                })
+                    headers: {
+                        'Content-Type':
+                            'application/json',
+                    },
+                    cache: 'no-store',
+                    body: JSON.stringify({
+                        items,
+                    }),
+                },
+            )
 
-                const fundiinData = await fundiinRes.json()
+            const validateData =
+                (await validateRes.json()) as CartValidationResponse
 
-                if (fundiinRes.ok && fundiinData.paymentUrl) {
-                    toast.success('Đang chuyển sang cổng thanh toán Fundiin...')
+            if (!validateRes.ok) {
+                toast.error(
+                    validateData.error ||
+                    'Không thể kiểm tra tồn kho',
+                )
+                return
+            }
+
+            const validatedItems:
+                ValidatedCheckoutItem[] =
+                Array.isArray(
+                    validateData.items,
+                )
+                    ? validateData.items
+                    : []
+
+            if (
+                validatedItems.length === 0
+            ) {
+                toast.error(
+                    'Giỏ hàng không hợp lệ',
+                )
+                router.push('/cart')
+                return
+            }
+
+            if (
+                Array.isArray(
+                    validateData.items,
+                )
+            ) {
+                syncItems(
+                    validateData.items,
+                )
+            }
+
+            if (
+                Array.isArray(
+                    validateData.invalidItems,
+                ) &&
+                validateData.invalidItems
+                    .length > 0
+            ) {
+                toast.error(
+                    'Một số sản phẩm đã hết hàng, vượt tồn kho hoặc cần liên hệ báo giá',
+                )
+                router.push('/cart')
+                return
+            }
+
+            const purchasableItems =
+                validatedItems.filter(
+                    (item) => {
+                        const price = Number(
+                            item.latestPrice ??
+                            item.price ??
+                            0,
+                        )
+
+                        const stock = Number(
+                            item.latestStock ??
+                            item.stock ??
+                            0,
+                        )
+
+                        const quantity = Number(
+                            item.quantity ?? 0,
+                        )
+
+                        return (
+                            item.isAvailable !==
+                            false &&
+                            item.isOutOfStock !==
+                            true &&
+                            item.isContactPrice !==
+                            true &&
+                            price > 0 &&
+                            stock > 0 &&
+                            quantity > 0 &&
+                            quantity <= stock
+                        )
+                    },
+                )
+
+            if (
+                purchasableItems.length === 0
+            ) {
+                toast.error(
+                    'Không có sản phẩm hợp lệ để thanh toán',
+                )
+                router.push('/cart')
+                return
+            }
+
+            const orderData = {
+                fullName,
+                phone,
+                email: email || null,
+                address,
+                province,
+                district:
+                    district || null,
+                ward: ward || null,
+
+                items: purchasableItems.map(
+                    (item) => ({
+                        product:
+                            item.productId ??
+                            item.id,
+
+                        variantId:
+                            item.variantId ??
+                            null,
+
+                        quantity: Number(
+                            item.quantity,
+                        ),
+                    }),
+                ),
+
+                paymentMethod,
+
+                voucherCode:
+                    voucherData?.voucher
+                        ?.code ?? null,
+            }
+
+            const response = await fetch(
+                '/api/create-order',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type':
+                            'application/json',
+                    },
+                    body: JSON.stringify(
+                        orderData,
+                    ),
+                },
+            )
+
+            const responseData =
+                (await response.json()) as {
+                    id?: string | number
+                    error?: string
+                    message?: string
+                }
+
+            if (
+                !response.ok ||
+                responseData.id ===
+                undefined
+            ) {
+                throw new Error(
+                    responseData.error ||
+                    responseData.message ||
+                    'Không thể tạo đơn hàng',
+                )
+            }
+
+            if (
+                paymentMethod === 'fundiin'
+            ) {
+                const fundiinResponse =
+                    await fetch(
+                        '/api/payments/fundiin',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type':
+                                    'application/json',
+                            },
+                            body: JSON.stringify({
+                                orderId:
+                                    responseData.id,
+                            }),
+                        },
+                    )
+
+                const fundiinData =
+                    (await fundiinResponse.json()) as {
+                        paymentUrl?: string
+                        message?: string
+                        error?: string
+                    }
+
+                if (
+                    fundiinResponse.ok &&
+                    fundiinData.paymentUrl
+                ) {
+                    toast.success(
+                        'Đang chuyển sang cổng thanh toán Fundiin...',
+                    )
 
                     clearCart()
-
-                    window.location.href = fundiinData.paymentUrl
+                    window.location.href =
+                        fundiinData.paymentUrl
 
                     return
                 }
 
-                throw new Error(fundiinData?.message || 'Không thể khởi tạo thanh toán Fundiin')
+                throw new Error(
+                    fundiinData.message ||
+                    fundiinData.error ||
+                    'Không thể khởi tạo thanh toán Fundiin',
+                )
             }
 
-            // 4. Nếu là COD thì hoàn tất đơn hàng
             clearCart()
-            toast.success('Đặt hàng thành công!')
-            router.push('/checkout/success')
+            toast.success(
+                'Đặt hàng thành công!',
+            )
+            router.push(
+                '/checkout/success',
+            )
+        } catch (error: unknown) {
+            console.error(
+                '[Checkout] Create order failed:',
+                error,
+            )
 
-        } catch (error: any) {
-            console.error(error)
-            toast.error('Có lỗi xảy ra, vui lòng thử lại!')
+            toast.error(
+                error instanceof Error
+                    ? error.message
+                    : 'Có lỗi xảy ra, vui lòng thử lại!',
+            )
+        } finally {
             setLoading(false)
         }
     }

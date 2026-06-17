@@ -1,4 +1,398 @@
-import { CollectionConfig } from 'payload'
+import type {
+  CollectionAfterChangeHook,
+  CollectionConfig,
+} from 'payload'
+
+type EntityID = string | number
+
+type RelationshipValue =
+  | EntityID
+  | {
+    id: EntityID
+  }
+
+type OrderLifecycleStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'shipping'
+  | 'completed'
+  | 'cancelled'
+  | 'failed'
+
+type OrderLifecycleDocument = {
+  id: EntityID
+  status?: OrderLifecycleStatus | null
+  paymentMethod?: string | null
+  voucherId?: RelationshipValue | null
+  fundiin?: {
+    paymentStatus?: string | null
+  } | null
+}
+
+type RedemptionLifecycleStatus =
+  | 'held'
+  | 'completed'
+  | 'cancelled'
+
+function isRecord(
+  value: unknown,
+): value is Record<string, unknown> {
+  return (
+    typeof value === 'object' &&
+    value !== null
+  )
+}
+
+function relationshipID(
+  value: unknown,
+): EntityID | null {
+  if (
+    typeof value === 'number' &&
+    Number.isFinite(value)
+  ) {
+    return value
+  }
+
+  if (
+    typeof value === 'string' &&
+    value.trim().length > 0
+  ) {
+    return value
+  }
+
+  if (!isRecord(value)) {
+    return null
+  }
+
+  const id = value.id
+
+  if (
+    typeof id === 'number' &&
+    Number.isFinite(id)
+  ) {
+    return id
+  }
+
+  if (
+    typeof id === 'string' &&
+    id.trim().length > 0
+  ) {
+    return id
+  }
+
+  return null
+}
+
+function normalizeStatus(
+  value: unknown,
+): string {
+  return typeof value === 'string'
+    ? value.trim().toLowerCase()
+    : ''
+}
+
+/**
+ * Điều chỉnh danh sách này đúng với giá trị
+ * paymentStatus mà webhook Fundiin của bạn trả về.
+ */
+const FUNDIIN_SUCCESS_STATUSES =
+  new Set<string>([
+    'success',
+    'successful',
+    'paid',
+    'completed',
+  ])
+
+function isSuccessfulFundiinStatus(
+  value: unknown,
+): boolean {
+  return FUNDIIN_SUCCESS_STATUSES.has(
+    normalizeStatus(value),
+  )
+}
+
+/**
+ * Đồng bộ vòng đời Order với VoucherRedemptions.
+ *
+ * Quy tắc:
+ * - completed/Fundiin thành công:
+ *     held -> completed
+ *
+ * - cancelled/failed:
+ *     held hoặc completed -> cancelled
+ *     usedCount giảm tương ứng
+ */
+const handleVoucherLifecycle:
+  CollectionAfterChangeHook<OrderLifecycleDocument> =
+  async ({
+    doc,
+    previousDoc,
+    operation,
+    req,
+  }) => {
+    /**
+     * Redemption được tạo riêng trong API tạo đơn.
+     * Hook này chỉ xử lý khi Order được cập nhật.
+     */
+    if (
+      operation !== 'update' ||
+      !previousDoc
+    ) {
+      return doc
+    }
+
+    const currentOrderStatus =
+      normalizeStatus(doc.status)
+
+    const previousOrderStatus =
+      normalizeStatus(
+        previousDoc.status,
+      )
+
+    const movedToCancelled =
+      (
+        currentOrderStatus ===
+        'cancelled' ||
+        currentOrderStatus === 'failed'
+      ) &&
+      currentOrderStatus !==
+      previousOrderStatus
+
+    const movedToCompleted =
+      currentOrderStatus ===
+      'completed' &&
+      previousOrderStatus !==
+      'completed'
+
+    const currentFundiinStatus =
+      doc.fundiin?.paymentStatus
+
+    const previousFundiinStatus =
+      previousDoc.fundiin
+        ?.paymentStatus
+
+    const fundiinJustSucceeded =
+      isSuccessfulFundiinStatus(
+        currentFundiinStatus,
+      ) &&
+      !isSuccessfulFundiinStatus(
+        previousFundiinStatus,
+      )
+
+    const shouldCancelVoucher =
+      movedToCancelled
+
+    const shouldCompleteVoucher =
+      movedToCompleted ||
+      fundiinJustSucceeded
+
+    if (
+      !shouldCancelVoucher &&
+      !shouldCompleteVoucher
+    ) {
+      return doc
+    }
+
+    const voucherID =
+      relationshipID(doc.voucherId) ??
+      relationshipID(
+        previousDoc.voucherId,
+      )
+
+    /**
+     * Đơn không sử dụng voucher thì không cần xử lý.
+     */
+    if (voucherID === null) {
+      return doc
+    }
+
+    const redemptionResult =
+      await req.payload.find({
+        collection:
+          'voucher-redemptions',
+
+        depth: 0,
+        limit: 10,
+        pagination: false,
+
+        overrideAccess: true,
+
+        /**
+         * Quan trọng:
+         * truyền req để tham gia cùng transaction
+         * với thao tác cập nhật Order.
+         */
+        req,
+
+        where: {
+          order: {
+            equals: doc.id,
+          },
+        },
+      })
+
+    if (
+      redemptionResult.docs.length === 0
+    ) {
+      console.warn(
+        `[Orders] Order ${String(
+          doc.id,
+        )
+        } có voucher nhưng không tìm thấy VoucherRedemption.`,
+      )
+
+      return doc
+    }
+
+    /**
+     * Trường hợp hủy đơn được ưu tiên.
+     * Nếu cùng một update có dữ liệu mâu thuẫn,
+     * không được đánh dấu voucher completed.
+     */
+    if (shouldCancelVoucher) {
+      const cancellableRedemptions =
+        redemptionResult.docs.filter(
+          (redemption) =>
+            redemption.status ===
+            'held' ||
+            redemption.status ===
+            'completed',
+        )
+
+      if (
+        cancellableRedemptions.length ===
+        0
+      ) {
+        /**
+         * Redemption đã cancelled từ trước.
+         * Không giảm usedCount lần thứ hai.
+         */
+        return doc
+      }
+
+      for (
+        const redemption of
+        cancellableRedemptions
+      ) {
+        await req.payload.update({
+          collection:
+            'voucher-redemptions',
+
+          id: redemption.id,
+
+          overrideAccess: true,
+          req,
+
+          data: {
+            status: 'cancelled',
+          },
+        })
+      }
+
+      const voucher =
+        await req.payload.findByID({
+          collection: 'vouchers',
+          id: voucherID,
+          depth: 0,
+          overrideAccess: true,
+          req,
+        })
+
+      const currentUsedCount =
+        typeof voucher.usedCount ===
+          'number' &&
+          Number.isFinite(
+            voucher.usedCount,
+          )
+          ? Math.max(
+            0,
+            Math.floor(
+              voucher.usedCount,
+            ),
+          )
+          : 0
+
+      /**
+       * Bình thường mỗi Order chỉ có một redemption,
+       * nên giá trị sẽ giảm 1.
+       *
+       * Nếu dữ liệu từng bị tạo trùng redemption,
+       * số lượt giảm tương ứng số bản ghi thực sự
+       * vừa chuyển sang cancelled.
+       */
+      const nextUsedCount =
+        Math.max(
+          0,
+          currentUsedCount -
+          cancellableRedemptions.length,
+        )
+
+      if (
+        nextUsedCount !==
+        currentUsedCount
+      ) {
+        await req.payload.update({
+          collection: 'vouchers',
+          id: voucherID,
+
+          overrideAccess: true,
+          req,
+
+          data: {
+            usedCount:
+              nextUsedCount,
+          },
+        })
+      }
+
+      return doc
+    }
+
+    if (shouldCompleteVoucher) {
+      const heldRedemptions =
+        redemptionResult.docs.filter(
+          (
+            redemption,
+          ): redemption is typeof redemption & {
+            status: 'held'
+          } =>
+            redemption.status ===
+            'held',
+        )
+
+      /**
+       * Redemption đã completed hoặc cancelled
+       * thì không cập nhật lại.
+       */
+      if (
+        heldRedemptions.length === 0
+      ) {
+        return doc
+      }
+
+      for (
+        const redemption of
+        heldRedemptions
+      ) {
+        await req.payload.update({
+          collection:
+            'voucher-redemptions',
+
+          id: redemption.id,
+
+          overrideAccess: true,
+          req,
+
+          data: {
+            status:
+              'completed' satisfies RedemptionLifecycleStatus,
+          },
+        })
+      }
+    }
+
+    return doc
+  }
 
 const sendOrderEmail = async ({ doc, operation, req }: any) => {
   if (operation === 'create') {
@@ -66,7 +460,10 @@ const sendOrderEmail = async ({ doc, operation, req }: any) => {
 export const Orders: CollectionConfig = {
   slug: 'orders',
   hooks: {
-    afterChange: [sendOrderEmail],
+    afterChange: [
+      handleVoucherLifecycle,
+      sendOrderEmail,
+    ],
   },
   admin: {
     useAsTitle: 'id',
@@ -188,6 +585,10 @@ export const Orders: CollectionConfig = {
         { label: 'Đang giao', value: 'shipping' },
         { label: 'Hoàn thành', value: 'completed' },
         { label: 'Đã hủy', value: 'cancelled' },
+        {
+          label: 'Thanh toán thất bại',
+          value: 'failed',
+        },
       ],
     },
     {

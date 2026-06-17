@@ -27,7 +27,7 @@ function getFinalPrice(basePrice: number, salePrice: number) {
 }
 
 async function validateOrderBeforePayment(order: any, payload: any) {
-    const checkedItems = []
+    const checkedItems: FundiinItem[] = []
     let serverTotal = 0
 
     for (const item of order.items || []) {
@@ -119,6 +119,359 @@ async function validateOrderBeforePayment(order: any, payload: any) {
     }
 }
 
+type FundiinItem = Readonly<{
+    productId: string
+    productName: string
+    description: string
+    category: string
+    currency: 'VND'
+    quantity: number
+    price: number
+    totalAmount: number
+    sku?: string
+}>
+
+type DiscountAllocation = {
+    itemIndex: number
+    discountAmount: number
+    fraction: number
+}
+
+type TrustedOrderAmounts = Readonly<{
+    subtotalAmount: number
+    discountAmount: number
+    totalAmount: number
+}>
+
+function toMoney(
+    value: unknown,
+    fallback = 0,
+): number {
+    const numberValue =
+        typeof value === 'number'
+            ? value
+            : typeof value === 'string' &&
+                value.trim().length > 0
+                ? Number(value)
+                : fallback
+
+    return Number.isFinite(numberValue)
+        ? Math.floor(numberValue)
+        : fallback
+}
+
+function validateTrustedOrderAmounts(
+    order: Record<string, unknown>,
+    serverSubtotal: number,
+): TrustedOrderAmounts {
+    const storedSubtotal = toMoney(
+        order.subtotalAmount,
+        serverSubtotal,
+    )
+
+    const discountAmount = Math.max(
+        0,
+        toMoney(order.discountAmount),
+    )
+
+    const totalAmount = toMoney(
+        order.totalAmount,
+        Number.NaN,
+    )
+
+    /**
+     * Tổng giá sản phẩm hiện tại phải khớp với
+     * subtotal đã được API create-order lưu.
+     */
+    if (storedSubtotal !== serverSubtotal) {
+        console.error(
+            '[Fundiin] Subtotal mismatch:',
+            {
+                orderId: order.id,
+                serverSubtotal,
+                storedSubtotal,
+            },
+        )
+
+        throw new Error(
+            'Tạm tính đơn hàng đã thay đổi. Vui lòng kiểm tra lại giỏ hàng.',
+        )
+    }
+
+    if (
+        discountAmount < 0 ||
+        discountAmount > storedSubtotal
+    ) {
+        throw new Error(
+            'Số tiền giảm giá trong đơn hàng không hợp lệ.',
+        )
+    }
+
+    const expectedTotal = Math.max(
+        0,
+        storedSubtotal - discountAmount,
+    )
+
+    if (
+        !Number.isFinite(totalAmount) ||
+        totalAmount !== expectedTotal
+    ) {
+        console.error(
+            '[Fundiin] Total mismatch:',
+            {
+                orderId: order.id,
+                storedSubtotal,
+                discountAmount,
+                expectedTotal,
+                totalAmount,
+            },
+        )
+
+        throw new Error(
+            'Tổng tiền đơn hàng không hợp lệ.',
+        )
+    }
+
+    if (totalAmount <= 0) {
+        throw new Error(
+            'Số tiền thanh toán qua Fundiin phải lớn hơn 0.',
+        )
+    }
+
+    return {
+        subtotalAmount: storedSubtotal,
+        discountAmount,
+        totalAmount,
+    }
+}
+
+/**
+ * Phân bổ discountAmount vào từng dòng sản phẩm.
+ *
+ * Bảo đảm:
+ * - Tổng item sau giảm bằng totalAmount.
+ * - totalAmount mỗi item luôn bằng price × quantity.
+ * - Không sử dụng giá âm.
+ * - Mỗi dòng gốc sinh tối đa hai dòng Fundiin.
+ */
+function applyDiscountToFundiinItems(
+    items: FundiinItem[],
+    discountAmount: number,
+): FundiinItem[] {
+    if (discountAmount <= 0) {
+        return items
+    }
+
+    const grossTotal = items.reduce(
+        (total, item) =>
+            total + item.totalAmount,
+        0,
+    )
+
+    if (
+        grossTotal <= 0 ||
+        discountAmount > grossTotal
+    ) {
+        throw new Error(
+            'Không thể phân bổ giảm giá cho đơn hàng.',
+        )
+    }
+
+    const allocations: DiscountAllocation[] =
+        items.map((item, itemIndex) => {
+            const rawDiscount =
+                (discountAmount *
+                    item.totalAmount) /
+                grossTotal
+
+            const flooredDiscount = Math.min(
+                item.totalAmount,
+                Math.floor(rawDiscount),
+            )
+
+            return {
+                itemIndex,
+                discountAmount:
+                    flooredDiscount,
+                fraction:
+                    rawDiscount -
+                    Math.floor(rawDiscount),
+            }
+        })
+
+    let remainingDiscount =
+        discountAmount -
+        allocations.reduce(
+            (total, allocation) =>
+                total +
+                allocation.discountAmount,
+            0,
+        )
+
+    /**
+     * Phân bổ phần dư theo phương pháp
+     * phần thập phân lớn nhất.
+     */
+    const allocationOrder = [
+        ...allocations,
+    ].sort(
+        (first, second) =>
+            second.fraction -
+            first.fraction,
+    )
+
+    while (remainingDiscount > 0) {
+        let allocatedInRound = false
+
+        for (const allocation of allocationOrder) {
+            if (remainingDiscount <= 0) {
+                break
+            }
+
+            const item =
+                items[allocation.itemIndex]
+
+            if (
+                allocation.discountAmount >=
+                item.totalAmount
+            ) {
+                continue
+            }
+
+            allocation.discountAmount += 1
+            remainingDiscount -= 1
+            allocatedInRound = true
+        }
+
+        if (!allocatedInRound) {
+            throw new Error(
+                'Không thể phân bổ toàn bộ số tiền giảm giá.',
+            )
+        }
+    }
+
+    const result: FundiinItem[] = []
+
+    for (const allocation of allocations) {
+        const item =
+            items[allocation.itemIndex]
+
+        const netLineAmount =
+            item.totalAmount -
+            allocation.discountAmount
+
+        /**
+         * Dòng được giảm hoàn toàn thì không gửi sang
+         * Fundiin vì price phải là số dương.
+         */
+        if (netLineAmount <= 0) {
+            continue
+        }
+
+        const quantity = Math.max(
+            1,
+            Math.floor(item.quantity),
+        )
+
+        const baseUnitPrice = Math.floor(
+            netLineAmount / quantity,
+        )
+
+        const remainder =
+            netLineAmount % quantity
+
+        const baseQuantity =
+            quantity - remainder
+
+        /**
+         * Ví dụ:
+         * netLineAmount = 199.999
+         * quantity = 2
+         *
+         * Tạo:
+         * - 1 × 99.999
+         * - 1 × 100.000
+         *
+         * Tổng vẫn chính xác 199.999.
+         */
+        if (
+            baseQuantity > 0 &&
+            baseUnitPrice > 0
+        ) {
+            result.push({
+                ...item,
+                productId:
+                    remainder > 0
+                        ? `${item.productId}-A`
+                        : item.productId,
+                quantity: baseQuantity,
+                price: baseUnitPrice,
+                totalAmount:
+                    baseUnitPrice *
+                    baseQuantity,
+            })
+        }
+
+        if (remainder > 0) {
+            const remainderUnitPrice =
+                baseUnitPrice + 1
+
+            result.push({
+                ...item,
+                productId:
+                    `${item.productId}-B`,
+                quantity: remainder,
+                price:
+                    remainderUnitPrice,
+                totalAmount:
+                    remainderUnitPrice *
+                    remainder,
+            })
+        }
+    }
+
+    const netItemsTotal = result.reduce(
+        (total, item) =>
+            total + item.totalAmount,
+        0,
+    )
+
+    const expectedNetTotal =
+        grossTotal - discountAmount
+
+    if (
+        netItemsTotal !== expectedNetTotal
+    ) {
+        console.error(
+            '[Fundiin] Discount allocation mismatch:',
+            {
+                grossTotal,
+                discountAmount,
+                expectedNetTotal,
+                netItemsTotal,
+            },
+        )
+
+        throw new Error(
+            'Tổng sản phẩm sau giảm giá không hợp lệ.',
+        )
+    }
+
+    if (result.length === 0) {
+        throw new Error(
+            'Đơn hàng không còn giá trị để thanh toán.',
+        )
+    }
+
+    if (result.length > 200) {
+        throw new Error(
+            'Đơn hàng vượt quá số dòng sản phẩm Fundiin cho phép.',
+        )
+    }
+
+    return result
+}
+
 export async function POST(req: Request) {
     try {
         const { orderId } = await req.json()
@@ -134,16 +487,55 @@ export async function POST(req: Request) {
             )
         }
 
-        const { checkedItems, serverTotal } = await validateOrderBeforePayment(order, payload)
+        const {
+            checkedItems,
+            serverTotal: serverSubtotal,
+        } = await validateOrderBeforePayment(
+            order,
+            payload,
+        )
 
-        const orderTotal = Math.floor(Number(order.totalAmount || 0))
+        const trustedAmounts =
+            validateTrustedOrderAmounts(
+                order,
+                serverSubtotal,
+            )
 
-        if (orderTotal !== serverTotal) {
+        const fundiinItems =
+            applyDiscountToFundiinItems(
+                checkedItems,
+                trustedAmounts.discountAmount,
+            )
+
+        const fundiinItemsTotal =
+            fundiinItems.reduce(
+                (total, item) =>
+                    total + item.totalAmount,
+                0,
+            )
+
+        if (
+            fundiinItemsTotal !==
+            trustedAmounts.totalAmount
+        ) {
+            console.error(
+                '[Fundiin] Payment amount mismatch:',
+                {
+                    orderId: order.id,
+                    fundiinItemsTotal,
+                    orderTotal:
+                        trustedAmounts.totalAmount,
+                },
+            )
+
             return NextResponse.json(
                 {
-                    error: 'Tổng tiền đơn hàng đã thay đổi. Vui lòng kiểm tra lại giỏ hàng.',
+                    error:
+                        'Tổng tiền gửi sang Fundiin không hợp lệ.',
                 },
-                { status: 409 },
+                {
+                    status: 409,
+                },
             )
         }
 
@@ -173,9 +565,9 @@ export async function POST(req: Request) {
             unSuccessRedirectUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout`,
             amount: {
                 currency: 'VND',
-                value: serverTotal,
+                value: trustedAmounts.totalAmount,
             },
-            items: checkedItems,
+            items: fundiinItems,
             customer: {
                 phoneNumber: cleanPhone,
                 email: order.customerInfo.email || 'customer@mfparis.vn',
@@ -225,9 +617,15 @@ export async function POST(req: Request) {
                 id: orderId,
                 data: {
                     fundiin: {
-                        transactionId: result.referenceId,
-                        paymentStatus: result.resultStatus || 'APPROVED',
-                    }
+                        transactionId:
+                            result.referenceId,
+                        paymentStatus:
+                            'initialized',
+                        orderToken:
+                            typeof result.orderToken === 'string'
+                                ? result.orderToken
+                                : null,
+                    },
                 } as any
             })
 
@@ -239,8 +637,24 @@ export async function POST(req: Request) {
             }, { status: 400 })
         }
 
-    } catch (error: any) {
-        console.error('🔥 SERVER ERROR:', error.message)
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+    } catch (error: unknown) {
+        const message =
+            error instanceof Error
+                ? error.message
+                : 'Internal Server Error'
+
+        console.error(
+            '🔥 FUNDIIN SERVER ERROR:',
+            error,
+        )
+
+        return NextResponse.json(
+            {
+                error: message,
+            },
+            {
+                status: 500,
+            },
+        )
     }
 }
