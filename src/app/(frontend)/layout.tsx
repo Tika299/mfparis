@@ -12,7 +12,7 @@ import { WishlistHydrator } from '@/components/WishlistHydrator'
 
 const playfair = Playfair_Display({
   subsets: ['latin', 'vietnamese'],
-  weight: ['400', '600', '700', '800', '900'],
+  weight: ['400', '600', '700'],
   variable: '--font-playfair',
   display: 'swap',
 })
@@ -28,7 +28,7 @@ const beVietnam = Be_Vietnam_Pro({
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi" suppressHydrationWarning className={`${beVietnam.variable} ${playfair.variable}`}>
-      <body className="font-sans antialiased text-[#1a1a1a]">
+      <body className="flex min-h-screen flex-col font-sans text-[#1a1a1a] antialiased">
         <WishlistHydrator />
         <Header />
         <GlobalEnterHandler />

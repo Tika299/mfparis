@@ -343,10 +343,12 @@ export default async function HomePage() {
                   <Icon size={20} />
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate text-[11px] font-black uppercase tracking-tight">
+                  <p className="truncate text-[12px] font-semibold leading-5 tracking-[-0.01em] text-neutral-800 sm:text-[13px]">
                     {item.title}
                   </p>
-                  <p className="truncate text-[10px] text-gray-400">{item.description}</p>
+                  <p className="truncate text-[11px] font-normal leading-5 text-neutral-400 sm:text-xs">
+                    {item.description}
+                  </p>
                 </div>
               </div>
             )
@@ -381,13 +383,13 @@ export default async function HomePage() {
           <div className="mb-8 flex items-center justify-between gap-4 px-1 md:mb-10 md:px-2">
             <div>
               <span className="sub-heading text-neutral-400">Browse</span>
-              <h2 className="font-heading text-2xl font-bold md:text-3xl text-neutral-900">
+              <h2 className="font-heading text-[26px] font-semibold leading-[1.15] tracking-[-0.02em] text-neutral-900 md:text-[34px]">
                 Danh mục nổi bật
               </h2>
             </div>
             <Link
               href="/categories"
-              className="shrink-0 border-b border-primary text-[11px] font-black uppercase tracking-wider text-primary transition-colors hover:border-black hover:text-black"
+              className="shrink-0 border-b border-primary text-[12px] font-semibold tracking-[0.02em] text-primary transition-colors hover:border-black hover:text-black"
             >
               Khám phá
             </Link>
@@ -425,7 +427,7 @@ export default async function HomePage() {
                           </div>
                         </div>
 
-                        <span className="line-clamp-2 min-h-[32px] w-full px-1 text-center text-[11px] font-black uppercase tracking-tight text-neutral-800 transition-colors group-hover:text-primary md:text-[12px]">
+                        <span className="line-clamp-2 min-h-[36px] w-full px-1 text-center text-[12px] font-semibold leading-[1.4] tracking-[-0.01em] text-neutral-800 transition-colors group-hover:text-primary md:text-[13px]">
                           {cat.name}
                         </span>
                       </Link>
@@ -486,7 +488,7 @@ export default async function HomePage() {
           <div className="mb-8 flex items-center justify-between gap-4 px-1 md:mb-10 md:px-2">
             <div>
               <span className="sub-heading">Partners</span>
-              <h2 className="font-heading text-2xl font-bold  md:text-3xl">
+              <h2 className="font-heading text-[26px] font-semibold leading-[1.15] tracking-[-0.02em] text-neutral-900 md:text-[34px]">
                 Đối tác thương hiệu
               </h2>
               <div className="mt-3 h-0.5 w-12 bg-primary" />
@@ -523,7 +525,7 @@ export default async function HomePage() {
                             className="max-h-8 w-full object-contain"
                           />
                         ) : (
-                          <span className="text-center text-lg font-black tracking-tighter text-neutral-700 group-hover:text-primary">
+                          <span className="text-center text-base font-semibold leading-snug tracking-[-0.01em] text-neutral-700 transition-colors group-hover:text-primary md:text-lg">
                             {brand.name}
                           </span>
                         )}
@@ -547,14 +549,14 @@ export default async function HomePage() {
               <div className="mb-10 flex items-center justify-between gap-4 px-1 md:mb-12 md:px-2">
                 <div>
                   <span className="sub-heading">Beauty Journal</span>
-                  <h2 className="heading-section text-left text-3xl md:text-4xl">
+                  <h2 className="font-heading text-[28px] font-semibold leading-[1.15] tracking-[-0.02em] text-neutral-900 md:text-[38px]">
                     Tạp chí làm đẹp
                   </h2>
                   <div className="mt-3 h-1 w-12 rounded-full bg-primary" />
                 </div>
                 <Link
                   href="/blog"
-                  className="shrink-0 rounded-full bg-black px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-colors hover:bg-primary md:px-8 md:text-[11px]"
+                  className="shrink-0 rounded-full bg-black px-5 py-3 text-[12px] font-semibold tracking-[0.06em] text-white shadow-lg transition-colors hover:bg-primary md:px-8"
                 >
                   Xem thêm
                 </Link>
@@ -585,10 +587,10 @@ export default async function HomePage() {
                             />
                             {/* Badge ngày */}
                             <div className="absolute left-4 top-4 flex h-14 w-14 flex-col items-center justify-center rounded-2xl border border-white/50 bg-white/90 shadow-xl backdrop-blur md:left-6 md:top-6">
-                              <span className="text-xl font-black leading-none text-primary">
+                              <span className="text-xl font-extrabold leading-none text-primary">
                                 {String(date.getDate()).padStart(2, '0')}
                               </span>
-                              <span className="mt-1 text-[9px] font-black uppercase leading-none text-neutral-500">
+                              <span className="mt-1 text-[10px] font-bold uppercase leading-none tracking-[0.08em] text-neutral-500">
                                 TH {date.getMonth() + 1}
                               </span>
                             </div>
@@ -596,10 +598,10 @@ export default async function HomePage() {
 
                           {/* Nội dung */}
                           <div className="space-y-3 px-3 pt-7 text-center md:px-4 md:pt-8">
-                            <h3 className="line-clamp-2 min-h-[56px] text-xl font-bold leading-snug tracking-tight text-gray-900 transition-colors group-hover:text-primary">
+                            <h3 className="line-clamp-2 min-h-[52px] text-[18px] font-semibold leading-[1.4] tracking-[-0.015em] text-gray-900 transition-colors group-hover:text-primary md:text-[20px]">
                               {post.title}
                             </h3>
-                            <p className="mx-auto line-clamp-3 max-w-[300px] text-sm leading-relaxed text-gray-400">
+                            <p className="mx-auto line-clamp-3 max-w-[320px] text-[14px] font-normal leading-7 text-neutral-500">
                               {post.excerpt}
                             </p>
                           </div>

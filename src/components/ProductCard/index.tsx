@@ -401,7 +401,7 @@ export const ProductCard = ({
   return (
     <article
       className={cn(
-        'group relative flex h-full flex-col overflow-hidden rounded-[32px] bg-white p-2 shadow-[0_4px_20px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.03] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)]',
+        'font-sans group relative flex h-full flex-col overflow-hidden rounded-[32px] bg-white p-1 shadow-[0_4px_20px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.03] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)]',
         className
       )}
     >
@@ -413,7 +413,7 @@ export const ProductCard = ({
         {/* Badge Giảm giá */}
         {isSale && (
           <div className="absolute left-3 top-3 z-20">
-            <span className="flex h-8 items-center justify-center rounded-full bg-[#e10613] px-3 text-[13px] font-black text-white shadow-lg shadow-red-200">
+            <span className="flex h-8 items-center justify-center rounded-full bg-[#e10613] px-3 text-[12px] font-extrabol sm:text-[13px] tracking-[-0.01em] tabular-nums text-white shadow-lg shadow-red-200">
               -{discountPercent}%
             </span>
           </div>
@@ -421,7 +421,7 @@ export const ProductCard = ({
 
         {isOutOfStock && (
           <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/70 backdrop-blur-[1px]">
-            <span className="rounded-full bg-black px-4 py-2 text-[12px] font-black uppercase tracking-widest text-white">
+            <span className="rounded-full bg-black px-4 py-2 text-[11px] font-bold uppercase tracking-[0.12em] sm:text-[12px] text-white">
               Hết hàng
             </span>
           </div>
@@ -488,10 +488,13 @@ export const ProductCard = ({
 
       {/* 2. CONTENT AREA */}
       <div className="flex flex-1 flex-col px-3 pb-3 pt-5">
-        {product.brand && typeof product.brand === 'object' && product.brand.name ? (<p className="mb-1.5 text-[11px] font-black uppercase tracking-widest text-[#b38756]"> {product.brand.name} </p>) : null}
+        {product.brand && typeof product.brand === 'object' && product.brand.name
+          ? (<p className="mb-1.5 text-[10px] font-bold uppercase leading-4 tracking-[0.14em] sm:text-[11px] text-[#b38756]"> {product.brand.name} </p>)
+          : null
+        }
 
         <Link href={`/products/${product.slug}`}>
-          <h3 className="line-clamp-2 min-h-[44px] text-[17px] font-bold leading-tight text-neutral-900 transition hover:text-[#e10613]">
+          <h3 className="line-clamp-2 min-h-[44px] text-[14px] font-semibold leading-[1.5] tracking-[-0.012em] text-neutral-900 transition sm:text-[15px] lg:text-[16px] hover:text-[#e10613]">
             {product.title}
           </h3>
         </Link>
@@ -501,12 +504,12 @@ export const ProductCard = ({
           {isSale ? (
             <>
               {/* Giá gốc */}
-              <span className="text-[12px] font-normal leading-none text-neutral-400 line-through sm:text-[13px]">
+              <span className="text-[11px] font-normal tabular-nums leading-none text-neutral-400 line-through sm:text-[12px]">
                 {formatPrice(basePrice)}đ
               </span>
 
               {/* Giá khuyến mãi */}
-              <span className="mt-1.5 text-[18px] font-extrabold leading-none tracking-tight text-[#e10613] sm:text-[20px]">
+              <span className="mt-1.5 text-[17px] font-extrabold leading-none tracking-[-0.025em] tabular-nums text-[#e10613] sm:text-[19px] lg:text-[20px]">
                 {formatPrice(salePrice)}đ
               </span>
             </>
@@ -523,7 +526,7 @@ export const ProductCard = ({
                 Giá gốc
               </span>
 
-              <span className="mt-1.5 text-[18px] font-extrabold leading-none tracking-tight text-[#e10613] sm:text-[20px]">
+              <span className="mt-1.5 text-[17px] font-extrabold leading-none tracking-[-0.025em] tabular-nums text-[#e10613] sm:text-[19px] lg:text-[20px]">
                 {isContactPrice
                   ? 'Liên hệ'
                   : `${formatPrice(basePrice)}đ`}
@@ -538,7 +541,7 @@ export const ProductCard = ({
             <>
               <RatingStars rating={rating} />
 
-              <span className="ml-1 text-[12px] font-semibold text-neutral-800 sm:text-[13px]">
+              <span className="ml-1 text-[11px] font-semibold tabular-nums text-neutral-800 sm:text-[12px]">
                 {rating.toLocaleString('vi-VN', {
                   minimumFractionDigits: 1,
                   maximumFractionDigits: 1,
@@ -552,7 +555,7 @@ export const ProductCard = ({
                 |
               </span>
 
-              <span className="truncate text-[10px] text-neutral-400 sm:text-[12px]">
+              <span className="truncate text-[10px] font-normal text-neutral-400 sm:text-[11px]">
                 {reviewCount.toLocaleString('vi-VN')} đánh giá
               </span>
             </>
@@ -560,7 +563,7 @@ export const ProductCard = ({
             <>
               <RatingStars rating={0} />
 
-              <span className="ml-1 truncate text-[10px] font-medium text-neutral-400 sm:text-[12px]">
+              <span className="ml-1 truncate text-[10px] font-normal text-neutral-400 sm:text-[11px]">
                 Chưa có đánh giá
               </span>
             </>
@@ -573,7 +576,7 @@ export const ProductCard = ({
           aria-label={`Xem voucher áp dụng cho ${product.title}`}
           className="mt-3 flex min-h-11 w-full items-center justify-between rounded-2xl bg-[#f5f9ff] px-3 py-2.5 text-[#1f5fe0] transition-colors hover:bg-[#ebf3ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1f5fe0] focus-visible:ring-offset-2 sm:px-4 sm:py-3"
         >
-          <span className="flex min-w-0 items-center gap-2 text-[11px] font-bold sm:text-[12.5px]">
+          <span className="flex min-w-0 items-center gap-2 text-[11px] font-semibold leading-5 tracking-[-0.005em] sm:text-[12px]">
             <Gift
               aria-hidden="true"
               size={18}
@@ -603,33 +606,51 @@ export const ProductCard = ({
           aria-label={
             isVariableProduct
               ? `Chọn phân loại cho ${product.title}`
-              : `Thêm ${product.title} vào giỏ hàng`
+              : isOutOfStock
+                ? `${product.title} hiện đã hết hàng`
+                : isContactPrice
+                  ? `Liên hệ mua ${product.title}`
+                  : `Thêm ${product.title} vào giỏ hàng`
           }
-          className="group/btn mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#e10613] py-4 text-[14px] font-black text-white shadow-lg shadow-red-100 transition-all hover:bg-black hover:shadow-neutral-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:shadow-none"
+          title={
+            isVariableProduct
+              ? 'Chọn phân loại'
+              : isOutOfStock
+                ? 'Hết hàng'
+                : isContactPrice
+                  ? 'Liên hệ'
+                  : 'Thêm vào giỏ hàng'
+          }
+          className="group/btn mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-[#e10613] px-3 py-3 text-white shadow-lg shadow-red-100 transition-all hover:bg-black hover:shadow-neutral-200 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:shadow-none sm:min-h-12 sm:py-3.5"
         >
           {isVariableProduct ? (
             <Settings
               aria-hidden="true"
-              size={19}
+              size={20}
+              strokeWidth={2}
               className="transition-transform duration-300 group-hover/btn:rotate-90"
             />
           ) : (
             <ShoppingBag
               aria-hidden="true"
-              size={19}
+              size={20}
+              strokeWidth={2}
               className="transition-transform group-hover/btn:-rotate-12"
             />
           )}
 
-          {isVariableProduct
-            ? 'Chọn phân loại'
-            : isOutOfStock
-              ? 'Hết hàng'
-              : isContactPrice
-                ? 'Liên hệ'
-                : added
-                  ? 'Đã thêm vào giỏ'
-                  : 'Thêm vào giỏ hàng'}
+          {/* Mobile ẩn chữ, từ sm trở lên mới hiển thị */}
+          <span className="hidden text-[13px] font-bold leading-5 tracking-[0.01em] sm:inline lg:text-[14px]">
+            {isVariableProduct
+              ? 'Chọn phân loại'
+              : isOutOfStock
+                ? 'Hết hàng'
+                : isContactPrice
+                  ? 'Liên hệ'
+                  : added
+                    ? 'Đã thêm vào giỏ'
+                    : 'Thêm vào giỏ hàng'}
+          </span>
         </button>
       </div>
     </article>

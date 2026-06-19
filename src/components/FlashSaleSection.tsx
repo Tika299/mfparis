@@ -137,21 +137,21 @@ export function FlashSaleSection({
 
                     <div className="relative z-10 grid gap-8 lg:grid-cols-12 lg:items-center">
                         <div className="lg:col-span-7">
-                            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest backdrop-blur md:text-[11px]">
+                            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] backdrop-blur md:text-[12px]">
                                 <Zap size={15} fill="currentColor" />
                                 Deal sốc mỗi ngày
                             </div>
 
-                            <h2 className="text-4xl uppercase font-thin leading-none tracking-tight sm:text-5xl md:text-6xl lg:text-7xl" style={{ color: '#ffeaa7 !important' }}>
+                            <h2 className="font-heading text-[42px] font-semibold uppercase leading-[0.95] tracking-[-0.035em] text-[#ffeaa7] sm:text-[52px] md:text-[64px] lg:text-[72px]">
                                 Flash Sale
                             </h2>
 
-                            <p className="mt-4 max-w-xl text-sm font-semibold text-red-50 md:text-base">
+                            <p className="mt-4 max-w-xl text-sm font-medium leading-6 text-red-50 md:text-base md:leading-7">
                                 Siêu ưu đãi cho Nước hoa - Mỹ phẩm - TPCN chính hãng
                             </p>
 
                             <div className="mt-7 max-w-md rounded-2xl border border-white/20 bg-black/15 p-3 backdrop-blur sm:p-4">
-                                <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-red-50">
+                                <div className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-red-50 sm:text-xs">
                                     <Clock size={16} />
                                     Kết thúc sau
                                 </div>
@@ -166,7 +166,7 @@ export function FlashSaleSection({
                                         label="Giờ"
                                     />
 
-                                    <span className="text-xl font-black sm:text-2xl">
+                                    <span className="text-xl font-bold sm:text-2xl">
                                         :
                                     </span>
 
@@ -268,8 +268,9 @@ export function FlashSaleSection({
                         <div className="col-span-2 flex items-center justify-center gap-3 rounded-2xl bg-red-50 px-4 py-3 text-center md:col-span-1">
                             <ShieldCheck size={22} />
                             <div>
-                                <p className="text-sm font-black uppercase leading-tight">100%</p>
-                                <p className="text-[10px] font-bold uppercase text-red-700">
+                                <p className="text-base font-extrabold leading-tight tracking-[-0.02em]">
+                                    100% </p>
+                                <p className="text-[11px] font-semibold tracking-[0.02em] text-red-700">
                                     Chính hãng
                                 </p>
                             </div>
@@ -279,7 +280,7 @@ export function FlashSaleSection({
 
                 {/* Tabs + products */}
                 <div className="p-4 md:p-6">
-                    <div className="mb-5 grid grid-cols-1 overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 text-center text-xs font-black uppercase tracking-widest sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="mb-5 grid grid-cols-1 overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 text-center text-[12px] font-semibold uppercase tracking-[0.08em] sm:grid-cols-2 lg:grid-cols-4">
                         <button
                             type="button"
                             onClick={() => setActiveCategory('all')}
@@ -315,8 +316,8 @@ export function FlashSaleSection({
                             onClick={() => setActiveCategory('all')}
                             className={
                                 activeCategory === 'all'
-                                    ? 'shrink-0 rounded-full bg-[#b72828] px-5 py-2.5 text-xs font-bold text-white'
-                                    : 'shrink-0 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-xs font-bold text-gray-500 hover:border-[#b72828] hover:text-[#b72828]'
+                                    ? 'shrink-0 rounded-full bg-[#b72828] px-5 py-2.5 text-[12px] font-semibold sm:text-[13px] text-white'
+                                    : 'shrink-0 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-[12px] font-semibold sm:text-[13px] text-gray-500 hover:border-[#b72828] hover:text-[#b72828]'
                             }
                         >
                             Tất cả
@@ -329,8 +330,8 @@ export function FlashSaleSection({
                                 onClick={() => setActiveCategory(cat.slug)}
                                 className={
                                     activeCategory === cat.slug
-                                        ? 'shrink-0 rounded-full bg-[#b72828] px-5 py-2.5 text-xs font-bold text-white'
-                                        : 'shrink-0 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-xs font-bold text-gray-500 hover:border-[#b72828] hover:text-[#b72828]'
+                                        ? 'shrink-0 rounded-full bg-[#b72828] px-5 py-2.5 text-[12px] font-semibold sm:text-[13px] text-white'
+                                        : 'shrink-0 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-[12px] font-semibold sm:text-[13px] text-gray-500 hover:border-[#b72828] hover:text-[#b72828]'
                                 }
                             >
                                 {cat.name}
@@ -373,7 +374,7 @@ export function FlashSaleSection({
                     <div className="mt-6 flex justify-center">
                         <Link
                             href="/products"
-                            className="inline-flex items-center gap-2 rounded-full bg-black px-7 py-4 text-[11px] font-black uppercase tracking-widest text-white transition hover:bg-[#b72828]"
+                            className="inline-flex items-center gap-2 rounded-full bg-black px-7 py-4 text-[12px] font-bold uppercase tracking-[0.1em] text-white transition hover:bg-[#b72828]"
                         >
                             Xem tất cả sản phẩm <ChevronRight size={16} />
                         </Link>
@@ -384,13 +385,14 @@ export function FlashSaleSection({
     )
 }
 
-function TimeBox({ value, label }: { value: string; label: string }) {
+function TimeBox(
+    { value, label, }: { value: string; label: string }) {
     return (
         <div className="min-w-[58px] rounded-2xl bg-white px-2.5 py-3 text-center text-[#b72828] shadow-lg sm:min-w-[70px] sm:px-3">
-            <p className="text-xl font-black leading-none sm:text-2xl md:text-3xl">
+            <p className="text-xl font-extrabold leading-none tracking-[-0.03em] sm:text-2xl md:text-3xl">
                 {value}
             </p>
-            <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-gray-500 sm:text-[10px]">
+            <p className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-gray-500 sm:text-[11px]">
                 {label}
             </p>
         </div>
@@ -491,10 +493,10 @@ function VoucherBox({
         >
             <p
                 className={[
-                    'text-[9px] font-black uppercase tracking-widest transition-colors sm:text-[10px]',
+                    'mt-1 text-xl font-extrabold uppercase leading-none tracking-[-0.02em] transition-colors sm:text-2xl',
                     isCopied
-                        ? 'text-emerald-600'
-                        : 'text-red-400',
+                        ? 'text-emerald-700'
+                        : 'text-[#b72828]',
                 ].join(' ')}
             >
                 {title}
@@ -511,19 +513,19 @@ function VoucherBox({
                 {value}
             </p>
 
-            <p className="mt-1 text-[9px] font-bold uppercase text-gray-600 sm:text-[10px]">
+            <p className="mt-1 text-[10px] font-medium leading-4 text-gray-600 sm:text-[11px]">
                 {sub}
             </p>
 
             {code.trim() ? (
-                <p className="mt-2 truncate font-mono text-[10px] font-black uppercase tracking-wider text-gray-500">
+                <p className="mt-2 truncate font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-gray-500 sm:text-[11px]">
                     Mã: {code}
                 </p>
             ) : null}
 
             <span
                 className={[
-                    'mt-2 inline-flex min-h-7 items-center justify-center rounded-full px-3 text-[10px] font-black uppercase tracking-wider transition-all',
+                    'mt-2 inline-flex min-h-7 items-center justify-center rounded-full px-3 text-[10px] font-bold uppercase tracking-[0.08em] transition-all sm:text-[11px]',
                     isCopied
                         ? 'bg-emerald-600 text-white'
                         : 'bg-red-50 text-[#b72828] group-hover:bg-[#b72828] group-hover:text-white',

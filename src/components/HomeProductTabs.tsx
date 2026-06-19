@@ -79,7 +79,7 @@ function HomeProductSection({
 
                         <div className="min-w-0">
                             <span className="sub-heading">{subLabel}</span>
-                            <h2 className="font-heading text-xl font-bold leading-tight md:text-2xl">
+                            <h2 className="font-heading text-[25px] font-semibold leading-[1.15] tracking-[-0.02em] text-neutral-900 md:text-[32px]">
                                 {title}
                             </h2>
                         </div>
@@ -87,7 +87,7 @@ function HomeProductSection({
 
                     <Link
                         href={href}
-                        className="hidden shrink-0 items-center gap-1 rounded-full border border-primary/10 bg-primary/5 px-4 py-2 text-[11px] font-black uppercase tracking-wider text-primary transition-colors hover:bg-primary hover:text-white md:flex"
+                        className="hidden shrink-0 items-center gap-1 rounded-full border border-primary/10 bg-primary/5 px-4 py-2.5 text-[12px] font-semibold tracking-[0.03em] text-primary transition-colors hover:bg-primary hover:text-white md:flex"
                     >
                         Xem tất cả <ChevronRight size={15} />
                     </Link>
@@ -119,7 +119,7 @@ function HomeProductSection({
                 <div className="mt-6 md:hidden">
                     <Link
                         href={href}
-                        className="flex h-12 w-full items-center justify-center rounded-full bg-black text-[11px] font-black uppercase tracking-widest text-white"
+                        className="flex h-12 w-full items-center justify-center rounded-full bg-black text-[13px] font-bold tracking-[0.04em] text-white transition-colors hover:bg-primary"
                     >
                         Xem tất cả sản phẩm
                     </Link>

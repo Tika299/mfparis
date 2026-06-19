@@ -43,16 +43,24 @@
 /* --- 3. CẤU HÌNH CƠ BẢN (Base Layer) --- */
 @layer base {
   * {
-    /* FIX LỖI: Thay @apply border-border bằng CSS thuần */
     border-color: var(--border);
+  }
+
+  html {
+    font-synthesis: none;
+    scroll-behavior: smooth;
+    scroll-padding-top: 100px;
   }
 
   body {
     background-color: #f4f6f8;
-    color: #000000 !important;
+    color: #1a1a1a;
     font-family: var(--font-sans);
-    font-size: 15px;
-    line-height: 1.6;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.65;
+    letter-spacing: -0.005em;
+    text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
@@ -60,8 +68,38 @@
   h1,
   h2 {
     font-family: var(--font-heading);
-    color: #000000 !important;
+    color: inherit;
+    font-optical-sizing: auto;
+    text-wrap: balance;
+  }
+
+  h1 {
     font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+  }
+
+  h2 {
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: inherit;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
   }
 
   @media (min-width: 1536px) {
@@ -71,50 +109,65 @@
   }
 }
 
+
 /* --- 4. CÁC THÀNH PHẦN REUSABLE (Components) --- */
 @layer components {
 
-  /* Khung xương chuẩn UX 1200px */
   .container-ux,
   .container-custom {
     @apply mx-auto px-4 sm:px-6 lg:px-8;
-    max-width: 1200px;
     width: 100%;
+    max-width: 1200px;
   }
 
   .heading-product {
     font-family: var(--font-heading);
-    color: #000000 !important;
-    font-style: normal;
-    @apply font-bold tracking-tight leading-[1.08];
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
   }
 
   .heading-section {
+    position: relative;
     font-family: var(--font-heading);
-    color: #000000 !important;
-    font-style: normal;
-    @apply font-bold tracking-tight text-center relative;
-    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-size: clamp(1.625rem, 2.7vw, 2.25rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-align: center;
+    text-wrap: balance;
   }
 
   .sub-heading {
-    @apply uppercase tracking-[0.3em] text-[10px] font-black text-gray-400 mb-2 block;
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #9ca3af;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 1024px) {
+    .sub-heading {
+      font-size: 12px;
+      letter-spacing: 0.17em;
+    }
   }
 
   .lc-card {
-    @apply bg-white rounded-xl shadow-sm border border-transparent transition-all duration-300;
+    @apply rounded-xl border border-transparent bg-white shadow-sm transition-all duration-300;
   }
-
-  /* .lc-card:hover {
-    @apply shadow-xl border-red-50;
-    transform: translateY(-4px);
-  } */
 
   .lc-sticky-nav {
     @apply sticky top-[100px] z-20;
   }
 }
+
 
 /* --- 5. TỐI ƯU NỘI DUNG TỪ WORDPRESS (Prose) --- */
 .prose {
