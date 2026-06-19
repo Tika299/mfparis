@@ -24,6 +24,8 @@ import Link from 'next/link'
 import { HomeProductTabs } from '@/components/HomeProductTabs'
 import { FlashSaleSection } from '@/components/FlashSaleSection'
 import type { Voucher } from '@/payload-types'
+import { StoreIntro } from '@/components/home/StoreIntro'
+import { GoogleReviews } from '@/components/home/GoogleReviews'
 
 // ─── Dữ liệu tĩnh ────────────────────────────────────────────────────────────
 
@@ -332,11 +334,11 @@ export default async function HomePage() {
             return (
               <div
                 key={item.title}
-                className={`flex items - center gap - 3 lg: justify - center ${!isLast ? 'lg:border-r lg:border-gray-100' : ''
+                className={`flex items-center gap-3 lg:justify-center ${!isLast ? 'lg:border-r lg:border-gray-100' : ''
                   } `}
               >
                 <div
-                  className={`flex h - 10 w - 10 shrink - 0 items - center justify - center rounded - full ${item.iconClass} `}
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${item.iconClass} `}
                 >
                   <Icon size={20} />
                 </div>
@@ -614,6 +616,10 @@ export default async function HomePage() {
           </Carousel>
         </div>
       </section>
+
+      <StoreIntro />
+
+      <GoogleReviews />
 
     </main>
   )

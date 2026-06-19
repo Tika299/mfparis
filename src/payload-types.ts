@@ -1539,6 +1539,7 @@ export interface SiteSetting {
     zaloLink?: string | null;
     address?: string | null;
     facebookUrl?: string | null;
+    googleMapUrl?: string | null;
   };
   flashSale?: {
     enabled?: boolean | null;
@@ -1579,6 +1580,14 @@ export interface AboutPage {
       [k: string]: unknown;
     } | null;
     image?: (number | null) | Media;
+    /**
+     * Dán link YouTube, YouTube Shorts, youtu.be hoặc Vimeo. Ví dụ: https://www.youtube.com/watch?v=VIDEO_ID
+     */
+    videoUrl?: string | null;
+    /**
+     * Nội dung này được dùng làm title cho iframe và hỗ trợ khả năng truy cập.
+     */
+    videoTitle?: string | null;
   };
   values?:
     | {
@@ -1623,6 +1632,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         zaloLink?: T;
         address?: T;
         facebookUrl?: T;
+        googleMapUrl?: T;
       };
   flashSale?:
     | T
@@ -1652,6 +1662,8 @@ export interface AboutPageSelect<T extends boolean = true> {
         heading?: T;
         content?: T;
         image?: T;
+        videoUrl?: T;
+        videoTitle?: T;
       };
   values?:
     | T

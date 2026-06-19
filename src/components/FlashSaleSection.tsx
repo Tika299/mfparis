@@ -142,11 +142,11 @@ export function FlashSaleSection({
                                 Deal sốc mỗi ngày
                             </div>
 
-                            <h2 className="text-4xl font-black uppercase leading-none tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+                            <h2 className="text-4xl uppercase font-thin leading-none tracking-tight sm:text-5xl md:text-6xl lg:text-7xl" style={{ color: '#ffeaa7 !important' }}>
                                 Flash Sale
                             </h2>
 
-                            <p className="mt-4 max-w-2xl text-sm font-semibold text-red-50 md:text-lg">
+                            <p className="mt-4 max-w-xl text-sm font-semibold text-red-50 md:text-base">
                                 Siêu ưu đãi cho Nước hoa - Mỹ phẩm - TPCN chính hãng
                             </p>
 
@@ -343,15 +343,15 @@ export function FlashSaleSection({
                             key={activeCategory}
                             opts={{
                                 align: 'start',
-                                loop: filteredProducts.length > 4,
+                                loop: filteredProducts.length > 5,
                             }}
                             className="relative"
                         >
-                            <CarouselContent className="-ml-4 pb-4 md:-ml-5">
+                            <CarouselContent className="-ml-3 pb-4 md:-ml-4">
                                 {filteredProducts.map((product) => (
                                     <CarouselItem
                                         key={product.id}
-                                        className="basis-[82%] pl-4 sm:basis-1/2 md:basis-1/2 md:pl-5 lg:basis-1/3 xl:basis-1/4"
+                                        className="basis-1/2 pl-3 md:basis-1/3 md:pl-4 lg:basis-1/4 xl:basis-1/5"
                                     >
                                         <ProductCard product={product} />
                                     </CarouselItem>

@@ -22,8 +22,36 @@ export const AboutPage: GlobalConfig = {
         { name: 'heading', type: 'text', label: 'Tiêu đề câu chuyện' },
         { name: 'content', type: 'richText', label: 'Nội dung kể chuyện' },
         { name: 'image', type: 'upload', relationTo: 'media', label: 'Ảnh minh họa câu chuyện' },
+        /*
+         * Video được dùng cho StoreIntro
+         * ở cuối trang chủ.
+         */
+        {
+          name: 'videoUrl',
+          type: 'text',
+          label: 'Link video giới thiệu',
+
+          admin: {
+            description:
+              'Dán link YouTube, YouTube Shorts, youtu.be hoặc Vimeo. Ví dụ: https://www.youtube.com/watch?v=VIDEO_ID',
+          },
+        },
+        {
+          name: 'videoTitle',
+          type: 'text',
+          label: 'Tiêu đề mô tả video',
+
+          defaultValue:
+            'Video giới thiệu Marais de France',
+
+          admin: {
+            description:
+              'Nội dung này được dùng làm title cho iframe và hỗ trợ khả năng truy cập.',
+          },
+        },
       ],
     },
+
     {
       name: 'values',
       type: 'array',

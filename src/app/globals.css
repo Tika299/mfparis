@@ -63,6 +63,12 @@
     color: #000000 !important;
     font-weight: 700;
   }
+
+  @media (min-width: 1536px) {
+    .container-ux {
+      max-width: 1280px;
+    }
+  }
 }
 
 /* --- 4. CÁC THÀNH PHẦN REUSABLE (Components) --- */

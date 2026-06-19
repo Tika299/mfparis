@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Menu, X, User, Phone, ShoppingBag, Truck, ShieldCheck } from 'lucide-react'
+import { Menu, X, Heart, Phone, ShoppingBag, Truck, ShieldCheck } from 'lucide-react'
 import { SearchBar } from './Header/SearchBar'
 import { CartCount } from './Header/CartCount'
+import { useWishlistStore } from '@/lib/store'
 
 type MobileMenuProps = {
     navItems: {
@@ -16,6 +17,14 @@ type MobileMenuProps = {
 
 export const MobileMenu = ({ navItems }: MobileMenuProps) => {
     const [open, setOpen] = useState(false)
+    const wishlistCount =
+        useWishlistStore((state) =>
+            state.hasHydrated
+                ? state.productIds.length
+                : 0,
+        )
+
+    const hasWishlistItems = wishlistCount > 0
 
     return (
         <>
@@ -100,12 +109,41 @@ export const MobileMenu = ({ navItems }: MobileMenuProps) => {
                     <div className="border-t border-gray-100 p-5">
                         <div className="grid grid-cols-3 gap-3">
                             <Link
-                                href="/account"
+                                href="/wishlist"
                                 onClick={() => setOpen(false)}
-                                className="flex flex-col items-center justify-center rounded-2xl bg-gray-50 py-3 text-xs font-bold text-gray-700"
+                                aria-label={`Xem danh sách yêu thích, ${wishlistCount} sản phẩm`}
+                                className="group relative flex min-h-[68px] flex-col items-center justify-center rounded-2xl bg-gray-50 py-3 text-xs font-bold text-gray-700 transition-colors hover:bg-red-50 hover:text-primary active:scale-[0.98]"
                             >
-                                <User size={18} />
-                                <span className="mt-1">Tài khoản</span>
+                                <Heart
+                                    aria-hidden="true"
+                                    size={19}
+                                    strokeWidth={2}
+                                    fill={
+                                        hasWishlistItems
+                                            ? 'currentColor'
+                                            : 'none'
+                                    }
+                                    className={
+                                        hasWishlistItems
+                                            ? 'text-primary'
+                                            : 'transition-colors group-hover:text-primary'
+                                    }
+                                />
+
+                                <span className="mt-1">
+                                    Yêu thích
+                                </span>
+
+                                {hasWishlistItems ? (
+                                    <span
+                                        aria-hidden="true"
+                                        className="absolute right-3 top-2 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-black leading-none text-white"
+                                    >
+                                        {wishlistCount > 99
+                                            ? '99+'
+                                            : wishlistCount}
+                                    </span>
+                                ) : null}
                             </Link>
 
                             <Link

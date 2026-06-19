@@ -96,15 +96,15 @@ function HomeProductSection({
                 <Carousel
                     opts={{
                         align: 'start',
-                        loop: products.length > 4,
+                        loop: products.length > 5,
                     }}
                     className="relative"
                 >
-                    <CarouselContent className="-ml-4 pb-4 md:-ml-5">
+                    <CarouselContent className="-ml-3 pb-4 md:-ml-4">
                         {products.map((product) => (
                             <CarouselItem
                                 key={product.id}
-                                className="basis-[78%] pl-4 sm:basis-1/2 md:basis-1/2 md:pl-5 lg:basis-1/3 xl:basis-1/4"
+                                className="basis-1/2 pl-3 md:basis-1/3 md:pl-4 lg:basis-1/4 xl:basis-1/5"
                             >
                                 <ProductCard product={product} />
                             </CarouselItem>

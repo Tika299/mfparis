@@ -8,10 +8,11 @@ import { Be_Vietnam_Pro, Playfair_Display } from 'next/font/google'
 import { FloatingContact } from '@/components/FloatingContact'
 import { Toaster } from 'sonner'
 import { GlobalEnterHandler } from '@/components/GlobalEnterHandler'
+import { WishlistHydrator } from '@/components/WishlistHydrator'
 
 const playfair = Playfair_Display({
   subsets: ['latin', 'vietnamese'],
-  weight: ['600', '700', '800', '900'],
+  weight: ['400', '600', '700', '800', '900'],
   variable: '--font-playfair',
   display: 'swap',
 })
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="vi" suppressHydrationWarning className={`${beVietnam.variable} ${playfair.variable}`}>
       <body className="font-sans antialiased text-[#1a1a1a]">
+        <WishlistHydrator />
         <Header />
         <GlobalEnterHandler />
         <main className="flex-grow">{children}</main>

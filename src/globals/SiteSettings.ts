@@ -88,6 +88,7 @@ export const SiteSettings: GlobalConfig = {
         },
         { name: 'address', type: 'textarea' },
         { name: 'facebookUrl', type: 'text' },
+        { name: 'googleMapUrl', type: 'text' },
       ],
     },
     {

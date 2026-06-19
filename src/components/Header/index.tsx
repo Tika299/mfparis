@@ -3,10 +3,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
-import { User, ShoppingBag, Truck, ShieldCheck } from 'lucide-react'
+import { Heart, ShoppingBag, Truck, ShieldCheck } from 'lucide-react'
 import { SearchBar } from './SearchBar'
 import { CartCount } from './CartCount'
 import { MobileMenu } from '../MobileMenu'
+import { WishlistButton } from './WishlistButton'
 
 export const Header = async () => {
   const payload = await getPayload({ config: configPromise })
@@ -98,16 +99,10 @@ export const Header = async () => {
           </div>
 
           {/* ICONS */}
-          <div className="relative z-20 flex shrink-0 items-center gap-2 sm:gap-3 md:gap-4">
+          <div className="relative flex shrink-0 items-center gap-2 sm:gap-3 md:gap-4">
             <div className="hidden h-6 w-px bg-gray-100 md:block" />
 
-            <Link
-              href="/account"
-              className="hidden rounded-full p-2 text-gray-700 transition-colors hover:bg-red-50 hover:text-primary sm:flex"
-              aria-label="Tài khoản"
-            >
-              <User size={20} strokeWidth={2} />
-            </Link>
+            <WishlistButton />
 
             <Link href="/cart" className="relative group" aria-label="Giỏ hàng">
               <div className="rounded-full bg-gray-50 p-2.5 transition-colors group-hover:bg-red-50">

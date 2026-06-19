@@ -231,3 +231,127 @@ export const useCartStore = create<CartState>()(
     },
   ),
 )
+
+export type WishlistProductId =
+  | string
+  | number
+
+interface WishlistState {
+  productIds: string[]
+  hasHydrated: boolean
+
+  toggleWishlist: (
+    productId: WishlistProductId,
+  ) => boolean
+
+  isInWishlist: (
+    productId: WishlistProductId,
+  ) => boolean
+
+  clearWishlist: () => void
+
+  setHasHydrated: (
+    hasHydrated: boolean,
+  ) => void
+}
+
+const normalizeWishlistProductId = (
+  productId: WishlistProductId,
+): string => {
+  return String(productId).trim()
+}
+
+export const useWishlistStore =
+  create<WishlistState>()(
+    persist(
+      (set, get) => ({
+        productIds: [],
+        hasHydrated: false,
+
+        toggleWishlist: (productId) => {
+          const normalizedProductId =
+            normalizeWishlistProductId(
+              productId,
+            )
+
+          if (!normalizedProductId) {
+            return false
+          }
+
+          const isExisting =
+            get().productIds.includes(
+              normalizedProductId,
+            )
+
+          set((state) => ({
+            productIds: isExisting
+              ? state.productIds.filter(
+                (id) =>
+                  id !==
+                  normalizedProductId,
+              )
+              : [
+                ...state.productIds,
+                normalizedProductId,
+              ],
+          }))
+
+          return !isExisting
+        },
+
+        isInWishlist: (productId) => {
+          const normalizedProductId =
+            normalizeWishlistProductId(
+              productId,
+            )
+
+          if (!normalizedProductId) {
+            return false
+          }
+
+          return get().productIds.includes(
+            normalizedProductId,
+          )
+        },
+
+        clearWishlist: () => {
+          set({
+            productIds: [],
+          })
+        },
+
+        setHasHydrated: (
+          hasHydrated,
+        ) => {
+          set({
+            hasHydrated,
+          })
+        },
+      }),
+
+      {
+        name: 'mf-paris-wishlist',
+
+        /**
+         * Quan trọng:
+         * Không đọc localStorage trong lần render
+         * đầu tiên để tránh hydration mismatch.
+         */
+        skipHydration: true,
+
+        /**
+         * Chỉ lưu danh sách ID.
+         * Không lưu hasHydrated vào localStorage.
+         */
+        partialize: (state) => ({
+          productIds:
+            state.productIds,
+        }),
+
+        onRehydrateStorage:
+          () => (state) => {
+            state?.setHasHydrated(true)
+          },
+      },
+    ),
+  )

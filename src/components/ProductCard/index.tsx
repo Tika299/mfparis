@@ -1,6 +1,6 @@
 'use client'
 
-import React, {
+import {
   useState,
   type MouseEvent,
 } from 'react'
@@ -9,12 +9,15 @@ import type {
   Product,
 } from '@/payload-types'
 import Link from 'next/link'
-import { ShoppingBag, Settings, Heart, ShieldCheck, Bike, RotateCcw, Gift, ChevronRight, Star } from 'lucide-react'
+import { ShoppingBag, Settings, Heart, Gift, ChevronRight, Star } from 'lucide-react'
 import { toast } from 'sonner'
 import { OptimizedImage } from '@/components/OptimizedImage'
 import { formatPrice } from '@/utilities/formatPrice'
 import { cn } from '@/utilities'
-import { useCartStore } from '@/lib/store'
+import {
+  useCartStore,
+  useWishlistStore,
+} from '@/lib/store'
 import { useRouter } from 'next/navigation'
 
 type ProductVariant =
@@ -264,6 +267,28 @@ export const ProductCard = ({
     (state) => state.addItem,
   )
 
+  const wishlistProductId = String(
+    product.id,
+  )
+
+  const toggleWishlist =
+    useWishlistStore(
+      (state) => state.toggleWishlist,
+    )
+
+  const hasWishlistHydrated =
+    useWishlistStore(
+      (state) => state.hasHydrated,
+    )
+
+  const isWishlisted = useWishlistStore(
+    (state) =>
+      state.hasHydrated &&
+      state.productIds.includes(
+        wishlistProductId,
+      ),
+  )
+
   const rating = normalizeRating(
     product.averageRating,
   )
@@ -277,6 +302,32 @@ export const ProductCard = ({
     rating > 0 &&
     reviewCount !== null &&
     reviewCount > 0
+
+  const handleToggleWishlist = (
+    event: MouseEvent<HTMLButtonElement>,
+  ): void => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    if (!hasWishlistHydrated) {
+      return
+    }
+
+    const hasBeenAdded =
+      toggleWishlist(wishlistProductId)
+
+    if (hasBeenAdded) {
+      toast.success(
+        'Đã thêm sản phẩm vào danh sách yêu thích',
+      )
+
+      return
+    }
+
+    toast.success(
+      'Đã xóa sản phẩm khỏi danh sách yêu thích',
+    )
+  }
 
   const handleAddToCart = (
     event: MouseEvent<HTMLButtonElement>,
@@ -379,12 +430,37 @@ export const ProductCard = ({
         {/* Nút Yêu thích */}
         <button
           type="button"
-          aria-label={`Thêm ${product.title} vào danh sách yêu thích`}
-          className="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 text-neutral-400 backdrop-blur-md transition hover:text-[#e10613]"
+          onClick={handleToggleWishlist}
+          disabled={!hasWishlistHydrated}
+          aria-pressed={isWishlisted}
+          aria-label={
+            isWishlisted
+              ? `Xóa ${product.title} khỏi danh sách yêu thích`
+              : `Thêm ${product.title} vào danh sách yêu thích`
+          }
+          title={
+            isWishlisted
+              ? 'Xóa khỏi yêu thích'
+              : 'Thêm vào yêu thích'
+          }
+          className={cn(
+            'absolute right-3 top-3 z-40 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md transition-all duration-200',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B72828] focus-visible:ring-offset-2',
+            isWishlisted
+              ? 'scale-105 bg-red-50 text-[#B72828] shadow-sm ring-1 ring-[#B72828]/15'
+              : 'bg-white/80 text-neutral-400 hover:scale-105 hover:bg-red-50 hover:text-[#B72828]',
+          )}
         >
           <Heart
+            aria-hidden="true"
             size={20}
             strokeWidth={2}
+            fill={
+              isWishlisted
+                ? 'currentColor'
+                : 'none'
+            }
+            className="transition-all duration-200"
           />
         </button>
 
@@ -421,57 +497,100 @@ export const ProductCard = ({
         </Link>
 
         {/* Giá tiền */}
-        <div className="mt-4 flex items-baseline gap-2">
-          <span className="text-[20px] font-black tracking-tight text-[#e10613]">
-            {isContactPrice ? 'Liên hệ' : `${formatPrice(finalPrice)}đ`}
-          </span>
-          {isSale && (
-            <span className="text-[14px] font-medium text-neutral-300 line-through">
-              {formatPrice(basePrice)}đ
-            </span>
+        <div className="mt-1 flex min-h-[54px] flex-col justify-end">
+          {isSale ? (
+            <>
+              {/* Giá gốc */}
+              <span className="text-[12px] font-normal leading-none text-neutral-400 line-through sm:text-[13px]">
+                {formatPrice(basePrice)}đ
+              </span>
+
+              {/* Giá khuyến mãi */}
+              <span className="mt-1.5 text-[18px] font-extrabold leading-none tracking-tight text-[#e10613] sm:text-[20px]">
+                {formatPrice(salePrice)}đ
+              </span>
+            </>
+          ) : (
+            <>
+              {/*
+       * Phần tử giữ chỗ giúp chiều cao khu vực giá
+       * đồng nhất với sản phẩm đang giảm giá.
+       */}
+              <span
+                aria-hidden="true"
+                className="invisible text-[12px] leading-none sm:text-[13px]"
+              >
+                Giá gốc
+              </span>
+
+              <span className="mt-1.5 text-[18px] font-extrabold leading-none tracking-tight text-[#e10613] sm:text-[20px]">
+                {isContactPrice
+                  ? 'Liên hệ'
+                  : `${formatPrice(basePrice)}đ`}
+              </span>
+            </>
           )}
         </div>
 
-        {/* Đánh giá */}
-        {shouldShowRating ? (
-          <div className="mt-3 flex items-center gap-1 border-b border-neutral-50 pb-4">
-            <RatingStars rating={rating} />
+        {/* Đánh giá - luôn hiển thị để các card đồng đều chiều cao */}
+        <div className="mt-3 flex min-h-[37px] items-center gap-1 border-b border-neutral-100 pb-3">
+          {shouldShowRating ? (
+            <>
+              <RatingStars rating={rating} />
 
-            <span className="ml-1 text-[13px] font-bold text-neutral-900">
-              {rating.toLocaleString('vi-VN', {
-                minimumFractionDigits: 1,
-                maximumFractionDigits: 1,
-              })}
-            </span>
+              <span className="ml-1 text-[12px] font-semibold text-neutral-800 sm:text-[13px]">
+                {rating.toLocaleString('vi-VN', {
+                  minimumFractionDigits: 1,
+                  maximumFractionDigits: 1,
+                })}
+              </span>
 
-            <span className="text-neutral-200">
-              |
-            </span>
+              <span
+                aria-hidden="true"
+                className="text-neutral-200"
+              >
+                |
+              </span>
 
-            <span className="text-[12px] text-neutral-400">
-              {reviewCount.toLocaleString(
-                'vi-VN',
-              )}{' '}
-              đánh giá
-            </span>
-          </div>
-        ) : null}
+              <span className="truncate text-[10px] text-neutral-400 sm:text-[12px]">
+                {reviewCount.toLocaleString('vi-VN')} đánh giá
+              </span>
+            </>
+          ) : (
+            <>
+              <RatingStars rating={0} />
 
-        {/* Chính sách 3 cột - Làm gọn lại */}
-        <div className="grid grid-cols-3 py-4">
-          <MiniPolicy icon={<ShieldCheck size={18} />} label="Chính hãng" sub="100% chuẩn" />
-          <MiniPolicy icon={<Bike size={18} />} label="Giao 2h" sub="Nội thành" />
-          <MiniPolicy icon={<RotateCcw size={18} />} label="Đổi trả" sub="7 ngày" />
+              <span className="ml-1 truncate text-[10px] font-medium text-neutral-400 sm:text-[12px]">
+                Chưa có đánh giá
+              </span>
+            </>
+          )}
         </div>
 
-        {/* Quà tặng */}
-        <button className="flex w-full items-center justify-between rounded-2xl bg-[#f5f9ff] px-4 py-3 text-[#1f5fe0] transition hover:bg-[#ebf3ff]">
-          <span className="flex items-center gap-2 text-[12.5px] font-bold">
-            <Gift size={18} />
-            Tặng quà/Voucher
+        {/* Quà tặng/Voucher */}
+        <Link
+          href="/vouchers"
+          aria-label={`Xem voucher áp dụng cho ${product.title}`}
+          className="mt-3 flex min-h-11 w-full items-center justify-between rounded-2xl bg-[#f5f9ff] px-3 py-2.5 text-[#1f5fe0] transition-colors hover:bg-[#ebf3ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1f5fe0] focus-visible:ring-offset-2 sm:px-4 sm:py-3"
+        >
+          <span className="flex min-w-0 items-center gap-2 text-[11px] font-bold sm:text-[12.5px]">
+            <Gift
+              aria-hidden="true"
+              size={18}
+              className="shrink-0"
+            />
+
+            <span className="truncate">
+              Tặng quà/Voucher
+            </span>
           </span>
-          <ChevronRight size={16} />
-        </button>
+
+          <ChevronRight
+            aria-hidden="true"
+            size={16}
+            className="shrink-0"
+          />
+        </Link>
 
         {/* Nút Mua ngay */}
         <button
@@ -514,15 +633,5 @@ export const ProductCard = ({
         </button>
       </div>
     </article>
-  )
-}
-
-function MiniPolicy({ icon, label, sub }: { icon: React.ReactNode; label: string; sub: string }) {
-  return (
-    <div className="flex flex-col items-center text-center">
-      <div className="mb-1 text-[#e10613]">{icon}</div>
-      <p className="text-[10px] font-bold text-neutral-800">{label}</p>
-      <p className="text-[9px] text-neutral-400">{sub}</p>
-    </div>
   )
 }
