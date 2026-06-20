@@ -1,5 +1,6 @@
 'use client'
 
+import type { FormEvent } from 'react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search } from 'lucide-react'
@@ -8,44 +9,63 @@ type SearchBarProps = {
   mobile?: boolean
 }
 
-export const SearchBar = ({ mobile = false }: SearchBarProps) => {
-  const [searchTerm, setSearchTerm] = useState('')
+export const SearchBar = ({
+  mobile = false,
+}: SearchBarProps) => {
+  const [searchTerm, setSearchTerm] =
+    useState('')
+
   const router = useRouter()
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSearch = (
+    event: FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault()
 
     const keyword = searchTerm.trim()
 
-    if (keyword) {
-      router.push(`/search?q=${encodeURIComponent(keyword)}`)
-      setSearchTerm('')
+    if (!keyword) {
+      return
     }
+
+    router.push(
+      `/search?q=${encodeURIComponent(keyword)}`,
+    )
+
+    setSearchTerm('')
   }
 
   return (
     <form
       onSubmit={handleSearch}
+      role="search"
       className={
         mobile
-          ? 'flex w-full items-center rounded-full border border-gray-200 bg-gray-50 px-4 py-3'
-          : 'flex w-full items-center rounded-full border border-gray-200 bg-gray-50 px-4 py-2 transition-colors focus-within:border-primary focus-within:bg-white'
+          ? 'flex h-11 w-full items-center rounded-[12px] border border-[#dedede] bg-[#f8f8f8] px-3.5 transition-colors focus-within:border-[#ad0509] focus-within:bg-white'
+          : 'flex h-[43px] w-full items-center rounded-[13px] border border-[#dedede] bg-white px-[14px] transition-colors focus-within:border-[#ad0509]'
       }
     >
       <input
-        type="text"
-        placeholder="Tìm kiếm sản phẩm..."
-        className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400"
+        type="search"
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={(event) =>
+          setSearchTerm(event.target.value)
+        }
+        placeholder="Bạn tìm sản phẩm gì..."
+        autoComplete="off"
+        className="h-full min-w-0 flex-1 bg-transparent text-[13px] font-normal text-[#202020] outline-none placeholder:text-[#8a8a8a]"
+        aria-label="Nhập từ khóa tìm kiếm"
       />
 
       <button
         type="submit"
-        className="ml-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-gray-700 shadow-sm transition-colors hover:bg-primary hover:text-white"
+        className="ml-2 flex h-8 w-8 shrink-0 items-center justify-center text-[#555555] transition-colors hover:text-[#ad0509]"
         aria-label="Tìm kiếm"
       >
-        <Search size={16} strokeWidth={2} />
+        <Search
+          size={mobile ? 19 : 21}
+          strokeWidth={2}
+        />
       </button>
     </form>
   )

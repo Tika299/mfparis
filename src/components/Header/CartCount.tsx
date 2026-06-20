@@ -1,25 +1,53 @@
 'use client'
 
-import { useCartStore } from '@/lib/store'
 import { useEffect, useState } from 'react'
+import { useCartStore } from '@/lib/store'
 
-export const CartCount = () => {
-  const [isClient, setIsClient] = useState(false)
-  const items = useCartStore((state) => state.items)
+type CartCountProps = {
+  showZero?: boolean
+  className?: string
+}
 
-  const count = items.reduce((acc, item) => acc + item.quantity, 0)
+export const CartCount = ({
+  showZero = false,
+  className = '',
+}: CartCountProps) => {
+  const [isClient, setIsClient] =
+    useState(false)
+
+  const items = useCartStore(
+    (state) => state.items,
+  )
+
+  const count = items.reduce(
+    (total, item) =>
+      total + item.quantity,
+    0,
+  )
 
   useEffect(() => {
     setIsClient(true)
   }, [])
 
-  if (!isClient || count <= 0) {
+  const displayedCount = isClient
+    ? count
+    : 0
+
+  if (
+    !showZero &&
+    (!isClient || displayedCount <= 0)
+  ) {
     return null
   }
 
   return (
-    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-black px-1 text-[9px] font-bold leading-none text-white">
-      {count > 99 ? '99+' : count}
+    <span
+      className={`inline-flex items-center justify-center rounded-full font-bold leading-none text-white ${className}`}
+      aria-label={`${displayedCount} sản phẩm trong giỏ hàng`}
+    >
+      {displayedCount > 99
+        ? '99+'
+        : displayedCount}
     </span>
   )
 }

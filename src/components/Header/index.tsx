@@ -1,124 +1,422 @@
-import React from 'react'
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
-import { Heart, ShoppingBag, Truck, ShieldCheck } from 'lucide-react'
+import {
+  ChevronRight,
+  Gift,
+  MapPin,
+  Menu,
+  ShoppingBag,
+  Smartphone,
+  UserRound,
+} from 'lucide-react'
+
 import { SearchBar } from './SearchBar'
 import { CartCount } from './CartCount'
-import { MobileMenu } from '../MobileMenu'
 import { WishlistButton } from './WishlistButton'
+import { MobileMenu } from '../MobileMenu'
+
+type HeaderNavItem = {
+  id: string
+  label: string
+  link: string
+}
+
+/**
+ * Chỉ được dùng khi trong Payload chưa nhập menu.
+ * Khi Payload đã có navItems, hệ thống sẽ ưu tiên dữ liệu từ Payload.
+ */
+const fallbackNavItems: HeaderNavItem[] = [
+  {
+    id: 'nuoc-hoa',
+    label: 'Nước hoa',
+    link: '/nuoc-hoa',
+  },
+  {
+    id: 'nuoc-hoa-niche',
+    label: 'Nước hoa niche',
+    link: '/nuoc-hoa-niche',
+  },
+  {
+    id: 'cham-soc-da',
+    label: 'Chăm sóc da',
+    link: '/cham-soc-da',
+  },
+  {
+    id: 'makeup',
+    label: 'Makeup',
+    link: '/makeup',
+  },
+  {
+    id: 'cham-soc-co-the',
+    label: 'Chăm sóc cơ thể',
+    link: '/cham-soc-co-the',
+  },
+  {
+    id: 'toc-va-nuoc-hoa-toc',
+    label: 'Tóc & Nước hoa tóc',
+    link: '/toc-va-nuoc-hoa-toc',
+  },
+  {
+    id: 'qua-tang',
+    label: 'Quà tặng',
+    link: '/qua-tang',
+  },
+  {
+    id: 'uu-dai',
+    label: 'Ưu đãi',
+    link: '/vouchers',
+  },
+]
 
 export const Header = async () => {
-  const payload = await getPayload({ config: configPromise })
-  const settings = await payload.findGlobal({ slug: 'site-settings', depth: 1 })
+  const payload = await getPayload({
+    config: configPromise,
+  })
+
+  const settings = await payload.findGlobal({
+    slug: 'site-settings',
+    depth: 1,
+  })
 
   const logo = settings.header?.logo
-  const logoUrl = logo && typeof logo === 'object' && 'url' in logo ? logo.url : null
-  const logoAlt = logo && typeof logo === 'object' && 'alt' in logo ? logo.alt : 'MF Paris'
-  const navItems = settings.header?.navItems || []
+
+  const logoUrl =
+    logo &&
+      typeof logo === 'object' &&
+      'url' in logo &&
+      typeof logo.url === 'string'
+      ? logo.url
+      : null
+
+  const logoAlt =
+    logo &&
+      typeof logo === 'object' &&
+      'alt' in logo &&
+      typeof logo.alt === 'string' &&
+      logo.alt
+      ? logo.alt
+      : 'Marais de France'
+
+  const cmsNavItems = (
+    settings.header?.navItems ?? []
+  ).reduce<HeaderNavItem[]>((result, item, index) => {
+    const label =
+      typeof item?.label === 'string'
+        ? item.label.trim()
+        : ''
+
+    const link =
+      typeof item?.link === 'string'
+        ? item.link.trim()
+        : ''
+
+    if (!label || !link) {
+      return result
+    }
+
+    result.push({
+      id: String(
+        item.id ??
+        `${label.toLowerCase().replaceAll(' ', '-')}-${index}`,
+      ),
+      label,
+      link,
+    })
+
+    return result
+  }, [])
+
+  const navItems =
+    cmsNavItems.length > 0
+      ? cmsNavItems
+      : fallbackNavItems
 
   return (
-    <header className="sticky top-0 z-[100] bg-white shadow-sm antialiased font-sans">
-      {/* TOP BAR - Desktop / Tablet lớn */}
-      <div className="hidden bg-primary text-primary-foreground border-b border-white/10 md:block">
-        <div className="container-custom flex h-9 items-center justify-between text-[10px] font-bold uppercase tracking-widest">
-          <div className="flex items-center gap-4 lg:gap-6">
-            <span className="flex items-center gap-2 whitespace-nowrap">
-              <Truck size={12} /> Miễn phí vận chuyển từ 500k
-            </span>
+    <header className="sticky top-0 z-[100] w-full bg-white font-sans text-[#202020]">
+      {/* =====================================================
+          DESKTOP HEADER
+          Hiển thị từ 1024 px trở lên
+      ====================================================== */}
+      <div className="hidden lg:block">
+        {/* TOP PROMOTION BAR */}
+        <div className="h-10 bg-[#ad0509] text-white">
+          <div className="mx-auto flex h-full w-full max-w-[1280px] items-center justify-between px-7">
+            {/* Nội dung bên trái */}
+            <div className="flex items-center gap-7">
+              <div className="flex items-center gap-2 whitespace-nowrap text-[12px] font-medium leading-none">
+                <Gift
+                  aria-hidden="true"
+                  size={15}
+                  strokeWidth={2.4}
+                />
 
-            <span className="hidden lg:flex items-center gap-2 whitespace-nowrap">
-              <ShieldCheck size={12} /> 100% Chính hãng Pháp
-            </span>
+                <span>
+                  <strong className="font-bold">
+                    FREESHIP
+                  </strong>{' '}
+                  cho đơn từ 499K
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 whitespace-nowrap text-[12px] font-medium leading-none">
+                <Gift
+                  aria-hidden="true"
+                  size={15}
+                  strokeWidth={2.4}
+                />
+
+                <span>
+                  Tặng sample cao cấp cho mọi đơn hàng
+                </span>
+              </div>
+            </div>
+
+            {/* Nội dung bên phải */}
+            <div className="flex items-center gap-7">
+              <Link
+                href="/tai-ung-dung"
+                className="flex items-center gap-2 whitespace-nowrap text-[12px] font-medium leading-none transition-opacity hover:opacity-80"
+              >
+                <Smartphone
+                  aria-hidden="true"
+                  size={14}
+                  strokeWidth={2.4}
+                />
+
+                <span>
+                  Tải ứng dụng Marais de France
+                </span>
+              </Link>
+
+              <Link
+                href="/he-thong-cua-hang"
+                className="flex items-center gap-2 whitespace-nowrap text-[12px] font-medium leading-none transition-opacity hover:opacity-80"
+              >
+                <MapPin
+                  aria-hidden="true"
+                  size={15}
+                  strokeWidth={2.4}
+                />
+
+                <span>Hệ thống cửa hàng</span>
+              </Link>
+            </div>
           </div>
+        </div>
 
-          <div className="flex items-center gap-4">
-            <Link href="/about" className="hover:opacity-70 transition-opacity">
-              Giới thiệu
+        {/* MAIN HEADER */}
+        <div className="bg-white">
+          <div className="mx-auto grid h-[86px] w-full max-w-[1280px] grid-cols-[269px_minmax(315px,1fr)_305px] items-center gap-x-6 px-7">
+            {/* LOGO */}
+            <div className="flex items-center pl-6">
+              <Link
+                href="/"
+                className="inline-flex items-center"
+                aria-label="Trang chủ Marais de France"
+              >
+                {logoUrl ? (
+                  <Image
+                    src={logoUrl}
+                    alt={logoAlt}
+                    width={420}
+                    height={130}
+                    sizes="198px"
+                    className="block h-auto w-[198px] object-contain object-left"
+                    priority
+                  />
+                ) : (
+                  <div className="flex flex-col">
+                    <span className="font-heading text-[25px] font-semibold leading-none text-[#b31319]">
+                      Marais de France
+                    </span>
+
+                    <span className="mt-1 text-center text-[9px] tracking-[0.35em] text-gray-500">
+                      PARIS
+                    </span>
+                  </div>
+                )}
+              </Link>
+            </div>
+
+            {/* SEARCH */}
+            <div className="w-full max-w-[340px] justify-self-center">
+              <SearchBar />
+            </div>
+
+            {/* ACCOUNT / WISHLIST / CART */}
+            <div className="flex w-[305px] items-center justify-end gap-6">
+              {/* ACCOUNT */}
+              <Link
+                href="/tai-khoan"
+                className="group flex items-center gap-2 text-[#252525]"
+                aria-label="Tài khoản"
+              >
+                <UserRound
+                  aria-hidden="true"
+                  size={26}
+                  strokeWidth={1.65}
+                  className="shrink-0 transition-colors group-hover:text-[#ad0509]"
+                />
+
+                <span className="whitespace-nowrap text-[12px] leading-[16px]">
+                  <span className="block font-medium">
+                    Tài khoản
+                  </span>
+
+                  <span className="block font-normal text-[#777777]">
+                    Đăng nhập
+                  </span>
+                </span>
+              </Link>
+
+              {/* WISHLIST */}
+              <WishlistButton mode="desktop" />
+
+              {/* CART */}
+              <Link
+                href="/cart"
+                className="group flex items-center gap-2 text-[#252525]"
+                aria-label="Giỏ hàng"
+              >
+                <span className="relative flex h-[31px] w-[31px] shrink-0 items-center justify-center">
+                  <ShoppingBag
+                    aria-hidden="true"
+                    size={26}
+                    strokeWidth={1.65}
+                    className="transition-colors group-hover:text-[#ad0509]"
+                  />
+
+                  <CartCount
+                    showZero
+                    className="absolute -right-[7px] -top-[8px] h-[15px] min-w-[15px] bg-[#ad0509] px-[3px] text-[8px] ring-2 ring-white"
+                  />
+                </span>
+
+                <span className="whitespace-nowrap text-[12px] font-medium">
+                  Giỏ hàng
+                </span>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* DESKTOP NAVIGATION */}
+        <div className="h-[49px] border-y border-[#ececec] bg-white">
+          <div className="mx-auto flex h-full w-full max-w-[1280px] items-center px-7">
+            {/* DANH MỤC */}
+            <Link
+              href="/categories"
+              className="group flex h-full shrink-0 items-center gap-3 pr-10 text-[12.5px] font-medium text-[#202020]"
+            >
+              <Menu
+                aria-hidden="true"
+                size={21}
+                strokeWidth={3}
+                className="text-[#7d0007] transition-colors group-hover:text-[#ad0509]"
+              />
+
+              <span>Danh mục</span>
             </Link>
-            <Link href="/blog" className="hover:opacity-70 transition-opacity">
-              Tạp chí
-            </Link>
+
+            {/* MENU ITEMS */}
+            <nav
+              className="flex min-w-0 flex-1 items-center justify-start gap-x-5 xl:gap-x-8"
+              aria-label="Điều hướng chính"
+            >
+              {navItems.map((item) => {
+                const isOffer =
+                  item.label
+                    .trim()
+                    .toLocaleLowerCase('vi') ===
+                  'ưu đãi'
+
+                return (
+                  <Link
+                    key={item.id}
+                    href={item.link}
+                    className={
+                      isOffer
+                        ? 'group flex items-center gap-2 whitespace-nowrap text-[12.5px] font-semibold text-[#c31920] transition-opacity hover:opacity-70'
+                        : 'whitespace-nowrap text-[12.5px] font-medium text-[#202020] transition-colors hover:text-[#ad0509]'
+                    }
+                  >
+                    <span>{item.label}</span>
+
+                    {isOffer ? (
+                      <ChevronRight
+                        aria-hidden="true"
+                        size={13}
+                        strokeWidth={2.3}
+                        className="transition-transform group-hover:translate-x-0.5"
+                      />
+                    ) : null}
+                  </Link>
+                )
+              })}
+            </nav>
           </div>
         </div>
       </div>
 
-      {/* MAIN HEADER */}
-      <div className="bg-white">
-        <div className="container-custom relative flex h-16 items-center justify-between gap-3 md:h-18 lg:h-20 lg:gap-8">
-          {/* MOBILE MENU */}
-          <div className="relative z-20 flex lg:hidden">
-            <MobileMenu navItems={navItems.filter((item): item is { id: string; label: string; link: string } => item.id !== null && item.id !== undefined)} />
-          </div>
+      {/* =====================================================
+          MOBILE / TABLET HEADER
+          Hiển thị dưới 1024 px
+      ====================================================== */}
+      <div className="lg:hidden">
+        <div className="relative flex h-16 items-center justify-between border-b border-[#eeeeee] bg-white px-4">
+          {/* MENU BÊN TRÁI */}
+          <MobileMenu
+            navItems={navItems}
+            logoUrl={logoUrl}
+            logoAlt={logoAlt}
+          />
 
-          {/* LOGO */}
+          {/* LOGO Ở GIỮA */}
           <Link
             href="/"
-            className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center lg:static lg:h-full lg:shrink-0 lg:translate-x-0 lg:translate-y-0 lg:justify-start"
+            className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"
+            aria-label="Trang chủ Marais de France"
           >
             {logoUrl ? (
               <Image
                 src={logoUrl}
                 alt={logoAlt}
-                width={180}
-                height={140}
-                sizes="(max-width: 640px) 76px, (max-width: 1024px) 86px, 150px"
-                className="block h-auto w-[76px] object-contain object-center transition-transform duration-300 hover:scale-105 sm:w-[82px] md:w-[88px] lg:w-[110px] lg:object-left"
+                width={280}
+                height={90}
+                sizes="126px"
+                className="h-auto w-[126px] object-contain"
                 priority
               />
             ) : (
-              <div className="flex flex-col items-center lg:items-start">
-                <span className="font-heading text-xl font-bold tracking-tight uppercase leading-none text-primary sm:text-2xl">
-                  MF PARIS
-                </span>
-                <span className="mt-1 hidden font-sans text-[8px] font-bold uppercase tracking-[0.35em] text-gray-400 sm:block">
-                  Authentic Service
-                </span>
-              </div>
+              <span className="font-heading text-lg font-semibold text-[#b31319]">
+                Marais de France
+              </span>
             )}
           </Link>
 
-          {/* DESKTOP NAV */}
-          <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
-            {navItems.map((item: any) => (
-              <Link
-                key={item.id}
-                href={item.link}
-                className="group relative font-heading text-[15px] xl:text-[16px] font-[600] tracking-[0.02em] transition-colors duration-300 hover:text-primary whitespace-nowrap"
-              >
-                {item.label}
-                <span className="absolute -bottom-2 left-0 h-[2px] w-0 rounded-full bg-primary transition-all duration-300 group-hover:w-full" />
-              </Link>
-            ))}
-          </nav>
+          {/* ICON BÊN PHẢI */}
+          <div className="ml-auto flex items-center gap-1">
+            <WishlistButton mode="icon" />
 
-          {/* SEARCH - TABLET / DESKTOP */}
-          <div className="hidden lg:flex flex-1 justify-end lg:max-w-[260px] xl:max-w-[320px]">
-            <SearchBar />
-          </div>
+            <Link
+              href="/cart"
+              className="relative flex h-10 w-10 items-center justify-center rounded-full bg-[#f7f7f7] text-[#303030]"
+              aria-label="Giỏ hàng"
+            >
+              <ShoppingBag
+                size={20}
+                strokeWidth={1.8}
+              />
 
-          {/* ICONS */}
-          <div className="relative flex shrink-0 items-center gap-2 sm:gap-3 md:gap-4">
-            <div className="hidden h-6 w-px bg-gray-100 md:block" />
-
-            <WishlistButton />
-
-            <Link href="/cart" className="relative group" aria-label="Giỏ hàng">
-              <div className="rounded-full bg-gray-50 p-2.5 transition-colors group-hover:bg-red-50">
-                <ShoppingBag
-                  size={20}
-                  strokeWidth={2}
-                  className="text-gray-700 transition-colors group-hover:text-primary"
-                />
-              </div>
-              <CartCount />
+              <CartCount className="absolute -right-0.5 -top-0.5 h-4 min-w-4 bg-[#ad0509] px-1 text-[8px] ring-2 ring-white" />
             </Link>
           </div>
         </div>
 
-        {/* SEARCH MOBILE RIÊNG */}
-        <div className="border-t border-gray-100 px-4 py-3 lg:hidden">
+        {/* SEARCH MOBILE */}
+        <div className="border-b border-[#eeeeee] bg-white px-4 py-2.5">
           <SearchBar mobile />
         </div>
       </div>
