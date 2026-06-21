@@ -1,383 +1,328 @@
-'use client'
-
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
-import { ChevronRight, Clock, ShieldCheck, Truck, Zap } from 'lucide-react'
-import { ProductCard } from '@/components/ProductCard'
-import { OptimizedImage } from '@/components/OptimizedImage'
 import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-} from '@/components/ui/carousel'
-import { toast } from 'sonner'
+    ChevronRight,
+    Zap,
+} from 'lucide-react'
 
-type FlashSaleVoucher = Readonly<{
-    id: string | number
-    code: string
-    title: string
-    value: string
-    sub: string
-}>
+import type {
+    Product,
+    Voucher,
+} from '@/payload-types'
+import { ProductCard } from '@/components/ProductCard'
+import { FlashSaleCountdown } from '@/components/FlashSaleCountdown'
 
-type FlashSaleSectionProps = {
-    products: any[]
-    categories: any[]
-    endTime: string
-    vouchers?: FlashSaleVoucher[]
+type VoucherRelationship =
+    | number
+    | Voucher
+    | null
+    | undefined
+
+type FlashSaleVoucherDTO =
+    Readonly<{
+        id: Voucher['id']
+        code: string
+        title: string
+        value: string
+        sub: string
+    }>
+
+type FlashSaleSectionProps =
+    Readonly<{
+        products: Product[]
+        endTime: string
+
+        /**
+         * Danh sách relationship voucher lấy từ:
+         * settings.flashSale.vouchers
+         */
+        vouchers?:
+        | VoucherRelationship[]
+        | null
+
+        viewAllHref?: string
+    }>
+
+/* =========================================================
+   VOUCHER HELPERS
+   Chuyển nguyên logic từ HomePage vào đây.
+========================================================= */
+
+function isPopulatedVoucher(
+    value: VoucherRelationship,
+): value is Voucher {
+    return (
+        typeof value === 'object' &&
+        value !== null
+    )
 }
 
-type VoucherBoxProps = Readonly<{
-    code: string
-    title: string
-    value: string
-    sub: string
-}>
+function formatCompactVND(
+    amount: number,
+): string {
+    if (amount >= 1_000_000) {
+        return `${(
+            amount / 1_000_000
+        ).toLocaleString('vi-VN', {
+            maximumFractionDigits: 1,
+        })} TR`
+    }
 
+    if (amount >= 1_000) {
+        return `${(
+            amount / 1_000
+        ).toLocaleString('vi-VN', {
+            maximumFractionDigits: 0,
+        })} K`
+    }
 
-function getTimeLeft(endTime: string) {
-    const end = new Date(endTime).getTime()
-    const now = Date.now()
-    const diff = Math.max(0, end - now)
+    return `${amount.toLocaleString(
+        'vi-VN',
+    )} Đ`
+}
 
-    const hours = Math.floor(diff / (1000 * 60 * 60))
-    const minutes = Math.floor((diff / (1000 * 60)) % 60)
-    const seconds = Math.floor((diff / 1000) % 60)
+function isVoucherAvailable(
+    voucher: Voucher,
+    currentTime: number,
+): boolean {
+    if (voucher.status !== 'active') {
+        return false
+    }
+
+    if (voucher.startsAt) {
+        const startsAt =
+            new Date(
+                voucher.startsAt,
+            ).getTime()
+
+        if (
+            Number.isFinite(startsAt) &&
+            startsAt > currentTime
+        ) {
+            return false
+        }
+    }
+
+    if (voucher.endsAt) {
+        const endsAt =
+            new Date(
+                voucher.endsAt,
+            ).getTime()
+
+        if (
+            Number.isFinite(endsAt) &&
+            endsAt <= currentTime
+        ) {
+            return false
+        }
+    }
+
+    const usageLimit = Number(
+        voucher.usageLimit ?? 0,
+    )
+
+    const usedCount = Number(
+        voucher.usedCount ?? 0,
+    )
+
+    if (
+        usageLimit > 0 &&
+        usedCount >= usageLimit
+    ) {
+        return false
+    }
+
+    return true
+}
+
+function toFlashSaleVoucherDTO(
+    voucher: Voucher,
+): FlashSaleVoucherDTO | null {
+    const code = voucher.code
+        ?.trim()
+        .toUpperCase()
+
+    const discountValue = Number(
+        voucher.value ?? 0,
+    )
+
+    if (
+        !code ||
+        !Number.isFinite(
+            discountValue,
+        ) ||
+        discountValue <= 0
+    ) {
+        return null
+    }
+
+    const value =
+        voucher.type === 'percent'
+            ? `${discountValue.toLocaleString(
+                'vi-VN',
+            )}%`
+            : formatCompactVND(
+                discountValue,
+            )
+
+    const minimumOrderAmount =
+        Number(
+            voucher.minOrderAmount ?? 0,
+        )
+
+    const maximumDiscountAmount =
+        Number(
+            voucher.maxDiscountAmount ??
+            0,
+        )
+
+    let sub =
+        minimumOrderAmount > 0
+            ? `Đơn từ ${formatCompactVND(
+                minimumOrderAmount,
+            )}`
+            : 'Không yêu cầu đơn tối thiểu'
+
+    if (
+        voucher.type === 'percent' &&
+        maximumDiscountAmount > 0
+    ) {
+        sub += ` · Tối đa ${formatCompactVND(
+            maximumDiscountAmount,
+        )}`
+    }
 
     return {
-        hours,
-        minutes,
-        seconds,
-        isEnded: diff <= 0,
+        id: voucher.id,
+        code,
+
+        title:
+            voucher.title?.trim() ||
+            'Voucher',
+
+        value,
+        sub,
     }
 }
 
-function pad(value: number) {
-    return String(value).padStart(2, '0')
-}
+/* =========================================================
+   FLASH SALE SECTION
+========================================================= */
 
 export function FlashSaleSection({
     products,
-    categories,
     endTime,
     vouchers = [],
+    viewAllHref = '/products',
 }: FlashSaleSectionProps) {
-    const [activeCategory, setActiveCategory] = useState('all')
-    type TimeLeft = ReturnType<typeof getTimeLeft>
-
-    const [timeLeft, setTimeLeft] =
-        useState<TimeLeft | null>(null)
-
-    useEffect(() => {
-        const updateCountdown = (): void => {
-            setTimeLeft(getTimeLeft(endTime))
-        }
-
-        /**
-         * Chỉ bắt đầu tính thời gian sau khi component
-         * đã mount trên trình duyệt.
-         */
-        updateCountdown()
-
-        const timer = window.setInterval(
-            updateCountdown,
-            1000,
-        )
-
-        return () => {
-            window.clearInterval(timer)
-        }
-    }, [endTime])
-
-    const availableCategories = useMemo(() => {
-        const productCategorySlugs = new Set<string>()
-
-        products.forEach((product) => {
-            product.categories?.forEach((cat: any) => {
-                if (cat?.slug) productCategorySlugs.add(cat.slug)
-            })
-        })
-
-        return categories
-            .filter((cat: any) => productCategorySlugs.has(cat.slug))
-            .slice(0, 8)
-    }, [products, categories])
-
-    const filteredProducts = useMemo(() => {
-        if (activeCategory === 'all') return products
-
-        return products.filter((product) =>
-            product.categories?.some((cat: any) => cat?.slug === activeCategory),
-        )
-    }, [products, activeCategory])
-
-    const heroProducts = products.slice(0, 4)
-
-    const voucherItems = vouchers
-
     if (!products?.length) {
         return null
     }
 
-    if (timeLeft?.isEnded) {
-        return null
-    }
+    const currentTime = Date.now()
+
+    const availableVouchers =
+        (vouchers ?? [])
+            .filter(isPopulatedVoucher)
+            .filter((voucher) =>
+                isVoucherAvailable(
+                    voucher,
+                    currentTime,
+                ),
+            )
+            .map(toFlashSaleVoucherDTO)
+            .filter(
+                (
+                    voucher,
+                ): voucher is FlashSaleVoucherDTO =>
+                    voucher !== null,
+            )
+            .slice(0, 4)
+
+    /**
+     * Banner lớn sử dụng voucher đầu tiên.
+     */
+    const primaryVoucher =
+        availableVouchers[0] ?? null
+
+    /**
+     * Dòng ưu đãi bổ sung sử dụng voucher thứ hai.
+     * Ví dụ: "+ Giảm thêm 100K".
+     */
+    const secondaryVoucher =
+        availableVouchers[1] ?? null
+
+    const displayedProducts =
+        products.slice(0, 5)
 
     return (
         <section className="container-ux mt-8 md:mt-10">
-            <div className="overflow-hidden rounded-[2rem] border border-red-100 bg-white shadow-sm md:rounded-[2.5rem]">
-                {/* Banner Flash Sale */}
-                <div className="relative overflow-hidden bg-gradient-to-br from-[#7a0000] via-[#b00005] to-[#e10613] px-4 py-7 text-white sm:px-5 md:px-8 md:py-9 lg:px-10 lg:py-10">
-                    <div className="absolute inset-0 opacity-30">
-                        <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-yellow-300 blur-3xl" />
-                        <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-red-950 blur-2xl" />
-                    </div>
+            <div className="overflow-hidden rounded-[22px] border border-[#e8e8e8] bg-white px-4 pb-4 pt-5 shadow-[0_6px_24px_rgba(0,0,0,0.035)] sm:px-5 sm:pb-5 lg:px-6 lg:pb-6 lg:pt-6">
+                {/* =================================================
+            HEADER
+        ================================================== */}
+                <div className="mb-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center lg:gap-6">
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <Zap
+                                aria-hidden="true"
+                                size={38}
+                                strokeWidth={2.2}
+                                fill="currentColor"
+                                className="shrink-0 text-[#b40008]"
+                            />
 
-                    <div className="relative z-10 grid gap-8 lg:grid-cols-12 lg:items-center">
-                        <div className="lg:col-span-7">
-                            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] backdrop-blur md:text-[12px]">
-                                <Zap size={15} fill="currentColor" />
-                                Deal sốc mỗi ngày
-                            </div>
-
-                            <h2 className="font-heading text-[42px] font-semibold uppercase leading-[0.95] tracking-[-0.035em] text-[#ffeaa7] sm:text-[52px] md:text-[64px] lg:text-[72px]">
+                            <h2 className="font-heading text-[30px] font-bold uppercase leading-none tracking-[-0.025em] text-[#b40008] sm:text-[36px] lg:text-[38px]">
                                 Flash Sale
                             </h2>
-
-                            <p className="mt-4 max-w-xl text-sm font-medium leading-6 text-red-50 md:text-base md:leading-7">
-                                Siêu ưu đãi cho Nước hoa - Mỹ phẩm - TPCN chính hãng
-                            </p>
-
-                            <div className="mt-7 max-w-md rounded-2xl border border-white/20 bg-black/15 p-3 backdrop-blur sm:p-4">
-                                <div className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-red-50 sm:text-xs">
-                                    <Clock size={16} />
-                                    Kết thúc sau
-                                </div>
-
-                                <div className="flex items-center gap-2 sm:gap-3">
-                                    <TimeBox
-                                        value={
-                                            timeLeft
-                                                ? pad(timeLeft.hours)
-                                                : '--'
-                                        }
-                                        label="Giờ"
-                                    />
-
-                                    <span className="text-xl font-bold sm:text-2xl">
-                                        :
-                                    </span>
-
-                                    <TimeBox
-                                        value={
-                                            timeLeft
-                                                ? pad(timeLeft.minutes)
-                                                : '--'
-                                        }
-                                        label="Phút"
-                                    />
-
-                                    <span className="text-xl font-black sm:text-2xl">
-                                        :
-                                    </span>
-
-                                    <TimeBox
-                                        value={
-                                            timeLeft
-                                                ? pad(timeLeft.seconds)
-                                                : '--'
-                                        }
-                                        label="Giây"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Tablet hero products: không chia 2 cột, kéo ngang cho thoáng */}
-                            <div className="mt-7 hidden gap-3 overflow-x-auto pb-2 md:flex lg:hidden">
-                                {heroProducts.map((product) => {
-                                    const media = product?.images?.[0]?.image
-
-                                    return (
-                                        <Link
-                                            key={product.id}
-                                            href={`/products/${product.slug}`}
-                                            className="flex h-36 w-28 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-white p-3 shadow-xl transition hover:-translate-y-1"
-                                        >
-                                            <OptimizedImage
-                                                media={media}
-                                                size="card"
-                                                alt={product.title}
-                                                className="h-full w-full [&_img]:object-contain"
-                                            />
-                                        </Link>
-                                    )
-                                })}
-                            </div>
                         </div>
 
-                        {/* Desktop hero products */}
-                        <div className="relative hidden min-h-[230px] lg:col-span-5 lg:block">
-                            <div className="absolute bottom-0 right-0 h-28 w-full rounded-full bg-yellow-300/20 blur-2xl" />
-
-                            <div className="absolute bottom-0 right-0 flex items-end justify-end gap-3">
-                                {heroProducts.map((product, index) => {
-                                    const media = product?.images?.[0]?.image
-
-                                    return (
-                                        <Link
-                                            key={product.id}
-                                            href={`/products/${product.slug}`}
-                                            className={[
-                                                'relative flex items-end justify-center overflow-hidden rounded-3xl border border-white/20 bg-white p-3 shadow-2xl transition hover:-translate-y-2',
-                                                index === 0 ? 'h-48 w-32' : '',
-                                                index === 1 ? 'h-56 w-36' : '',
-                                                index === 2 ? 'h-44 w-32' : '',
-                                                index === 3 ? 'h-40 w-28' : '',
-                                            ].join(' ')}
-                                        >
-                                            <OptimizedImage
-                                                media={media}
-                                                size="card"
-                                                alt={product.title}
-                                                className="h-full w-full [&_img]:object-contain"
-                                            />
-                                        </Link>
-                                    )
-                                })}
-                            </div>
-                        </div>
+                        <p className="mt-3 text-[14px] font-medium leading-5 text-[#555555] sm:text-[15px]">
+                            Ưu đãi chớp nhoáng – Săn ngay kẻo lỡ!
+                        </p>
                     </div>
 
-                    {/* Voucher bar */}
-                    <div className="relative z-10 mt-8 grid grid-cols-2 gap-3 rounded-3xl bg-white p-3 text-[#b72828] shadow-xl md:grid-cols-3 lg:grid-cols-5">
-                        {voucherItems.slice(0, 4).map((voucher, index) => (
-                            <VoucherBox
-                                key={
-                                    voucher.id ??
-                                    `${voucher.code ?? 'voucher'}-${index}`
-                                }
-                                code={voucher.code?.trim() ?? ''}
-                                title={voucher.title || 'Voucher'}
-                                value={voucher.value || ''}
-                                sub={voucher.sub || ''}
-                            />
-                        ))}
+                    <FlashSaleCountdown
+                        endTime={endTime}
+                    />
 
-                        <div className="col-span-2 flex items-center justify-center gap-3 rounded-2xl bg-red-50 px-4 py-3 text-center md:col-span-1">
-                            <ShieldCheck size={22} />
-                            <div>
-                                <p className="text-base font-extrabold leading-tight tracking-[-0.02em]">
-                                    100% </p>
-                                <p className="text-[11px] font-semibold tracking-[0.02em] text-red-700">
-                                    Chính hãng
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    <Link
+                        href={viewAllHref}
+                        className="inline-flex min-h-[50px] w-fit items-center justify-center gap-3 rounded-[13px] bg-[#be0008] px-6 text-[14px] font-bold text-white shadow-[0_7px_18px_rgba(190,0,8,0.18)] transition-colors hover:bg-[#980007] lg:min-w-[132px]"
+                    >
+                        <span>Xem tất cả</span>
+
+                        <ChevronRight
+                            aria-hidden="true"
+                            size={18}
+                            strokeWidth={2.3}
+                        />
+                    </Link>
                 </div>
 
-                {/* Tabs + products */}
-                <div className="p-4 md:p-6">
-                    <div className="mb-5 grid grid-cols-1 overflow-hidden rounded-2xl border border-gray-100 bg-gray-50 text-center text-[12px] font-semibold uppercase tracking-[0.08em] sm:grid-cols-2 lg:grid-cols-4">
-                        <button
-                            type="button"
-                            onClick={() => setActiveCategory('all')}
-                            className={
-                                activeCategory === 'all'
-                                    ? 'flex h-14 items-center justify-center gap-2 bg-[#b72828] text-white'
-                                    : 'flex h-14 items-center justify-center gap-2 bg-white text-gray-700 hover:text-[#b72828]'
-                            }
-                        >
-                            <Zap size={16} fill="currentColor" />
-                            Deal sốc mỗi ngày
-                        </button>
+                {/* =================================================
+            VOUCHER + SẢN PHẨM
+        ================================================== */}
+                <div className="grid items-stretch gap-4 lg:grid-cols-[290px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
+                    <PaydayPromotionCard
+                        primaryVoucher={
+                            primaryVoucher
+                        }
+                        secondaryVoucher={
+                            secondaryVoucher
+                        }
+                    />
 
-                        {availableCategories.slice(0, 3).map((cat: any) => (
-                            <button
-                                key={cat.id}
-                                type="button"
-                                onClick={() => setActiveCategory(cat.slug)}
-                                className={
-                                    activeCategory === cat.slug
-                                        ? 'h-14 bg-[#b72828] px-3 text-white'
-                                        : 'h-14 bg-white px-3 text-gray-700 hover:text-[#b72828]'
-                                }
-                            >
-                                {cat.name}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="mb-6 flex gap-2 overflow-x-auto pb-1">
-                        <button
-                            type="button"
-                            onClick={() => setActiveCategory('all')}
-                            className={
-                                activeCategory === 'all'
-                                    ? 'shrink-0 rounded-full bg-[#b72828] px-5 py-2.5 text-[12px] font-semibold sm:text-[13px] text-white'
-                                    : 'shrink-0 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-[12px] font-semibold sm:text-[13px] text-gray-500 hover:border-[#b72828] hover:text-[#b72828]'
-                            }
-                        >
-                            Tất cả
-                        </button>
-
-                        {availableCategories.map((cat: any) => (
-                            <button
-                                key={cat.id}
-                                type="button"
-                                onClick={() => setActiveCategory(cat.slug)}
-                                className={
-                                    activeCategory === cat.slug
-                                        ? 'shrink-0 rounded-full bg-[#b72828] px-5 py-2.5 text-[12px] font-semibold sm:text-[13px] text-white'
-                                        : 'shrink-0 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-[12px] font-semibold sm:text-[13px] text-gray-500 hover:border-[#b72828] hover:text-[#b72828]'
-                                }
-                            >
-                                {cat.name}
-                            </button>
-                        ))}
-                    </div>
-
-                    {filteredProducts.length > 0 ? (
-                        <Carousel
-                            key={activeCategory}
-                            opts={{
-                                align: 'start',
-                                loop: filteredProducts.length > 5,
-                            }}
-                            className="relative"
-                        >
-                            <CarouselContent className="-ml-3 pb-4 md:-ml-4">
-                                {filteredProducts.map((product) => (
-                                    <CarouselItem
-                                        key={product.id}
-                                        className="basis-1/2 pl-3 md:basis-1/3 md:pl-4 lg:basis-1/4 xl:basis-1/5"
-                                    >
-                                        <ProductCard product={product} />
-                                    </CarouselItem>
-                                ))}
-                            </CarouselContent>
-
-                            <CarouselPrevious className="absolute -left-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 border-none bg-white text-neutral-700 shadow-xl transition hover:bg-[#b72828] hover:text-white md:flex" />
-
-                            <CarouselNext className="absolute -right-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 border-none bg-white text-neutral-700 shadow-xl transition hover:bg-[#b72828] hover:text-white md:flex" />
-                        </Carousel>
-                    ) : (
-                        <div className="rounded-3xl bg-neutral-50 px-6 py-12 text-center">
-                            <p className="text-sm font-semibold text-neutral-500">
-                                Chưa có sản phẩm trong danh mục này.
-                            </p>
-                        </div>
-                    )}
-
-                    <div className="mt-6 flex justify-center">
-                        <Link
-                            href="/products"
-                            className="inline-flex items-center gap-2 rounded-full bg-black px-7 py-4 text-[12px] font-bold uppercase tracking-[0.1em] text-white transition hover:bg-[#b72828]"
-                        >
-                            Xem tất cả sản phẩm <ChevronRight size={16} />
-                        </Link>
+                    <div className="grid grid-flow-col auto-cols-[78%] gap-3 overflow-x-auto pb-1 pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:auto-cols-[46%] md:auto-cols-[32%] lg:grid-flow-row lg:auto-cols-auto lg:grid-cols-4 lg:overflow-visible lg:pb-0 lg:pr-0 xl:grid-cols-5">
+                        {displayedProducts.map(
+                            (product) => (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    mode="flash"
+                                    className="h-full min-h-[410px] rounded-[18px] shadow-none hover:-translate-y-1 hover:shadow-[0_10px_24px_rgba(0,0,0,0.055)]"
+                                />
+                            ),
+                        )}
                     </div>
                 </div>
             </div>
@@ -385,177 +330,166 @@ export function FlashSaleSection({
     )
 }
 
-function TimeBox(
-    { value, label, }: { value: string; label: string }) {
-    return (
-        <div className="min-w-[58px] rounded-2xl bg-white px-2.5 py-3 text-center text-[#b72828] shadow-lg sm:min-w-[70px] sm:px-3">
-            <p className="text-xl font-extrabold leading-none tracking-[-0.03em] sm:text-2xl md:text-3xl">
-                {value}
-            </p>
-            <p className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-gray-500 sm:text-[11px]">
-                {label}
-            </p>
-        </div>
-    )
-}
+/* =========================================================
+   PROMOTION CARD
+========================================================= */
 
-function VoucherBox({
-    code,
-    title,
-    value,
-    sub,
-}: VoucherBoxProps) {
-    const [isCopied, setIsCopied] =
-        useState(false)
+function PaydayPromotionCard({
+    primaryVoucher,
+    secondaryVoucher,
+}: Readonly<{
+    primaryVoucher:
+    | FlashSaleVoucherDTO
+    | null
 
-    const resetTimerRef = useRef<
-        number | null
-    >(null)
+    secondaryVoucher:
+    | FlashSaleVoucherDTO
+    | null
+}>) {
+    /**
+     * Không có voucher khả dụng:
+     * Vẫn giữ layout nhưng thông báo chưa có ưu đãi.
+     */
+    if (!primaryVoucher) {
+        return (
+            <div className="flex min-h-[410px] items-center justify-center rounded-[20px] bg-[linear-gradient(145deg,#8f0000_0%,#bd0008_46%,#d2050d_100%)] px-6 text-center text-white">
+                <div>
+                    <Zap
+                        size={42}
+                        fill="currentColor"
+                        className="mx-auto text-[#ffdc76]"
+                    />
 
-    useEffect(() => {
-        return () => {
-            if (resetTimerRef.current !== null) {
-                window.clearTimeout(
-                    resetTimerRef.current,
-                )
-            }
-        }
-    }, [])
+                    <p className="mt-4 text-[21px] font-bold uppercase">
+                        Flash Sale
+                    </p>
 
-    const handleCopyVoucher =
-        async (): Promise<void> => {
-            const normalizedCode = code
-                .trim()
-                .toUpperCase()
-
-            if (!normalizedCode) {
-                toast.error(
-                    'Voucher này chưa được thiết lập mã.',
-                )
-
-                return
-            }
-
-            try {
-                await navigator.clipboard.writeText(
-                    normalizedCode,
-                )
-
-                setIsCopied(true)
-
-                toast.success(
-                    `Đã lưu mã: ${normalizedCode}`,
-                )
-
-                if (resetTimerRef.current !== null) {
-                    window.clearTimeout(
-                        resetTimerRef.current,
-                    )
-                }
-
-                resetTimerRef.current =
-                    window.setTimeout(() => {
-                        setIsCopied(false)
-                        resetTimerRef.current = null
-                    }, 3000)
-            } catch (error: unknown) {
-                console.error(
-                    '[VoucherBox] Copy voucher failed:',
-                    error,
-                )
-
-                toast.error(
-                    'Không thể sao chép mã. Vui lòng thử lại.',
-                )
-            }
-        }
+                    <p className="mt-2 text-sm text-white/80">
+                        Voucher mới sẽ sớm được cập nhật
+                    </p>
+                </div>
+            </div>
+        )
+    }
 
     return (
-        <button
-            type="button"
-            onClick={() => {
-                void handleCopyVoucher()
-            }}
-            disabled={!code.trim()}
-            aria-label={
-                isCopied
-                    ? `Đã lưu mã ${code}`
-                    : `Lưu mã voucher ${code}`
-            }
-            className={[
-                'group relative w-full overflow-hidden rounded-2xl border px-3 py-3 text-center transition-all duration-300 sm:px-4',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b72828] focus-visible:ring-offset-2',
-                'disabled:cursor-not-allowed disabled:opacity-60',
-                isCopied
-                    ? 'border-emerald-200 bg-emerald-50 shadow-inner'
-                    : 'border-red-100 bg-white hover:-translate-y-0.5 hover:border-[#b72828]/30 hover:shadow-md',
-            ].join(' ')}
+        <Link
+            href="/vouchers"
+            className="group relative min-h-[410px] overflow-hidden rounded-[20px] bg-[radial-gradient(circle_at_90%_18%,rgba(255,50,50,0.65),transparent_35%),linear-gradient(145deg,#8f0000_0%,#bd0008_46%,#d2050d_100%)] px-6 py-7 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+            aria-label={`Xem voucher ${primaryVoucher.code}`}
         >
-            <p
-                className={[
-                    'mt-1 text-xl font-extrabold uppercase leading-none tracking-[-0.02em] transition-colors sm:text-2xl',
-                    isCopied
-                        ? 'text-emerald-700'
-                        : 'text-[#b72828]',
-                ].join(' ')}
+            {/* Nền sáng */}
+            <div className="pointer-events-none absolute -right-16 -top-14 h-52 w-52 rounded-full bg-red-400/20 blur-3xl" />
+
+            <div className="pointer-events-none absolute -bottom-16 -left-12 h-48 w-48 rounded-full bg-[#720000]/70 blur-3xl" />
+
+            {/* Đường trang trí vàng */}
+            <svg
+                aria-hidden="true"
+                viewBox="0 0 180 120"
+                className="pointer-events-none absolute right-2 top-[70px] h-[120px] w-[180px] opacity-90"
+                fill="none"
             >
-                {title}
-            </p>
+                <path
+                    d="M8 102C18 54 58 24 91 40C112 51 115 12 145 17C164 20 176 38 169 61"
+                    stroke="#d8ab3b"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                />
 
-            <p
-                className={[
-                    'mt-1 text-xl font-black uppercase leading-none transition-colors sm:text-2xl',
-                    isCopied
-                        ? 'text-emerald-700'
-                        : 'text-[#b72828]',
-                ].join(' ')}
-            >
-                {value}
-            </p>
+                <circle
+                    cx="91"
+                    cy="40"
+                    r="2.5"
+                    fill="#d8ab3b"
+                />
+            </svg>
 
-            <p className="mt-1 text-[10px] font-medium leading-4 text-gray-600 sm:text-[11px]">
-                {sub}
-            </p>
+            {/* Nội dung voucher chính */}
+            <div className="relative z-10">
+                <h3 className="line-clamp-1 text-[25px] font-medium uppercase leading-none tracking-[-0.02em] sm:text-[27px]">
+                    {primaryVoucher.title}
+                </h3>
 
-            {code.trim() ? (
-                <p className="mt-2 truncate font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-gray-500 sm:text-[11px]">
-                    Mã: {code}
+                <p className="mt-5 text-[16px] font-normal">
+                    Sale thêm đến
                 </p>
-            ) : null}
 
-            <span
-                className={[
-                    'mt-2 inline-flex min-h-7 items-center justify-center rounded-full px-3 text-[10px] font-bold uppercase tracking-[0.08em] transition-all sm:text-[11px]',
-                    isCopied
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-red-50 text-[#b72828] group-hover:bg-[#b72828] group-hover:text-white',
-                ].join(' ')}
-            >
-                {isCopied ? 'Đã lưu' : 'Lưu mã'}
-            </span>
-        </button>
+                <p className="mt-1 font-heading text-[66px] font-bold italic leading-none text-[#ffdc76] drop-shadow-sm">
+                    {primaryVoucher.value}
+                </p>
+
+                <p className="mt-3 line-clamp-2 text-[15px] font-normal">
+                    {primaryVoucher.sub}
+                </p>
+
+                {secondaryVoucher ? (
+                    <>
+                        <div className="my-5 h-px w-[72%] bg-gradient-to-r from-[#ffd879] via-[#ffd879]/80 to-transparent" />
+
+                        <p className="line-clamp-1 text-[16px] font-bold text-[#ffe189]">
+                            + Giảm thêm{' '}
+                            {secondaryVoucher.value}
+                        </p>
+
+                        <p className="mt-3 line-clamp-2 text-[15px]">
+                            {secondaryVoucher.sub}
+                        </p>
+                    </>
+                ) : null}
+            </div>
+
+            <GiftArtwork />
+
+            {/* Mã voucher */}
+            <div className="absolute bottom-7 left-6 z-20 flex min-h-[56px] w-[74%] items-center justify-between rounded-[11px] bg-white px-4 py-2.5 text-[#b40008] shadow-[0_8px_20px_rgba(78,0,0,0.18)] transition-transform duration-300 group-hover:-translate-y-0.5">
+                <div className="min-w-0">
+                    <p className="text-[10px] font-medium text-[#777777]">
+                        Nhập mã
+                    </p>
+
+                    <p className="mt-1 truncate text-[15px] font-bold uppercase tracking-[0.18em]">
+                        {primaryVoucher.code}
+                    </p>
+                </div>
+
+                <ChevronRight
+                    aria-hidden="true"
+                    size={17}
+                    className="shrink-0 text-[#d39b9b]"
+                />
+            </div>
+        </Link>
     )
 }
 
+/* =========================================================
+   GIFT ARTWORK
+========================================================= */
 
-function MiniTrust({
-    icon,
-    title,
-    sub,
-}: {
-    icon: ReactNode
-    title: string
-    sub: string
-}) {
+function GiftArtwork() {
     return (
-        <div className="flex items-center gap-3 rounded-2xl bg-white px-3 py-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-[#b72828]">
-                {icon}
+        <div
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-0 right-[-11px] z-10 h-[185px] w-[180px]"
+        >
+            <div className="absolute bottom-[-15px] right-1 h-14 w-40 rounded-full bg-[#620000]/45 blur-xl" />
+
+            <div className="absolute bottom-0 right-0 h-[112px] w-[145px] rounded-t-[3px] bg-[linear-gradient(135deg,#ed1119_0%,#b10007_48%,#f12028_100%)] shadow-[-12px_14px_25px_rgba(77,0,0,0.35)]">
+                <div className="absolute left-[57px] top-0 h-full w-[25px] bg-[linear-gradient(90deg,#c89224,#ffe591,#b47a13)]" />
+
+                <div className="absolute left-0 top-[27px] h-[25px] w-full bg-[linear-gradient(180deg,#f4d467,#b37814,#f7dc75)]" />
             </div>
-            <div>
-                <p className="text-[11px] font-black uppercase text-gray-900">{title}</p>
-                <p className="text-[10px] text-gray-500">{sub}</p>
+
+            <div className="absolute bottom-[102px] right-[-4px] h-[28px] w-[153px] rotate-[-2deg] rounded-[3px] bg-[linear-gradient(180deg,#ff2930,#b30008)] shadow-[0_6px_12px_rgba(77,0,0,0.3)]">
+                <div className="absolute left-[61px] top-0 h-full w-[26px] bg-[linear-gradient(90deg,#c28b20,#ffe68c,#ad7110)]" />
             </div>
+
+            <div className="absolute bottom-[124px] right-[75px] h-[48px] w-[66px] rotate-[17deg] rounded-[50%_50%_45%_55%] border-[8px] border-[#e2b53f] border-r-[#ffea8e]" />
+
+            <div className="absolute bottom-[123px] right-[23px] h-[47px] w-[65px] rotate-[-18deg] rounded-[50%_50%_55%_45%] border-[8px] border-[#e2b53f] border-l-[#ffea8e]" />
+
+            <div className="absolute bottom-[121px] right-[70px] h-[30px] w-[34px] rotate-[-4deg] rounded-[45%] bg-[radial-gradient(circle_at_35%_30%,#fff1a6,#ca8e18_72%)] shadow-md" />
         </div>
     )
 }

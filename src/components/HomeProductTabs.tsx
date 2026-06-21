@@ -1,7 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { ChevronRight, Flame, Sparkles, PackageCheck } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
+
+import type { Product } from '@/payload-types'
 import { ProductCard } from '@/components/ProductCard'
 import {
     Carousel,
@@ -11,18 +13,54 @@ import {
     CarouselPrevious,
 } from '@/components/ui/carousel'
 
-type HomeProductTabsProps = {
-    bestSellers: any[]
-    newArrivals: any[]
-    combos: any[]
+type HomeProduct = Product & {
+    comboDescription?: string | null
+    shortDescription?: string | null
+    excerpt?: string | null
 }
 
-type ProductSectionProps = {
+type HomeProductTabsProps = Readonly<{
+    bestSellers: HomeProduct[]
+    newArrivals: HomeProduct[]
+    combos: HomeProduct[]
+}>
+
+type ProductSectionMode =
+    | 'combo'
+    | 'new'
+    | 'bestSeller'
+
+type ProductSectionProps = Readonly<{
     title: string
-    subLabel: string
-    products: any[]
-    icon: any
-    href?: string
+    products: HomeProduct[]
+    mode: ProductSectionMode
+    href: string
+}>
+
+/**
+ * Nội dung mô tả ngắn dưới tên combo.
+ *
+ * Hệ thống ưu tiên:
+ * 1. comboDescription
+ * 2. shortDescription
+ * 3. excerpt
+ */
+function getComboDescription(
+    product: HomeProduct,
+): string | undefined {
+    const description =
+        product.comboDescription ??
+        product.shortDescription ??
+        product.excerpt
+
+    if (
+        typeof description !== 'string' ||
+        !description.trim()
+    ) {
+        return undefined
+    }
+
+    return description.trim()
 }
 
 export function HomeProductTabs({
@@ -32,28 +70,28 @@ export function HomeProductTabs({
 }: HomeProductTabsProps) {
     return (
         <>
+            {/* 1. SẢN PHẨM COMBO */}
             <HomeProductSection
-                title="Sản phẩm bán chạy"
-                subLabel="Best Seller"
-                products={bestSellers}
-                icon={Flame}
-                href="/products"
+                title="Sản phẩm combo"
+                products={combos}
+                mode="combo"
+                href="/products?isCombo=true"
             />
 
+            {/* 2. SẢN PHẨM MỚI */}
             <HomeProductSection
                 title="Sản phẩm mới"
-                subLabel="New Arrival"
                 products={newArrivals}
-                icon={Sparkles}
-                href="/products"
+                mode="new"
+                href="/products?sort=-createdAt"
             />
 
+            {/* 3. SẢN PHẨM BÁN CHẠY */}
             <HomeProductSection
-                title="Combo tiết kiệm"
-                subLabel="Combo Deal"
-                products={combos}
-                icon={PackageCheck}
-                href="/products?isCombo=true"
+                title="Sản phẩm bán chạy"
+                products={bestSellers}
+                mode="bestSeller"
+                href="/products?sort=best-selling"
             />
         </>
     )
@@ -61,67 +99,154 @@ export function HomeProductTabs({
 
 function HomeProductSection({
     title,
-    subLabel,
     products,
-    icon: Icon,
-    href = '/products',
+    mode,
+    href,
 }: ProductSectionProps) {
-    if (!products?.length) return null
+    if (!products?.length) {
+        return null
+    }
+
+    /**
+     * Desktop hiển thị 6 sản phẩm.
+     * Các sản phẩm còn lại xem bằng carousel.
+     */
+    const hasCarouselNavigation =
+        products.length > 6
+
+    /**
+     * Theo ảnh mẫu:
+     * Chỉ section bán chạy hiện nút tròn hai bên.
+     */
+    const showNavigation =
+        mode === 'bestSeller' &&
+        hasCarouselNavigation
 
     return (
-        <section className="container-ux mt-8 md:mt-10">
-            <div className="lc-card rounded-[2rem] p-4 sm:p-5 md:rounded-[2.5rem] md:p-8">
-                <div className="mb-6 flex flex-col gap-5 px-1 md:mb-8 md:flex-row md:items-center md:justify-between md:px-2">
-                    <div className="flex min-w-0 items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-red-100">
-                            <Icon size={20} fill="currentColor" />
-                        </div>
-
-                        <div className="min-w-0">
-                            <span className="sub-heading">{subLabel}</span>
-                            <h2 className="font-heading text-[25px] font-semibold leading-[1.15] tracking-[-0.02em] text-neutral-900 md:text-[32px]">
-                                {title}
-                            </h2>
-                        </div>
-                    </div>
+        <section className="container-ux mt-7 md:mt-8">
+            <div className="relative overflow-visible rounded-[24px] border border-[#eeeeee] bg-white px-4 pb-5 pt-5 shadow-[0_8px_30px_rgba(0,0,0,0.045)] sm:px-5 sm:pb-6 sm:pt-6 md:rounded-[28px] md:px-7 md:pb-7 md:pt-7 lg:px-8">
+                {/* ================================================
+            SECTION HEADER
+        ================================================= */}
+                <div className="mb-6 flex items-center justify-between gap-4 md:mb-7">
+                    <h2 className="min-w-0 font-heading text-[27px] font-semibold leading-[1.15] tracking-[-0.025em] text-black sm:text-[32px] md:text-[38px]">
+                        {title}
+                    </h2>
 
                     <Link
                         href={href}
-                        className="hidden shrink-0 items-center gap-1 rounded-full border border-primary/10 bg-primary/5 px-4 py-2.5 text-[12px] font-semibold tracking-[0.03em] text-primary transition-colors hover:bg-primary hover:text-white md:flex"
+                        className="group inline-flex h-[48px] shrink-0 items-center justify-center gap-1 rounded-[15px] border border-[#efd8cf] bg-white px-4 text-[13px] font-semibold text-[#202020] transition-colors hover:border-[#b40008] hover:text-[#b40008] sm:h-[52px] sm:px-5 sm:text-[14px]"
                     >
-                        Xem tất cả <ChevronRight size={15} />
+                        <span>Xem tất cả</span>
+
+                        <ChevronRight
+                            aria-hidden="true"
+                            size={16}
+                            strokeWidth={2}
+                            className="text-[#d4a093] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-[#b40008]"
+                        />
                     </Link>
                 </div>
 
+                {/* ================================================
+            PRODUCT CAROUSEL
+        ================================================= */}
                 <Carousel
                     opts={{
                         align: 'start',
-                        loop: products.length > 5,
+                        loop: hasCarouselNavigation,
+                        containScroll: 'trimSnaps',
                     }}
-                    className="relative"
+                    className="relative w-full"
                 >
-                    <CarouselContent className="-ml-3 pb-4 md:-ml-4">
-                        {products.map((product) => (
-                            <CarouselItem
-                                key={product.id}
-                                className="basis-1/2 pl-3 md:basis-1/3 md:pl-4 lg:basis-1/4 xl:basis-1/5"
-                            >
-                                <ProductCard product={product} />
-                            </CarouselItem>
-                        ))}
+                    <CarouselContent className="-ml-3 pb-0 md:-ml-4">
+                        {products.map(
+                            (product, index) => (
+                                <CarouselItem
+                                    key={product.id}
+                                    className={[
+                                        /*
+                                         * Mobile: một card lớn, thấy một phần card tiếp theo.
+                                         * Tablet: 2–4 card.
+                                         * Desktop lớn: đúng 6 card.
+                                         */
+                                        'basis-[82%] pl-3',
+                                        'min-[480px]:basis-[48%]',
+                                        'md:basis-1/3 md:pl-4',
+                                        'lg:basis-1/4',
+                                        'xl:basis-1/6',
+                                    ].join(' ')}
+                                >
+                                    {mode === 'combo' ? (
+                                        <ProductCard
+                                            product={product}
+                                            mode="combo"
+                                            badgeText="COMBO"
+                                            description={
+                                                getComboDescription(
+                                                    product,
+                                                )
+                                            }
+                                            showRating={false}
+                                            showAddToCart={false}
+                                            className="h-full rounded-[18px] border-[#e8e8e8] shadow-none hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.04)]"
+                                        />
+                                    ) : null}
+
+                                    {mode === 'new' ? (
+                                        <ProductCard
+                                            product={product}
+                                            mode="new"
+                                            badgeText="MỚI"
+                                            showRating={false}
+                                            showAddToCart={false}
+                                            className="h-full rounded-[18px] border-[#e8e8e8] shadow-none hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.04)]"
+                                        />
+                                    ) : null}
+
+                                    {mode === 'bestSeller' ? (
+                                        <ProductCard
+                                            product={product}
+                                            mode="bestSeller"
+                                            rank={index + 1}
+                                            showRating
+                                            showAddToCart={false}
+                                            className="h-full rounded-[18px] border-[#e8e8e8] shadow-none hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.04)]"
+                                        />
+                                    ) : null}
+                                </CarouselItem>
+                            ),
+                        )}
                     </CarouselContent>
 
-                    <CarouselPrevious className="absolute -left-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 border-none bg-white text-neutral-700 shadow-xl transition hover:bg-primary hover:text-white md:flex" />
+                    {/* Nút điều hướng chỉ hiện cho bán chạy */}
+                    {showNavigation ? (
+                        <>
+                            <CarouselPrevious
+                                aria-label="Xem sản phẩm trước"
+                                className="absolute -left-[22px] top-1/2 z-30 hidden h-[50px] w-[50px] -translate-y-1/2 border border-[#eeeeee] bg-white text-[#202020] shadow-[0_7px_20px_rgba(0,0,0,0.12)] transition-all hover:border-[#b40008] hover:bg-white hover:text-[#b40008] md:flex"
+                            />
 
-                    <CarouselNext className="absolute -right-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 border-none bg-white text-neutral-700 shadow-xl transition hover:bg-primary hover:text-white md:flex" />
+                            <CarouselNext
+                                aria-label="Xem sản phẩm tiếp theo"
+                                className="absolute -right-[22px] top-1/2 z-30 hidden h-[50px] w-[50px] -translate-y-1/2 border border-[#eeeeee] bg-white text-[#202020] shadow-[0_7px_20px_rgba(0,0,0,0.12)] transition-all hover:border-[#b40008] hover:bg-white hover:text-[#b40008] md:flex"
+                            />
+                        </>
+                    ) : null}
                 </Carousel>
 
-                <div className="mt-6 md:hidden">
+                {/* Nút mobile */}
+                <div className="mt-5 sm:hidden">
                     <Link
                         href={href}
-                        className="flex h-12 w-full items-center justify-center rounded-full bg-black text-[13px] font-bold tracking-[0.04em] text-white transition-colors hover:bg-primary"
+                        className="flex h-11 w-full items-center justify-center gap-1 rounded-[13px] border border-[#efd8cf] bg-white text-[13px] font-semibold text-[#202020]"
                     >
-                        Xem tất cả sản phẩm
+                        Xem tất cả
+
+                        <ChevronRight
+                            size={15}
+                            className="text-[#d4a093]"
+                        />
                     </Link>
                 </div>
             </div>
