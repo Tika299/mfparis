@@ -150,7 +150,7 @@ export function FloatingContactMenu({
     return (
         <div
             ref={containerRef}
-            className="fixed bottom-4 right-3 z-[999] h-14 w-14 sm:bottom-5 sm:right-5 sm:h-16 sm:w-16 md:bottom-7 md:right-7"
+            className="fixed bottom-4 right-3 z-[100] h-14 w-14 sm:bottom-5 sm:right-5 sm:h-16 sm:w-16 md:bottom-7 md:right-7"
         >
             {/* =============================================
           LIVE CHAT
@@ -158,7 +158,7 @@ export function FloatingContactMenu({
       ============================================== */}
             <FloatingAction
                 open={open}
-                positionClassName="-translate-y-[76px] sm:-translate-y-[86px]"
+                positionClassName="-translate-y-[76px] sm:-translate-y-[86px] z-[101]"
                 delay={0}
                 label="Chat trực tuyến"
             >
