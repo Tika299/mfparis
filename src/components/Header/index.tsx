@@ -223,7 +223,7 @@ export const Header = async () => {
                     width={420}
                     height={130}
                     sizes="198px"
-                    className="block h-auto w-[198px] object-contain object-left"
+                    className="block h-auto w-[140px] object-contain object-left"
                     priority
                   />
                 ) : (
