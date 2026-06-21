@@ -222,7 +222,7 @@ export const Header = async () => {
                     alt={logoAlt}
                     width={420}
                     height={130}
-                    sizes="198px"
+                    sizes="140px"
                     className="block h-auto w-[140px] object-contain object-left"
                     priority
                   />

@@ -304,7 +304,7 @@ export default async function HomePage() {
 function PolicySection() {
   return (
     <section className="container-ux mt-5 md:mt-6">
-      <div className="grid grid-cols-2 gap-3 rounded-[20px] border border-[#eeeeee] bg-white p-4 shadow-[0_6px_22px_rgba(0,0,0,0.035)] sm:p-5 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 rounded-[18px] border border-[#eeeeee] bg-white p-3 shadow-[0_6px_22px_rgba(0,0,0,0.035)] sm:p-4 md:grid-cols-4 md:rounded-[20px] md:p-5">
         {policies.map(
           (item, index) => {
             const Icon = item.icon
@@ -313,13 +313,16 @@ function PolicySection() {
               index ===
               policies.length - 1
 
+            const hasDesktopDivider =
+              index < policies.length - 1
+
             return (
               <div
                 key={item.title}
                 className={[
-                  'flex min-w-0 items-center gap-3 lg:justify-center',
-                  !isLast
-                    ? 'lg:border-r lg:border-[#eeeeee]'
+                  'flex min-w-0 items-center gap-2.5 md:justify-center md:gap-3',
+                  hasDesktopDivider
+                    ? 'md:border-r md:border-[#eeeeee]'
                     : '',
                 ].join(' ')}
               >
@@ -406,7 +409,7 @@ function FeaturedCategoriesSection({
           }}
           className="relative w-full"
         >
-          <CarouselContent className="-ml-4 pb-1">
+          <CarouselContent className="-ml-3 pb-1 md:-ml-4">
             {categories.map(
               (category) => {
                 const categoryName =
@@ -425,12 +428,11 @@ function FeaturedCategoriesSection({
                   <CarouselItem
                     key={category.id}
                     className={[
-                      'pl-4',
-                      'basis-[44%]',
-                      'min-[520px]:basis-[31%]',
-                      'md:basis-[24%]',
-                      'lg:basis-[16.666%]',
-                      'xl:basis-[12.5%]',
+                      'pl-3',
+                      'basis-1/2',
+                      'md:basis-1/4 md:pl-4',
+                      'lg:basis-1/6',
+                      'xl:basis-1/8',
                     ].join(' ')}
                   >
                     <Link
@@ -442,7 +444,7 @@ function FeaturedCategoriesSection({
                       className="group/category flex h-full min-w-0 flex-col items-center"
                     >
                       {/* OVAL IMAGE */}
-                      <div className="relative mx-auto aspect-[0.78/1] w-full max-w-[168px] overflow-hidden rounded-[999px] border border-[#eadfd9] bg-white p-4 transition-[border-color,box-shadow,transform] duration-300 group-hover/category:-translate-y-1 group-hover/category:border-[#d8b5aa] group-hover/category:shadow-[0_12px_26px_rgba(0,0,0,0.06)] sm:p-5">
+                      <div className="relative mx-auto aspect-[0.78/1] w-full max-w-[138px] overflow-hidden rounded-[999px] border border-[#eadfd9] bg-white p-2 transition-[border-color,box-shadow,transform] duration-300 group-hover/category:-translate-y-1 group-hover/category:border-[#d8b5aa] group-hover/category:shadow-[0_12px_26px_rgba(0,0,0,0.06)] sm:max-w-[148px] sm:p-3 md:max-w-[158px] md:p-4 lg:max-w-[168px]">
                         <OptimizedImage
                           media={
                             category.image
@@ -556,12 +558,10 @@ function BrandPartnersSection({
                 <CarouselItem
                   key={brand.id}
                   className={[
-                    'pl-3 md:pl-4',
-                    'basis-[46%]',
-                    'min-[520px]:basis-[31%]',
-                    'md:basis-[24%]',
-                    'lg:basis-[16.666%]',
-                    'xl:basis-[12.5%]',
+                    'basis-1/2 pl-3',
+                    'md:basis-1/3 md:pl-4',
+                    'lg:basis-1/6',
+                    'xl:basis-1/8',
                   ].join(' ')}
                 >
                   <Link
@@ -573,7 +573,7 @@ function BrandPartnersSection({
                     aria-label={
                       brandName
                     }
-                    className="group/brand flex h-[104px] w-full items-center justify-center overflow-hidden rounded-[13px] border border-[#e5e5e5] bg-white px-4 transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:border-[#d9d9d9] hover:shadow-[0_9px_22px_rgba(0,0,0,0.055)] sm:h-[112px]"
+                    className="group/brand flex h-[82px] w-full items-center justify-center overflow-hidden rounded-[10px] border border-[#e5e5e5] bg-white px-2.5 transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:border-[#d9d9d9] hover:shadow-[0_9px_22px_rgba(0,0,0,0.055)] sm:h-[90px] sm:px-3 md:h-[100px] md:px-4 lg:h-[112px] lg:rounded-[13px]"
                   >
                     {hasLogo ? (
                       <OptimizedImage
@@ -597,12 +597,12 @@ function BrandPartnersSection({
             <>
               <CarouselPrevious
                 aria-label="Xem thương hiệu trước"
-                className="absolute -left-[23px] top-1/2 z-30 hidden h-[48px] w-[48px] -translate-y-1/2 border border-[#eeeeee] bg-white text-[#202020] shadow-[0_7px_20px_rgba(0,0,0,0.12)] transition-all hover:border-[#b40008] hover:bg-white hover:text-[#b40008] md:flex"
+                className="absolute -left-[23px] top-[68%] z-30 hidden h-[48px] w-[48px] -translate-y-1/2 border border-[#eeeeee] bg-white text-[#202020] shadow-[0_7px_20px_rgba(0,0,0,0.12)] transition-all hover:border-[#b40008] hover:bg-white hover:text-[#b40008] md:flex"
               />
 
               <CarouselNext
                 aria-label="Xem thương hiệu tiếp theo"
-                className="absolute -right-[23px] top-1/2 z-30 hidden h-[48px] w-[48px] -translate-y-1/2 border border-[#eeeeee] bg-white text-[#202020] shadow-[0_7px_20px_rgba(0,0,0,0.12)] transition-all hover:border-[#b40008] hover:bg-white hover:text-[#b40008] md:flex"
+                className="absolute -right-[23px] top-[68%] z-30 hidden h-[48px] w-[48px] -translate-y-1/2 border border-[#eeeeee] bg-white text-[#202020] shadow-[0_7px_20px_rgba(0,0,0,0.12)] transition-all hover:border-[#b40008] hover:bg-white hover:text-[#b40008] md:flex"
               />
             </>
           ) : null}

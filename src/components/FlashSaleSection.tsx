@@ -10,6 +10,13 @@ import type {
 } from '@/payload-types'
 import { ProductCard } from '@/components/ProductCard'
 import { FlashSaleCountdown } from '@/components/FlashSaleCountdown'
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from '@/components/ui/carousel'
 
 type VoucherRelationship =
     | number
@@ -251,8 +258,7 @@ export function FlashSaleSection({
     const secondaryVoucher =
         availableVouchers[1] ?? null
 
-    const displayedProducts =
-        products.slice(0, 5)
+    const displayedProducts = products
 
     return (
         <section className="container-ux mt-8 md:mt-10">
@@ -302,7 +308,7 @@ export function FlashSaleSection({
                 {/* =================================================
             VOUCHER + SẢN PHẨM
         ================================================== */}
-                <div className="grid items-stretch gap-4 lg:grid-cols-[290px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
+                <div className="grid items-stretch gap-3 md:gap-4 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
                     <PaydayPromotionCard
                         primaryVoucher={
                             primaryVoucher
@@ -312,18 +318,82 @@ export function FlashSaleSection({
                         }
                     />
 
-                    <div className="grid grid-flow-col auto-cols-[78%] gap-3 overflow-x-auto pb-1 pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:auto-cols-[46%] md:auto-cols-[32%] lg:grid-flow-row lg:auto-cols-auto lg:grid-cols-4 lg:overflow-visible lg:pb-0 lg:pr-0 xl:grid-cols-5">
-                        {displayedProducts.map(
-                            (product) => (
-                                <ProductCard
-                                    key={product.id}
-                                    product={product}
-                                    mode="flash"
-                                    className="h-full min-h-[410px] rounded-[18px] shadow-none hover:-translate-y-1 hover:shadow-[0_10px_24px_rgba(0,0,0,0.055)]"
+                    <Carousel
+                        opts={{
+                            align: 'start',
+                            containScroll: 'trimSnaps',
+                            loop: displayedProducts.length > 4,
+                            dragFree: false,
+                        }}
+                        className="relative min-w-0 w-full"
+                    >
+                        <CarouselContent className="-ml-2.5 pb-1 md:-ml-3 lg:-ml-4">
+                            {displayedProducts.map(
+                                (product) => (
+                                    <CarouselItem
+                                        key={product.id}
+                                        className={[
+                                            /*
+                                             * Mobile:
+                                             * Hiển thị chính xác 2 sản phẩm.
+                                             */
+                                            'basis-1/2 pl-2.5',
+
+                                            /*
+                                             * Tablet:
+                                             * Hiển thị chính xác 3 sản phẩm.
+                                             */
+                                            'md:basis-1/3 md:pl-3',
+
+                                            /*
+                                             * Desktop:
+                                             * Luôn hiển thị chính xác 4 sản phẩm.
+                                             */
+                                            'lg:basis-1/4 lg:pl-4',
+                                            'xl:basis-1/4',
+                                            '2xl:basis-1/4',
+                                        ].join(' ')}
+                                    >
+                                        <ProductCard
+                                            product={product}
+                                            mode="flash"
+                                            className="h-full min-h-[410px] rounded-[18px] shadow-none hover:-translate-y-1 hover:shadow-[0_10px_24px_rgba(0,0,0,0.055)]"
+                                        />
+                                    </CarouselItem>
+                                ),
+                            )}
+                        </CarouselContent>
+
+                        {displayedProducts.length > 4 ? (
+                            <>
+                                <CarouselPrevious
+                                    aria-label="Xem sản phẩm Flash Sale trước"
+                                    className={[
+                                        'absolute left-2 top-1/2 z-30 hidden',
+                                        'h-10 w-10 -translate-y-1/2',
+                                        'border border-[#eeeeee] bg-white text-[#333333]',
+                                        'shadow-[0_6px_18px_rgba(0,0,0,0.13)]',
+                                        'transition-colors',
+                                        'hover:border-[#b40008] hover:bg-[#b40008] hover:text-white',
+                                        'lg:flex',
+                                    ].join(' ')}
                                 />
-                            ),
-                        )}
-                    </div>
+
+                                <CarouselNext
+                                    aria-label="Xem sản phẩm Flash Sale tiếp theo"
+                                    className={[
+                                        'absolute right-2 top-1/2 z-30 hidden',
+                                        'h-10 w-10 -translate-y-1/2',
+                                        'border border-[#eeeeee] bg-white text-[#333333]',
+                                        'shadow-[0_6px_18px_rgba(0,0,0,0.13)]',
+                                        'transition-colors',
+                                        'hover:border-[#b40008] hover:bg-[#b40008] hover:text-white',
+                                        'lg:flex',
+                                    ].join(' ')}
+                                />
+                            </>
+                        ) : null}
+                    </Carousel>
                 </div>
             </div>
         </section>

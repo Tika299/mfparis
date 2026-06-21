@@ -33,7 +33,7 @@ export const OptimizedImage = ({
     }
     // Nếu thực sự không có gì
     return (
-      <div className={cn('bg-gray-100 flex items-center justify-center w-full h-full', className)}>
+      <div className={cn('bg-white flex items-center justify-center w-full h-full', className)}>
         <Image
           src="/api/media/file/placeholder.jpg"
           alt="Placeholder"

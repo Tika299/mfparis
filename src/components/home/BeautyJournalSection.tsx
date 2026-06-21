@@ -176,10 +176,9 @@ export function BeautyJournalSection({
                                 <CarouselItem
                                     key={post.id}
                                     className={[
-                                        'pl-4',
-                                        'basis-[88%]',
-                                        'min-[520px]:basis-[65%]',
-                                        'md:basis-1/2',
+                                        'basis-full pl-3',
+                                        'sm:basis-1/2',
+                                        'md:basis-1/2 md:pl-4',
                                         'lg:basis-1/3',
                                     ].join(' ')}
                                 >

@@ -124,18 +124,18 @@ function HomeProductSection({
 
     return (
         <section className="container-ux mt-7 md:mt-8">
-            <div className="relative overflow-visible rounded-[24px] border border-[#eeeeee] bg-white px-4 pb-5 pt-5 shadow-[0_8px_30px_rgba(0,0,0,0.045)] sm:px-5 sm:pb-6 sm:pt-6 md:rounded-[28px] md:px-7 md:pb-7 md:pt-7 lg:px-8">
+            <div className="relative overflow-visible rounded-[18px] border border-[#eeeeee] bg-white px-3 pb-4 pt-4 shadow-[0_6px_20px_rgba(0,0,0,0.035)] sm:px-4 sm:pb-5 sm:pt-5 md:rounded-[24px] md:px-5 md:pb-6 md:pt-6 lg:rounded-[28px] lg:px-8 lg:pb-7 lg:pt-7">
                 {/* ================================================
             SECTION HEADER
         ================================================= */}
-                <div className="mb-6 flex items-center justify-between gap-4 md:mb-7">
-                    <h2 className="min-w-0 font-heading text-[27px] font-semibold leading-[1.15] tracking-[-0.025em] text-black sm:text-[32px] md:text-[38px]">
+                <div className="mb-4 flex items-center justify-between gap-3 sm:mb-5 md:mb-6 lg:mb-7">
+                    <h2 className="min-w-0 font-heading text-[22px] font-semibold leading-[1.15] tracking-[-0.025em] text-black sm:text-[25px] md:text-[30px] lg:text-[38px]">
                         {title}
                     </h2>
 
                     <Link
                         href={href}
-                        className="group inline-flex h-[48px] shrink-0 items-center justify-center gap-1 rounded-[15px] border border-[#efd8cf] bg-white px-4 text-[13px] font-semibold text-[#202020] transition-colors hover:border-[#b40008] hover:text-[#b40008] sm:h-[52px] sm:px-5 sm:text-[14px]"
+                        className="group inline-flex h-9 shrink-0 items-center justify-center gap-0.5 rounded-[10px] border border-[#efd8cf] bg-white px-2.5 text-[11px] font-semibold text-[#202020] transition-colors hover:border-[#b40008] hover:text-[#b40008] sm:h-10 sm:px-3 sm:text-[12px] md:h-11 md:rounded-[12px] md:px-4 md:text-[13px] lg:h-[52px] lg:rounded-[15px] lg:px-5 lg:text-[14px]"
                     >
                         <span>Xem tất cả</span>
 
@@ -159,7 +159,7 @@ function HomeProductSection({
                     }}
                     className="relative w-full"
                 >
-                    <CarouselContent className="-ml-3 pb-0 md:-ml-4">
+                    <CarouselContent className="-ml-2.5 pb-1 md:-ml-3 lg:-ml-4">
                         {products.map(
                             (product, index) => (
                                 <CarouselItem
@@ -170,10 +170,9 @@ function HomeProductSection({
                                          * Tablet: 2–4 card.
                                          * Desktop lớn: đúng 6 card.
                                          */
-                                        'basis-[82%] pl-3',
-                                        'min-[480px]:basis-[48%]',
-                                        'md:basis-1/3 md:pl-4',
-                                        'lg:basis-1/4',
+                                        'basis-1/2 pl-2.5',
+                                        'md:basis-1/3 md:pl-3',
+                                        'lg:basis-1/4 lg:pl-4',
                                         'xl:basis-1/6',
                                     ].join(' ')}
                                 >
@@ -234,21 +233,6 @@ function HomeProductSection({
                         </>
                     ) : null}
                 </Carousel>
-
-                {/* Nút mobile */}
-                <div className="mt-5 sm:hidden">
-                    <Link
-                        href={href}
-                        className="flex h-11 w-full items-center justify-center gap-1 rounded-[13px] border border-[#efd8cf] bg-white text-[13px] font-semibold text-[#202020]"
-                    >
-                        Xem tất cả
-
-                        <ChevronRight
-                            size={15}
-                            className="text-[#d4a093]"
-                        />
-                    </Link>
-                </div>
             </div>
         </section>
     )

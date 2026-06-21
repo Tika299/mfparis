@@ -537,7 +537,7 @@ export const ProductCard = ({
          * Không dùng rounded-[32px].
          * Ảnh mẫu chỉ bo khoảng 18–22px.
          */
-        'group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[20px] border border-[#e6e6e6] bg-white font-sans',
+        'group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[14px] border border-[#e6e6e6] bg-white font-sans sm:rounded-[16px] lg:rounded-[20px]',
 
         /*
          * Hover nhẹ, không nhấc card quá cao.
@@ -553,21 +553,21 @@ export const ProductCard = ({
       <div className="relative aspect-[1/1] w-full overflow-hidden bg-white">
         {/* FLASH SALE BADGE */}
         {shouldShowDiscountBadge ? (
-          <span className="absolute left-4 top-4 z-20 flex min-h-8 items-center justify-center rounded-[8px] bg-[#c40008] px-3 text-[13px] font-bold tabular-nums text-white shadow-[0_4px_12px_rgba(196,0,8,0.2)]">
+          <span className="absolute left-2 top-2 z-20 flex min-h-7 items-center justify-center rounded-[7px] bg-[#c40008] px-2 text-[10px] font-bold uppercase text-white shadow-sm sm:left-2.5 sm:top-2.5 sm:text-[11px] lg:left-4 lg:top-4 lg:min-h-8 lg:px-3 lg:text-[12px]">
             -{discountPercent}%
           </span>
         ) : null}
 
         {/* NEW BADGE */}
         {shouldShowNewBadge ? (
-          <span className="absolute left-4 top-4 z-20 flex min-h-8 items-center justify-center rounded-[8px] bg-[#c40008] px-3 text-[13px] font-bold uppercase text-white shadow-[0_4px_12px_rgba(196,0,8,0.2)]">
+          <span className="absolute left-2 top-2 z-20 flex min-h-7 items-center justify-center rounded-[7px] bg-[#c40008] px-2 text-[10px] font-bold uppercase text-white shadow-sm sm:left-2.5 sm:top-2.5 sm:text-[11px] lg:left-4 lg:top-4 lg:min-h-8 lg:px-3 lg:text-[12px]">
             {badgeText ?? 'Mới'}
           </span>
         ) : null}
 
         {/* COMBO BADGE */}
         {shouldShowComboBadge ? (
-          <span className="absolute left-4 top-4 z-20 flex min-h-8 items-center justify-center rounded-[8px] bg-[#c40008] px-3 text-[12px] font-bold uppercase text-white shadow-[0_4px_12px_rgba(196,0,8,0.2)]">
+          <span className="absolute left-2 top-2 z-20 flex min-h-7 items-center justify-center rounded-[7px] bg-[#c40008] px-2 text-[10px] font-bold uppercase text-white shadow-sm sm:left-2.5 sm:top-2.5 sm:text-[11px] lg:left-4 lg:top-4 lg:min-h-8 lg:px-3 lg:text-[12px]">
             {badgeText ?? 'Combo'}
           </span>
         ) : null}
@@ -576,7 +576,7 @@ export const ProductCard = ({
         {shouldShowRankBadge ? (
           <span
             className={cn(
-              'absolute left-4 top-4 z-20 flex h-12 min-w-12 items-center justify-center rounded-[11px] px-3 text-[20px] font-bold shadow-sm',
+              'absolute left-2 top-2 z-20 flex h-9 min-w-9 items-center justify-center rounded-[9px] px-2 text-[15px] font-bold shadow-sm sm:left-2.5 sm:top-2.5 sm:h-10 sm:min-w-10 sm:text-[17px] lg:left-4 lg:top-4 lg:h-12 lg:min-w-12 lg:text-[20px]',
               getRankClassName(rank),
             )}
           >
@@ -602,7 +602,7 @@ export const ProductCard = ({
               : `Thêm ${product.title} vào yêu thích`
           }
           className={cn(
-            'absolute right-3 top-3 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#989898] transition-all duration-200',
+            'absolute right-2 top-2 z-30 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#989898] transition-all duration-200 sm:right-2.5 sm:top-2.5 sm:h-9 sm:w-9 lg:right-3 lg:top-3 lg:h-10 lg:w-10',
             'hover:bg-[#fff3f3] hover:text-[#b40008]',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b40008] focus-visible:ring-offset-2',
             isWishlisted &&
@@ -611,13 +611,10 @@ export const ProductCard = ({
         >
           <Heart
             aria-hidden="true"
-            size={24}
+            size={19}
             strokeWidth={1.8}
-            fill={
-              isWishlisted
-                ? 'currentColor'
-                : 'none'
-            }
+            fill={isWishlisted ? 'currentColor' : 'none'}
+            className="sm:h-5 sm:w-5 lg:h-6 lg:w-6"
           />
         </button>
 
@@ -633,7 +630,7 @@ export const ProductCard = ({
         {/* PRODUCT IMAGE */}
         <Link
           href={`/products/${product.slug}`}
-          className="relative flex h-full w-full items-center justify-center p-3 sm:p-4"
+          className="relative flex h-full w-full items-center justify-center p-2 sm:p-2.5 md:p-3 lg:p-4"
           aria-label={product.title}
         >
           <div className="relative h-full w-full transition-transform duration-500 group-hover:scale-[1.04]">
@@ -650,11 +647,11 @@ export const ProductCard = ({
       {/* =====================================================
           CONTENT AREA
       ====================================================== */}
-      <div className="flex flex-1 flex-col px-4 pb-4">
+      <div className="flex flex-1 flex-col px-2.5 pb-3 sm:px-3 sm:pb-3.5 md:px-3.5 lg:px-4 lg:pb-4">
         {/* BRAND */}
         {showBrand &&
           brandName ? (
-          <p className="mb-1 line-clamp-1 text-[13px] font-bold leading-5 text-[#222222] sm:text-[14px]">
+          <p className="mb-0.5 line-clamp-1 text-[10px] font-bold leading-4 text-[#222222] sm:text-[11px] md:text-[12px] lg:mb-1 lg:text-[14px]">
             {brandName}
           </p>
         ) : null}
@@ -669,8 +666,8 @@ export const ProductCard = ({
               'text-[#252525] transition-colors hover:text-[#b40008]',
 
               mode === 'combo'
-                ? 'line-clamp-1 min-h-[24px] text-[14px] font-bold leading-6 sm:text-[15px]'
-                : 'line-clamp-2 min-h-[46px] text-[13px] font-normal leading-[1.55] sm:text-[14px]',
+                ? 'line-clamp-2 min-h-[38px] text-[11px] font-bold leading-[1.5] sm:min-h-[40px] sm:text-[12px] md:min-h-[42px] md:text-[13px] lg:min-h-[46px] lg:text-[15px]'
+                : 'line-clamp-2 min-h-[38px] text-[11px] font-normal leading-[1.5] sm:min-h-[40px] sm:text-[12px] md:min-h-[42px] md:text-[13px] lg:min-h-[46px] lg:text-[14px]',
             )}
           >
             {product.title}
@@ -679,22 +676,22 @@ export const ProductCard = ({
 
         {/* COMBO DESCRIPTION */}
         {showComboDescription ? (
-          <p className="mt-1 line-clamp-2 min-h-[44px] text-[13px] font-normal leading-[1.55] text-[#555555] sm:text-[14px]">
+          <p className="mt-1 line-clamp-2 min-h-[36px] text-[10px] font-normal leading-[1.5] text-[#666666] sm:min-h-[38px] sm:text-[11px] md:min-h-[40px] md:text-[12px] lg:min-h-[44px] lg:text-[13px]">
             {description}
           </p>
         ) : null}
 
         {/* RATING */}
         {showRating ? (
-          <div className="mt-2 flex min-h-6 items-center gap-1.5">
+          <div className="mt-1.5 flex min-h-5 items-center gap-1 sm:mt-2 sm:min-h-6">
             {hasRating ? (
               <>
                 <Star
                   aria-hidden="true"
-                  size={17}
+                  size={14}
                   strokeWidth={1.5}
                   fill="#ff9900"
-                  className="shrink-0 text-[#ff9900]"
+                  className="shrink-0 text-[#ff9900] sm:h-4 sm:w-4 lg:h-[17px] lg:w-[17px]"
                 />
 
                 <span className="text-[12px] font-medium tabular-nums text-[#646464] sm:text-[13px]">
@@ -707,7 +704,7 @@ export const ProductCard = ({
                   )}
                 </span>
 
-                <span className="text-[12px] text-[#777777] sm:text-[13px]">
+                <span className="text-[10px] font-medium tabular-nums text-[#646464] sm:text-[11px] md:text-[12px] lg:text-[13px]">
                   (
                   {formatReviewCount(
                     reviewCount,
@@ -728,12 +725,12 @@ export const ProductCard = ({
           {mode === 'flash' && isSale ? (
             <div className="flex min-h-[48px] flex-col justify-end">
               {/* Giá niêm yết cũ */}
-              <span className="text-[12px] font-normal leading-none tabular-nums text-[#999999] line-through sm:text-[13px]">
+              <span className="text-[10px] font-normal leading-none tabular-nums text-[#999999] line-through sm:text-[11px] lg:text-[13px]">
                 {formatPrice(basePrice)}đ
               </span>
 
               {/* Giá bán hiện tại */}
-              <span className="mt-2 text-[16px] font-bold leading-none tabular-nums text-[#c40008] sm:text-[17px]">
+              <span className="mt-1.5 text-[14px] font-bold leading-none tabular-nums text-[#c40008] sm:text-[15px] md:text-[16px] lg:mt-2 lg:text-[17px]">
                 {formatPrice(salePrice)}đ
               </span>
             </div>
@@ -747,7 +744,7 @@ export const ProductCard = ({
                 Giá niêm yết
               </span>
 
-              <span className="mt-2 block text-[17px] font-bold leading-none tabular-nums text-[#c40008] sm:text-[18px]">
+              <span className="block text-[14px] font-bold leading-none tabular-nums text-[#c40008] sm:text-[15px] md:text-[16px] lg:text-[18px]">
                 {isContactPrice
                   ? 'Liên hệ'
                   : `${formatPrice(finalPrice)}đ`}
@@ -771,7 +768,10 @@ export const ProductCard = ({
                       : `Thêm ${product.title} vào giỏ hàng`
               }
               className={cn(
-                'mt-4 flex min-h-[46px] w-full items-center justify-center gap-2 rounded-[12px] border border-[#eed4d4] bg-white px-3 text-[14px] font-bold text-[#b40008]',
+                'mt-3 flex min-h-10 w-full items-center justify-center gap-1.5 rounded-[10px] border border-[#eed4d4] bg-white px-1.5 text-[10px] font-bold text-[#b40008]',
+                'sm:min-h-[42px] sm:px-2 sm:text-[11px]',
+                'md:min-h-11 md:text-[12px]',
+                'lg:mt-4 lg:min-h-[46px] lg:rounded-[12px] lg:px-3 lg:text-[14px]',
                 'transition-colors duration-200 hover:border-[#b40008] hover:bg-[#b40008] hover:text-white',
                 'disabled:cursor-not-allowed disabled:border-[#e5e5e5] disabled:bg-[#f5f5f5] disabled:text-[#aaaaaa]',
               )}
@@ -779,14 +779,16 @@ export const ProductCard = ({
               {isVariableProduct ? (
                 <Settings
                   aria-hidden="true"
-                  size={18}
+                  size={16}
                   strokeWidth={2}
+                  className="shrink-0 lg:h-[18px] lg:w-[18px]"
                 />
               ) : (
                 <ShoppingBag
                   aria-hidden="true"
-                  size={18}
+                  size={16}
                   strokeWidth={2}
+                  className="shrink-0 lg:h-[18px] lg:w-[18px]"
                 />
               )}
 
