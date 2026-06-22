@@ -477,7 +477,7 @@ function PaydayPromotionCard({
 
             {/* Nội dung voucher chính */}
             <div className="relative z-10">
-                <h3 className="line-clamp-1 text-[25px] font-medium uppercase leading-none tracking-[-0.02em] sm:text-[27px]">
+                <h3 className="line-clamp-1 text-[25px] font-medium uppercase leading-none tracking-[-0.02em] sm:text-[27px] pt-2">
                     {primaryVoucher.title}
                 </h3>
 

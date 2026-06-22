@@ -13,6 +13,7 @@ import {
 
 import { LiveChat } from '../LiveChat'
 import { cn } from '@/utilities'
+import { BackToTopButton } from '../BackToTopButton'
 
 type FloatingContactMenuProps =
     Readonly<{
@@ -152,6 +153,49 @@ export function FloatingContactMenu({
             ref={containerRef}
             className="fixed bottom-4 right-3 z-[100] h-14 w-14 sm:bottom-5 sm:right-5 sm:h-16 sm:w-16 md:bottom-7 md:right-7"
         >
+            {/* =================================================
+    BACK TO TOP LUÔN HIỂN THỊ
+
+    Menu đóng:
+    Nằm ngay phía trên nút chính.
+
+    Menu mở:
+    Tự đẩy cao hơn để không che LiveChat/Zalo.
+================================================== */}
+            <div
+                className={cn(
+                    'absolute bottom-0 right-0 z-10',
+                    'transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]',
+
+                    open
+                        ? [
+                            '-translate-y-[154px]',
+                            'sm:-translate-y-[174px]',
+                            'md:-translate-y-[184px]',
+                        ].join(' ')
+                        : [
+                            '-translate-y-[68px]',
+                            'sm:-translate-y-[78px]',
+                            'md:-translate-y-[84px]',
+                        ].join(' '),
+
+                    /*
+                     * Ghi đè vị trí fixed nếu BackToTopButton
+                     * đang tự định vị trong component riêng.
+                     */
+                    '[&>*]:!static',
+                    '[&>*]:!bottom-auto',
+                    '[&>*]:!right-auto',
+                    '[&>*]:!m-0',
+
+                    '[&>*]:!h-12',
+                    '[&>*]:!w-12',
+                    'sm:[&>*]:!h-14',
+                    'sm:[&>*]:!w-14',
+                )}
+            >
+                <BackToTopButton />
+            </div>
             {/* =============================================
           LIVE CHAT
           Bung chéo lên bên trái

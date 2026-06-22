@@ -3,7 +3,6 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 
-import { BackToTopButton } from '../BackToTopButton'
 import { FloatingContactMenu } from './FloatingContactMenu'
 
 type ContactSettings = {
@@ -38,31 +37,9 @@ export const FloatingContact = async () => {
     'https://zalo.me/0792979299'
 
   return (
-    <>
-      {/* Back To Top luôn hiển thị độc lập */}
-      <div
-        className={[
-          'fixed bottom-[84px] right-3 z-[998]',
-          'sm:bottom-[96px] sm:right-5',
-          'md:bottom-[104px] md:right-7',
-
-          /*
-           * Ghi đè nếu BackToTopButton đang tự dùng fixed.
-           */
-          '[&>*]:!static',
-          '[&>*]:!bottom-auto',
-          '[&>*]:!right-auto',
-          '[&>*]:!m-0',
-        ].join(' ')}
-      >
-        <BackToTopButton />
-      </div>
-
-      {/* Cụm Live Chat, Zalo và điện thoại */}
-      <FloatingContactMenu
-        phone={phone}
-        zalo={zalo}
-      />
-    </>
+    <FloatingContactMenu
+      phone={phone}
+      zalo={zalo}
+    />
   )
 }

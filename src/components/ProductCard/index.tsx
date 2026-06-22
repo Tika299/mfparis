@@ -768,7 +768,9 @@ export const ProductCard = ({
                       : `Thêm ${product.title} vào giỏ hàng`
               }
               className={cn(
-                'mt-3 flex min-h-10 w-full items-center justify-center gap-1.5 rounded-[10px] border border-[#eed4d4] bg-white px-1.5 text-[10px] font-bold text-[#b40008]',
+                'mt-3 flex min-h-10 w-full min-w-0 items-center justify-center gap-1 rounded-[10px]',
+                'border border-[#eed4d4] bg-white px-1 text-[9px] font-bold leading-none text-[#b40008]',
+                'min-[390px]:px-1.5 min-[390px]:text-[10px]',
                 'sm:min-h-[42px] sm:px-2 sm:text-[11px]',
                 'md:min-h-11 md:text-[12px]',
                 'lg:mt-4 lg:min-h-[46px] lg:rounded-[12px] lg:px-3 lg:text-[14px]',
@@ -792,7 +794,12 @@ export const ProductCard = ({
                 />
               )}
 
-              <span>
+              <span
+                className={cn(
+                  'shrink-0 whitespace-nowrap leading-none',
+                  mode === 'flash' && 'lg:sr-only',
+                )}
+              >
                 {isVariableProduct
                   ? 'Chọn phân loại'
                   : isOutOfStock
