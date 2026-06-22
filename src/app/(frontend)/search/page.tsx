@@ -1,7 +1,7 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { ProductCard } from '@/components/ProductCard'
-import { SearchFilters } from '@/components/SearchFilters'
+import { SearchFilters } from '@/components/search-filters/SearchFilters'
 import { SearchIcon, X } from 'lucide-react'
 import Link from 'next/link'
 
