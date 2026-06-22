@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { OptimizedImage } from '@/components/OptimizedImage'
@@ -11,25 +12,49 @@ type PageProps = {
 }
 
 export const metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://maraisdefrance.vn'),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL || 'https://maraisdefrance.vn',
+  ),
   title: 'Thương hiệu | MF Paris Chính Hãng',
-  description: 'Khám phá các thương hiệu nước hoa, mỹ phẩm và thực phẩm chức năng chính hãng tại MF Paris.',
+  description:
+    'Khám phá các thương hiệu nước hoa, mỹ phẩm và thực phẩm chức năng chính hãng tại MF Paris.',
 }
 
-export default async function AllBrandsPage({ searchParams }: PageProps) {
-  const payload = await getPayload({ config: configPromise })
+const getCachedBrandsPageData = unstable_cache(
+  async (page: number, limit: number) => {
+    const payload = await getPayload({
+      config: configPromise,
+    })
 
+    return payload.find({
+      collection: 'brands',
+      limit,
+      page,
+      sort: 'name',
+      depth: 1,
+    })
+  },
+  ['all-brands-page-data-v1'],
+  {
+    tags: ['brands'],
+    revalidate: 300,
+  },
+)
+
+export default async function AllBrandsPage({
+  searchParams,
+}: PageProps) {
   const resolvedSearchParams = await searchParams
-  const currentPage = Math.max(Number(resolvedSearchParams?.page) || 1, 1)
+  const currentPage = Math.max(
+    Number(resolvedSearchParams?.page) || 1,
+    1,
+  )
   const limit = 24
 
-  const brandsRes = await payload.find({
-    collection: 'brands',
+  const brandsRes = await getCachedBrandsPageData(
+    currentPage,
     limit,
-    page: currentPage,
-    sort: 'name',
-    depth: 1,
-  })
+  )
 
   const totalPages = brandsRes.totalPages || 1
 
@@ -53,10 +78,13 @@ export default async function AllBrandsPage({ searchParams }: PageProps) {
     <div className="bg-[#FDFBF9] min-h-screen pb-20">
       <div className="max-w-[1440px] mx-auto px-6 md:px-10 py-16">
         <header className="text-center mb-16 space-y-4">
-          <h1 className="text-5xl font-bold font-sans">Thương hiệu</h1>
+          <h1 className="text-5xl font-bold font-sans">
+            Thương hiệu
+          </h1>
           <div className="w-20 h-0.5 bg-amber-200 mx-auto"></div>
           <p className="text-sm text-gray-500 max-w-xl mx-auto">
-            Tổng hợp các thương hiệu nước hoa, mỹ phẩm và chăm sóc sức khỏe đang có tại MF Paris.
+            Tổng hợp các thương hiệu nước hoa, mỹ phẩm và chăm sóc sức
+            khỏe đang có tại MF Paris.
           </p>
         </header>
 
@@ -95,7 +123,6 @@ export default async function AllBrandsPage({ searchParams }: PageProps) {
           </div>
         )}
 
-        {/* PHÂN TRANG */}
         {totalPages > 1 && (
           <div className="mt-14 flex flex-wrap items-center justify-center gap-2">
             {currentPage > 1 && (
@@ -116,7 +143,9 @@ export default async function AllBrandsPage({ searchParams }: PageProps) {
                 >
                   1
                 </Link>
-                <span className="px-2 text-gray-400">...</span>
+                <span className="px-2 text-gray-400">
+                  ...
+                </span>
               </>
             )}
 
@@ -136,7 +165,9 @@ export default async function AllBrandsPage({ searchParams }: PageProps) {
 
             {currentPage < totalPages - 2 && (
               <>
-                <span className="px-2 text-gray-400">...</span>
+                <span className="px-2 text-gray-400">
+                  ...
+                </span>
                 <Link
                   href={getPageHref(totalPages)}
                   className="w-11 h-11 rounded-full bg-white border border-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 hover:bg-black hover:text-white transition-all"

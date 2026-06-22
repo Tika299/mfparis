@@ -295,7 +295,7 @@ export interface Product {
   brand: number | Brand;
   categories?: (number | Category)[] | null;
   /**
-   * Chọn sản phẩm có biến thể nếu sản phẩm có nhiều dung tích, màu, quy cách...
+   * Chá»n sáº£n pháº©m cÃ³ biáº¿n thá»ƒ náº¿u sáº£n pháº©m cÃ³ nhiá»u dung tÃ­ch, mÃ u, quy cÃ¡ch...
    */
   productType?: ('simple' | 'variable') | null;
   price: {
@@ -304,7 +304,7 @@ export interface Product {
     stock?: number | null;
   };
   /**
-   * Ảnh sản phẩm nên dùng tỉ lệ 1:1 để hiển thị đẹp.
+   * áº¢nh sáº£n pháº©m nÃªn dÃ¹ng tá»‰ lá»‡ 1:1 Ä‘á»ƒ hiá»ƒn thá»‹ Ä‘áº¹p.
    */
   images?:
     | {
@@ -313,11 +313,11 @@ export interface Product {
       }[]
     | null;
   /**
-   * Hiển thị ở phần đầu trang sản phẩm.
+   * Hiá»ƒn thá»‹ á»Ÿ pháº§n Ä‘áº§u trang sáº£n pháº©m.
    */
   shortDescription?: string | null;
   /**
-   * Dùng cho dung tích, xuất xứ, nhóm hương, loại da, nồng độ...
+   * DÃ¹ng cho dung tÃ­ch, xuáº¥t xá»©, nhÃ³m hÆ°Æ¡ng, loáº¡i da, ná»“ng Ä‘á»™...
    */
   specifications?:
     | {
@@ -327,14 +327,14 @@ export interface Product {
       }[]
     | null;
   /**
-   * Dữ liệu dùng cho bộ lọc danh mục, tìm kiếm và so sánh sản phẩm.
+   * Dá»¯ liá»‡u dÃ¹ng cho bá»™ lá»c danh má»¥c, tÃ¬m kiáº¿m vÃ  so sÃ¡nh sáº£n pháº©m.
    */
   productAttributes?:
     | {
         attribute: number | Attribute;
         values?: (number | AttributeValue)[] | null;
         /**
-         * Dùng khi sản phẩm có giá trị riêng, ví dụ độ lưu hương 7 giờ.
+         * DÃ¹ng khi sáº£n pháº©m cÃ³ giÃ¡ trá»‹ riÃªng, vÃ­ dá»¥ Ä‘á»™ lÆ°u hÆ°Æ¡ng 7 giá».
          */
         numericValue?: number | null;
         booleanValue?: boolean | null;
@@ -344,28 +344,28 @@ export interface Product {
     | null;
   fragranceProfile?: {
     /**
-     * Chọn các nốt hương xuất hiện đầu tiên sau khi xịt.
+     * Chá»n cÃ¡c ná»‘t hÆ°Æ¡ng xuáº¥t hiá»‡n Ä‘áº§u tiÃªn sau khi xá»‹t.
      */
     topNotes?: (number | FragranceNote)[] | null;
     /**
-     * Chọn các nốt hương tạo nên phần lõi của mùi hương.
+     * Chá»n cÃ¡c ná»‘t hÆ°Æ¡ng táº¡o nÃªn pháº§n lÃµi cá»§a mÃ¹i hÆ°Æ¡ng.
      */
     middleNotes?: (number | FragranceNote)[] | null;
     /**
-     * Chọn các nốt hương lưu lại lâu nhất trên da.
+     * Chá»n cÃ¡c ná»‘t hÆ°Æ¡ng lÆ°u láº¡i lÃ¢u nháº¥t trÃªn da.
      */
     baseNotes?: (number | FragranceNote)[] | null;
     /**
-     * Chấm theo thang điểm 0–10.
+     * Cháº¥m theo thang Ä‘iá»ƒm 0â€“10.
      */
     longevityScore?: number | null;
     /**
-     * Chấm theo thang điểm 0–10.
+     * Cháº¥m theo thang Ä‘iá»ƒm 0â€“10.
      */
     sillageScore?: number | null;
   };
   /**
-   * Dùng cho các biến thể như 30ml, 50ml, 100ml, fullbox, tester, màu sắc, quy cách...
+   * DÃ¹ng cho cÃ¡c biáº¿n thá»ƒ nhÆ° 30ml, 50ml, 100ml, fullbox, tester, mÃ u sáº¯c, quy cÃ¡ch...
    */
   variants?:
     | {
@@ -373,7 +373,7 @@ export interface Product {
         sku?: string | null;
         isDefault?: boolean | null;
         /**
-         * Ví dụ: 50ml, màu đỏ, fullbox hoặc tester.
+         * VÃ­ dá»¥: 50ml, mÃ u Ä‘á», fullbox hoáº·c tester.
          */
         optionValues?: (number | AttributeValue)[] | null;
         basePrice: number;
@@ -385,7 +385,7 @@ export interface Product {
       }[]
     | null;
   /**
-   * Nội dung chi tiết sản phẩm được convert từ HTML WordPress sang RichText. Giữ H2, H3, list, link, bảng nếu editor hỗ trợ.
+   * Ná»™i dung chi tiáº¿t sáº£n pháº©m Ä‘Æ°á»£c convert tá»« HTML WordPress sang RichText. Giá»¯ H2, H3, list, link, báº£ng náº¿u editor há»— trá»£.
    */
   description?: {
     root: {
@@ -407,15 +407,15 @@ export interface Product {
   seoTitle?: string | null;
   seoDescription?: string | null;
   /**
-   * Tự động tạo từ tên sản phẩm, có thể chỉnh tay để tối ưu SEO.
+   * Tá»± Ä‘á»™ng táº¡o tá»« tÃªn sáº£n pháº©m, cÃ³ thá»ƒ chá»‰nh tay Ä‘á»ƒ tá»‘i Æ°u SEO.
    */
   slug: string;
   /**
-   * Được tính tự động từ các review đã duyệt.
+   * ÄÆ°á»£c tÃ­nh tá»± Ä‘á»™ng tá»« cÃ¡c review Ä‘Ã£ duyá»‡t.
    */
   averageRating?: number | null;
   /**
-   * Tổng số review đã duyệt của sản phẩm.
+   * Tá»•ng sá»‘ review Ä‘Ã£ duyá»‡t cá»§a sáº£n pháº©m.
    */
   reviewCount?: number | null;
   status?: ('draft' | 'published') | null;

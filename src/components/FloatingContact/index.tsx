@@ -4,6 +4,7 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 
 import { FloatingContactMenu } from './FloatingContactMenu'
+import { getSiteSettings } from '@/data/getSiteSettings'
 
 type ContactSettings = {
   phone?: string | null
@@ -16,10 +17,7 @@ export const FloatingContact = async () => {
     config: configPromise,
   })
 
-  const settings = await payload.findGlobal({
-    slug: 'site-settings',
-    depth: 1,
-  })
+  const settings = await getSiteSettings()
 
   const contact =
     settings.contact as

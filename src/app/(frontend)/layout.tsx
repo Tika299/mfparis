@@ -1,6 +1,5 @@
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-export const fetchCache = 'force-no-store'
+export const revalidate = 300
+
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import '../globals.css'
@@ -45,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               borderRadius: '1.2rem',
               fontFamily: 'var(--font-be-vietnam)',
             },
-            className: "top-center border-gray-100 shadow-2xl",
+            className: 'top-center border-gray-100 shadow-2xl',
           }}
         />
         {/* NÚT LIÊN HỆ GÓC TRÁI MÀN HÌNH */}

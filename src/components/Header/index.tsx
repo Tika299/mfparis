@@ -16,6 +16,7 @@ import { SearchBar } from './SearchBar'
 import { CartCount } from './CartCount'
 import { WishlistButton } from './WishlistButton'
 import { MobileMenu } from '../MobileMenu'
+import { getSiteSettings } from '@/data/getSiteSettings'
 
 type HeaderNavItem = {
   id: string
@@ -75,10 +76,7 @@ export const Header = async () => {
     config: configPromise,
   })
 
-  const settings = await payload.findGlobal({
-    slug: 'site-settings',
-    depth: 1,
-  })
+  const settings = await getSiteSettings()
 
   const logo = settings.header?.logo
 

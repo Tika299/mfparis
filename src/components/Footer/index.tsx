@@ -10,6 +10,7 @@ import {
   MessageCircle,
   Phone,
 } from 'lucide-react'
+import { getSiteSettings } from '@/data/getSiteSettings'
 
 type FooterLink = {
   id?: string | number | null
@@ -272,11 +273,7 @@ export const Footer = async () => {
     config: configPromise,
   })
 
-  const settings =
-    await payload.findGlobal({
-      slug: 'site-settings',
-      depth: 1,
-    })
+  const settings = await getSiteSettings()
 
   const typedSettings =
     settings as unknown as {

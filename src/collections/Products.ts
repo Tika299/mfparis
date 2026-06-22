@@ -1,3 +1,4 @@
+import { revalidateTag } from 'next/cache'
 import type {
   CollectionBeforeChangeHook,
   CollectionConfig,
@@ -77,6 +78,12 @@ const syncVariantPrice: CollectionBeforeChangeHook = async ({ data }) => {
   return data
 }
 
+const revalidateProductTags = async () => {
+  revalidateTag('products', 'max')
+  revalidateTag('categories', 'max')
+  revalidateTag('brands', 'max')
+}
+
 export const Products: CollectionConfig = {
   slug: 'products',
 
@@ -91,7 +98,17 @@ export const Products: CollectionConfig = {
   },
 
   hooks: {
-    afterChange: [trackProductSlugHistory],
+    afterChange: [
+      trackProductSlugHistory,
+      async () => {
+        await revalidateProductTags()
+      },
+    ],
+    afterDelete: [
+      async () => {
+        await revalidateProductTags()
+      },
+    ],
     beforeChange: [syncVariantPrice],
   },
 
@@ -101,7 +118,7 @@ export const Products: CollectionConfig = {
       type: 'tabs',
       tabs: [
         {
-          label: 'Thông tin chung',
+          label: 'ThÃ´ng tin chung',
           fields: [
             {
               type: 'row',
@@ -110,7 +127,7 @@ export const Products: CollectionConfig = {
                   name: 'title',
                   type: 'text',
                   required: true,
-                  label: 'Tên sản phẩm',
+                  label: 'TÃªn sáº£n pháº©m',
                   admin: {
                     width: '70%',
                   },
@@ -118,7 +135,7 @@ export const Products: CollectionConfig = {
                 {
                   name: 'sku',
                   type: 'text',
-                  label: 'Mã SKU',
+                  label: 'MÃ£ SKU',
                   admin: {
                     width: '30%',
                   },
@@ -134,7 +151,7 @@ export const Products: CollectionConfig = {
                   type: 'relationship',
                   relationTo: 'brands',
                   required: true,
-                  label: 'Thương hiệu',
+                  label: 'ThÆ°Æ¡ng hiá»‡u',
                   admin: {
                     width: '50%',
                   },
@@ -144,7 +161,7 @@ export const Products: CollectionConfig = {
                   type: 'relationship',
                   relationTo: 'categories',
                   hasMany: true,
-                  label: 'Danh mục sản phẩm',
+                  label: 'Danh má»¥c sáº£n pháº©m',
                   admin: {
                     width: '50%',
                   },
@@ -154,27 +171,27 @@ export const Products: CollectionConfig = {
             {
               name: 'productType',
               type: 'select',
-              label: 'Loại sản phẩm',
+              label: 'Loáº¡i sáº£n pháº©m',
               defaultValue: 'simple',
               options: [
                 {
-                  label: 'Sản phẩm thường',
+                  label: 'Sáº£n pháº©m thÆ°á»ng',
                   value: 'simple',
                 },
                 {
-                  label: 'Sản phẩm có biến thể',
+                  label: 'Sáº£n pháº©m cÃ³ biáº¿n thá»ƒ',
                   value: 'variable',
                 },
               ],
               admin: {
-                description: 'Chọn sản phẩm có biến thể nếu sản phẩm có nhiều dung tích, màu, quy cách...',
+                description: 'Chá»n sáº£n pháº©m cÃ³ biáº¿n thá»ƒ náº¿u sáº£n pháº©m cÃ³ nhiá»u dung tÃ­ch, mÃ u, quy cÃ¡ch...',
               },
             },
 
             {
               name: 'price',
               type: 'group',
-              label: 'Giá & Kho hàng',
+              label: 'GiÃ¡ & Kho hÃ ng',
               fields: [
                 {
                   type: 'row',
@@ -183,7 +200,7 @@ export const Products: CollectionConfig = {
                       name: 'basePrice',
                       type: 'number',
                       required: true,
-                      label: 'Giá niêm yết (đ)',
+                      label: 'GiÃ¡ niÃªm yáº¿t (Ä‘)',
                       admin: {
                         width: '33.33%',
                       },
@@ -191,7 +208,7 @@ export const Products: CollectionConfig = {
                     {
                       name: 'salePrice',
                       type: 'number',
-                      label: 'Giá khuyến mãi (đ)',
+                      label: 'GiÃ¡ khuyáº¿n mÃ£i (Ä‘)',
                       admin: {
                         width: '33.33%',
                       },
@@ -199,7 +216,7 @@ export const Products: CollectionConfig = {
                     {
                       name: 'stock',
                       type: 'number',
-                      label: 'Số lượng kho',
+                      label: 'Sá»‘ lÆ°á»£ng kho',
                       defaultValue: 0,
                       admin: {
                         width: '33.33%',
@@ -213,9 +230,9 @@ export const Products: CollectionConfig = {
             {
               name: 'images',
               type: 'array',
-              label: 'Bộ sưu tập hình ảnh',
+              label: 'Bá»™ sÆ°u táº­p hÃ¬nh áº£nh',
               admin: {
-                description: 'Ảnh sản phẩm nên dùng tỉ lệ 1:1 để hiển thị đẹp.',
+                description: 'áº¢nh sáº£n pháº©m nÃªn dÃ¹ng tá»‰ lá»‡ 1:1 Ä‘á»ƒ hiá»ƒn thá»‹ Ä‘áº¹p.',
               },
               fields: [
                 {
@@ -223,7 +240,7 @@ export const Products: CollectionConfig = {
                   type: 'upload',
                   relationTo: 'media',
                   required: true,
-                  label: 'Ảnh',
+                  label: 'áº¢nh',
                 },
               ],
             },
@@ -231,24 +248,24 @@ export const Products: CollectionConfig = {
             {
               name: 'shortDescription',
               type: 'textarea',
-              label: 'Mô tả ngắn',
+              label: 'MÃ´ táº£ ngáº¯n',
               admin: {
                 rows: 4,
-                description: 'Hiển thị ở phần đầu trang sản phẩm.',
+                description: 'Hiá»ƒn thá»‹ á»Ÿ pháº§n Ä‘áº§u trang sáº£n pháº©m.',
               },
             },
           ],
         },
 
         {
-          label: 'Thông số kỹ thuật',
+          label: 'ThÃ´ng sá»‘ ká»¹ thuáº­t',
           fields: [
             {
               name: 'specifications',
               type: 'array',
-              label: 'Thông số tùy chỉnh',
+              label: 'ThÃ´ng sá»‘ tÃ¹y chá»‰nh',
               admin: {
-                description: 'Dùng cho dung tích, xuất xứ, nhóm hương, loại da, nồng độ...',
+                description: 'DÃ¹ng cho dung tÃ­ch, xuáº¥t xá»©, nhÃ³m hÆ°Æ¡ng, loáº¡i da, ná»“ng Ä‘á»™...',
               },
               fields: [
                 {
@@ -257,7 +274,7 @@ export const Products: CollectionConfig = {
                     {
                       name: 'label',
                       type: 'text',
-                      label: 'Tên thông số',
+                      label: 'TÃªn thÃ´ng sá»‘',
                       required: true,
                       admin: {
                         width: '50%',
@@ -266,7 +283,7 @@ export const Products: CollectionConfig = {
                     {
                       name: 'value',
                       type: 'text',
-                      label: 'Giá trị',
+                      label: 'GiÃ¡ trá»‹',
                       required: true,
                       admin: {
                         width: '50%',
@@ -279,15 +296,15 @@ export const Products: CollectionConfig = {
           ],
         },
         {
-          label: 'Thuộc tính & Bộ lọc',
+          label: 'Thuá»™c tÃ­nh & Bá»™ lá»c',
           fields: [
             {
               name: 'productAttributes',
               type: 'array',
-              label: 'Thuộc tính có cấu trúc',
+              label: 'Thuá»™c tÃ­nh cÃ³ cáº¥u trÃºc',
               admin: {
                 description:
-                  'Dữ liệu dùng cho bộ lọc danh mục, tìm kiếm và so sánh sản phẩm.',
+                  'Dá»¯ liá»‡u dÃ¹ng cho bá»™ lá»c danh má»¥c, tÃ¬m kiáº¿m vÃ  so sÃ¡nh sáº£n pháº©m.',
                 initCollapsed: false,
               },
               fields: [
@@ -296,7 +313,7 @@ export const Products: CollectionConfig = {
                   type: 'relationship',
                   relationTo: 'attributes',
                   required: true,
-                  label: 'Thuộc tính',
+                  label: 'Thuá»™c tÃ­nh',
                   filterOptions: {
                     isActive: {
                       equals: true,
@@ -308,7 +325,7 @@ export const Products: CollectionConfig = {
                   type: 'relationship',
                   relationTo: 'attribute-values',
                   hasMany: true,
-                  label: 'Giá trị lựa chọn',
+                  label: 'GiÃ¡ trá»‹ lá»±a chá»n',
 
                   filterOptions: ({
                     siblingData,
@@ -345,33 +362,33 @@ export const Products: CollectionConfig = {
                 {
                   name: 'numericValue',
                   type: 'number',
-                  label: 'Giá trị số trực tiếp',
+                  label: 'GiÃ¡ trá»‹ sá»‘ trá»±c tiáº¿p',
                   admin: {
                     description:
-                      'Dùng khi sản phẩm có giá trị riêng, ví dụ độ lưu hương 7 giờ.',
+                      'DÃ¹ng khi sáº£n pháº©m cÃ³ giÃ¡ trá»‹ riÃªng, vÃ­ dá»¥ Ä‘á»™ lÆ°u hÆ°Æ¡ng 7 giá».',
                   },
                 },
                 {
                   name: 'booleanValue',
                   type: 'checkbox',
-                  label: 'Giá trị đúng/sai',
+                  label: 'GiÃ¡ trá»‹ Ä‘Ãºng/sai',
                 },
                 {
                   name: 'textValue',
                   type: 'text',
-                  label: 'Giá trị văn bản',
+                  label: 'GiÃ¡ trá»‹ vÄƒn báº£n',
                 },
               ],
             },
           ],
         },
         {
-          label: 'Hồ sơ nước hoa',
+          label: 'Há»“ sÆ¡ nÆ°á»›c hoa',
           fields: [
             {
               name: 'fragranceProfile',
               type: 'group',
-              label: 'Kiến trúc mùi hương',
+              label: 'Kiáº¿n trÃºc mÃ¹i hÆ°Æ¡ng',
 
               fields: [
                 {
@@ -379,7 +396,7 @@ export const Products: CollectionConfig = {
                   type: 'relationship',
                   relationTo: 'fragrance-notes',
                   hasMany: true,
-                  label: 'Hương đầu',
+                  label: 'HÆ°Æ¡ng Ä‘áº§u',
 
                   filterOptions: {
                     isActive: {
@@ -389,7 +406,7 @@ export const Products: CollectionConfig = {
 
                   admin: {
                     description:
-                      'Chọn các nốt hương xuất hiện đầu tiên sau khi xịt.',
+                      'Chá»n cÃ¡c ná»‘t hÆ°Æ¡ng xuáº¥t hiá»‡n Ä‘áº§u tiÃªn sau khi xá»‹t.',
                   },
                 },
 
@@ -398,7 +415,7 @@ export const Products: CollectionConfig = {
                   type: 'relationship',
                   relationTo: 'fragrance-notes',
                   hasMany: true,
-                  label: 'Hương giữa',
+                  label: 'HÆ°Æ¡ng giá»¯a',
 
                   filterOptions: {
                     isActive: {
@@ -408,7 +425,7 @@ export const Products: CollectionConfig = {
 
                   admin: {
                     description:
-                      'Chọn các nốt hương tạo nên phần lõi của mùi hương.',
+                      'Chá»n cÃ¡c ná»‘t hÆ°Æ¡ng táº¡o nÃªn pháº§n lÃµi cá»§a mÃ¹i hÆ°Æ¡ng.',
                   },
                 },
 
@@ -417,7 +434,7 @@ export const Products: CollectionConfig = {
                   type: 'relationship',
                   relationTo: 'fragrance-notes',
                   hasMany: true,
-                  label: 'Hương cuối',
+                  label: 'HÆ°Æ¡ng cuá»‘i',
 
                   filterOptions: {
                     isActive: {
@@ -427,7 +444,7 @@ export const Products: CollectionConfig = {
 
                   admin: {
                     description:
-                      'Chọn các nốt hương lưu lại lâu nhất trên da.',
+                      'Chá»n cÃ¡c ná»‘t hÆ°Æ¡ng lÆ°u láº¡i lÃ¢u nháº¥t trÃªn da.',
                   },
                 },
 
@@ -437,7 +454,7 @@ export const Products: CollectionConfig = {
                     {
                       name: 'longevityScore',
                       type: 'number',
-                      label: 'Độ lưu hương',
+                      label: 'Äá»™ lÆ°u hÆ°Æ¡ng',
                       min: 0,
                       max: 10,
 
@@ -445,14 +462,14 @@ export const Products: CollectionConfig = {
                         width: '50%',
                         step: 0.5,
                         description:
-                          'Chấm theo thang điểm 0–10.',
+                          'Cháº¥m theo thang Ä‘iá»ƒm 0â€“10.',
                       },
                     },
 
                     {
                       name: 'sillageScore',
                       type: 'number',
-                      label: 'Độ tỏa hương',
+                      label: 'Äá»™ tá»a hÆ°Æ¡ng',
                       min: 0,
                       max: 10,
 
@@ -460,7 +477,7 @@ export const Products: CollectionConfig = {
                         width: '50%',
                         step: 0.5,
                         description:
-                          'Chấm theo thang điểm 0–10.',
+                          'Cháº¥m theo thang Ä‘iá»ƒm 0â€“10.',
                       },
                     },
                   ],
@@ -470,15 +487,15 @@ export const Products: CollectionConfig = {
           ],
         },
         {
-          label: 'Biến thể',
+          label: 'Biáº¿n thá»ƒ',
           fields: [
             {
               name: 'variants',
               type: 'array',
-              label: 'Danh sách biến thể',
+              label: 'Danh sÃ¡ch biáº¿n thá»ƒ',
               admin: {
                 description:
-                  'Dùng cho các biến thể như 30ml, 50ml, 100ml, fullbox, tester, màu sắc, quy cách...',
+                  'DÃ¹ng cho cÃ¡c biáº¿n thá»ƒ nhÆ° 30ml, 50ml, 100ml, fullbox, tester, mÃ u sáº¯c, quy cÃ¡ch...',
                 condition: (data) => data?.productType === 'variable',
               },
               fields: [
@@ -488,7 +505,7 @@ export const Products: CollectionConfig = {
                     {
                       name: 'name',
                       type: 'text',
-                      label: 'Tên biến thể',
+                      label: 'TÃªn biáº¿n thá»ƒ',
                       required: true,
                       admin: {
                         width: '40%',
@@ -498,7 +515,7 @@ export const Products: CollectionConfig = {
                     {
                       name: 'sku',
                       type: 'text',
-                      label: 'SKU biến thể',
+                      label: 'SKU biáº¿n thá»ƒ',
                       admin: {
                         width: '30%',
                       },
@@ -506,7 +523,7 @@ export const Products: CollectionConfig = {
                     {
                       name: 'isDefault',
                       type: 'checkbox',
-                      label: 'Biến thể mặc định',
+                      label: 'Biáº¿n thá»ƒ máº·c Ä‘á»‹nh',
                       defaultValue: false,
                       admin: {
                         width: '30%',
@@ -517,10 +534,10 @@ export const Products: CollectionConfig = {
                       type: 'relationship',
                       relationTo: 'attribute-values',
                       hasMany: true,
-                      label: 'Giá trị thuộc tính của biến thể',
+                      label: 'GiÃ¡ trá»‹ thuá»™c tÃ­nh cá»§a biáº¿n thá»ƒ',
                       admin: {
                         description:
-                          'Ví dụ: 50ml, màu đỏ, fullbox hoặc tester.',
+                          'VÃ­ dá»¥: 50ml, mÃ u Ä‘á», fullbox hoáº·c tester.',
                       },
                       filterOptions: {
                         isActive: {
@@ -537,7 +554,7 @@ export const Products: CollectionConfig = {
                     {
                       name: 'basePrice',
                       type: 'number',
-                      label: 'Giá niêm yết',
+                      label: 'GiÃ¡ niÃªm yáº¿t',
                       required: true,
                       admin: {
                         width: '33.33%',
@@ -546,7 +563,7 @@ export const Products: CollectionConfig = {
                     {
                       name: 'salePrice',
                       type: 'number',
-                      label: 'Giá khuyến mãi',
+                      label: 'GiÃ¡ khuyáº¿n mÃ£i',
                       admin: {
                         width: '33.33%',
                       },
@@ -554,7 +571,7 @@ export const Products: CollectionConfig = {
                     {
                       name: 'stock',
                       type: 'number',
-                      label: 'Tồn kho',
+                      label: 'Tá»“n kho',
                       defaultValue: 0,
                       admin: {
                         width: '33.33%',
@@ -570,7 +587,7 @@ export const Products: CollectionConfig = {
                       name: 'image',
                       type: 'upload',
                       relationTo: 'media',
-                      label: 'Ảnh riêng của biến thể',
+                      label: 'áº¢nh riÃªng cá»§a biáº¿n thá»ƒ',
                       admin: {
                         width: '50%',
                       },
@@ -578,7 +595,7 @@ export const Products: CollectionConfig = {
                     {
                       name: 'isActive',
                       type: 'checkbox',
-                      label: 'Đang bán',
+                      label: 'Äang bÃ¡n',
                       defaultValue: true,
                       admin: {
                         width: '50%',
@@ -592,15 +609,15 @@ export const Products: CollectionConfig = {
         },
 
         {
-          label: 'Nội dung chi tiết',
+          label: 'Ná»™i dung chi tiáº¿t',
           fields: [
             {
               name: 'description',
               type: 'richText',
-              label: 'Mô tả sản phẩm',
+              label: 'MÃ´ táº£ sáº£n pháº©m',
               admin: {
                 description:
-                  'Nội dung chi tiết sản phẩm được convert từ HTML WordPress sang RichText. Giữ H2, H3, list, link, bảng nếu editor hỗ trợ.',
+                  'Ná»™i dung chi tiáº¿t sáº£n pháº©m Ä‘Æ°á»£c convert tá»« HTML WordPress sang RichText. Giá»¯ H2, H3, list, link, báº£ng náº¿u editor há»— trá»£.',
               },
             },
           ],
@@ -612,7 +629,7 @@ export const Products: CollectionConfig = {
             {
               name: 'isCombo',
               type: 'checkbox',
-              label: 'Đây là bộ sản phẩm / combo',
+              label: 'ÄÃ¢y lÃ  bá»™ sáº£n pháº©m / combo',
               defaultValue: false,
             },
             {
@@ -620,7 +637,7 @@ export const Products: CollectionConfig = {
               type: 'relationship',
               relationTo: 'products',
               hasMany: true,
-              label: 'Danh sách sản phẩm trong combo',
+              label: 'Danh sÃ¡ch sáº£n pháº©m trong combo',
               admin: {
                 condition: (data) => data?.isCombo,
               },
@@ -654,19 +671,19 @@ export const Products: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
-      label: 'Đường dẫn',
+      label: 'ÄÆ°á»ng dáº«n',
       hooks: {
         beforeValidate: [beforeChangeSlug],
       },
       admin: {
         position: 'sidebar',
-        description: 'Tự động tạo từ tên sản phẩm, có thể chỉnh tay để tối ưu SEO.',
+        description: 'Tá»± Ä‘á»™ng táº¡o tá»« tÃªn sáº£n pháº©m, cÃ³ thá»ƒ chá»‰nh tay Ä‘á»ƒ tá»‘i Æ°u SEO.',
       },
     },
 
     {
       name: 'averageRating',
-      label: 'Điểm đánh giá trung bình',
+      label: 'Äiá»ƒm Ä‘Ã¡nh giÃ¡ trung bÃ¬nh',
       type: 'number',
       min: 0,
       max: 5,
@@ -674,8 +691,8 @@ export const Products: CollectionConfig = {
       index: true,
 
       /**
-       * Không cho request thông thường tự ghi đè.
-       * Hook Reviews sử dụng overrideAccess: true nên vẫn cập nhật được.
+       * KhÃ´ng cho request thÃ´ng thÆ°á»ng tá»± ghi Ä‘Ã¨.
+       * Hook Reviews sá»­ dá»¥ng overrideAccess: true nÃªn váº«n cáº­p nháº­t Ä‘Æ°á»£c.
        */
       access: {
         create: () => false,
@@ -687,12 +704,12 @@ export const Products: CollectionConfig = {
         position: 'sidebar',
         step: 0.01,
         description:
-          'Được tính tự động từ các review đã duyệt.',
+          'ÄÆ°á»£c tÃ­nh tá»± Ä‘á»™ng tá»« cÃ¡c review Ä‘Ã£ duyá»‡t.',
       },
     },
     {
       name: 'reviewCount',
-      label: 'Tổng số đánh giá',
+      label: 'Tá»•ng sá»‘ Ä‘Ã¡nh giÃ¡',
       type: 'number',
       min: 0,
       defaultValue: 0,
@@ -708,22 +725,22 @@ export const Products: CollectionConfig = {
         position: 'sidebar',
         step: 1,
         description:
-          'Tổng số review đã duyệt của sản phẩm.',
+          'Tá»•ng sá»‘ review Ä‘Ã£ duyá»‡t cá»§a sáº£n pháº©m.',
       },
     },
 
     {
       name: 'status',
       type: 'select',
-      label: 'Trạng thái',
+      label: 'Tráº¡ng thÃ¡i',
       defaultValue: 'draft',
       options: [
         {
-          label: 'Nháp',
+          label: 'NhÃ¡p',
           value: 'draft',
         },
         {
-          label: 'Đang bán',
+          label: 'Äang bÃ¡n',
           value: 'published',
         },
       ],
@@ -735,19 +752,19 @@ export const Products: CollectionConfig = {
     {
       name: 'displayLocation',
       type: 'select',
-      label: 'Vị trí trang chủ',
+      label: 'Vá»‹ trÃ­ trang chá»§',
       hasMany: true,
       options: [
         {
-          label: 'Sản phẩm bán chạy',
+          label: 'Sáº£n pháº©m bÃ¡n cháº¡y',
           value: 'best-seller',
         },
         {
-          label: 'Sản phẩm combo',
+          label: 'Sáº£n pháº©m combo',
           value: 'combo',
         },
         {
-          label: 'Sản phẩm mới',
+          label: 'Sáº£n pháº©m má»›i',
           value: 'new-arrival',
         },
         {

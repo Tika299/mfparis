@@ -1,11 +1,27 @@
+import { revalidateTag } from 'next/cache'
 import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { trackCategorySlugHistory } from '@/collections/hooks/trackSlugHistory'
 
+const revalidateCategoryTags = async () => {
+  revalidateTag('categories', 'max')
+  revalidateTag('products', 'max')
+}
+
 export const Categories: CollectionConfig = {
   slug: 'categories',
   hooks: {
-    afterChange: [trackCategorySlugHistory],
+    afterChange: [
+      trackCategorySlugHistory,
+      async () => {
+        await revalidateCategoryTags()
+      },
+    ],
+    afterDelete: [
+      async () => {
+        await revalidateCategoryTags()
+      },
+    ],
   },
   admin: { useAsTitle: 'name' },
   fields: [
@@ -30,6 +46,11 @@ export const Categories: CollectionConfig = {
         description: 'Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO',
       },
     },
-    { name: 'parent', type: 'relationship', relationTo: 'categories', label: 'Danh mục cha' },
+    {
+      name: 'parent',
+      type: 'relationship',
+      relationTo: 'categories',
+      label: 'Danh mục cha',
+    },
   ],
 }

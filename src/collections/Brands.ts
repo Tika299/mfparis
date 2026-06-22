@@ -1,8 +1,26 @@
+import { revalidateTag } from 'next/cache'
 import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 
+const revalidateBrandTags = async () => {
+  revalidateTag('brands', 'max')
+  revalidateTag('products', 'max')
+}
+
 export const Brands: CollectionConfig = {
   slug: 'brands',
+  hooks: {
+    afterChange: [
+      async () => {
+        await revalidateBrandTags()
+      },
+    ],
+    afterDelete: [
+      async () => {
+        await revalidateBrandTags()
+      },
+    ],
+  },
   admin: { useAsTitle: 'name' },
   fields: [
     { name: 'name', type: 'text', required: true },
@@ -27,7 +45,6 @@ export const Brands: CollectionConfig = {
       admin: {
         description: 'Bạn có thể dùng trình soạn thảo trực quan hoặc dán mã HTML vào.',
         components: {
-          // Thêm component xem trước vào sau ô nhập liệu
           afterInput: [
             {
               path: '@/components/Admin/RichTextPreview#RichTextPreview',

@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import Link from 'next/link'
@@ -5,9 +6,12 @@ import { ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react'
 import { OptimizedImage } from '@/components/OptimizedImage'
 
 export const metadata = {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://maraisdefrance.vn'),
+    metadataBase: new URL(
+        process.env.NEXT_PUBLIC_BASE_URL || 'https://maraisdefrance.vn',
+    ),
     title: 'Danh mục sản phẩm | MF Paris Chính Hãng',
-    description: 'Khám phá các dòng sản phẩm nước hoa, mỹ phẩm và thực phẩm chức năng cao cấp từ Pháp tại MF Paris.',
+    description:
+        'Khám phá các dòng sản phẩm nước hoa, mỹ phẩm và thực phẩm chức năng cao cấp từ Pháp tại MF Paris.',
 }
 
 type PageProps = {
@@ -16,25 +20,127 @@ type PageProps = {
     }>
 }
 
-export default async function AllCategoriesPage({ searchParams }: PageProps) {
-    const payload = await getPayload({ config: configPromise })
+type RelationshipValue =
+    | string
+    | number
+    | {
+        id?: string | number | null
+    }
+    | null
+    | undefined
 
+function getRelationshipID(value: RelationshipValue): string | number | null {
+    if (typeof value === 'string' || typeof value === 'number') {
+        return value
+    }
+
+    if (
+        value &&
+        typeof value === 'object' &&
+        ('id' in value)
+    ) {
+        const id = value.id
+
+        if (typeof id === 'string' || typeof id === 'number') {
+            return id
+        }
+    }
+
+    return null
+}
+
+const getCachedCategoriesPageData = unstable_cache(
+    async (page: number, limit: number) => {
+        const payload = await getPayload({
+            config: configPromise,
+        })
+
+        const categoriesRes = await payload.find({
+            collection: 'categories',
+            limit,
+            page,
+            sort: 'name',
+            depth: 1,
+        })
+
+        const productsRes = await payload.find({
+            collection: 'products',
+            depth: 0,
+            pagination: false,
+            overrideAccess: true,
+            where: {
+                status: {
+                    equals: 'published',
+                },
+            },
+            select: {
+                categories: true,
+            },
+        })
+
+        const productCountByCategory = new Map<string, number>()
+
+        for (const product of productsRes.docs) {
+            if (!Array.isArray(product.categories)) {
+                continue
+            }
+
+            const uniqueCategoryIDs = new Set<string>()
+
+            for (const category of product.categories) {
+                const categoryID = getRelationshipID(category)
+
+                if (categoryID !== null) {
+                    uniqueCategoryIDs.add(String(categoryID))
+                }
+            }
+
+            for (const categoryID of uniqueCategoryIDs) {
+                productCountByCategory.set(
+                    categoryID,
+                    (productCountByCategory.get(categoryID) ?? 0) + 1,
+                )
+            }
+        }
+
+        return {
+            ...categoriesRes,
+            docs: categoriesRes.docs.map((category: any) => ({
+                ...category,
+                productCount:
+                    productCountByCategory.get(String(category.id)) ?? 0,
+            })),
+        }
+    },
+    ['all-categories-page-data-v1'],
+    {
+        tags: ['categories', 'products'],
+        revalidate: 300,
+    },
+)
+
+export default async function AllCategoriesPage({
+    searchParams,
+}: PageProps) {
     const resolvedSearchParams = await searchParams
-    const currentPage = Math.max(Number(resolvedSearchParams?.page) || 1, 1)
+    const currentPage = Math.max(
+        Number(resolvedSearchParams?.page) || 1,
+        1,
+    )
     const limit = 12
 
-    const categoriesRes = await payload.find({
-        collection: 'categories',
-        limit,
-        page: currentPage,
-        sort: 'name',
-        depth: 1,
-    })
+    const categoriesRes =
+        await getCachedCategoriesPageData(
+            currentPage,
+            limit,
+        )
 
     const totalPages = categoriesRes.totalPages || 1
 
     const getPageHref = (page: number) => {
-        return page <= 1 ? '/categories' : `/categories?page=${page}`
+        return page <= 1
+            ? '/categories'
+            : `/categories?page=${page}`
     }
 
     const getPageNumbers = () => {
@@ -51,15 +157,19 @@ export default async function AllCategoriesPage({ searchParams }: PageProps) {
 
     return (
         <div className="bg-[#F4F6F8] min-h-screen pb-20 antialiased font-sans">
-
             {/* SECTION 1: BREADCRUMB */}
             <div className="bg-white border-b border-gray-100 mb-10">
                 <nav className="container-ux h-12 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
-                    <Link href="/" className="hover:text-black transition-colors">
+                    <Link
+                        href="/"
+                        className="hover:text-black transition-colors"
+                    >
                         TRANG CHỦ
                     </Link>
                     <ChevronRight size={12} />
-                    <span className="text-black">DANH MỤC SẢN PHẨM</span>
+                    <span className="text-black">
+                        DANH MỤC SẢN PHẨM
+                    </span>
                 </nav>
             </div>
 
@@ -80,7 +190,10 @@ export default async function AllCategoriesPage({ searchParams }: PageProps) {
                     <div className="w-16 h-1 bg-[#b72828] mx-auto rounded-full"></div>
 
                     <p className="text-gray-500 text-sm max-w-lg mx-auto pt-2 italic">
-                        Tuyển chọn những tinh hoa làm đẹp và chăm sóc sức khỏe tốt nhất từ các phòng thí nghiệm hàng đầu tại Pháp.
+                        Tuyển chọn những tinh hoa làm đẹp
+                        và chăm sóc sức khỏe tốt nhất
+                        từ các phòng thí nghiệm hàng
+                        đầu tại Pháp.
                     </p>
                 </header>
 
@@ -153,7 +266,9 @@ export default async function AllCategoriesPage({ searchParams }: PageProps) {
                                 >
                                     1
                                 </Link>
-                                <span className="px-2 text-gray-400">...</span>
+                                <span className="px-2 text-gray-400">
+                                    ...
+                                </span>
                             </>
                         )}
 
@@ -173,7 +288,9 @@ export default async function AllCategoriesPage({ searchParams }: PageProps) {
 
                         {currentPage < totalPages - 2 && (
                             <>
-                                <span className="px-2 text-gray-400">...</span>
+                                <span className="px-2 text-gray-400">
+                                    ...
+                                </span>
                                 <Link
                                     href={getPageHref(totalPages)}
                                     className="w-11 h-11 rounded-full bg-white border border-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 hover:bg-black hover:text-white transition-all"
@@ -202,7 +319,10 @@ export default async function AllCategoriesPage({ searchParams }: PageProps) {
                     </h4>
 
                     <p className="text-gray-500 text-sm max-w-md mx-auto">
-                        Đội ngũ chuyên gia của MF Paris luôn sẵn sàng tư vấn lộ trình chăm sóc da và mùi hương phù hợp nhất với bạn.
+                        Đội ngũ chuyên gia của MF Paris
+                        luôn sẵn sàng tư vấn lộ trình
+                        chăm sóc da và mùi hương
+                        phù hợp nhất với bạn.
                     </p>
 
                     <Link

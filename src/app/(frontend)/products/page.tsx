@@ -9,12 +9,13 @@ import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
 import { ProductCard } from '@/components/ProductCard'
-import { SearchFilters } from '@/components/SearchFilters'
+import { SearchFilters } from '@/components/search-filters/SearchFilters'
 import { cn } from '@/utilities'
 import {
   generateCanonicalUrl,
   INDEXABLE_FACET_KEYS,
 } from '@/utilities/seo'
+import { getProductFilterOptions } from '@/data/getProductFilterOptions'
 
 const PRODUCTS_PATHNAME = '/products'
 const PRODUCTS_PER_PAGE = 12
@@ -637,6 +638,9 @@ export default async function AllProductsPage({
   searchParams,
 }: ProductsPageProps) {
   const resolvedSearchParams = await searchParams
+  const filterRouteContext = {
+    type: 'listing' as const,
+  }
 
   const brandValues = getSearchParamValues(
     resolvedSearchParams,
@@ -690,14 +694,16 @@ export default async function AllProductsPage({
     maxPrice,
   })
 
-  const [productsRes, filterOptions] = await Promise.all([
-    getCachedProducts({
-      page: requestedPage,
-      sort,
-      where: productsWhere,
-    }),
-    getCachedProductFilterOptions(),
-  ])
+  const [productsRes, filterOptions] =
+    await Promise.all([
+      getCachedProducts({
+        page: requestedPage,
+        sort,
+        where: productsWhere,
+      }),
+
+      getProductFilterOptions(),
+    ])
 
   if (
     requestedPage > 1 &&
@@ -816,20 +822,30 @@ export default async function AllProductsPage({
           <aside className="hidden lg:block lg:w-[250px] lg:shrink-0">
             <div className="lc-card rounded-2xl bg-white p-5 shadow-sm">
               <SearchFilters
-                brands={filterOptions.brands.docs}
-                categories={filterOptions.categories.docs}
+                brands={filterOptions.brands}
+                categories={filterOptions.categories}
                 variant="sidebar"
+                sticky={false}
+                routeContext={{
+                  type: 'listing',
+                }}
               />
             </div>
           </aside>
 
           <main className="min-w-0 flex-1">
             <div className="mb-6 hidden md:block lg:hidden">
-              <SearchFilters
-                brands={filterOptions.brands.docs}
-                categories={filterOptions.categories.docs}
-                variant="horizontal"
-              />
+              <div className="sticky top-20 z-40 mb-6 hidden md:block lg:hidden">
+                <SearchFilters
+                  brands={filterOptions.brands}
+                  categories={filterOptions.categories}
+                  variant="horizontal"
+                  sticky={false}
+                  routeContext={{
+                    type: 'listing',
+                  }}
+                />
+              </div>
             </div>
 
             {productsRes.docs.length > 0 ? (
@@ -960,9 +976,12 @@ export default async function AllProductsPage({
 
       <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 md:hidden">
         <SearchFilters
-          brands={filterOptions.brands.docs}
-          categories={filterOptions.categories.docs}
+          brands={filterOptions.brands}
+          categories={filterOptions.categories}
           variant="mobile-fab"
+          routeContext={{
+            type: 'listing',
+          }}
         />
       </div>
     </div>

@@ -1,83 +1,287 @@
+import type { Where } from 'payload'
+
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
-import { ProductCard } from '@/components/ProductCard'
-import { notFound } from 'next/navigation'
-import { SearchFilters } from '@/components/SearchFilters'
-import { RichText } from '@/components/RichText'
 
-function hasRichTextContent(content: any) {
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+
+import { ProductCard } from '@/components/ProductCard'
+import { RichText } from '@/components/RichText'
+import { SearchFilters } from '@/components/search-filters/SearchFilters'
+import { getProductFilterOptions } from '@/data/getProductFilterOptions'
+
+const PRODUCTS_PER_PAGE = 20
+const DEFAULT_SORT = '-createdAt'
+
+const ALLOWED_SORT_VALUES = new Set([
+  '-createdAt',
+  'price.basePrice',
+  '-price.basePrice',
+  'title',
+])
+
+type BrandProductsPageProps = {
+  params: Promise<{
+    slug: string
+  }>
+
+  searchParams: Promise<{
+    page?: string
+    min?: string
+    max?: string
+    sort?: string
+    category?: string
+  }>
+}
+
+function hasRichTextContent(content: unknown): boolean {
+  if (
+    !content ||
+    typeof content !== 'object' ||
+    !('root' in content)
+  ) {
+    return false
+  }
+
+  const root = content.root
+
+  if (
+    !root ||
+    typeof root !== 'object' ||
+    !('children' in root)
+  ) {
+    return false
+  }
+
   return (
-    content &&
-    typeof content === 'object' &&
-    Array.isArray(content.root?.children) &&
-    content.root.children.length > 0
+    Array.isArray(root.children) &&
+    root.children.length > 0
   )
+}
+
+function normalizePage(value?: string): number {
+  const parsedPage = Number(value)
+
+  if (
+    !Number.isInteger(parsedPage) ||
+    parsedPage < 1
+  ) {
+    return 1
+  }
+
+  return parsedPage
+}
+
+function normalizePrice(value?: string): number | null {
+  if (!value) return null
+
+  const parsedValue = Number(value)
+
+  if (
+    !Number.isFinite(parsedValue) ||
+    parsedValue < 0
+  ) {
+    return null
+  }
+
+  return parsedValue
+}
+
+function normalizeSort(value?: string): string {
+  if (
+    value &&
+    ALLOWED_SORT_VALUES.has(value)
+  ) {
+    return value
+  }
+
+  return DEFAULT_SORT
 }
 
 export default async function BrandProductsPage({
   params,
   searchParams,
-}: {
-  params: Promise<{ slug: string }>
-  searchParams: Promise<{
-    min?: string
-    max?: string
-    sort?: string
-    category?: string
-    brand?: string
-  }>
-}) {
+}: BrandProductsPageProps) {
   const { slug } = await params
-  const { min, max, sort = '-createdAt', category } = await searchParams
 
-  const payload = await getPayload({ config: configPromise })
+  const {
+    page,
+    min,
+    max,
+    sort: requestedSort,
+    category,
+  } = await searchParams
 
+  const currentPage = normalizePage(page)
+  const minimumPrice = normalizePrice(min)
+  const maximumPrice = normalizePrice(max)
+  const sort = normalizeSort(requestedSort)
+
+  const payload = await getPayload({
+    config: configPromise,
+  })
+
+  /*
+   * Bước 1: Tìm brand hiện tại bằng slug.
+   */
   const brandRes = await payload.find({
     collection: 'brands',
-    where: { slug: { equals: slug } },
+    where: {
+      slug: {
+        equals: slug,
+      },
+    },
     limit: 1,
+    pagination: false,
     depth: 2,
   })
 
-  const currentBrand: any = brandRes.docs[0]
-  if (!currentBrand) notFound()
+  const currentBrand = brandRes.docs[0]
 
-  const whereQueries: any = {
-    and: [
-      { status: { equals: 'published' } },
-      { brand: { equals: currentBrand.id } },
-    ],
+  if (!currentBrand) {
+    notFound()
   }
+
+  /*
+   * Bước 2: Tạo điều kiện lấy sản phẩm.
+   */
+  const andConditions: Where[] = [
+    {
+      status: {
+        equals: 'published',
+      },
+    },
+    {
+      brand: {
+        equals: currentBrand.id,
+      },
+    },
+  ]
 
   if (category) {
-    whereQueries.and.push({ 'categories.slug': { equals: category } })
-  }
-
-  if (min) {
-    whereQueries.and.push({
-      'price.basePrice': { greater_than_equal: Number(min) },
+    andConditions.push({
+      'categories.slug': {
+        equals: category,
+      },
     })
   }
 
-  if (max) {
-    whereQueries.and.push({
-      'price.basePrice': { less_than_equal: Number(max) },
+  if (minimumPrice !== null) {
+    andConditions.push({
+      'price.basePrice': {
+        greater_than_equal: minimumPrice,
+      },
     })
   }
 
-  const [productsRes, brandsRes, categoriesRes] = await Promise.all([
+  if (maximumPrice !== null) {
+    andConditions.push({
+      'price.basePrice': {
+        less_than_equal: maximumPrice,
+      },
+    })
+  }
+
+  const whereQueries: Where = {
+    and: andConditions,
+  }
+
+  /*
+   * Bước 3: Lấy dữ liệu song song.
+   */
+  const [
+    productsRes,
+    filterOptions,
+  ] = await Promise.all([
     payload.find({
       collection: 'products',
       where: whereQueries,
       sort,
-      limit: 40,
+      limit: PRODUCTS_PER_PAGE,
+      page: currentPage,
       depth: 2,
     }),
-    payload.find({ collection: 'brands', limit: 100 }),
-    payload.find({ collection: 'categories', limit: 100 }),
+
+    getProductFilterOptions(),
   ])
 
-  const hasDescription = hasRichTextContent(currentBrand.description)
+  const totalPages =
+    productsRes.totalPages || 1
+
+  const totalDocs =
+    productsRes.totalDocs || 0
+
+  const hasDescription =
+    hasRichTextContent(
+      currentBrand.description,
+    )
+
+  const buildPageHref = (
+    pageNumber: number,
+  ): string => {
+    const query = new URLSearchParams()
+
+    if (category) {
+      query.set('category', category)
+    }
+
+    if (minimumPrice !== null) {
+      query.set(
+        'min',
+        String(minimumPrice),
+      )
+    }
+
+    if (maximumPrice !== null) {
+      query.set(
+        'max',
+        String(maximumPrice),
+      )
+    }
+
+    if (sort !== DEFAULT_SORT) {
+      query.set('sort', sort)
+    }
+
+    if (pageNumber > 1) {
+      query.set(
+        'page',
+        String(pageNumber),
+      )
+    }
+
+    const queryString = query.toString()
+
+    return queryString
+      ? `/brands/${encodeURIComponent(
+        slug,
+      )}?${queryString}`
+      : `/brands/${encodeURIComponent(
+        slug,
+      )}`
+  }
+
+  const visiblePages = Array.from(
+    {
+      length: totalPages,
+    },
+    (_, index) => index + 1,
+  ).filter((pageNumber) => {
+    return (
+      pageNumber === 1 ||
+      pageNumber === totalPages ||
+      Math.abs(
+        pageNumber - currentPage,
+      ) <= 2
+    )
+  })
+
+  const filterRouteContext = {
+    type: 'brand' as const,
+    slug,
+    clearPath: '/products',
+  }
 
   return (
     <div className="min-h-screen bg-[#F4F6F8] pb-16">
@@ -88,76 +292,182 @@ export default async function BrandProductsPage({
           </h1>
 
           <p className="mt-1 text-xs text-gray-500 md:text-sm">
-            {productsRes.docs.length} sản phẩm
+            {totalDocs.toLocaleString(
+              'vi-VN',
+            )}{' '}
+            sản phẩm
           </p>
         </div>
       </div>
 
       <div className="container-ux mt-4 md:mt-6 lg:mt-8">
-        {/* Tablet: filter ngang */}
+        {/* Tablet */}
         <div className="sticky top-20 z-40 mb-5 hidden md:block lg:hidden">
           <SearchFilters
-            brands={brandsRes.docs}
-            categories={categoriesRes.docs}
+            brands={filterOptions.brands}
+            categories={filterOptions.categories}
             variant="horizontal"
             sticky={false}
+            routeContext={
+              filterRouteContext
+            }
           />
         </div>
 
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-8">
-          {/* Desktop sidebar */}
+          {/* Desktop */}
           <aside className="hidden lg:sticky lg:top-24 lg:block lg:max-h-[calc(100dvh-7rem)] lg:w-[250px] lg:shrink-0 lg:self-start lg:overflow-y-auto lg:pr-1">
             <div className="lc-card rounded-2xl p-5">
               <SearchFilters
-                brands={brandsRes.docs}
-                categories={categoriesRes.docs}
+                brands={filterOptions.brands}
+                categories={filterOptions.categories}
                 variant="sidebar"
                 sticky={false}
+                routeContext={
+                  filterRouteContext
+                }
               />
             </div>
           </aside>
 
           <main className="min-w-0 flex-1">
             {productsRes.docs.length > 0 ? (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {productsRes.docs.map((product: any) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                  {productsRes.docs.map(
+                    (product) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                      />
+                    ),
+                  )}
+                </div>
+
+                {totalPages > 1 && (
+                  <nav
+                    aria-label="Phân trang sản phẩm"
+                    className="mt-10 flex flex-wrap items-center justify-center gap-2"
+                  >
+                    {productsRes.hasPrevPage && (
+                      <Link
+                        href={buildPageHref(
+                          currentPage - 1,
+                        )}
+                        className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50"
+                      >
+                        Trước
+                      </Link>
+                    )}
+
+                    {visiblePages.map(
+                      (
+                        pageNumber,
+                        index,
+                      ) => {
+                        const previousPage =
+                          visiblePages[
+                          index - 1
+                          ]
+
+                        const showDots =
+                          previousPage &&
+                          pageNumber -
+                          previousPage >
+                          1
+
+                        return (
+                          <div
+                            key={
+                              pageNumber
+                            }
+                            className="flex items-center gap-2"
+                          >
+                            {showDots && (
+                              <span className="px-1 text-sm font-bold text-gray-400">
+                                …
+                              </span>
+                            )}
+
+                            <Link
+                              href={buildPageHref(
+                                pageNumber,
+                              )}
+                              aria-current={
+                                pageNumber ===
+                                  currentPage
+                                  ? 'page'
+                                  : undefined
+                              }
+                              className={
+                                pageNumber ===
+                                  currentPage
+                                  ? 'rounded-full bg-primary px-4 py-2 text-sm font-bold text-white shadow-sm'
+                                  : 'rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50'
+                              }
+                            >
+                              {pageNumber}
+                            </Link>
+                          </div>
+                        )
+                      },
+                    )}
+
+                    {productsRes.hasNextPage && (
+                      <Link
+                        href={buildPageHref(
+                          currentPage + 1,
+                        )}
+                        className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50"
+                      >
+                        Sau
+                      </Link>
+                    )}
+                  </nav>
+                )}
+              </>
             ) : (
               <div className="lc-card rounded-2xl py-16 text-center md:py-24">
                 <p className="text-lg font-bold md:text-xl">
-                  Chưa có sản phẩm nào trong thương hiệu này.
+                  Chưa có sản phẩm phù
+                  hợp với bộ lọc hiện tại.
                 </p>
               </div>
             )}
 
-            {hasDescription && currentBrand.description && (
-              <section className="mt-10 rounded-2xl bg-white p-5 shadow-sm md:mt-12 md:p-8">
-                <h2 className="mb-4 text-xl font-bold md:text-2xl">
-                  Giới thiệu về {currentBrand.name}
-                </h2>
+            {hasDescription &&
+              currentBrand.description && (
+                <section className="mt-10 rounded-2xl bg-white p-5 shadow-sm md:mt-12 md:p-8">
+                  <h2 className="mb-4 text-xl font-bold md:text-2xl">
+                    Giới thiệu về{' '}
+                    {currentBrand.name}
+                  </h2>
 
-                <div className="brand-description prose prose-sm max-w-none text-gray-700 md:prose-base prose-a:font-semibold prose-a:text-primary">
-                  <RichText
-                    data={currentBrand.description}
-                    showToc
-                    expandable
-                    maxHeight={1200}
-                  />
-                </div>
-              </section>
-            )}
+                  <div className="brand-description prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
+                    <RichText
+                      data={
+                        currentBrand.description
+                      }
+                      showToc
+                      expandable
+                      maxHeight={1200}
+                    />
+                  </div>
+                </section>
+              )}
           </main>
         </div>
       </div>
 
-      {/* Mobile: nút bộ lọc nổi */}
+      {/* Mobile */}
       <div className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 md:hidden">
         <SearchFilters
-          brands={brandsRes.docs}
-          categories={categoriesRes.docs}
+          brands={filterOptions.brands}
+          categories={filterOptions.categories}
           variant="mobile-fab"
+          routeContext={
+            filterRouteContext
+          }
         />
       </div>
     </div>
