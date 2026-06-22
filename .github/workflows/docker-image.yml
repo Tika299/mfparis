@@ -31,6 +31,8 @@ jobs:
           push: true
           tags: ghcr.io/tika299/mfparis:latest
           build-args: |
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            PAYLOAD_SECRET=${{ secrets.PAYLOAD_SECRET }}
             NEXT_PUBLIC_BASE_URL=https://maraisdefrance.vn
             NEXT_PUBLIC_SERVER_URL=https://maraisdefrance.vn
             NEXT_PUBLIC_SOCKET_URL=https://socket.maraisdefrance.vn
