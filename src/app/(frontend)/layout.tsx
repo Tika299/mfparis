@@ -11,7 +11,7 @@ import { WishlistHydrator } from '@/components/WishlistHydrator'
 
 const playfair = Playfair_Display({
   subsets: ['latin', 'vietnamese'],
-  weight: ['400', '600', '700'],
+  weight: ['600', '700'],
   variable: '--font-playfair',
   display: 'swap',
 })
@@ -19,7 +19,7 @@ const playfair = Playfair_Display({
 // Cấu hình Be Vietnam Pro
 const beVietnam = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '600', '700'],
   variable: '--font-be-vietnam',
   display: 'swap',
 })

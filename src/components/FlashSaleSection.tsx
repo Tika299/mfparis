@@ -357,7 +357,7 @@ export function FlashSaleSection({
                                         <ProductCard
                                             product={product}
                                             mode="flash"
-                                            className="h-full min-h-[410px] rounded-[18px] shadow-none hover:-translate-y-1 hover:shadow-[0_10px_24px_rgba(0,0,0,0.055)]"
+                                            className="h-full rounded-[18px] shadow-none hover:-translate-y-1 hover:shadow-[0_10px_24px_rgba(0,0,0,0.055)]"
                                         />
                                     </CarouselItem>
                                 ),

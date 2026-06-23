@@ -196,6 +196,24 @@ function getRankClassName(
   }
 }
 
+function normalizeProductTitle(
+  title: string,
+): string {
+  const cleanedTitle = title
+    .split('|')[0]
+    .split('–')[0]
+    .split('- Chính Hãng')[0]
+    .trim()
+
+  const maxLength = 58
+
+  if (cleanedTitle.length <= maxLength) {
+    return cleanedTitle
+  }
+
+  return `${cleanedTitle.slice(0, maxLength).trim()}...`
+}
+
 export const ProductCard = ({
   product,
   mode = 'standard',
@@ -355,6 +373,7 @@ export const ProductCard = ({
     rating > 0 &&
     reviewCount > 0
 
+
   /*
    * ==========================================================
    * CẤU HÌNH THEO MODE
@@ -365,7 +384,8 @@ export const ProductCard = ({
     showRatingProp ??
     (
       mode === 'bestSeller' ||
-      mode === 'standard'
+      mode === 'standard' ||
+      mode === 'flash'
     )
 
   const showAddToCart =
@@ -394,6 +414,13 @@ export const ProductCard = ({
     typeof rank === 'number' &&
     rank >= 1 &&
     rank <= 3
+
+  const shouldUseCompactSpacing =
+    !isSale &&
+    !hasRating
+
+  const shouldShowRatingRow =
+    showRating && hasRating
 
   /*
    * ==========================================================
@@ -529,6 +556,9 @@ export const ProductCard = ({
       setAdded(false)
     }, 1200)
   }
+
+  const displayTitle =
+    normalizeProductTitle(product.title)
 
   return (
     <article
@@ -666,88 +696,70 @@ export const ProductCard = ({
               'text-[#252525] transition-colors hover:text-[#b40008]',
 
               mode === 'combo'
-                ? 'line-clamp-2 min-h-[38px] text-[11px] font-bold leading-[1.5] sm:min-h-[40px] sm:text-[12px] md:min-h-[42px] md:text-[13px] lg:min-h-[46px] lg:text-[15px]'
-                : 'line-clamp-2 min-h-[38px] text-[11px] font-normal leading-[1.5] sm:min-h-[40px] sm:text-[12px] md:min-h-[42px] md:text-[13px] lg:min-h-[46px] lg:text-[14px]',
+                ? 'line-clamp-2 min-h-[38px] text-[12px] font-bold leading-[1.5] sm:min-h-[40px] sm:text-[12px] md:min-h-[42px] md:text-[13px] lg:min-h-[46px] lg:text-[15px]'
+                : 'line-clamp-2 min-h-[38px] text-[12px] font-normal leading-[1.5] sm:min-h-[40px] sm:text-[12px] md:min-h-[42px] md:text-[13px] lg:min-h-[46px] lg:text-[14px]',
             )}
           >
-            {product.title}
+            {displayTitle}
           </h3>
         </Link>
 
         {/* COMBO DESCRIPTION */}
         {showComboDescription ? (
-          <p className="mt-1 line-clamp-2 min-h-[36px] text-[10px] font-normal leading-[1.5] text-[#666666] sm:min-h-[38px] sm:text-[11px] md:min-h-[40px] md:text-[12px] lg:min-h-[44px] lg:text-[13px]">
-            {description}
+          <p className="mt-1 line-clamp-2 min-h-[36px] text-[10px] font-normal leading-[1.55] text-[#666666] sm:min-h-[38px] sm:text-[11px] md:min-h-[40px] md:text-[12px] lg:min-h-[44px] lg:text-[13px]">
+            {displayTitle}
           </p>
         ) : null}
 
         {/* RATING */}
-        {showRating ? (
-          <div className="mt-1.5 flex min-h-5 items-center gap-1 sm:mt-2 sm:min-h-6">
-            {hasRating ? (
-              <>
-                <Star
-                  aria-hidden="true"
-                  size={14}
-                  strokeWidth={1.5}
-                  fill="#ff9900"
-                  className="shrink-0 text-[#ff9900] sm:h-4 sm:w-4 lg:h-[17px] lg:w-[17px]"
-                />
+        <div className="mt-1 min-h-5 sm:mt-1.5 sm:min-h-6">
+          {shouldShowRatingRow ? (
+            <div className="flex items-center gap-1">
+              <Star
+                aria-hidden="true"
+                size={14}
+                strokeWidth={1.5}
+                fill="#ff9900"
+                className="shrink-0 text-[#ff9900] sm:h-4 sm:w-4 lg:h-[17px] lg:w-[17px]"
+              />
 
-                <span className="text-[12px] font-medium tabular-nums text-[#646464] sm:text-[13px]">
-                  {rating.toLocaleString(
-                    'vi-VN',
-                    {
-                      minimumFractionDigits: 1,
-                      maximumFractionDigits: 1,
-                    },
-                  )}
-                </span>
-
-                <span className="text-[10px] font-medium tabular-nums text-[#646464] sm:text-[11px] md:text-[12px] lg:text-[13px]">
-                  (
-                  {formatReviewCount(
-                    reviewCount,
-                  )}
-                  )
-                </span>
-              </>
-            ) : (
-              <span className="text-[12px] text-[#a0a0a0]">
-                Chưa có đánh giá
+              <span className="text-[12px] font-medium tabular-nums text-[#646464] sm:text-[13px]">
+                {rating.toLocaleString('vi-VN', {
+                  minimumFractionDigits: 1,
+                  maximumFractionDigits: 1,
+                })}
               </span>
-            )}
-          </div>
-        ) : null}
+
+              <span className="text-[10px] font-medium tabular-nums text-[#646464] sm:text-[11px] md:text-[12px] lg:text-[13px]">
+                ({formatReviewCount(reviewCount)})
+              </span>
+            </div>
+          ) : null}
+        </div>
 
         {/* Đẩy giá xuống đáy card */}
-        <div className="mt-auto pt-4">
+        <div className="mt-1 pt-1 sm:mt-2.5 sm:pt-2.5 lg:mt-3 lg:pt-3">
           {mode === 'flash' && isSale ? (
-            <div className="flex min-h-[48px] flex-col justify-end">
-              {/* Giá niêm yết cũ */}
+            <div className="flex flex-col justify-end sm:min-h-[46px] lg:min-h-[48px]">
               <span className="text-[10px] font-normal leading-none tabular-nums text-[#999999] line-through sm:text-[11px] lg:text-[13px]">
                 {formatPrice(basePrice)}đ
               </span>
 
-              {/* Giá bán hiện tại */}
-              <span className="mt-1.5 text-[14px] font-bold leading-none tabular-nums text-[#c40008] sm:text-[15px] md:text-[16px] lg:mt-2 lg:text-[17px]">
+              <span className="mt-1 text-[14px] font-bold leading-none tabular-nums text-[#c40008] sm:text-[15px] md:text-[16px] lg:mt-2 lg:text-[17px]">
                 {formatPrice(salePrice)}đ
               </span>
             </div>
           ) : (
-            <div className="flex min-h-[48px] flex-col justify-end">
-              {/* Dòng giữ chỗ để các card bằng nhau */}
+            <div className="flex flex-col justify-end sm:min-h-[46px] lg:min-h-[48px]">
               <span
                 aria-hidden="true"
-                className="invisible text-[12px] leading-none"
+                className="invisible text-[10px] leading-none sm:text-[11px] lg:text-[13px]"
               >
-                Giá niêm yết
+                {formatPrice(basePrice || finalPrice)}đ
               </span>
 
-              <span className="block text-[14px] font-bold leading-none tabular-nums text-[#c40008] sm:text-[15px] md:text-[16px] lg:text-[18px]">
-                {isContactPrice
-                  ? 'Liên hệ'
-                  : `${formatPrice(finalPrice)}đ`}
+              <span className="mt-1 text-[14px] font-bold leading-none tabular-nums text-[#c40008] sm:text-[15px] md:text-[16px] lg:mt-2 lg:text-[17px]">
+                {isContactPrice ? 'Liên hệ' : `${formatPrice(finalPrice)}đ`}
               </span>
             </div>
           )}

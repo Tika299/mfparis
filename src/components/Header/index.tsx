@@ -1,7 +1,5 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { getPayload } from 'payload'
-import configPromise from '@payload-config'
 import {
   ChevronRight,
   Gift,
@@ -72,10 +70,6 @@ const fallbackNavItems: HeaderNavItem[] = [
 ]
 
 export const Header = async () => {
-  const payload = await getPayload({
-    config: configPromise,
-  })
-
   const settings = await getSiteSettings()
 
   const logo = settings.header?.logo
@@ -97,9 +91,7 @@ export const Header = async () => {
       ? logo.alt
       : 'Marais de France'
 
-  const cmsNavItems = (
-    settings.header?.navItems ?? []
-  ).reduce<HeaderNavItem[]>((result, item, index) => {
+  const cmsNavItems = (settings.header?.navItems ?? []).reduce<HeaderNavItem[]>((result, item, index) => {
     const label =
       typeof item?.label === 'string'
         ? item.label.trim()
@@ -222,7 +214,6 @@ export const Header = async () => {
                     height={130}
                     sizes="140px"
                     className="block h-auto w-[140px] object-contain object-left"
-                    priority
                   />
                 ) : (
                   <div className="flex flex-col">
@@ -384,8 +375,7 @@ export const Header = async () => {
                 width={280}
                 height={90}
                 sizes="126px"
-                className="h-auto w-[126px] object-contain"
-                priority
+                className="h-auto w-[100px] object-contain"
               />
             ) : (
               <span className="font-heading text-lg font-semibold text-[#b31319]">
