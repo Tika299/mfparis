@@ -201,7 +201,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
                         {createdAt && <span>{createdAt}</span>}
                       </div>
 
-                      <h2 className="font-heading text-[22px] font-bold leading-tight text-black transition-colors duration-300 line-clamp-2 group-hover:text-primary">
+                      <h2 className="font-sans text-[22px] font-bold leading-tight text-black transition-colors duration-300 line-clamp-2 group-hover:text-primary">
                         {post.title}
                       </h2>
 

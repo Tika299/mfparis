@@ -376,122 +376,102 @@ function FeaturedCategoriesSection({
     return null
   }
 
-  const showNavigation =
-    categories.length > 8
+  const categoryPairs: any[][] = []
+
+  for (let index = 0; index < categories.length; index += 2) {
+    categoryPairs.push(
+      categories.slice(index, index + 2),
+    )
+  }
 
   return (
     <section className="container-ux mt-8 md:mt-10">
-      <div className="group/categories relative overflow-visible rounded-[24px] border border-[#eeeeee] bg-white px-4 pb-7 pt-6 shadow-[0_8px_30px_rgba(0,0,0,0.045)] sm:px-5 md:rounded-[28px] md:px-7 md:pb-8 md:pt-7 lg:px-8">
-        {/* HEADER */}
-        <div className="mb-7 flex items-center justify-between gap-4 md:mb-9">
-          <h2 className="min-w-0 font-heading text-[28px] font-semibold leading-[1.15] tracking-[-0.025em] text-black sm:text-[33px] md:text-[38px]">
-            Danh mục nổi bật
-          </h2>
+      <div className="lc-card rounded-[2rem] p-5 sm:p-6 md:rounded-[2.5rem] md:p-8">
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between gap-4 px-1 md:mb-10 md:px-2">
+          <div>
+            <span className="sub-heading text-neutral-400">
+              Browse
+            </span>
+
+            <h2 className="font-heading text-[26px] font-semibold leading-[1.15] tracking-[-0.02em] text-neutral-900 md:text-[34px]">
+              Danh mục nổi bật
+            </h2>
+          </div>
 
           <Link
             href="/categories"
-            className="group/button inline-flex h-[48px] shrink-0 items-center justify-center gap-1 rounded-[15px] border border-[#efd8cf] bg-white px-4 text-[13px] font-semibold text-[#202020] shadow-[0_3px_10px_rgba(0,0,0,0.025)] transition-colors hover:border-[#b40008] hover:text-[#b40008] sm:h-[52px] sm:px-5 sm:text-[14px]"
+            className="shrink-0 border-b border-primary text-[12px] font-semibold tracking-[0.02em] text-primary transition-colors hover:border-black hover:text-black"
           >
-            <span>Xem tất cả</span>
-
-            <ChevronRight
-              aria-hidden="true"
-              size={16}
-              strokeWidth={2}
-              className="text-[#d4a093] transition-transform duration-200 group-hover/button:translate-x-0.5 group-hover/button:text-[#b40008]"
-            />
+            Khám phá
           </Link>
         </div>
 
-        {/* CAROUSEL */}
+        {/* Slider Danh mục */}
         <Carousel
           opts={{
             align: 'start',
-            loop: showNavigation,
-            containScroll:
-              'trimSnaps',
+            loop: true,
           }}
           className="relative w-full"
         >
-          <CarouselContent className="-ml-3 pb-1 md:-ml-4">
-            {categories.map(
-              (category) => {
-                const categoryName =
-                  typeof category.name ===
-                    'string'
-                    ? category.name
-                    : 'Danh mục'
+          <CarouselContent className="-ml-4 pb-2 md:-ml-5">
+            {categoryPairs.map(
+              (pair, index) => (
+                <CarouselItem
+                  key={index}
+                  className="basis-[52%] pl-4 sm:basis-[38%] md:basis-[28%] md:pl-5 lg:basis-[22%] xl:basis-[18%]"
+                >
+                  <div className="grid grid-rows-2 gap-4">
+                    {pair.map((cat) => {
+                      const categoryName =
+                        typeof cat.name ===
+                          'string'
+                          ? cat.name
+                          : 'Danh mục'
 
-                const categorySlug =
-                  typeof category.slug ===
-                    'string'
-                    ? category.slug
-                    : ''
+                      const categorySlug =
+                        typeof cat.slug ===
+                          'string'
+                          ? cat.slug
+                          : ''
 
-                return (
-                  <CarouselItem
-                    key={category.id}
-                    className={[
-                      'pl-3',
-                      'basis-1/2',
-                      'md:basis-1/4 md:pl-4',
-                      'lg:basis-1/6',
-                      'xl:basis-1/8',
-                    ].join(' ')}
-                  >
-                    <Link
-                      href={
-                        categorySlug
-                          ? `/categories/${categorySlug}`
-                          : '/categories'
-                      }
-                      className="group/category flex h-full min-w-0 flex-col items-center"
-                    >
-                      {/* OVAL IMAGE */}
-                      <div className="relative mx-auto aspect-[0.78/1] w-full max-w-[138px] overflow-hidden rounded-[999px] border border-[#eadfd9] bg-white p-2 transition-[border-color,box-shadow,transform] duration-300 group-hover/category:-translate-y-1 group-hover/category:border-[#d8b5aa] group-hover/category:shadow-[0_12px_26px_rgba(0,0,0,0.06)] sm:max-w-[148px] sm:p-3 md:max-w-[158px] md:p-4 lg:max-w-[168px]">
-                        <OptimizedImage
-                          media={
-                            category.image
+                      return (
+                        <Link
+                          key={cat.id}
+                          href={
+                            categorySlug
+                              ? `/categories/${categorySlug}`
+                              : '/categories'
                           }
-                          size="card"
-                          alt={
-                            categoryName
-                          }
-                          className="h-full w-full transition-transform duration-500 group-hover/category:scale-[1.04] [&_img]:h-full [&_img]:w-full [&_img]:object-contain"
-                        />
-                      </div>
+                          className="group flex min-w-0 flex-col items-center rounded-2xl border border-transparent p-2.5 transition-colors hover:border-primary/20"
+                        >
+                          <div className="mb-3 flex h-[86px] w-[86px] items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-white md:h-[102px] md:w-[102px]">
+                            <div className="relative h-[62px] w-[62px] overflow-hidden md:h-[74px] md:w-[74px]">
+                              <OptimizedImage
+                                media={cat.image}
+                                size="thumbnail"
+                                alt={categoryName}
+                                className="h-full w-full object-contain"
+                              />
+                            </div>
+                          </div>
 
-                      {/* CATEGORY NAME */}
-                      <h3 className="mt-4 line-clamp-2 min-h-[44px] w-full text-center text-[13px] font-normal leading-[1.55] text-[#303030] transition-colors group-hover/category:text-[#b40008] sm:text-[14px]">
-                        {categoryName}
-                      </h3>
-                    </Link>
-                  </CarouselItem>
-                )
-              },
+                          <span className="line-clamp-2 min-h-[36px] w-full px-1 text-center text-[12px] font-semibold leading-[1.4] tracking-[-0.01em] text-neutral-800 transition-colors group-hover:text-primary md:text-[13px]">
+                            {categoryName}
+                          </span>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                </CarouselItem>
+              ),
             )}
           </CarouselContent>
 
-          {showNavigation ? (
-            <>
-              <CarouselPrevious
-                aria-label="Xem danh mục trước"
-                className="absolute -left-[23px] top-[43%] z-30 hidden h-[48px] w-[48px] -translate-y-1/2 border border-[#eeeeee] bg-white text-[#202020] shadow-[0_7px_20px_rgba(0,0,0,0.12)] transition-all hover:border-[#b40008] hover:bg-white hover:text-[#b40008] md:flex"
-              />
-
-              <CarouselNext
-                aria-label="Xem danh mục tiếp theo"
-                className="absolute -right-[23px] top-[43%] z-30 hidden h-[48px] w-[48px] -translate-y-1/2 border border-[#eeeeee] bg-white text-[#202020] shadow-[0_7px_20px_rgba(0,0,0,0.12)] transition-all hover:border-[#b40008] hover:bg-white hover:text-[#b40008] md:flex"
-              />
-            </>
-          ) : null}
+          <CarouselPrevious className="absolute -left-4 top-1/2 z-20 hidden h-10 w-10 border-none bg-white hover:bg-primary hover:text-white md:flex" />
+          <CarouselNext className="absolute -right-4 top-1/2 z-20 hidden h-10 w-10 border-none bg-white hover:bg-primary hover:text-white md:flex" />
         </Carousel>
-
-        {categories.length > 2 ? (
-          <p className="mt-4 text-center text-[11px] text-[#999999] md:hidden">
-            Vuốt ngang để xem thêm
-          </p>
-        ) : null}
       </div>
     </section>
   )

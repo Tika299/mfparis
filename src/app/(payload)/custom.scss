@@ -3,24 +3,33 @@
 :root {
     /* Màu chủ đạo MF Paris */
     --theme-bg: #fdfbf9;
-    /* Màu nền kem nhạt cực sang */
     --theme-elevation-0: #fdfbf9;
     --theme-elevation-50: #ffffff;
     --theme-elevation-100: #ffffff;
     --color-primary-500: #16423c;
-    /* Xanh cổ vịt */
     --color-primary-600: #113530;
     --color-success-500: #22c55e;
-    --font-body: 'Be Vietnam Pro', sans-serif;
+
+    /* Dùng đúng biến font từ next/font */
+    --font-body: var(--font-be-vietnam), sans-serif;
+    --font-heading: var(--font-playfair), serif;
+
     --primary-color: #b72828;
 }
 
 /* 1. Nền toàn cục */
 body,
 .template-default,
-.app-header {
+.app-header,
+.payload-admin-fonts {
     background-color: var(--theme-bg) !important;
     font-family: var(--font-body) !important;
+}
+
+/* Ép toàn bộ admin dùng font body mặc định */
+.payload-admin-fonts,
+.payload-admin-fonts * {
+    font-family: var(--font-body);
 }
 
 /* 2. Thanh Sidebar bên trái (Navigation) */
@@ -31,7 +40,7 @@ body,
 }
 
 .nav-group__label {
-    font-family: var(--font-body) !important;
+    font-family: var(--font-heading) !important;
     font-style: italic !important;
     text-transform: none !important;
     font-size: 1.1rem !important;
@@ -48,7 +57,6 @@ body,
 .nav__link:hover,
 .nav__link--active {
     background-color: #f0f7f4 !important;
-    /* Xanh nhạt khi hover */
     color: var(--color-primary-500) !important;
 }
 
@@ -76,7 +84,7 @@ body,
 }
 
 .collections__label {
-    font-family: var(--font-body) !important;
+    font-family: var(--font-heading) !important;
     font-style: italic !important;
     font-size: 1.8rem !important;
     color: var(--color-primary-500) !important;
@@ -121,7 +129,45 @@ body,
     color: var(--color-primary-500) !important;
 }
 
-/* 5. Custom Scrollbar cho sang */
+/* 5. RichText / Lexical editor */
+.field-type-richText,
+.field-type-richText * {
+    font-family: var(--font-body) !important;
+}
+
+.field-type-richText [contenteditable='true'],
+.field-type-richText .editor,
+.field-type-richText .lexical-editor,
+.field-type-richText .lexicalEditor,
+.field-type-richText .rich-text-editor,
+.field-type-richText .payload-richtext,
+.field-type-richText .ProseMirror {
+    font-family: var(--font-body) !important;
+    line-height: 1.75 !important;
+    color: #1a1a1a !important;
+}
+
+.field-type-richText h1,
+.field-type-richText h2,
+.field-type-richText h3,
+.field-type-richText h4,
+.field-type-richText h5,
+.field-type-richText h6 {
+    font-family: var(--font-heading) !important;
+    color: #16423c !important;
+}
+
+.field-type-richText p,
+.field-type-richText li,
+.field-type-richText span,
+.field-type-richText strong,
+.field-type-richText em,
+.field-type-richText a,
+.field-type-richText blockquote {
+    font-family: var(--font-body) !important;
+}
+
+/* 6. Custom Scrollbar */
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -139,7 +185,7 @@ body,
     background: var(--color-primary-500);
 }
 
-/* 6. Nút Logout */
+/* 7. Nút Logout */
 .nav__log-out {
     margin: 20px !important;
     border-radius: 10px !important;
@@ -151,11 +197,10 @@ body,
     background: #fef2f2 !important;
 }
 
-/* 7. Ẩn logo Payload mặc định (nếu muốn) và tinh chỉnh icon */
+/* 8. Ẩn logo Payload mặc định */
 .graphic-icon {
     fill: var(--color-primary-500) !important;
 }
-
 
 /* --- CHAT DASHBOARD CARD STYLES --- */
 
@@ -167,7 +212,6 @@ body,
     background: #ffffff;
     border: 1px solid #f0f0f0;
     border-radius: 32px;
-    /* Tương đương rounded-[2rem] */
     padding: 32px;
     display: flex;
     flex-direction: row;
@@ -210,7 +254,7 @@ body,
 }
 
 .chat-card__title {
-    font-family: 'Be Vietnam Pro', serif !important;
+    font-family: var(--font-heading) !important;
     font-style: italic;
     font-size: 26px;
     font-weight: 700;
@@ -297,7 +341,6 @@ body,
     color: #f59e0b;
 }
 
-/* Reponsive cho máy tính bảng/điện thoại */
 @media (max-width: 768px) {
     .chat-card {
         flex-direction: column;
@@ -335,7 +378,6 @@ body,
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
     }
 
-    /* SIDEBAR */
     .admin-chat-sidebar {
         width: 350px;
         border-right: 1px solid #f0f0f0;
@@ -348,7 +390,7 @@ body,
             border-bottom: 1px solid #f9f9f9;
 
             .sidebar-title {
-                font-family: 'Be Vietnam Pro', serif;
+                font-family: var(--font-heading);
                 font-size: 24px;
                 margin: 0 0 20px 0;
             }
@@ -448,7 +490,6 @@ body,
         }
     }
 
-    /* CHAT MAIN WINDOW */
     .admin-chat-main {
         flex-grow: 1;
         display: flex;
@@ -523,17 +564,11 @@ body,
                 .message-bubble {
                     max-width: 70%;
                     padding: 15px 20px;
-                    /* CÁC DÒNG QUAN TRỌNG ĐỂ FIX VẾT HỞ */
                     border: none !important;
-                    /* Loại bỏ hoàn toàn border mặc định của Payload */
                     outline: none !important;
-                    /* Loại bỏ viền focus */
                     background-clip: padding-box;
-                    /* Ép màu nền tràn khít đến mép */
                     -webkit-backface-visibility: hidden;
-                    /* Fix răng cưa trên Chrome/Safari */
                     transform: translateZ(0);
-                    /* Ép xử lý bằng GPU để làm mịn các góc bo */
                     border-radius: 20px;
                     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
 
@@ -633,8 +668,7 @@ body,
             }
 
             p {
-                font-family: 'Playfair Display', serif;
-                font-style: italic;
+                font-family: var(--font-body);
                 font-size: 18px;
             }
         }
@@ -642,22 +676,30 @@ body,
 }
 
 .session-item.is-unread {
-  background-color: #fffafa !important; // Nền hồng nhạt
-  .session-name { font-weight: 900 !important; color: #000; }
-  .session-last-msg { font-weight: 700 !important; color: #333; }
+    background-color: #fffafa !important;
+
+    .session-name {
+        font-weight: 900 !important;
+        color: #000;
+    }
+
+    .session-last-msg {
+        font-weight: 700 !important;
+        color: #333;
+    }
 }
 
 .session-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .unread-dot {
-  width: 10px;
-  height: 10px;
-  background-color: #ff4d4f; // Màu đỏ Zalo
-  border-radius: 50%;
-  box-shadow: 0 0 10px rgba(255, 77, 79, 0.4);
-  flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    background-color: #ff4d4f;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 77, 79, 0.4);
+    flex-shrink: 0;
 }
