@@ -1135,7 +1135,7 @@ export async function generateMetadata({
     },
 
     openGraph: {
-      type: 'product' as any,
+      type: 'website',
       locale: 'vi_VN',
       siteName: 'MF PARIS',
       title: metadataContent.title,
@@ -1146,10 +1146,8 @@ export async function generateMetadata({
           {
             url: openGraphImage.url,
             alt: product.title,
-            width:
-              openGraphImage.width,
-            height:
-              openGraphImage.height,
+            width: openGraphImage.width,
+            height: openGraphImage.height,
           },
         ]
         : undefined,
