@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { notFound } from 'next/navigation'
@@ -16,8 +18,223 @@ import {
 import RichText from '@/components/RichText'
 import { ExpandableContent } from '@/components/ExpandableContent'
 import RelatedPostsCarousel from '@/components/Blog/RelatedPostsCarousel'
+import { SITE_ORIGIN } from '@/utilities/seo'
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+type BlogPostPageProps = {
+  params: Promise<{
+    slug: string
+  }>
+}
+
+type RelationshipMedia =
+  | number
+  | {
+    url?: string | null
+  }
+  | null
+  | undefined
+
+function getSiteUrl(): string {
+  return (
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    SITE_ORIGIN
+  )
+}
+
+async function getPostBySlug(slug: string) {
+  const payload = await getPayload({
+    config: configPromise,
+  })
+
+  const result = await payload.find({
+    collection: 'posts',
+    where: {
+      slug: {
+        equals: slug,
+      },
+    },
+    limit: 1,
+    pagination: false,
+    depth: 2,
+  })
+
+  return result.docs[0] ?? null
+}
+
+function extractPlainTextFromRichText(
+  value: unknown,
+): string {
+  if (!value || typeof value !== 'object') {
+    return ''
+  }
+
+  const visit = (node: unknown): string[] => {
+    if (!node || typeof node !== 'object') {
+      return []
+    }
+
+    const record = node as Record<string, unknown>
+    const parts: string[] = []
+
+    if (typeof record.text === 'string') {
+      const text = record.text.trim()
+
+      if (text) {
+        parts.push(text)
+      }
+    }
+
+    if (Array.isArray(record.children)) {
+      for (const child of record.children) {
+        parts.push(...visit(child))
+      }
+    }
+
+    return parts
+  }
+
+  const text = visit(value)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  return text
+}
+
+function truncateText(
+  value: string,
+  maxLength: number,
+): string {
+  if (value.length <= maxLength) {
+    return value
+  }
+
+  return `${value
+    .slice(0, maxLength - 1)
+    .trim()}…`
+}
+
+function getPostDescription(
+  post: {
+    title?: string | null
+    excerpt?: string | null
+    content?: unknown
+  },
+): string {
+  if (
+    typeof post.excerpt === 'string' &&
+    post.excerpt.trim()
+  ) {
+    return truncateText(
+      post.excerpt.trim(),
+      160,
+    )
+  }
+
+  const contentText =
+    extractPlainTextFromRichText(
+      post.content,
+    )
+
+  if (contentText) {
+    return truncateText(contentText, 160)
+  }
+
+  return `Khám phá bài viết ${post.title ?? 'mới nhất'} tại MF Paris.`
+}
+
+function getMediaUrl(
+  media: RelationshipMedia,
+): string | undefined {
+  if (!media || typeof media !== 'object') {
+    return undefined
+  }
+
+  if (
+    typeof media.url !== 'string' ||
+    !media.url.trim()
+  ) {
+    return undefined
+  }
+
+  try {
+    return new URL(
+      media.url,
+      getSiteUrl(),
+    ).toString()
+  } catch {
+    return undefined
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: BlogPostPageProps): Promise<Metadata> {
+  const { slug } = await params
+
+  const post = await getPostBySlug(slug)
+
+  if (!post) {
+    return {
+      title: 'Bài viết không tồn tại | MF Paris',
+      description:
+        'Bài viết bạn đang tìm kiếm hiện không tồn tại tại MF Paris.',
+      robots: {
+        index: false,
+        follow: true,
+      },
+    }
+  }
+
+  const title = `${post.title} | MF Paris`
+  const description =
+    getPostDescription(post)
+  const canonicalUrl = `/blog/${encodeURIComponent(
+    slug,
+  )}`
+  const imageUrl = getMediaUrl(
+    (post as any).thumbnail,
+  )
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      type: 'article',
+      locale: 'vi_VN',
+      url: canonicalUrl,
+      siteName: 'MF Paris',
+      title,
+      description,
+      images: imageUrl
+        ? [
+          {
+            url: imageUrl,
+            alt: post.title,
+          },
+        ]
+        : undefined,
+    },
+    twitter: {
+      card: imageUrl
+        ? 'summary_large_image'
+        : 'summary',
+      title,
+      description,
+      images: imageUrl
+        ? [imageUrl]
+        : undefined,
+    },
+  }
+}
+
+export default async function BlogPostPage({
+  params,
+}: BlogPostPageProps) {
   const { slug } = await params
   const payload = await getPayload({ config: configPromise })
 

@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 export const revalidate = 300
 
 import { Header } from '@/components/Header'
@@ -8,6 +10,37 @@ import { FloatingContact } from '@/components/FloatingContact'
 import { Toaster } from 'sonner'
 import { GlobalEnterHandler } from '@/components/GlobalEnterHandler'
 import { WishlistHydrator } from '@/components/WishlistHydrator'
+import { SITE_ORIGIN } from '@/utilities/seo'
+
+const siteUrl =
+  process.env.NEXT_PUBLIC_BASE_URL ||
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  SITE_ORIGIN
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: 'MF Paris Chính Hãng',
+    template: '%s | MF Paris',
+  },
+  description:
+    'MF Paris chuyên nước hoa, mỹ phẩm và sản phẩm làm đẹp chính hãng từ Pháp và Châu Âu, tuyển chọn kỹ lưỡng cùng dịch vụ tư vấn tận tâm.',
+  openGraph: {
+    type: 'website',
+    locale: 'vi_VN',
+    url: siteUrl,
+    siteName: 'MF Paris',
+    title: 'MF Paris Chính Hãng',
+    description:
+      'MF Paris chuyên nước hoa, mỹ phẩm và sản phẩm làm đẹp chính hãng từ Pháp và Châu Âu, tuyển chọn kỹ lưỡng cùng dịch vụ tư vấn tận tâm.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MF Paris Chính Hãng',
+    description:
+      'MF Paris chuyên nước hoa, mỹ phẩm và sản phẩm làm đẹp chính hãng từ Pháp và Châu Âu, tuyển chọn kỹ lưỡng cùng dịch vụ tư vấn tận tâm.',
+  },
+}
 
 const playfair = Playfair_Display({
   subsets: ['latin', 'vietnamese'],

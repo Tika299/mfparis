@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 export const revalidate = 300
 
 import Link from 'next/link'
@@ -18,6 +20,7 @@ import { HomeProductTabs } from '@/components/HomeProductTabs'
 import { BeautyJournalSection } from '@/components/home/BeautyJournalSection'
 import { StoreIntro } from '@/components/home/StoreIntro'
 import { GoogleReviews } from '@/components/home/GoogleReviews'
+import { SITE_ORIGIN } from '@/utilities/seo'
 
 import {
   Carousel,
@@ -26,6 +29,32 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
+
+const homeTitle =
+  'Nước hoa, mỹ phẩm chính hãng từ Pháp'
+const homeDescription =
+  'Khám phá nước hoa, mỹ phẩm và sản phẩm làm đẹp chính hãng từ Pháp tại MF Paris. Tuyển chọn cao cấp, tư vấn tận tâm và giao hàng toàn quốc.'
+
+export const metadata: Metadata = {
+  title: homeTitle,
+  description: homeDescription,
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'vi_VN',
+    url: SITE_ORIGIN,
+    siteName: 'MF Paris',
+    title: `${homeTitle} | MF Paris`,
+    description: homeDescription,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${homeTitle} | MF Paris`,
+    description: homeDescription,
+  },
+}
 
 /* =========================================================
    CHÍNH SÁCH
@@ -178,6 +207,10 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen pb-16 antialiased">
+      <h1 className="sr-only">
+        Nước hoa, mỹ phẩm và sản phẩm làm đẹp chính hãng từ Pháp tại MF Paris
+      </h1>
+
       {/* ==================================================
           1. HERO SLIDER
       =================================================== */}

@@ -32,6 +32,7 @@ import { RelatedProducts } from '@/components/RelatedProducts'
 import type {
   Brand,
   Category,
+  Media,
   Product,
 } from '@/payload-types'
 import { SITE_ORIGIN } from '@/utilities/seo'
@@ -78,6 +79,12 @@ type ProductSchemaAvailability =
   | 'Discontinued'
   | 'InStock'
   | 'OutOfStock'
+
+type OpenGraphImageData = Readonly<{
+  url: string
+  width?: number
+  height?: number
+}>
 
 function isRecord(
   value: unknown,
@@ -129,6 +136,15 @@ function isPopulatedCategory(
     isRelationshipID(value.id) &&
     typeof value.name === 'string' &&
     typeof value.slug === 'string'
+  )
+}
+
+function isPopulatedMedia(
+  value: unknown,
+): value is Media {
+  return (
+    isRecord(value) &&
+    isRelationshipID(value.id)
   )
 }
 
@@ -211,10 +227,6 @@ function getProductSeoStatus(
     return seoStatus
   }
 
-  /*
-   * Tương thích với các sản phẩm cũ chưa được cập nhật
-   * seoStatus sau khi chạy migration.
-   */
   return 'active'
 }
 
@@ -314,16 +326,46 @@ function getMediaUrl(
   }
 }
 
-function getProductOpenGraphImage(
+function getProductOpenGraphImageData(
   product: Product,
-): string | null {
-  const firstImage = product.images?.[0]
+): OpenGraphImageData | null {
+  const firstImage = product.images?.[0]?.image
 
-  if (!firstImage) {
+  if (!isPopulatedMedia(firstImage)) {
     return null
   }
 
-  return getMediaUrl(firstImage.image)
+  const candidate =
+    firstImage.sizes?.large && firstImage.sizes.large.url
+      ? {
+        url: firstImage.sizes.large.url,
+        width: firstImage.sizes.large.width ?? undefined,
+        height: firstImage.sizes.large.height ?? undefined,
+      }
+      : firstImage.url
+        ? {
+          url: firstImage.url,
+          width: firstImage.width ?? undefined,
+          height: firstImage.height ?? undefined,
+        }
+        : null
+
+  if (!candidate?.url) {
+    return null
+  }
+
+  try {
+    return {
+      url: new URL(
+        candidate.url,
+        SITE_ORIGIN,
+      ).toString(),
+      width: candidate.width,
+      height: candidate.height,
+    }
+  } catch {
+    return null
+  }
 }
 
 function getSchemaAvailability(
@@ -781,7 +823,6 @@ const getApprovedReviews = cache(
 
         const result = await payload.find({
           collection: 'reviews',
-
           where: {
             and: [
               {
@@ -796,17 +837,10 @@ const getApprovedReviews = cache(
               },
             ],
           },
-
           sort: '-createdAt',
           limit: APPROVED_REVIEWS_LIMIT,
           depth: 1,
-
-          /**
-           * Áp dụng access.read của Reviews.
-           * Public chỉ được đọc review approved.
-           */
           overrideAccess: false,
-
           select: {
             rating: true,
             comment: true,
@@ -853,14 +887,6 @@ function ProductRatingStars({
     Math.max(0, rating),
   )
 
-  /**
-   * Chỉ làm tròn phần hiển thị ngôi sao.
-   * Con số điểm bên cạnh vẫn giữ chính xác.
-   *
-   * Ví dụ:
-   * 4.2 hiển thị 4 sao
-   * 4.8 hiển thị 5 sao
-   */
   const filledStarCount = Math.round(
     normalizedRating,
   )
@@ -884,14 +910,37 @@ function ProductRatingStars({
             index < filledStarCount
 
           return (
-            <Star key={index} aria-hidden="true" size={18} strokeWidth={1.5} color={isFilled ? '#F6A800' : '#E5E7EB'} fill={isFilled ? '#F6A800' : '#E5E7EB'} style={{ color: isFilled ? '#F6A800' : '#E5E7EB', fill: isFilled ? '#F6A800' : '#E5E7EB', flexShrink: 0, }} />
+            <Star
+              key={index}
+              aria-hidden="true"
+              size={18}
+              strokeWidth={1.5}
+              color={
+                isFilled
+                  ? '#F6A800'
+                  : '#E5E7EB'
+              }
+              fill={
+                isFilled
+                  ? '#F6A800'
+                  : '#E5E7EB'
+              }
+              style={{
+                color: isFilled
+                  ? '#F6A800'
+                  : '#E5E7EB',
+                fill: isFilled
+                  ? '#F6A800'
+                  : '#E5E7EB',
+                flexShrink: 0,
+              }}
+            />
           )
         },
       )}
     </span>
   )
 }
-
 
 function StockAlertForm({
   product,
@@ -1060,7 +1109,7 @@ export async function generateMetadata({
     getProductCanonicalUrl(product.slug)
 
   const openGraphImage =
-    getProductOpenGraphImage(product)
+    getProductOpenGraphImageData(product)
 
   const shouldNoindex =
     seoStatus === 'discontinued_keep_page'
@@ -1086,7 +1135,7 @@ export async function generateMetadata({
     },
 
     openGraph: {
-      type: 'website',
+      type: 'product' as any,
       locale: 'vi_VN',
       siteName: 'MF PARIS',
       title: metadataContent.title,
@@ -1095,8 +1144,12 @@ export async function generateMetadata({
       images: openGraphImage
         ? [
           {
-            url: openGraphImage,
+            url: openGraphImage.url,
             alt: product.title,
+            width:
+              openGraphImage.width,
+            height:
+              openGraphImage.height,
           },
         ]
         : undefined,
@@ -1107,7 +1160,7 @@ export async function generateMetadata({
       title: metadataContent.title,
       description: metadataContent.description,
       images: openGraphImage
-        ? [openGraphImage]
+        ? [openGraphImage.url]
         : undefined,
     },
   }
@@ -1154,20 +1207,25 @@ export default async function ProductPage({
       product,
       relatedProductsLimit,
     ),
-
     getApprovedReviews(product.id),
   ])
 
   const averageRating =
-    typeof product.averageRating === 'number' &&
-      Number.isFinite(product.averageRating) &&
+    typeof product.averageRating ===
+      'number' &&
+      Number.isFinite(
+        product.averageRating,
+      ) &&
       product.averageRating > 0
       ? Math.min(5, product.averageRating)
       : null
 
   const reviewCount =
-    typeof product.reviewCount === 'number' &&
-      Number.isFinite(product.reviewCount) &&
+    typeof product.reviewCount ===
+      'number' &&
+      Number.isFinite(
+        product.reviewCount,
+      ) &&
       product.reviewCount > 0
       ? Math.floor(product.reviewCount)
       : 0
@@ -1178,6 +1236,175 @@ export default async function ProductPage({
       ? averageRating
       : null
 
+  const getProductImageUrls = (
+    currentProduct: Product,
+  ): string[] => {
+    if (!Array.isArray(currentProduct.images)) {
+      return []
+    }
+
+    return currentProduct.images
+      .map((item) => getMediaUrl(item.image))
+      .filter(
+        (url): url is string =>
+          Boolean(url),
+      )
+  }
+
+  const getProductOfferPrice = (
+    currentProduct: Product,
+  ): number | null => {
+    const basePrice = Number(
+      currentProduct.price?.basePrice ?? 0,
+    )
+    const salePrice = Number(
+      currentProduct.price?.salePrice ?? 0,
+    )
+
+    if (
+      salePrice > 0 &&
+      salePrice < basePrice
+    ) {
+      return salePrice
+    }
+
+    if (basePrice > 0) {
+      return basePrice
+    }
+
+    return null
+  }
+
+  const buildProductJsonLd = (
+    currentProduct: Product,
+  ) => {
+    const currentBrand =
+      getProductBrand(currentProduct)
+    const currentSeoStatus =
+      getProductSeoStatus(currentProduct)
+    const price =
+      getProductOfferPrice(currentProduct)
+    const normalizedReviewCount =
+      normalizeReviewCount(
+        currentProduct.reviewCount,
+      )
+    const normalizedAverageRating =
+      normalizeAverageRating(
+        currentProduct.averageRating,
+      )
+    const canonicalUrl =
+      getProductCanonicalUrl(
+        currentProduct.slug,
+      )
+    const imageUrls =
+      getProductImageUrls(currentProduct)
+
+    const jsonLd: Record<
+      string,
+      unknown
+    > = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: currentProduct.title,
+      url: canonicalUrl,
+      description:
+        getProductDescription(
+          currentProduct,
+        ),
+      image: imageUrls,
+      sku:
+        currentProduct.sku || undefined,
+      brand: currentBrand
+        ? {
+          '@type': 'Brand',
+          name: currentBrand.name,
+        }
+        : undefined,
+      offers: price
+        ? {
+          '@type': 'Offer',
+          url: canonicalUrl,
+          price,
+          priceCurrency: 'VND',
+          availability: `https://schema.org/${getSchemaAvailability(
+            currentSeoStatus,
+          )}`,
+          itemCondition:
+            'https://schema.org/NewCondition',
+        }
+        : undefined,
+    }
+
+    if (
+      normalizedAverageRating &&
+      normalizedReviewCount > 0
+    ) {
+      jsonLd.aggregateRating = {
+        '@type': 'AggregateRating',
+        ratingValue:
+          normalizedAverageRating,
+        reviewCount:
+          normalizedReviewCount,
+        bestRating: 5,
+        worstRating: 1,
+      }
+    }
+
+    return jsonLd
+  }
+
+  const buildProductBreadcrumbJsonLd = (
+    currentProduct: Product,
+  ) => {
+    const currentCategories =
+      getProductCategories(
+        currentProduct,
+      )
+    const primaryCategory =
+      currentCategories[0]
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Trang chủ',
+          item: SITE_ORIGIN,
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'Sản phẩm',
+          item: `${SITE_ORIGIN}/products`,
+        },
+        primaryCategory
+          ? {
+            '@type': 'ListItem',
+            position: 3,
+            name: primaryCategory.name,
+            item: `${SITE_ORIGIN}/categories/${primaryCategory.slug}`,
+          }
+          : null,
+        {
+          '@type': 'ListItem',
+          position: primaryCategory
+            ? 4
+            : 3,
+          name: currentProduct.title,
+          item: getProductCanonicalUrl(
+            currentProduct.slug,
+          ),
+        },
+      ].filter(Boolean),
+    }
+  }
+
+  const productJsonLd =
+    buildProductJsonLd(product)
+  const breadcrumbJsonLd =
+    buildProductBreadcrumbJsonLd(product)
 
   return (
     <div
@@ -1187,6 +1414,23 @@ export default async function ProductPage({
         schemaAvailability
       }
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            productJsonLd,
+          ),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            breadcrumbJsonLd,
+          ),
+        }}
+      />
+
       <ProductQuickNav
         description={product.description}
       />
@@ -1361,7 +1605,10 @@ export default async function ProductPage({
 
                   <dl className="divide-y divide-gray-200">
                     {product.specifications.map(
-                      (specification, index) => (
+                      (
+                        specification,
+                        index,
+                      ) => (
                         <div
                           key={
                             specification.id ??
