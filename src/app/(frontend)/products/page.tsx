@@ -76,12 +76,23 @@ const getCachedProducts = unstable_cache(
 
     return payload.find({
       collection: 'products',
-      depth: 2,
+      depth: 1,
       limit: PRODUCTS_PER_PAGE,
       overrideAccess: true,
       page,
       sort,
       where,
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        brand: true,
+        price: true,
+        images: true,
+        averageRating: true,
+        reviewCount: true,
+        status: true,
+      },
     })
   },
   ['mfparis-products-list-v2'],

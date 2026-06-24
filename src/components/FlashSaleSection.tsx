@@ -4,11 +4,11 @@ import {
     Zap,
 } from 'lucide-react'
 
-import type {
-    Product,
-    Voucher,
-} from '@/payload-types'
-import { ProductCard } from '@/components/ProductCard'
+import type { Voucher } from '@/payload-types'
+import {
+    ProductCard,
+    type ProductCardProduct,
+} from '@/components/ProductCard'
 import { FlashSaleCountdown } from '@/components/FlashSaleCountdown'
 import {
     Carousel,
@@ -35,17 +35,11 @@ type FlashSaleVoucherDTO =
 
 type FlashSaleSectionProps =
     Readonly<{
-        products: Product[]
+        products: ProductCardProduct[]
         endTime: string
-
-        /**
-         * Danh sách relationship voucher lấy từ:
-         * settings.flashSale.vouchers
-         */
         vouchers?:
         | VoucherRelationship[]
         | null
-
         viewAllHref?: string
     }>
 

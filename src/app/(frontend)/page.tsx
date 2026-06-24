@@ -71,6 +71,18 @@ export default async function HomePage() {
     config: configPromise,
   })
 
+  const productListSelect = {
+    id: true,
+    title: true,
+    slug: true,
+    brand: true,
+    price: true,
+    images: true,
+    averageRating: true,
+    reviewCount: true,
+    status: true,
+  } as const
+
   const [
     settings,
     flashSaleRes,
@@ -81,105 +93,67 @@ export default async function HomePage() {
     brandsRes,
     postsRes,
   ] = await Promise.all([
-    /*
-     * Site Settings cần depth 2 để:
-     * - Hero Slider lấy được ảnh
-     * - Flash Sale lấy được relationship voucher
-     */
     payload.findGlobal({
       slug: 'site-settings',
       depth: 2,
     }),
 
-    /* Flash Sale */
     payload.find({
       collection: 'products',
       where: {
         and: [
-          {
-            status: {
-              equals: 'published',
-            },
-          },
-          {
-            displayLocation: {
-              contains: 'flash-sale',
-            },
-          },
+          { status: { equals: 'published' } },
+          { displayLocation: { contains: 'flash-sale' } },
         ],
       },
-      depth: 2,
+      depth: 1,
+      select: productListSelect,
       sort: '-updatedAt',
       limit: 12,
     }),
 
-    /* Sản phẩm bán chạy */
     payload.find({
       collection: 'products',
       where: {
         and: [
-          {
-            status: {
-              equals: 'published',
-            },
-          },
-          {
-            displayLocation: {
-              contains: 'best-seller',
-            },
-          },
+          { status: { equals: 'published' } },
+          { displayLocation: { contains: 'best-seller' } },
         ],
       },
-      depth: 2,
+      depth: 1,
+      select: productListSelect,
       sort: '-updatedAt',
       limit: 12,
     }),
 
-    /* Sản phẩm mới */
     payload.find({
       collection: 'products',
       where: {
         and: [
-          {
-            status: {
-              equals: 'published',
-            },
-          },
-          {
-            displayLocation: {
-              contains: 'new-arrival',
-            },
-          },
+          { status: { equals: 'published' } },
+          { displayLocation: { contains: 'new-arrival' } },
         ],
       },
-      depth: 2,
+      depth: 1,
+      select: productListSelect,
       sort: '-createdAt',
       limit: 12,
     }),
 
-    /* Combo */
     payload.find({
       collection: 'products',
       where: {
         and: [
-          {
-            status: {
-              equals: 'published',
-            },
-          },
-          {
-            displayLocation: {
-              contains: 'combo',
-            },
-          },
+          { status: { equals: 'published' } },
+          { displayLocation: { contains: 'combo' } },
         ],
       },
-      depth: 2,
+      depth: 1,
+      select: productListSelect,
       sort: '-updatedAt',
       limit: 12,
     }),
 
-    /* Danh mục */
     payload.find({
       collection: 'categories',
       depth: 2,
@@ -187,7 +161,6 @@ export default async function HomePage() {
       limit: 20,
     }),
 
-    /* Thương hiệu */
     payload.find({
       collection: 'brands',
       depth: 2,
@@ -195,7 +168,6 @@ export default async function HomePage() {
       limit: 24,
     }),
 
-    /* Tạp chí */
     payload.find({
       collection: 'posts',
       depth: 2,

@@ -151,6 +151,7 @@ export const Products: CollectionConfig = {
                   type: 'relationship',
                   relationTo: 'brands',
                   required: true,
+                  index: true,
                   label: 'Thương hiệu',
                   admin: {
                     width: '50%',
@@ -161,6 +162,7 @@ export const Products: CollectionConfig = {
                   type: 'relationship',
                   relationTo: 'categories',
                   hasMany: true,
+                  index: true,
                   label: 'Danh mục sản phẩm',
                   admin: {
                     width: '50%',
@@ -200,6 +202,7 @@ export const Products: CollectionConfig = {
                       name: 'basePrice',
                       type: 'number',
                       required: true,
+                      index: true,
                       label: 'Giá niêm yết (đ)',
                       admin: {
                         width: '33.33%',
@@ -734,6 +737,7 @@ export const Products: CollectionConfig = {
       type: 'select',
       label: 'Trạng thái',
       defaultValue: 'draft',
+      index: true,
       options: [
         {
           label: 'Nháp',
@@ -754,6 +758,7 @@ export const Products: CollectionConfig = {
       type: 'select',
       label: 'Vị trí trang chủ',
       hasMany: true,
+      index: true,
       options: [
         {
           label: 'Sản phẩm bán chạy',

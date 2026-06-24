@@ -476,6 +476,7 @@ export const Orders: CollectionConfig = {
       type: 'relationship',
       relationTo: 'users',
       required: false,
+      index: true,
       label: 'Khách hàng (Tài khoản)',
       admin: {
         position: 'sidebar',
@@ -569,6 +570,7 @@ export const Orders: CollectionConfig = {
       name: 'paymentMethod',
       type: 'select',
       defaultValue: 'cod',
+      index: true,
       options: [
         { label: 'COD (Thanh toán khi nhận hàng)', value: 'cod' },
         { label: 'Chuyển khoản ngân hàng', value: 'bank_transfer' },
@@ -579,6 +581,7 @@ export const Orders: CollectionConfig = {
       name: 'status',
       type: 'select',
       defaultValue: 'pending',
+      index: true,
       options: [
         { label: 'Chờ xử lý', value: 'pending' },
         { label: 'Đã xác nhận', value: 'confirmed' },
@@ -615,6 +618,7 @@ export const Orders: CollectionConfig = {
     {
       name: 'voucherCode',
       type: 'text',
+      index: true,
       label: 'Mã voucher',
     },
     {

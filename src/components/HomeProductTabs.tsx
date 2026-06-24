@@ -3,8 +3,10 @@
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
 
-import type { Product } from '@/payload-types'
-import { ProductCard } from '@/components/ProductCard'
+import {
+    ProductCard,
+    type ProductCardProduct,
+} from '@/components/ProductCard'
 import {
     Carousel,
     CarouselContent,
@@ -13,7 +15,7 @@ import {
     CarouselPrevious,
 } from '@/components/ui/carousel'
 
-type HomeProduct = Product & {
+type HomeProduct = ProductCardProduct & {
     comboDescription?: string | null
     shortDescription?: string | null
     excerpt?: string | null
