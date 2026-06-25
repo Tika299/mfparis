@@ -5,6 +5,8 @@ export const revalidate = 300
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import '../globals.css'
+import '@/styles/floating-contact.css'
+import '@/styles/carousel-overrides.css'
 import { Be_Vietnam_Pro, Playfair_Display } from 'next/font/google'
 import { FloatingContact } from '@/components/FloatingContact'
 import { Toaster } from 'sonner'

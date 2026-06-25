@@ -1,0 +1,92 @@
+@keyframes ring-anim {
+    0% {
+        transform: rotate(0) scale(1);
+    }
+
+    10% {
+        transform: rotate(-25deg) scale(1.1);
+    }
+
+    20% {
+        transform: rotate(25deg) scale(1.1);
+    }
+
+    30% {
+        transform: rotate(-25deg) scale(1.1);
+    }
+
+    40% {
+        transform: rotate(25deg) scale(1.1);
+    }
+
+    50% {
+        transform: rotate(0) scale(1);
+    }
+
+    100% {
+        transform: rotate(0) scale(1);
+    }
+}
+
+.animate-ring {
+    animation: ring-anim 1s infinite;
+}
+
+@keyframes floating-contact-breathe {
+
+    0%,
+    100% {
+        opacity: 0.26;
+        transform: scale(0.92);
+    }
+
+    50% {
+        opacity: 0;
+        transform: scale(1.22);
+    }
+}
+
+.floating-contact-main {
+    position: relative;
+    isolation: isolate;
+    overflow: visible;
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+.floating-contact-main::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    z-index: -1;
+    border-radius: 9999px;
+    pointer-events: none;
+    background:
+        radial-gradient(circle,
+            rgba(183, 40, 40, 0.3) 0%,
+            rgba(183, 40, 40, 0.16) 45%,
+            rgba(183, 40, 40, 0) 72%);
+    opacity: 0;
+    transform: scale(0.92);
+    will-change: transform, opacity;
+}
+
+.floating-contact-main[aria-expanded='false']::before {
+    animation: floating-contact-breathe 2.4s ease-in-out infinite;
+}
+
+.floating-contact-main[aria-expanded='true']::before {
+    animation: none;
+    opacity: 0;
+    transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .floating-contact-main::before {
+        animation: none !important;
+    }
+
+    .animate-ring {
+        animation: none !important;
+    }
+}

@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   images: {
     formats: ['image/avif', 'image/webp'],
-    deviceSizes: [360, 640, 828, 1080, 1200, 1600],
+    deviceSizes: [378, 414, 640, 768, 1024, 1280, 1600, 1920],
     imageSizes: [96, 160, 320],
     minimumCacheTTL: 2592000,
     remotePatterns: [

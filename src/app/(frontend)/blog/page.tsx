@@ -3,6 +3,7 @@ import configPromise from '@payload-config'
 import { OptimizedImage } from '@/components/OptimizedImage'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Search, Sparkles, X } from 'lucide-react'
+import '../@/styles/blog.css'
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://maraisdefrance.vn'),

@@ -1,11 +1,10 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 @source "../../**/*.{js,ts,jsx,tsx,mdx}";
 
-/* --- 1. ĐỊNH NGHĨA THEME (Chuẩn Tailwind v4) --- */
+/* --- 1. DINH NGHIA THEME (Chuan Tailwind v4) --- */
 @theme inline {
   --font-heading: var(--font-playfair), 'Playfair Display', Georgia, serif;
   --font-sans: var(--font-be-vietnam), 'Be Vietnam Pro', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -15,7 +14,6 @@
   --color-background: #ffffff;
   --color-foreground: #000000;
 
-  /* Khai báo biến border để Tailwind nhận diện */
   --color-border: var(--border);
   --color-ring: var(--ring);
 
@@ -27,20 +25,18 @@
   --radius-3xl: calc(var(--radius) * 2.2);
 }
 
-/* --- 2. BIẾN GLOBAL (Base Variables) --- */
+/* --- 2. BIEN GLOBAL (Base Variables) --- */
 :root {
   --max-width: 1200px;
   --border: oklch(0.922 0 0);
-  /* Màu xám nhạt cho border */
   --ring: oklch(0.708 0 0);
   --radius: 0.625rem;
 
-  /* Ép màu mặc định toàn trang */
   --foreground: #000000;
-  --background: #FFFFFF;
+  --background: #ffffff;
 }
 
-/* --- 3. CẤU HÌNH CƠ BẢN (Base Layer) --- */
+/* --- 3. CAU HINH CO BAN (Base Layer) --- */
 @layer base {
   * {
     border-color: var(--border);
@@ -109,8 +105,7 @@
   }
 }
 
-
-/* --- 4. CÁC THÀNH PHẦN REUSABLE (Components) --- */
+/* --- 4. CAC THANH PHAN REUSABLE (Components) --- */
 @layer components {
 
   .container-ux,
@@ -165,200 +160,5 @@
 
   .lc-sticky-nav {
     @apply sticky top-[100px] z-20;
-  }
-}
-
-
-/* --- 5. TỐI ƯU NỘI DUNG TỪ WORDPRESS (Prose) --- */
-.prose {
-  color: #000000 !important;
-  max-width: 100% !important;
-  font-family: var(--font-be-vietnam);
-}
-
-.prose p {
-  color: #000000 !important;
-  font-size: 16px;
-  line-height: 1.8;
-  margin-bottom: 1.5rem;
-}
-
-.prose h2,
-.prose h3 {
-  color: #000000 !important;
-  font-family: var(--font-heading);
-  @apply font-bold mt-12 mb-6;
-}
-
-.prose strong {
-  color: #000000 !important;
-  font-weight: 800;
-}
-
-/* Fix hiển thị danh sách (List) */
-.prose ul {
-  list-style-type: disc !important;
-  padding-left: 1.5rem !important;
-  margin-bottom: 1.5rem !important;
-  display: block !important;
-}
-
-.prose ol {
-  list-style-type: decimal !important;
-  padding-left: 1.5rem !important;
-  margin-bottom: 1.5rem !important;
-  display: block !important;
-}
-
-.prose li {
-  display: list-item !important;
-  margin-bottom: 0.5rem !important;
-  color: #000000 !important;
-}
-
-.prose ul li::marker {
-  color: #b72828;
-}
-
-/* --- 6. UTILITIES & ANIMATIONS --- */
-
-/* Hiệu ứng rung cho nút Phone */
-@keyframes ring-anim {
-  0% {
-    transform: rotate(0) scale(1);
-  }
-
-  10% {
-    transform: rotate(-25deg) scale(1.1);
-  }
-
-  20% {
-    transform: rotate(25deg) scale(1.1);
-  }
-
-  30% {
-    transform: rotate(-25deg) scale(1.1);
-  }
-
-  40% {
-    transform: rotate(25deg) scale(1.1);
-  }
-
-  50% {
-    transform: rotate(0) scale(1);
-  }
-
-  100% {
-    transform: rotate(0) scale(1);
-  }
-}
-
-.animate-ring {
-  animation: ring-anim 1s infinite;
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #000000;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #b72828;
-}
-
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 100px;
-}
-
-/* Fix nút carousel không nhảy khi click */
-[data-slot="carousel-previous"],
-[data-slot="carousel-next"] {
-  transform: translateY(-50%) !important;
-  transition: none !important;
-  animation: none !important;
-}
-
-[data-slot="carousel-previous"]:hover,
-[data-slot="carousel-next"]:hover,
-[data-slot="carousel-previous"]:active,
-[data-slot="carousel-next"]:active,
-[data-slot="carousel-previous"]:focus,
-[data-slot="carousel-next"]:focus,
-[data-slot="carousel-previous"]:focus-visible,
-[data-slot="carousel-next"]:focus-visible {
-  transform: translateY(-50%) !important;
-  transition: none !important;
-  animation: none !important;
-  box-shadow: none !important;
-}
-
-/* --- BLOG PAGE UX/UI --- */
-.blog-page-bg {
-  background:
-    radial-gradient(circle at top left, rgba(183, 40, 40, 0.08), transparent 34rem),
-    linear-gradient(180deg, #fff 0%, #faf7f5 42%, #fff 100%);
-}
-
-.blog-card {
-  will-change: transform;
-}
-
-.blog-card h2 {
-  letter-spacing: -0.02em;
-}
-
-.blog-card img {
-  transform-origin: center;
-}
-
-/* =========================================================
-   FLOATING CONTACT MENU
-========================================================= */
-
-@keyframes floating-contact-breathe {
-  0%,
-  100% {
-    box-shadow:
-      0 10px 30px rgba(183, 40, 40, 0.4),
-      0 0 0 0 rgba(183, 40, 40, 0.28);
-  }
-
-  50% {
-    box-shadow:
-      0 12px 34px rgba(183, 40, 40, 0.48),
-      0 0 0 10px rgba(183, 40, 40, 0);
-  }
-}
-
-.floating-contact-main[aria-expanded='false'] {
-  animation: floating-contact-breathe 2.4s ease-in-out infinite;
-}
-
-.floating-contact-main[aria-expanded='true'] {
-  animation: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .floating-contact-main {
-    animation: none !important;
-  }
-
-  .animate-ring {
-    animation: none !important;
   }
 }

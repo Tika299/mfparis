@@ -50,6 +50,10 @@ type PayloadMediaWithSizes = Media & {
   } | null
 }
 
+const MOBILE_HERO_SIZES = '(max-width: 767px) 378px'
+const TABLET_HERO_SIZES = '(min-width: 768px) and (max-width: 1023px) 100vw'
+const DESKTOP_HERO_SIZES = '(min-width: 1024px) 100vw'
+
 function isMediaObject(
   value: SlideMediaRelationship,
 ): value is PayloadMediaWithSizes {
@@ -141,7 +145,7 @@ function HeroSlide({
     src: mobile?.url || fallback.url,
     width: mobile?.width || 600,
     height: mobile?.height || 800,
-    sizes: '100vw',
+    sizes: MOBILE_HERO_SIZES,
     priority: isFirstSlide,
     quality: 82,
   }).props
@@ -151,7 +155,7 @@ function HeroSlide({
     src: tablet?.url || fallback.url,
     width: tablet?.width || 1024,
     height: tablet?.height || 1024,
-    sizes: '100vw',
+    sizes: TABLET_HERO_SIZES,
     priority: isFirstSlide,
     quality: 82,
   }).props
@@ -161,7 +165,7 @@ function HeroSlide({
     src: desktop?.url || fallback.url,
     width: desktop?.width || 1920,
     height: desktop?.height || 800,
-    sizes: '100vw',
+    sizes: DESKTOP_HERO_SIZES,
     priority: isFirstSlide,
     quality: 82,
   }).props
@@ -187,12 +191,10 @@ function HeroSlide({
           <img
             src={mobileImage.src}
             srcSet={mobileImage.srcSet}
-            sizes="100vw"
+            sizes="(max-width: 767px) 378px"
             alt={alt}
             loading={isFirstSlide ? 'eager' : 'lazy'}
-            fetchPriority={
-              isFirstSlide ? 'high' : 'auto'
-            }
+            fetchPriority={isFirstSlide ? 'high' : 'auto'}
             decoding="async"
             className="absolute inset-0 h-full w-full object-cover"
           />

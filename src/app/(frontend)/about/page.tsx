@@ -7,6 +7,7 @@ import { OptimizedImage } from '@/components/OptimizedImage'
 import RichText from '@/components/RichText'
 import Link from 'next/link'
 import { CheckCircle2, Heart, Award, Sparkles } from 'lucide-react'
+import '../@/styles/prose.css'
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://maraisdefrance.vn'),

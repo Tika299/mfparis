@@ -1,0 +1,50 @@
+.prose {
+    color: #000000 !important;
+    max-width: 100% !important;
+    font-family: var(--font-be-vietnam);
+}
+
+.prose p {
+    color: #000000 !important;
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+.prose h2,
+.prose h3 {
+    color: #000000 !important;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+}
+
+.prose strong {
+    color: #000000 !important;
+    font-weight: 800;
+}
+
+.prose ul {
+    list-style-type: disc !important;
+    padding-left: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+    display: block !important;
+}
+
+.prose ol {
+    list-style-type: decimal !important;
+    padding-left: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+    display: block !important;
+}
+
+.prose li {
+    display: list-item !important;
+    margin-bottom: 0.5rem !important;
+    color: #000000 !important;
+}
+
+.prose ul li::marker {
+    color: #b72828;
+}

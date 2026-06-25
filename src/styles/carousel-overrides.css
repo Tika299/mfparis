@@ -1,0 +1,42 @@
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #000000;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #b72828;
+}
+
+[data-slot="carousel-previous"],
+[data-slot="carousel-next"] {
+    transform: translateY(-50%) !important;
+    transition: none !important;
+    animation: none !important;
+}
+
+[data-slot="carousel-previous"]:hover,
+[data-slot="carousel-next"]:hover,
+[data-slot="carousel-previous"]:active,
+[data-slot="carousel-next"]:active,
+[data-slot="carousel-previous"]:focus,
+[data-slot="carousel-next"]:focus,
+[data-slot="carousel-previous"]:focus-visible,
+[data-slot="carousel-next"]:focus-visible {
+    transform: translateY(-50%) !important;
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+}

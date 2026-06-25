@@ -6,7 +6,7 @@ import configPromise from '@payload-config'
 
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-
+import '../@/styles/prose.css'
 import { ProductCard } from '@/components/ProductCard'
 import { RichText } from '@/components/RichText'
 import { SearchFilters } from '@/components/search-filters/SearchFilters'

@@ -280,7 +280,7 @@ export function FloatingContactMenu({
                 className={cn(
                     'floating-contact-main absolute bottom-0 right-0 z-30 flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-[#b72828] text-white',
                     'shadow-[0_10px_30px_rgba(183,40,40,0.42)]',
-                    'transition-all duration-300 ease-out',
+                    'transition-[transform,background-color,box-shadow] duration-300 ease-out',
                     'hover:scale-105 hover:bg-[#9e1f1f]',
                     'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#b72828]/25 focus-visible:ring-offset-2',
                     'sm:h-16 sm:w-16',
