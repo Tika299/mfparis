@@ -15,13 +15,13 @@ import {
 
 import { HeroSlider } from '@/components/HeroSlider'
 import { FlashSaleSection } from '@/components/FlashSaleSection'
-import { HomeProductTabs } from '@/components/HomeProductTabs'
-import { BeautyJournalSection } from '@/components/home/BeautyJournalSection'
 import { StoreIntro } from '@/components/home/StoreIntro'
 import { GoogleReviews } from '@/components/home/GoogleReviews'
 import { SITE_ORIGIN } from '@/utilities/seo'
 import { FeaturedCategoriesSectionClient } from '@/components/FeaturedCategoriesSectionClient'
 import { BrandPartnersSectionClient } from '@/components/BrandPartnersSectionClient'
+import { HomeProductTabsSectionClient } from '@/components/HomeProductTabsSectionClient'
+import { BeautyJournalSectionClient } from '@/components/BeautyJournalSectionClient'
 
 const homeTitle =
   'Nước hoa, mỹ phẩm chính hãng từ Pháp'
@@ -258,16 +258,10 @@ export default async function HomePage() {
       {/* ==================================================
           4. COMBO / SẢN PHẨM MỚI / BÁN CHẠY
       =================================================== */}
-      <HomeProductTabs
-        bestSellers={
-          bestSellersRes.docs
-        }
-        newArrivals={
-          newArrivalsRes.docs
-        }
-        combos={
-          comboProductsRes.docs
-        }
+      <HomeProductTabsSectionClient
+        bestSellers={bestSellersRes.docs}
+        newArrivals={newArrivalsRes.docs}
+        combos={comboProductsRes.docs}
       />
 
       {/* ==================================================
@@ -289,7 +283,7 @@ export default async function HomePage() {
       {/* ==================================================
           7. TẠP CHÍ LÀM ĐẸP
       =================================================== */}
-      <BeautyJournalSection
+      <BeautyJournalSectionClient
         posts={postsRes.docs}
         viewAllHref="/blog"
       />

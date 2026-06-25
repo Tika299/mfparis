@@ -661,7 +661,7 @@ const getRelatedProducts = unstable_cache(
 
     const result = await payload.find({
       collection: 'products',
-      depth: 2,
+      depth: 1,
       limit,
       overrideAccess: true,
       sort: '-createdAt',
@@ -670,6 +670,30 @@ const getRelatedProducts = unstable_cache(
         brandID,
         categoryIDsCsv,
       ),
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        sku: true,
+        brand: true,
+        price: true,
+        images: true,
+        averageRating: true,
+        reviewCount: true,
+        status: true,
+        productType: true,
+        variants: {
+          id: true,
+          name: true,
+          sku: true,
+          basePrice: true,
+          salePrice: true,
+          stock: true,
+          isActive: true,
+          isDefault: true,
+          image: true,
+        },
+      },
     })
 
     return result.docs

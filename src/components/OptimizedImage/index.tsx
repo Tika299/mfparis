@@ -81,7 +81,7 @@ export const OptimizedImage = ({
       size === 'thumbnail'
         ? '150px'
         : size === 'card'
-          ? '(min-width: 1536px) 23vw, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 48vw'
+          ? '(max-width: 767px) 50vw, (max-width: 1279px) 33.33vw, 25vw'
           : size === 'heroMobile' ||
             size === 'heroTablet' ||
             size === 'heroDesktop'

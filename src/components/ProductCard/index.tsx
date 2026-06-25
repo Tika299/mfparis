@@ -375,7 +375,7 @@ export const ProductCard = ({
               media={displayMedia}
               size="card"
               alt={product.title}
-              sizes="(min-width: 1536px) 23vw, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 48vw"
+              sizes="(max-width: 767px) 50vw, (max-width: 1279px) 33.33vw, 33.33vw"
               className="h-full w-full [&_img]:object-contain"
             />
           </div>
