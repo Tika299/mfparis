@@ -104,34 +104,52 @@ function getOriginalImage(
 }
 
 function resolveHeroSources(slide: HeroSlideItem) {
+  const mobileSized =
+    getExactSizedImage(slide.imageMobile, 'heroMobile')
+
+  const tabletSized =
+    getExactSizedImage(slide.imageTablet, 'heroTablet')
+
+  const desktopSized =
+    getExactSizedImage(slide.imageDesktop, 'heroDesktop')
+
+  const mobileOriginal =
+    getOriginalImage(slide.imageMobile)
+
+  const tabletOriginal =
+    getOriginalImage(slide.imageTablet)
+
+  const desktopOriginal =
+    getOriginalImage(slide.imageDesktop)
+
   const mobile =
-    getExactSizedImage(slide.imageMobile, 'heroMobile') ??
-    getExactSizedImage(slide.imageTablet, 'heroMobile') ??
-    getExactSizedImage(slide.imageDesktop, 'heroMobile')
+    mobileSized ??
+    mobileOriginal ??
+    tabletSized ??
+    tabletOriginal ??
+    desktopSized ??
+    desktopOriginal
 
   const tablet =
-    getExactSizedImage(slide.imageTablet, 'heroTablet') ??
-    getExactSizedImage(slide.imageDesktop, 'heroTablet') ??
-    getExactSizedImage(slide.imageMobile, 'heroTablet')
+    tabletSized ??
+    tabletOriginal ??
+    desktopSized ??
+    desktopOriginal ??
+    mobileSized ??
+    mobileOriginal
 
   const desktop =
-    getExactSizedImage(slide.imageDesktop, 'heroDesktop') ??
-    getExactSizedImage(slide.imageTablet, 'heroDesktop') ??
-    getExactSizedImage(slide.imageMobile, 'heroDesktop')
-
-  const fallback =
-    mobile ??
-    tablet ??
-    desktop ??
-    getOriginalImage(slide.imageMobile) ??
-    getOriginalImage(slide.imageTablet) ??
-    getOriginalImage(slide.imageDesktop)
+    desktopSized ??
+    desktopOriginal ??
+    tabletSized ??
+    tabletOriginal ??
+    mobileSized ??
+    mobileOriginal
 
   return {
     mobile,
     tablet,
     desktop,
-    fallback,
   }
 }
 
@@ -142,19 +160,15 @@ function HeroSlide({
   slide: HeroSlideItem
   index: number
 }>) {
-  const { mobile, tablet, desktop, fallback } =
+  const { mobile, tablet, desktop } =
     resolveHeroSources(slide)
 
-  if (!fallback?.url) {
-    return null
-  }
 
   const isFirstSlide = index === 0
   const alt =
     mobile?.alt ||
     tablet?.alt ||
     desktop?.alt ||
-    fallback.alt ||
     'Hero banner'
 
   return (
@@ -180,16 +194,14 @@ function HeroSlide({
           ) : null}
 
           <img
-            src={mobile?.url || fallback.url}
+            src={mobile?.url}
             alt={alt}
             width={
               mobile?.width ||
-              fallback.width ||
               414
             }
             height={
               mobile?.height ||
-              fallback.height ||
               552
             }
             loading={isFirstSlide ? 'eager' : 'lazy'}
