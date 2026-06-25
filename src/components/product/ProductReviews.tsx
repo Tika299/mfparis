@@ -209,10 +209,7 @@ function ReadOnlyStars({
             : 'h-4 w-4'
 
     return (
-        <div
-            className="flex items-center gap-0.5"
-            aria-label={`${normalizedRating} trên 5 sao`}
-        >
+        <div className="flex items-center gap-0.5">
             {Array.from(
                 { length: 5 },
                 (_, index) => {

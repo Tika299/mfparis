@@ -43,7 +43,6 @@ export const CartCount = ({
   return (
     <span
       className={`inline-flex items-center justify-center rounded-full font-bold leading-none text-white ${className}`}
-      aria-label={`${displayedCount} sản phẩm trong giỏ hàng`}
     >
       {displayedCount > 99
         ? '99+'

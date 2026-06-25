@@ -725,7 +725,6 @@ function SocialButton({
   if (!href || href === '#') {
     return (
       <span
-        aria-label={`${label} chưa được thiết lập`}
         title={`${label} chưa được thiết lập`}
         className={`${className} cursor-default opacity-60`}
       >

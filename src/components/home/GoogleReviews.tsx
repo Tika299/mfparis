@@ -67,10 +67,7 @@ export async function GoogleReviews() {
 
                         {/* Sao đánh giá */}
                         <div className="mt-5 flex flex-wrap items-center gap-3">
-                            <div
-                                className="flex items-center gap-1"
-                                aria-label="Đánh giá khách hàng trên Google"
-                            >
+                            <div className="flex items-center gap-1">
                                 {Array.from(
                                     { length: 5 },
                                     (_, index) => (
