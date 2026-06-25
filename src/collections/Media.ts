@@ -35,11 +35,12 @@ export const Media: CollectionConfig = {
       },
       {
         name: 'heroMobile',
-        width: 600,
-        height: 800,
-        fit: 'cover',
+        width: 414,
+        height: 552,
         position: 'centre',
-        withoutEnlargement: true,
+        formatOptions: {
+          format: 'webp',
+        },
       },
       {
         name: 'heroTablet',

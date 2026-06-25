@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import Image, { getImageProps } from 'next/image'
 import Link from 'next/link'
 import type { Media } from '@/payload-types'
 import {
@@ -13,7 +12,11 @@ import {
 } from '@/components/ui/carousel'
 import Autoplay from 'embla-carousel-autoplay'
 
-type SlideMediaRelationship = number | Media | null | undefined
+type SlideMediaRelationship =
+  | number
+  | Media
+  | null
+  | undefined
 
 type HeroSlideItem = {
   link?: string | null
@@ -50,9 +53,12 @@ type PayloadMediaWithSizes = Media & {
   } | null
 }
 
-const MOBILE_HERO_SIZES = '(max-width: 767px) 378px'
-const TABLET_HERO_SIZES = '(min-width: 768px) and (max-width: 1023px) 100vw'
-const DESKTOP_HERO_SIZES = '(min-width: 1024px) 100vw'
+type ResolvedHeroImage = {
+  url: string
+  width?: number
+  height?: number
+  alt: string
+}
 
 function isMediaObject(
   value: SlideMediaRelationship,
@@ -60,21 +66,21 @@ function isMediaObject(
   return !!value && typeof value === 'object'
 }
 
-function getSizedImage(
+function toResolvedImage(
   image: SlideMediaRelationship,
   sizeName: 'heroMobile' | 'heroTablet' | 'heroDesktop',
-) {
+): ResolvedHeroImage | null {
   if (!isMediaObject(image)) {
     return null
   }
 
-  const sized = image.sizes?.[sizeName]
+  const sizedImage = image.sizes?.[sizeName]
 
-  if (sized?.url) {
+  if (sizedImage?.url) {
     return {
-      url: sized.url,
-      width: sized.width ?? image.width ?? undefined,
-      height: sized.height ?? image.height ?? undefined,
+      url: sizedImage.url,
+      width: sizedImage.width ?? image.width ?? undefined,
+      height: sizedImage.height ?? image.height ?? undefined,
       alt: image.alt ?? '',
     }
   }
@@ -91,22 +97,22 @@ function getSizedImage(
   return null
 }
 
-function buildHeroSources(slide: HeroSlideItem) {
+function resolveHeroSources(slide: HeroSlideItem) {
   const desktop =
-    getSizedImage(slide.imageDesktop, 'heroDesktop') ??
-    getSizedImage(slide.imageTablet, 'heroDesktop') ??
-    getSizedImage(slide.imageMobile, 'heroDesktop')
+    toResolvedImage(slide.imageDesktop, 'heroDesktop') ??
+    toResolvedImage(slide.imageTablet, 'heroDesktop') ??
+    toResolvedImage(slide.imageMobile, 'heroDesktop')
 
   const tablet =
-    getSizedImage(slide.imageTablet, 'heroTablet') ??
-    getSizedImage(slide.imageDesktop, 'heroTablet') ??
-    getSizedImage(slide.imageMobile, 'heroTablet') ??
+    toResolvedImage(slide.imageTablet, 'heroTablet') ??
+    toResolvedImage(slide.imageDesktop, 'heroTablet') ??
+    toResolvedImage(slide.imageMobile, 'heroTablet') ??
     desktop
 
   const mobile =
-    getSizedImage(slide.imageMobile, 'heroMobile') ??
-    getSizedImage(slide.imageTablet, 'heroMobile') ??
-    getSizedImage(slide.imageDesktop, 'heroMobile') ??
+    toResolvedImage(slide.imageMobile, 'heroMobile') ??
+    toResolvedImage(slide.imageTablet, 'heroMobile') ??
+    toResolvedImage(slide.imageDesktop, 'heroMobile') ??
     tablet ??
     desktop
 
@@ -120,14 +126,15 @@ function buildHeroSources(slide: HeroSlideItem) {
 function HeroSlide({
   slide,
   index,
-}: {
+}: Readonly<{
   slide: HeroSlideItem
   index: number
-}) {
+}>) {
   const { mobile, tablet, desktop } =
-    buildHeroSources(slide)
+    resolveHeroSources(slide)
 
-  const fallback = desktop ?? tablet ?? mobile
+  const fallback =
+    mobile ?? tablet ?? desktop
 
   if (!fallback?.url) {
     return null
@@ -140,36 +147,6 @@ function HeroSlide({
     desktop?.alt ||
     'Hero banner'
 
-  const mobileImage = getImageProps({
-    alt,
-    src: mobile?.url || fallback.url,
-    width: mobile?.width || 600,
-    height: mobile?.height || 800,
-    sizes: MOBILE_HERO_SIZES,
-    priority: isFirstSlide,
-    quality: 82,
-  }).props
-
-  const tabletImage = getImageProps({
-    alt,
-    src: tablet?.url || fallback.url,
-    width: tablet?.width || 1024,
-    height: tablet?.height || 1024,
-    sizes: TABLET_HERO_SIZES,
-    priority: isFirstSlide,
-    quality: 82,
-  }).props
-
-  const desktopImage = getImageProps({
-    alt,
-    src: desktop?.url || fallback.url,
-    width: desktop?.width || 1920,
-    height: desktop?.height || 800,
-    sizes: DESKTOP_HERO_SIZES,
-    priority: isFirstSlide,
-    quality: 82,
-  }).props
-
   return (
     <Link
       href={slide.link || '#'}
@@ -178,23 +155,39 @@ function HeroSlide({
     >
       <div className="relative w-full aspect-[3/4] md:aspect-square lg:aspect-[21/9]">
         <picture>
-          <source
-            media="(min-width: 1024px)"
-            srcSet={desktopImage.srcSet}
-            sizes="100vw"
-          />
-          <source
-            media="(min-width: 768px)"
-            srcSet={tabletImage.srcSet}
-            sizes="100vw"
-          />
+          {desktop?.url ? (
+            <source
+              media="(min-width: 1024px)"
+              srcSet={desktop.url}
+            />
+          ) : null}
+
+          {tablet?.url ? (
+            <source
+              media="(min-width: 768px)"
+              srcSet={tablet.url}
+            />
+          ) : null}
+
           <img
-            src={mobileImage.src}
-            srcSet={mobileImage.srcSet}
-            sizes="(max-width: 767px) 378px"
+            src={mobile?.url || fallback.url}
             alt={alt}
-            loading={isFirstSlide ? 'eager' : 'lazy'}
-            fetchPriority={isFirstSlide ? 'high' : 'auto'}
+            width={
+              mobile?.width ||
+              fallback.width ||
+              414
+            }
+            height={
+              mobile?.height ||
+              fallback.height ||
+              552
+            }
+            loading={
+              isFirstSlide ? 'eager' : 'lazy'
+            }
+            fetchPriority={
+              isFirstSlide ? 'high' : 'auto'
+            }
             decoding="async"
             className="absolute inset-0 h-full w-full object-cover"
           />
@@ -221,7 +214,7 @@ export const HeroSlider = ({
     setIsHydrated(true)
   }, [])
 
-  if (!sliders || sliders.length === 0) {
+  if (!sliders?.length) {
     return null
   }
 
