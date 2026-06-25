@@ -29,6 +29,13 @@ type HeroSliderProps = {
   sliders: HeroSlideItem[]
 }
 
+type SizedImage = {
+  url: string
+  width?: number
+  height?: number
+  alt?: string
+}
+
 type PayloadMediaWithSizes = Media & {
   url?: string | null
   alt?: string | null
@@ -53,73 +60,78 @@ type PayloadMediaWithSizes = Media & {
   } | null
 }
 
-type ResolvedHeroImage = {
-  url: string
-  width?: number
-  height?: number
-  alt: string
-}
-
 function isMediaObject(
   value: SlideMediaRelationship,
 ): value is PayloadMediaWithSizes {
   return !!value && typeof value === 'object'
 }
 
-function toResolvedImage(
+function getExactSizedImage(
   image: SlideMediaRelationship,
   sizeName: 'heroMobile' | 'heroTablet' | 'heroDesktop',
-): ResolvedHeroImage | null {
+): SizedImage | null {
   if (!isMediaObject(image)) {
     return null
   }
 
-  const sizedImage = image.sizes?.[sizeName]
+  const sized = image.sizes?.[sizeName]
 
-  if (sizedImage?.url) {
-    return {
-      url: sizedImage.url,
-      width: sizedImage.width ?? image.width ?? undefined,
-      height: sizedImage.height ?? image.height ?? undefined,
-      alt: image.alt ?? '',
-    }
+  if (!sized?.url) {
+    return null
   }
 
-  if (image.url) {
-    return {
-      url: image.url,
-      width: image.width ?? undefined,
-      height: image.height ?? undefined,
-      alt: image.alt ?? '',
-    }
+  return {
+    url: sized.url,
+    width: sized.width ?? undefined,
+    height: sized.height ?? undefined,
+    alt: image.alt ?? '',
+  }
+}
+
+function getOriginalImage(
+  image: SlideMediaRelationship,
+): SizedImage | null {
+  if (!isMediaObject(image) || !image.url) {
+    return null
   }
 
-  return null
+  return {
+    url: image.url,
+    width: image.width ?? undefined,
+    height: image.height ?? undefined,
+    alt: image.alt ?? '',
+  }
 }
 
 function resolveHeroSources(slide: HeroSlideItem) {
-  const desktop =
-    toResolvedImage(slide.imageDesktop, 'heroDesktop') ??
-    toResolvedImage(slide.imageTablet, 'heroDesktop') ??
-    toResolvedImage(slide.imageMobile, 'heroDesktop')
+  const mobile =
+    getExactSizedImage(slide.imageMobile, 'heroMobile') ??
+    getExactSizedImage(slide.imageTablet, 'heroMobile') ??
+    getExactSizedImage(slide.imageDesktop, 'heroMobile')
 
   const tablet =
-    toResolvedImage(slide.imageTablet, 'heroTablet') ??
-    toResolvedImage(slide.imageDesktop, 'heroTablet') ??
-    toResolvedImage(slide.imageMobile, 'heroTablet') ??
-    desktop
+    getExactSizedImage(slide.imageTablet, 'heroTablet') ??
+    getExactSizedImage(slide.imageDesktop, 'heroTablet') ??
+    getExactSizedImage(slide.imageMobile, 'heroTablet')
 
-  const mobile =
-    toResolvedImage(slide.imageMobile, 'heroMobile') ??
-    toResolvedImage(slide.imageTablet, 'heroMobile') ??
-    toResolvedImage(slide.imageDesktop, 'heroMobile') ??
+  const desktop =
+    getExactSizedImage(slide.imageDesktop, 'heroDesktop') ??
+    getExactSizedImage(slide.imageTablet, 'heroDesktop') ??
+    getExactSizedImage(slide.imageMobile, 'heroDesktop')
+
+  const fallback =
+    mobile ??
     tablet ??
-    desktop
+    desktop ??
+    getOriginalImage(slide.imageMobile) ??
+    getOriginalImage(slide.imageTablet) ??
+    getOriginalImage(slide.imageDesktop)
 
   return {
     mobile,
     tablet,
     desktop,
+    fallback,
   }
 }
 
@@ -130,11 +142,8 @@ function HeroSlide({
   slide: HeroSlideItem
   index: number
 }>) {
-  const { mobile, tablet, desktop } =
+  const { mobile, tablet, desktop, fallback } =
     resolveHeroSources(slide)
-
-  const fallback =
-    mobile ?? tablet ?? desktop
 
   if (!fallback?.url) {
     return null
@@ -145,6 +154,7 @@ function HeroSlide({
     mobile?.alt ||
     tablet?.alt ||
     desktop?.alt ||
+    fallback.alt ||
     'Hero banner'
 
   return (
@@ -182,12 +192,8 @@ function HeroSlide({
               fallback.height ||
               552
             }
-            loading={
-              isFirstSlide ? 'eager' : 'lazy'
-            }
-            fetchPriority={
-              isFirstSlide ? 'high' : 'auto'
-            }
+            loading={isFirstSlide ? 'eager' : 'lazy'}
+            fetchPriority={isFirstSlide ? 'high' : 'auto'}
             decoding="async"
             className="absolute inset-0 h-full w-full object-cover"
           />
