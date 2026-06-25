@@ -39,7 +39,7 @@ export const Media: CollectionConfig = {
         height: 552,
         position: 'centre',
         formatOptions: {
-          format: 'webp',
+          format: 'avif',
         },
       },
       {

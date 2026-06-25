@@ -22,6 +22,7 @@ import { FeaturedCategoriesSectionClient } from '@/components/FeaturedCategories
 import { BrandPartnersSectionClient } from '@/components/BrandPartnersSectionClient'
 import { HomeProductTabsSectionClient } from '@/components/HomeProductTabsSectionClient'
 import { BeautyJournalSectionClient } from '@/components/BeautyJournalSectionClient'
+import '@/styles/carousel-overrides.css'
 
 const homeTitle =
   'Nước hoa, mỹ phẩm chính hãng từ Pháp'

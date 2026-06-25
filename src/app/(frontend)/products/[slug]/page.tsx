@@ -3,6 +3,7 @@ import type { Where } from 'payload'
 import type { JSX } from 'react'
 import FragranceProfile from '@/components/product/FragranceProfile'
 import '@/styles/prose.css'
+import '@/styles/carousel-overrides.css'
 import configPromise from '@payload-config'
 import {
   ChevronRight,

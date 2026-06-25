@@ -234,7 +234,7 @@ export function FloatingContactMenu({
                     className="group flex h-12 w-12 items-center justify-center rounded-full border border-[#dcecff] bg-white shadow-[0_8px_24px_rgba(0,91,187,0.22)] transition-transform hover:scale-110 sm:h-14 sm:w-14"
                 >
                     <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg"
+                        src="/icons/zalo.svg"
                         alt=""
                         aria-hidden="true"
                         className="h-8 w-8 object-contain transition-transform group-hover:scale-105 sm:h-9 sm:w-9"

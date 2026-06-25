@@ -6,13 +6,11 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import '../globals.css'
 import '@/styles/floating-contact.css'
-import '@/styles/carousel-overrides.css'
 import { Be_Vietnam_Pro, Playfair_Display } from 'next/font/google'
 import { FloatingContact } from '@/components/FloatingContact'
 import { Toaster } from 'sonner'
-import { GlobalEnterHandler } from '@/components/GlobalEnterHandler'
-import { WishlistHydrator } from '@/components/WishlistHydrator'
 import { SITE_ORIGIN } from '@/utilities/seo'
+import { ClientEnhancements } from '@/components/ClientEnhancements'
 
 const siteUrl =
   process.env.NEXT_PUBLIC_BASE_URL ||
@@ -63,9 +61,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="vi" suppressHydrationWarning className={`${beVietnam.variable} ${playfair.variable}`}>
       <body className="flex min-h-screen flex-col font-sans text-[#1a1a1a] antialiased">
-        <WishlistHydrator />
+        <ClientEnhancements />
         <Header />
-        <GlobalEnterHandler />
         <main className="flex-grow">{children}</main>
         <Footer />
         {/* Cấu hình Toaster cho sang trọng */}

@@ -21,6 +21,7 @@ import RelatedPostsCarousel from '@/components/Blog/RelatedPostsCarousel'
 import { SITE_ORIGIN } from '@/utilities/seo'
 import '@/styles/blog.css'
 import '@/styles/prose.css'
+import '@/styles/carousel-overrides.css'
 
 type BlogPostPageProps = {
   params: Promise<{
