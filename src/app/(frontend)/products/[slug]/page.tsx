@@ -336,19 +336,27 @@ function getProductOpenGraphImageData(
   }
 
   const candidate =
-    firstImage.sizes?.large && firstImage.sizes.large.url
+    firstImage.sizes?.heroDesktop?.url
       ? {
-        url: firstImage.sizes.large.url,
-        width: firstImage.sizes.large.width ?? undefined,
-        height: firstImage.sizes.large.height ?? undefined,
+        url: firstImage.sizes.heroDesktop.url,
+        width:
+          firstImage.sizes.heroDesktop.width ?? undefined,
+        height:
+          firstImage.sizes.heroDesktop.height ?? undefined,
       }
-      : firstImage.url
+      : firstImage.sizes?.card?.url
         ? {
-          url: firstImage.url,
-          width: firstImage.width ?? undefined,
-          height: firstImage.height ?? undefined,
+          url: firstImage.sizes.card.url,
+          width: firstImage.sizes.card.width ?? undefined,
+          height: firstImage.sizes.card.height ?? undefined,
         }
-        : null
+        : firstImage.url
+          ? {
+            url: firstImage.url,
+            width: firstImage.width ?? undefined,
+            height: firstImage.height ?? undefined,
+          }
+          : null
 
   if (!candidate?.url) {
     return null

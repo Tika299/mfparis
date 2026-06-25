@@ -14,7 +14,6 @@ import {
 } from 'lucide-react'
 
 import { HeroSlider } from '@/components/HeroSlider'
-import { OptimizedImage } from '@/components/OptimizedImage'
 import { FlashSaleSection } from '@/components/FlashSaleSection'
 import { HomeProductTabs } from '@/components/HomeProductTabs'
 import { BeautyJournalSection } from '@/components/home/BeautyJournalSection'
