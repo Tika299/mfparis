@@ -2,12 +2,13 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { PlayCircle } from 'lucide-react'
+import { LiteYouTube } from '@/components/LiteYouTube'
 
 /**
  * Chỉ chấp nhận các nguồn video được cho phép.
  * Không đưa URL tùy ý từ CMS trực tiếp vào iframe.
  */
-function getVideoEmbedUrl(
+function getYouTubeVideoId(
     value: string | null | undefined,
 ): string | null {
     const normalizedValue = value?.trim()
@@ -18,82 +19,31 @@ function getVideoEmbedUrl(
 
     try {
         const url = new URL(normalizedValue)
-
         const hostname = url.hostname
             .replace(/^www\./, '')
             .toLowerCase()
 
-        /*
-         * Link YouTube dạng:
-         * https://youtu.be/VIDEO_ID
-         */
         if (hostname === 'youtu.be') {
             const videoId = url.pathname
                 .split('/')
                 .filter(Boolean)[0]
 
-            return videoId
-                ? `https://www.youtube.com/embed/${videoId}`
-                : null
+            return videoId || null
         }
 
-        /*
-         * Link YouTube dạng:
-         * /watch?v=VIDEO_ID
-         * /shorts/VIDEO_ID
-         * /embed/VIDEO_ID
-         */
         if (
             hostname === 'youtube.com' ||
             hostname === 'm.youtube.com'
         ) {
             if (url.pathname === '/watch') {
-                const videoId =
-                    url.searchParams.get('v')
-
-                return videoId
-                    ? `https://www.youtube.com/embed/${videoId}`
-                    : null
+                return url.searchParams.get('v')
             }
 
             const pathMatch = url.pathname.match(
                 /^\/(?:embed|shorts)\/([^/?]+)/,
             )
 
-            const videoId = pathMatch?.[1]
-
-            return videoId
-                ? `https://www.youtube.com/embed/${videoId}`
-                : null
-        }
-
-        /*
-         * Link Vimeo dạng:
-         * https://vimeo.com/123456789
-         */
-        if (hostname === 'vimeo.com') {
-            const videoId = url.pathname
-                .split('/')
-                .filter(Boolean)[0]
-
-            if (
-                videoId &&
-                /^\d+$/.test(videoId)
-            ) {
-                return `https://player.vimeo.com/video/${videoId}`
-            }
-
-            return null
-        }
-
-        /*
-         * Cho phép URL Vimeo đã ở dạng embed.
-         */
-        if (
-            hostname === 'player.vimeo.com' &&
-            url.pathname.startsWith('/video/')
-        ) {
-            return url.toString()
+            return pathMatch?.[1] || null
         }
 
         return null
@@ -123,8 +73,9 @@ export async function StoreIntro() {
         story?.videoTitle?.trim() ||
         'Video giới thiệu Marais de France'
 
-    const videoEmbedUrl =
-        getVideoEmbedUrl(story?.videoUrl)
+    const videoId = getYouTubeVideoId(
+        story?.videoUrl,
+    )
 
     return (
         <section
@@ -162,15 +113,12 @@ export async function StoreIntro() {
 
                     {/* Khung video tỷ lệ 16:9 */}
                     <div className="relative aspect-video overflow-hidden rounded-[1.5rem] bg-neutral-100 shadow-sm ring-1 ring-black/[0.05] md:rounded-[2rem]">
-                        {videoEmbedUrl ? (
-                            <iframe
-                                src={videoEmbedUrl}
+                        {videoId ? (
+                            <LiteYouTube
+                                videoId={videoId}
                                 title={videoTitle}
-                                className="absolute inset-0 h-full w-full border-0"
-                                loading="lazy"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                referrerPolicy="strict-origin-when-cross-origin"
-                                allowFullScreen
+                                className="h-full w-full"
+                                roundedClassName="rounded-[1.5rem] md:rounded-[2rem]"
                             />
                         ) : (
                             <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">

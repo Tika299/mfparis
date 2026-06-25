@@ -1,8 +1,3 @@
-// src/components/FloatingContact/index.tsx
-
-import { getPayload } from 'payload'
-import configPromise from '@payload-config'
-
 import { FloatingContactMenu } from './FloatingContactMenu'
 import { getSiteSettings } from '@/data/getSiteSettings'
 
@@ -13,10 +8,6 @@ type ContactSettings = {
 }
 
 export const FloatingContact = async () => {
-  const payload = await getPayload({
-    config: configPromise,
-  })
-
   const settings = await getSiteSettings()
 
   const contact =

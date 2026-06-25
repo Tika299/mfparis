@@ -1,3 +1,4 @@
+import type { ProductCardProduct } from '@/components/ProductCard'
 import Link from 'next/link'
 import {
     ChevronRight,
@@ -5,18 +6,8 @@ import {
 } from 'lucide-react'
 
 import type { Voucher } from '@/payload-types'
-import {
-    ProductCard,
-    type ProductCardProduct,
-} from '@/components/ProductCard'
 import { FlashSaleCountdown } from '@/components/FlashSaleCountdown'
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-} from '@/components/ui/carousel'
+import { FlashSaleProductsCarouselClient } from '@/components/FlashSaleProductsCarouselClient'
 
 type VoucherRelationship =
     | number
@@ -312,82 +303,9 @@ export function FlashSaleSection({
                         }
                     />
 
-                    <Carousel
-                        opts={{
-                            align: 'start',
-                            containScroll: 'trimSnaps',
-                            loop: displayedProducts.length > 4,
-                            dragFree: false,
-                        }}
-                        className="relative min-w-0 w-full"
-                    >
-                        <CarouselContent className="-ml-2.5 pb-1 md:-ml-3 lg:-ml-4">
-                            {displayedProducts.map(
-                                (product) => (
-                                    <CarouselItem
-                                        key={product.id}
-                                        className={[
-                                            /*
-                                             * Mobile:
-                                             * Hiển thị chính xác 2 sản phẩm.
-                                             */
-                                            'basis-1/2 pl-2.5',
-
-                                            /*
-                                             * Tablet:
-                                             * Hiển thị chính xác 3 sản phẩm.
-                                             */
-                                            'md:basis-1/3 md:pl-3',
-
-                                            /*
-                                             * Desktop:
-                                             * Luôn hiển thị chính xác 4 sản phẩm.
-                                             */
-                                            'lg:basis-1/4 lg:pl-4',
-                                            'xl:basis-1/4',
-                                            '2xl:basis-1/4',
-                                        ].join(' ')}
-                                    >
-                                        <ProductCard
-                                            product={product}
-                                            mode="flash"
-                                            className="h-full rounded-[18px] shadow-none hover:-translate-y-1 hover:shadow-[0_10px_24px_rgba(0,0,0,0.055)]"
-                                        />
-                                    </CarouselItem>
-                                ),
-                            )}
-                        </CarouselContent>
-
-                        {displayedProducts.length > 4 ? (
-                            <>
-                                <CarouselPrevious
-                                    aria-label="Xem sản phẩm Flash Sale trước"
-                                    className={[
-                                        'absolute left-2 top-1/2 z-30 hidden',
-                                        'h-10 w-10 -translate-y-1/2',
-                                        'border border-[#eeeeee] bg-white text-[#333333]',
-                                        'shadow-[0_6px_18px_rgba(0,0,0,0.13)]',
-                                        'transition-colors',
-                                        'hover:border-[#b40008] hover:bg-[#b40008] hover:text-white',
-                                        'lg:flex',
-                                    ].join(' ')}
-                                />
-
-                                <CarouselNext
-                                    aria-label="Xem sản phẩm Flash Sale tiếp theo"
-                                    className={[
-                                        'absolute right-2 top-1/2 z-30 hidden',
-                                        'h-10 w-10 -translate-y-1/2',
-                                        'border border-[#eeeeee] bg-white text-[#333333]',
-                                        'shadow-[0_6px_18px_rgba(0,0,0,0.13)]',
-                                        'transition-colors',
-                                        'hover:border-[#b40008] hover:bg-[#b40008] hover:text-white',
-                                        'lg:flex',
-                                    ].join(' ')}
-                                />
-                            </>
-                        ) : null}
-                    </Carousel>
+                    <FlashSaleProductsCarouselClient
+                        products={displayedProducts}
+                    />
                 </div>
             </div>
         </section>

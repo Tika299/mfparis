@@ -1,13 +1,23 @@
 import React from 'react'
 import Image from 'next/image'
-import { cn } from '@/utilities' // Đảm bảo đường dẫn này đúng với file cn của bạn
+import { cn } from '@/utilities'
+
+type MediaSizeName =
+  | 'thumbnail'
+  | 'card'
+  | 'large'
+  | 'heroMobile'
+  | 'heroTablet'
+  | 'heroDesktop'
 
 interface OptimizedImageProps {
-  media: any // Đối tượng Media từ Payload
-  size?: 'thumbnail' | 'card' | 'large' // Các size đã định nghĩa trong Media.ts
+  media: any
+  size?: MediaSizeName
   alt?: string
   className?: string
   priority?: boolean
+  sizes?: string
+  quality?: number
 }
 
 export const OptimizedImage = ({
@@ -16,56 +26,95 @@ export const OptimizedImage = ({
   alt,
   className,
   priority = false,
+  sizes,
+  quality = 85,
 }: OptimizedImageProps) => {
-  // 1. Kiểm tra nếu không có media
   if (!media || typeof media !== 'object') {
-    // Nếu là ID (đang trong mode Preview của Admin)
-    if (typeof media === 'number' || typeof media === 'string') {
+    if (
+      typeof media === 'number' ||
+      typeof media === 'string'
+    ) {
       return (
         <div
-          className={cn('bg-gray-200 animate-pulse flex items-center justify-center', className)}
+          className={cn(
+            'flex h-full w-full items-center justify-center bg-gray-200 animate-pulse',
+            className,
+          )}
         >
-          <span style={{ fontSize: '30px', color: 'black', fontWeight: 'bold' }}>
+          <span className="px-4 text-center text-base font-bold text-black sm:text-lg">
             Đang tải ảnh từ thư viện...
           </span>
         </div>
       )
     }
-    // Nếu thực sự không có gì
+
     return (
-      <div className={cn('bg-white flex items-center justify-center w-full h-full', className)}>
+      <div
+        className={cn(
+          'relative flex h-full w-full items-center justify-center overflow-hidden bg-white',
+          className,
+        )}
+      >
         <Image
           src="/api/media/file/placeholder.jpg"
           alt="Placeholder"
           fill
+          sizes={sizes ?? '100vw'}
           className="object-cover"
         />
       </div>
     )
   }
 
-  // 2. Lấy URL theo size yêu cầu, nếu không có thì lấy ảnh gốc (.url)
-  const src = media.sizes?.[size]?.url || media.url
-  const imageAlt = alt || media.alt || 'MF Paris Product'
+  const sizedMedia = media.sizes?.[size]
+  const src =
+    sizedMedia?.url ||
+    media.url ||
+    '/api/media/file/placeholder.jpg'
+
+  const imageAlt =
+    alt || media.alt || 'MF Paris Product'
+
+  const imageSizes =
+    sizes ??
+    (
+      size === 'thumbnail'
+        ? '150px'
+        : size === 'card'
+          ? '(min-width: 1536px) 23vw, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 48vw'
+          : size === 'heroMobile' ||
+            size === 'heroTablet' ||
+            size === 'heroDesktop'
+            ? '100vw'
+            : '100vw'
+    )
+
+  const width =
+    sizedMedia?.width || media.width || 800
+  const height =
+    sizedMedia?.height || media.height || 800
 
   return (
-    <div className={cn('relative overflow-hidden w-full h-full', className)}>
+    <div
+      className={cn(
+        'relative h-full w-full overflow-hidden',
+        className,
+      )}
+    >
       <Image
         src={src}
         alt={imageAlt}
         fill
         priority={priority}
-        sizes={
-          size === 'thumbnail'
-            ? '150px'
-            : size === 'card'
-              ? '(max-width: 768px) 50vw, 25vw'
-              : '100vw'
-        }
-        className="object-cover transition-transform duration-700 ease-in-out"
+        sizes={imageSizes}
+        quality={quality}
         loading={priority ? undefined : 'lazy'}
-        quality={85}
+        className="object-cover transition-transform duration-700 ease-in-out"
       />
+
+      <span className="hidden">
+        {width}x{height}
+      </span>
     </div>
   )
 }

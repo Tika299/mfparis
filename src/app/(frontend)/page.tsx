@@ -21,14 +21,8 @@ import { BeautyJournalSection } from '@/components/home/BeautyJournalSection'
 import { StoreIntro } from '@/components/home/StoreIntro'
 import { GoogleReviews } from '@/components/home/GoogleReviews'
 import { SITE_ORIGIN } from '@/utilities/seo'
-
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel'
+import { FeaturedCategoriesSectionClient } from '@/components/FeaturedCategoriesSectionClient'
+import { BrandPartnersSectionClient } from '@/components/BrandPartnersSectionClient'
 
 const homeTitle =
   'Nước hoa, mỹ phẩm chính hãng từ Pháp'
@@ -389,18 +383,9 @@ function FeaturedCategoriesSection({
     return null
   }
 
-  const categoryPairs: any[][] = []
-
-  for (let index = 0; index < categories.length; index += 2) {
-    categoryPairs.push(
-      categories.slice(index, index + 2),
-    )
-  }
-
   return (
     <section className="container-ux mt-8 md:mt-10">
       <div className="lc-card rounded-[2rem] p-5 sm:p-6 md:rounded-[2.5rem] md:p-8">
-        {/* Header */}
         <div className="mb-8 flex items-center justify-between gap-4 px-1 md:mb-10 md:px-2">
           <div>
             <span className="sub-heading text-neutral-400">
@@ -420,73 +405,9 @@ function FeaturedCategoriesSection({
           </Link>
         </div>
 
-        {/* Slider Danh mục */}
-        <Carousel
-          opts={{
-            align: 'start',
-            loop: true,
-          }}
-          className="relative w-full"
-        >
-          <CarouselContent className="-ml-4 pb-2 md:-ml-5">
-            {categoryPairs.map(
-              (pair, index) => (
-                <CarouselItem
-                  key={index}
-                  className="basis-[52%] pl-4 sm:basis-[38%] md:basis-[28%] md:pl-5 lg:basis-[22%] xl:basis-[18%]"
-                >
-                  <div className="grid grid-rows-2 gap-4">
-                    {pair.map((cat) => {
-                      const categoryName =
-                        typeof cat.name ===
-                          'string'
-                          ? cat.name
-                          : 'Danh mục'
-
-                      const categorySlug =
-                        typeof cat.slug ===
-                          'string'
-                          ? cat.slug
-                          : ''
-
-                      return (
-                        <Link
-                          key={cat.id}
-                          href={
-                            categorySlug
-                              ? `/categories/${categorySlug}`
-                              : '/categories'
-                          }
-                          className="group flex min-w-0 flex-col items-center rounded-2xl border border-transparent p-2.5 transition-colors hover:border-primary/20"
-                        >
-                          <div className="mb-3 flex h-[86px] w-[86px] items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-black/5 md:h-[102px] md:w-[102px]">
-                            <div className="relative h-[62px] w-[62px] overflow-hidden rounded-full bg-gray-50 md:h-[74px] md:w-[74px]">
-                              <OptimizedImage
-                                media={cat.image}
-                                size="thumbnail"
-                                alt={categoryName}
-                                className="h-full w-full object-contain transition-transform duration-1000 ease-in-out"
-                              />
-
-                              <div className="absolute inset-0 bg-black/5 transition-colors duration-500 group-hover:bg-black/5" />
-                            </div>
-                          </div>
-
-                          <span className="line-clamp-2 min-h-[36px] w-full px-1 text-center text-[12px] font-semibold leading-[1.4] tracking-[-0.01em] text-neutral-800 transition-colors group-hover:text-primary md:text-[13px]">
-                            {categoryName}
-                          </span>
-                        </Link>
-                      )
-                    })}
-                  </div>
-                </CarouselItem>
-              ),
-            )}
-          </CarouselContent>
-
-          <CarouselPrevious className="absolute -left-4 top-1/2 z-20 hidden h-10 w-10 border-none bg-white hover:bg-primary hover:text-white md:flex" />
-          <CarouselNext className="absolute -right-4 top-1/2 z-20 hidden h-10 w-10 border-none bg-white hover:bg-primary hover:text-white md:flex" />
-        </Carousel>
+        <FeaturedCategoriesSectionClient
+          categories={categories}
+        />
       </div>
     </section>
   )
@@ -508,104 +429,18 @@ function BrandPartnersSection({
     return null
   }
 
-  const showNavigation =
-    brands.length > 8
-
   return (
     <section className="container-ux mt-8 md:mt-10">
       <div className="group/brands relative overflow-visible rounded-[24px] border border-[#eeeeee] bg-white px-4 pb-7 pt-6 shadow-[0_8px_30px_rgba(0,0,0,0.045)] sm:px-5 md:rounded-[28px] md:px-7 md:pb-8 md:pt-7 lg:px-8">
-        {/* HEADER */}
         <div className="mb-7 md:mb-8">
           <h2 className="font-heading text-[28px] font-semibold leading-[1.15] tracking-[-0.025em] text-black sm:text-[33px] md:text-[38px]">
             Đối tác thương hiệu
           </h2>
         </div>
 
-        {/* CAROUSEL */}
-        <Carousel
-          opts={{
-            align: 'start',
-            loop: showNavigation,
-            containScroll:
-              'trimSnaps',
-          }}
-          className="relative w-full"
-        >
-          <CarouselContent className="-ml-3 pb-1 md:-ml-4">
-            {brands.map((brand) => {
-              const brandName =
-                typeof brand.name ===
-                  'string'
-                  ? brand.name
-                  : 'Thương hiệu'
-
-              const brandSlug =
-                typeof brand.slug ===
-                  'string'
-                  ? brand.slug
-                  : ''
-
-              const logo =
-                brand.logo
-
-              const hasLogo =
-                logo &&
-                typeof logo ===
-                'object'
-
-              return (
-                <CarouselItem
-                  key={brand.id}
-                  className={[
-                    'basis-1/2 pl-3',
-                    'md:basis-1/3 md:pl-4',
-                    'lg:basis-1/6',
-                    'xl:basis-1/8',
-                  ].join(' ')}
-                >
-                  <Link
-                    href={
-                      brandSlug
-                        ? `/brands/${brandSlug}`
-                        : '/brands'
-                    }
-                    aria-label={
-                      brandName
-                    }
-                    className="group/brand flex h-[82px] w-full items-center justify-center overflow-hidden rounded-[10px] border border-[#e5e5e5] bg-white px-2.5 transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:border-[#d9d9d9] hover:shadow-[0_9px_22px_rgba(0,0,0,0.055)] sm:h-[90px] sm:px-3 md:h-[100px] md:px-4 lg:h-[112px] lg:rounded-[13px]"
-                  >
-                    {hasLogo ? (
-                      <OptimizedImage
-                        media={logo}
-                        size="thumbnail"
-                        alt={brandName}
-                        className="h-[65%] w-full transition-transform duration-300 group-hover/brand:scale-[1.035] [&_img]:h-full [&_img]:w-full [&_img]:object-contain"
-                      />
-                    ) : (
-                      <span className="line-clamp-2 text-center text-[16px] font-semibold leading-snug text-[#202020]">
-                        {brandName}
-                      </span>
-                    )}
-                  </Link>
-                </CarouselItem>
-              )
-            })}
-          </CarouselContent>
-
-          {showNavigation ? (
-            <>
-              <CarouselPrevious
-                aria-label="Xem thương hiệu trước"
-                className="absolute -left-[23px] top-[68%] z-30 hidden h-[48px] w-[48px] -translate-y-1/2 border border-[#eeeeee] bg-white text-[#202020] shadow-[0_7px_20px_rgba(0,0,0,0.12)] transition-all hover:border-[#b40008] hover:bg-white hover:text-[#b40008] md:flex"
-              />
-
-              <CarouselNext
-                aria-label="Xem thương hiệu tiếp theo"
-                className="absolute -right-[23px] top-[68%] z-30 hidden h-[48px] w-[48px] -translate-y-1/2 border border-[#eeeeee] bg-white text-[#202020] shadow-[0_7px_20px_rgba(0,0,0,0.12)] transition-all hover:border-[#b40008] hover:bg-white hover:text-[#b40008] md:flex"
-              />
-            </>
-          ) : null}
-        </Carousel>
+        <BrandPartnersSectionClient
+          brands={brands}
+        />
 
         {brands.length > 2 ? (
           <p className="mt-4 text-center text-[11px] text-[#999999] md:hidden">

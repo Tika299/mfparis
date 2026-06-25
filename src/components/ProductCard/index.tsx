@@ -310,6 +310,9 @@ export const ProductCard = ({
     rank >= 1 &&
     rank <= 3
 
+  const productCardSizes =
+    '(min-width: 1536px) 23vw, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 48vw'
+
   return (
     <article
       className={cn(
@@ -372,6 +375,7 @@ export const ProductCard = ({
               media={displayMedia}
               size="card"
               alt={product.title}
+              sizes="(min-width: 1536px) 23vw, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 48vw"
               className="h-full w-full [&_img]:object-contain"
             />
           </div>

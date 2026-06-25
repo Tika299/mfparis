@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import Image from 'next/image'
+import Image, { getImageProps } from 'next/image'
 import Link from 'next/link'
 import type { Media } from '@/payload-types'
 import {
@@ -13,11 +13,7 @@ import {
 } from '@/components/ui/carousel'
 import Autoplay from 'embla-carousel-autoplay'
 
-type SlideMediaRelationship =
-  | number
-  | Media
-  | null
-  | undefined
+type SlideMediaRelationship = number | Media | null | undefined
 
 type HeroSlideItem = {
   link?: string | null
@@ -30,14 +26,91 @@ type HeroSliderProps = {
   sliders: HeroSlideItem[]
 }
 
-function getSlideImageUrl(
+type PayloadMediaWithSizes = Media & {
+  url?: string | null
+  alt?: string | null
+  width?: number | null
+  height?: number | null
+  sizes?: {
+    heroMobile?: {
+      url?: string | null
+      width?: number | null
+      height?: number | null
+    } | null
+    heroTablet?: {
+      url?: string | null
+      width?: number | null
+      height?: number | null
+    } | null
+    heroDesktop?: {
+      url?: string | null
+      width?: number | null
+      height?: number | null
+    } | null
+  } | null
+}
+
+function isMediaObject(
+  value: SlideMediaRelationship,
+): value is PayloadMediaWithSizes {
+  return !!value && typeof value === 'object'
+}
+
+function getSizedImage(
   image: SlideMediaRelationship,
-): string {
-  if (!image || typeof image !== 'object') {
-    return ''
+  sizeName: 'heroMobile' | 'heroTablet' | 'heroDesktop',
+) {
+  if (!isMediaObject(image)) {
+    return null
   }
 
-  return image.url ?? ''
+  const sized = image.sizes?.[sizeName]
+
+  if (sized?.url) {
+    return {
+      url: sized.url,
+      width: sized.width ?? image.width ?? undefined,
+      height: sized.height ?? image.height ?? undefined,
+      alt: image.alt ?? '',
+    }
+  }
+
+  if (image.url) {
+    return {
+      url: image.url,
+      width: image.width ?? undefined,
+      height: image.height ?? undefined,
+      alt: image.alt ?? '',
+    }
+  }
+
+  return null
+}
+
+function buildHeroSources(slide: HeroSlideItem) {
+  const desktop =
+    getSizedImage(slide.imageDesktop, 'heroDesktop') ??
+    getSizedImage(slide.imageTablet, 'heroDesktop') ??
+    getSizedImage(slide.imageMobile, 'heroDesktop')
+
+  const tablet =
+    getSizedImage(slide.imageTablet, 'heroTablet') ??
+    getSizedImage(slide.imageDesktop, 'heroTablet') ??
+    getSizedImage(slide.imageMobile, 'heroTablet') ??
+    desktop
+
+  const mobile =
+    getSizedImage(slide.imageMobile, 'heroMobile') ??
+    getSizedImage(slide.imageTablet, 'heroMobile') ??
+    getSizedImage(slide.imageDesktop, 'heroMobile') ??
+    tablet ??
+    desktop
+
+  return {
+    mobile,
+    tablet,
+    desktop,
+  }
 }
 
 function HeroSlide({
@@ -47,74 +120,83 @@ function HeroSlide({
   slide: HeroSlideItem
   index: number
 }) {
-  const pcImg =
-    getSlideImageUrl(slide.imageDesktop) ||
-    '/placeholder.jpg'
+  const { mobile, tablet, desktop } =
+    buildHeroSources(slide)
 
-  const tabletImg =
-    getSlideImageUrl(slide.imageTablet) ||
-    pcImg
+  const fallback = desktop ?? tablet ?? mobile
 
-  const mobileImg =
-    getSlideImageUrl(slide.imageMobile) ||
-    tabletImg
+  if (!fallback?.url) {
+    return null
+  }
 
   const isFirstSlide = index === 0
+  const alt =
+    mobile?.alt ||
+    tablet?.alt ||
+    desktop?.alt ||
+    'Hero banner'
+
+  const mobileImage = getImageProps({
+    alt,
+    src: mobile?.url || fallback.url,
+    width: mobile?.width || 600,
+    height: mobile?.height || 800,
+    sizes: '100vw',
+    priority: isFirstSlide,
+    quality: 82,
+  }).props
+
+  const tabletImage = getImageProps({
+    alt,
+    src: tablet?.url || fallback.url,
+    width: tablet?.width || 1024,
+    height: tablet?.height || 1024,
+    sizes: '100vw',
+    priority: isFirstSlide,
+    quality: 82,
+  }).props
+
+  const desktopImage = getImageProps({
+    alt,
+    src: desktop?.url || fallback.url,
+    width: desktop?.width || 1920,
+    height: desktop?.height || 800,
+    sizes: '100vw',
+    priority: isFirstSlide,
+    quality: 82,
+  }).props
 
   return (
     <Link
       href={slide.link || '#'}
-      className="block relative w-full"
+      className="relative block w-full"
+      aria-label={alt}
     >
-      <div className="relative aspect-[3/4] md:hidden w-full">
-        <Image
-          src={mobileImg}
-          alt="Banner Mobile"
-          fill
-          sizes="100vw"
-          priority={isFirstSlide}
-          fetchPriority={
-            isFirstSlide ? 'high' : undefined
-          }
-          loading={
-            isFirstSlide ? undefined : 'lazy'
-          }
-          className="object-cover"
-        />
-      </div>
-
-      <div className="relative hidden md:block lg:hidden aspect-square w-full">
-        <Image
-          src={tabletImg}
-          alt="Banner Tablet"
-          fill
-          sizes="100vw"
-          priority={isFirstSlide}
-          fetchPriority={
-            isFirstSlide ? 'high' : undefined
-          }
-          loading={
-            isFirstSlide ? undefined : 'lazy'
-          }
-          className="object-cover"
-        />
-      </div>
-
-      <div className="relative hidden lg:block aspect-[21/9] w-full">
-        <Image
-          src={pcImg}
-          alt="Banner Desktop"
-          fill
-          sizes="100vw"
-          priority={isFirstSlide}
-          fetchPriority={
-            isFirstSlide ? 'high' : undefined
-          }
-          loading={
-            isFirstSlide ? undefined : 'lazy'
-          }
-          className="object-cover"
-        />
+      <div className="relative w-full aspect-[3/4] md:aspect-square lg:aspect-[21/9]">
+        <picture>
+          <source
+            media="(min-width: 1024px)"
+            srcSet={desktopImage.srcSet}
+            sizes="100vw"
+          />
+          <source
+            media="(min-width: 768px)"
+            srcSet={tabletImage.srcSet}
+            sizes="100vw"
+          />
+          <img
+            src={mobileImage.src}
+            srcSet={mobileImage.srcSet}
+            sizes="100vw"
+            alt={alt}
+            loading={isFirstSlide ? 'eager' : 'lazy'}
+            fetchPriority={
+              isFirstSlide ? 'high' : 'auto'
+            }
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </picture>
       </div>
     </Link>
   )
@@ -169,8 +251,8 @@ export const HeroSlider = ({
       </CarouselContent>
 
       <div className="hidden md:block">
-        <CarouselPrevious className="left-10 bg-white/20 border-none text-white hover:bg-white/40" />
-        <CarouselNext className="right-10 bg-white/20 border-none text-white hover:bg-white/40" />
+        <CarouselPrevious className="left-10 border-none bg-white/20 text-white hover:bg-white/40" />
+        <CarouselNext className="right-10 border-none bg-white/20 text-white hover:bg-white/40" />
       </div>
     </Carousel>
   )

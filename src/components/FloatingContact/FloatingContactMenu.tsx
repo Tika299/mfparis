@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import {
     useEffect,
     useRef,
@@ -11,9 +12,19 @@ import {
     X,
 } from 'lucide-react'
 
-import { LiveChat } from '../LiveChat'
 import { cn } from '@/utilities'
 import { BackToTopButton } from '../BackToTopButton'
+
+const LiveChat = dynamic(
+    () =>
+        import('../LiveChat').then(
+            (mod) => mod.LiveChat,
+        ),
+    {
+        ssr: false,
+        loading: () => null,
+    },
+)
 
 type FloatingContactMenuProps =
     Readonly<{
@@ -69,6 +80,9 @@ export function FloatingContactMenu({
     const [open, setOpen] =
         useState(false)
 
+    const [shouldLoadChat, setShouldLoadChat] =
+        useState(false)
+
     const containerRef =
         useRef<HTMLDivElement>(null)
 
@@ -83,12 +97,17 @@ export function FloatingContactMenu({
     }
 
     const toggleMenu = () => {
-        setOpen((current) => !current)
+        setOpen((current) => {
+            const nextOpen = !current
+
+            if (nextOpen) {
+                setShouldLoadChat(true)
+            }
+
+            return nextOpen
+        })
     }
 
-    /**
-     * Nhấn ESC để đóng.
-     */
     useEffect(() => {
         const handleEscape = (
             event: KeyboardEvent,
@@ -111,9 +130,6 @@ export function FloatingContactMenu({
         }
     }, [])
 
-    /**
-     * Nhấn bên ngoài cụm nút để đóng.
-     */
     useEffect(() => {
         if (!open) {
             return
@@ -153,20 +169,10 @@ export function FloatingContactMenu({
             ref={containerRef}
             className="fixed bottom-4 right-3 z-[100] h-14 w-14 sm:bottom-5 sm:right-5 sm:h-16 sm:w-16 md:bottom-7 md:right-7"
         >
-            {/* =================================================
-    BACK TO TOP LUÔN HIỂN THỊ
-
-    Menu đóng:
-    Nằm ngay phía trên nút chính.
-
-    Menu mở:
-    Tự đẩy cao hơn để không che LiveChat/Zalo.
-================================================== */}
             <div
                 className={cn(
                     'absolute bottom-0 right-0 z-10',
                     'transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]',
-
                     open
                         ? [
                             '-translate-y-[154px]',
@@ -178,16 +184,10 @@ export function FloatingContactMenu({
                             'sm:-translate-y-[78px]',
                             'md:-translate-y-[84px]',
                         ].join(' '),
-
-                    /*
-                     * Ghi đè vị trí fixed nếu BackToTopButton
-                     * đang tự định vị trong component riêng.
-                     */
                     '[&>*]:!static',
                     '[&>*]:!bottom-auto',
                     '[&>*]:!right-auto',
                     '[&>*]:!m-0',
-
                     '[&>*]:!h-12',
                     '[&>*]:!w-12',
                     'sm:[&>*]:!h-14',
@@ -196,10 +196,7 @@ export function FloatingContactMenu({
             >
                 <BackToTopButton />
             </div>
-            {/* =============================================
-          LIVE CHAT
-          Bung chéo lên bên trái
-      ============================================== */}
+
             <FloatingAction
                 open={open}
                 positionClassName="-translate-y-[76px] sm:-translate-y-[86px] z-[101]"
@@ -218,14 +215,10 @@ export function FloatingContactMenu({
                         'sm:[&>*]:!w-14',
                     ].join(' ')}
                 >
-                    <LiveChat />
+                    {shouldLoadChat ? <LiveChat /> : null}
                 </div>
             </FloatingAction>
 
-            {/* =============================================
-          ZALO
-          Bung chéo sang trái
-      ============================================== */}
             <FloatingAction
                 open={open}
                 positionClassName="-translate-x-[64px] -translate-y-[53px] sm:-translate-x-[70px] sm:-translate-y-[68px]"
@@ -249,10 +242,6 @@ export function FloatingContactMenu({
                 </a>
             </FloatingAction>
 
-            {/* =============================================
-          GỌI ĐIỆN
-          Bung ngang sang trái
-      ============================================== */}
             <FloatingAction
                 open={open}
                 positionClassName="-translate-x-[84px] sm:-translate-x-[96px]"
@@ -274,9 +263,6 @@ export function FloatingContactMenu({
                 </a>
             </FloatingAction>
 
-            {/* =============================================
-          NÚT CHÍNH
-      ============================================== */}
             <button
                 type="button"
                 onClick={toggleMenu}
@@ -334,7 +320,6 @@ export function FloatingContactMenu({
                     />
                 </span>
 
-                {/* Ba dấu chấm trong icon chat */}
                 {!open ? (
                     <span
                         aria-hidden="true"
@@ -349,10 +334,6 @@ export function FloatingContactMenu({
         </div>
     )
 }
-
-/* =====================================================
-   FLOATING ACTION WRAPPER
-===================================================== */
 
 function FloatingAction({
     open,
@@ -380,7 +361,6 @@ function FloatingAction({
                     : '0ms',
             }}
         >
-            {/* Tooltip */}
             <span className="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-lg bg-[#202020] px-3 py-1.5 text-[11px] font-medium text-white opacity-0 shadow-lg transition-opacity group-hover/action:opacity-100 sm:block">
                 {label}
             </span>
