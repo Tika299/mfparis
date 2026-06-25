@@ -34,6 +34,6 @@ export const migrations = [
   {
     up: migration_20260625_044942_update_media_sizes.up,
     down: migration_20260625_044942_update_media_sizes.down,
-    name: '20260625_044942_update_media_sizes'
+    name: '20260625_044942_update_media_sizes',
   },
 ];
