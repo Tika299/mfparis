@@ -104,12 +104,25 @@ export default async function HomePage() {
     id: true,
     title: true,
     slug: true,
+    sku: true,
     brand: true,
     price: true,
     images: true,
     averageRating: true,
     reviewCount: true,
     status: true,
+    productType: true,
+    variants: {
+      id: true,
+      name: true,
+      sku: true,
+      basePrice: true,
+      salePrice: true,
+      stock: true,
+      isActive: true,
+      isDefault: true,
+      image: true,
+    },
   } as const
 
   const [
@@ -446,14 +459,16 @@ function FeaturedCategoriesSection({
                           }
                           className="group flex min-w-0 flex-col items-center rounded-2xl border border-transparent p-2.5 transition-colors hover:border-primary/20"
                         >
-                          <div className="mb-3 flex h-[86px] w-[86px] items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-white md:h-[102px] md:w-[102px]">
-                            <div className="relative h-[62px] w-[62px] overflow-hidden md:h-[74px] md:w-[74px]">
+                          <div className="mb-3 flex h-[86px] w-[86px] items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-black/5 md:h-[102px] md:w-[102px]">
+                            <div className="relative h-[62px] w-[62px] overflow-hidden rounded-full bg-gray-50 md:h-[74px] md:w-[74px]">
                               <OptimizedImage
                                 media={cat.image}
                                 size="thumbnail"
                                 alt={categoryName}
-                                className="h-full w-full object-contain"
+                                className="h-full w-full object-contain transition-transform duration-1000 ease-in-out"
                               />
+
+                              <div className="absolute inset-0 bg-black/5 transition-colors duration-500 group-hover:bg-black/5" />
                             </div>
                           </div>
 
