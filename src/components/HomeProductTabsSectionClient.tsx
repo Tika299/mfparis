@@ -55,7 +55,6 @@ export function HomeProductTabsSectionClient({
 }: HomeProductTabsSectionClientProps) {
     return (
         <LazySection
-            minHeight={1500}
             rootMargin="300px"
             placeholder={
                 <div className="container-ux mt-7 space-y-7 md:mt-8">
