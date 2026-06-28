@@ -285,7 +285,7 @@ export const ProductCard = ({
 
   const showAddToCart =
     showAddToCartProp ??
-    mode === 'flash'
+    mode !== 'combo'
 
   const showComboDescription =
     mode === 'combo' &&

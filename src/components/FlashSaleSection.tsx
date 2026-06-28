@@ -296,20 +296,16 @@ export function FlashSaleSection({
                 <div className="grid items-stretch gap-2.5 md:gap-3 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
                     <div className="order-2 min-w-0 lg:order-1">
                         <PaydayPromotionCard
-                            primaryVoucher={
-                                primaryVoucher
-                            }
-                            secondaryVoucher={
-                                secondaryVoucher
-                            }
+                            primaryVoucher={primaryVoucher}
+                            secondaryVoucher={secondaryVoucher}
                         />
-                        <div className="order-1 min-w-0 w-full lg:order-2">
-                            <FlashSaleProductsCarouselClient
-                                products={displayedProducts}
-                            />
-                        </div>
                     </div>
 
+                    <div className="order-1 min-w-0 w-full lg:order-2">
+                        <FlashSaleProductsCarouselClient
+                            products={displayedProducts}
+                        />
+                    </div>
                 </div>
             </div>
         </section>
