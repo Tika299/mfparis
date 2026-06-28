@@ -36,7 +36,8 @@
     "convert:products-richtext": "tsx src/scripts/convert-products-html-to-richtext.ts",
     "convert:categories-desc": "tsx src/scripts/convert-categories-description.ts",
     "convert:brands-desc": "tsx src/scripts/convert-brands-description.ts",
-    "convert:posts-content": "tsx src/scripts/convert-posts-content.ts"
+    "convert:posts-content": "tsx src/scripts/convert-posts-content.ts",
+    "clear:products": "tsx src/scripts/clear-data.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.85.0",
