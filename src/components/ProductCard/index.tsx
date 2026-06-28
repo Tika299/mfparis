@@ -136,10 +136,33 @@ function truncateProductTitle(
     return normalizedTitle
   }
 
-  return `${normalizedTitle.slice(
-    0,
-    maxLength,
-  ).trimEnd()}...`
+  const words =
+    normalizedTitle.split(' ')
+
+  let result = ''
+
+  for (const word of words) {
+    const nextValue = result
+      ? `${result} ${word}`
+      : word
+
+    if (
+      nextValue.length > maxLength
+    ) {
+      break
+    }
+
+    result = nextValue
+  }
+
+  if (!result) {
+    return `${normalizedTitle.slice(
+      0,
+      maxLength,
+    ).trimEnd()}...`
+  }
+
+  return `${result}...`
 }
 
 function formatReviewCount(
@@ -339,12 +362,27 @@ export const ProductCard = ({
     mode === 'flash'
       ? truncateProductTitle(
         product.title,
-        42,
+        30,
       )
-      : truncateProductTitle(
-        product.title,
-        52,
-      )
+      : mode === 'bestSeller'
+        ? truncateProductTitle(
+          product.title,
+          34,
+        )
+        : mode === 'new'
+          ? truncateProductTitle(
+            product.title,
+            36,
+          )
+          : mode === 'combo'
+            ? truncateProductTitle(
+              product.title,
+              38,
+            )
+            : truncateProductTitle(
+              product.title,
+              40,
+            )
 
   return (
     <article
@@ -441,12 +479,12 @@ export const ProductCard = ({
         >
           <h3
             className={cn(
-              'overflow-hidden break-words text-[#252525] transition-colors hover:text-[#b40008]',
+              'overflow-hidden text-[#252525] [display:-webkit-box] [-webkit-box-orient:vertical] whitespace-normal break-normal transition-colors hover:text-[#b40008]',
               mode === 'combo'
-                ? 'line-clamp-2 h-[36px] text-[12px] font-bold leading-[18px] sm:h-[36px] sm:text-[12px] md:h-[40px] md:text-[13px] md:leading-[20px] lg:h-[44px] lg:text-[15px] lg:leading-[22px]'
+                ? '[-webkit-line-clamp:2] h-[36px] text-[12px] font-bold leading-[18px] sm:h-[36px] sm:text-[12px] md:h-[40px] md:text-[13px] md:leading-[20px] lg:h-[44px] lg:text-[15px] lg:leading-[22px]'
                 : isFlashMode
-                  ? 'line-clamp-2 h-[32px] text-[11px] font-normal leading-[16px] sm:h-[32px] sm:text-[11px] md:h-[36px] md:text-[12px] md:leading-[18px] lg:h-[40px] lg:text-[14px] lg:leading-[20px]'
-                  : 'line-clamp-2 h-[36px] text-[12px] font-normal leading-[18px] sm:h-[36px] sm:text-[12px] md:h-[40px] md:text-[13px] md:leading-[20px] lg:h-[40px] lg:text-[14px] lg:leading-[20px]',
+                  ? '[-webkit-line-clamp:2] h-[32px] text-[11px] font-normal leading-[16px] sm:h-[32px] sm:text-[11px] md:h-[36px] md:text-[12px] md:leading-[18px] lg:h-[40px] lg:text-[14px] lg:leading-[20px]'
+                  : '[-webkit-line-clamp:2] h-[36px] text-[12px] font-normal leading-[18px] sm:h-[36px] sm:text-[12px] md:h-[40px] md:text-[13px] md:leading-[20px] lg:h-[40px] lg:text-[14px] lg:leading-[20px]',
             )}
           >
             {displayTitle}
