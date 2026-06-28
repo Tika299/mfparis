@@ -123,6 +123,25 @@ function normalizeReviewCount(
   )
 }
 
+function truncateProductTitle(
+  title: string,
+  maxLength: number,
+): string {
+  const normalizedTitle =
+    title.replace(/\s+/g, ' ').trim()
+
+  if (
+    normalizedTitle.length <= maxLength
+  ) {
+    return normalizedTitle
+  }
+
+  return `${normalizedTitle.slice(
+    0,
+    maxLength,
+  ).trimEnd()}...`
+}
+
 function formatReviewCount(
   count: number,
 ): string {
@@ -316,6 +335,17 @@ export const ProductCard = ({
   const productCardSizes =
     '(min-width: 1536px) 23vw, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 48vw'
 
+  const displayTitle =
+    mode === 'flash'
+      ? truncateProductTitle(
+        product.title,
+        42,
+      )
+      : truncateProductTitle(
+        product.title,
+        52,
+      )
+
   return (
     <article
       className={cn(
@@ -407,19 +437,19 @@ export const ProductCard = ({
 
         <Link
           href={`/products/${product.slug}`}
-          className="block"
+          className="block overflow-hidden"
         >
           <h3
             className={cn(
-              'text-[#252525] transition-colors hover:text-[#b40008]',
+              'overflow-hidden break-words text-[#252525] transition-colors hover:text-[#b40008]',
               mode === 'combo'
-                ? 'line-clamp-2 min-h-[38px] text-[12px] font-bold leading-[1.5] sm:min-h-[40px] sm:text-[12px] md:min-h-[42px] md:text-[13px] lg:min-h-[46px] lg:text-[15px]'
+                ? 'line-clamp-2 h-[36px] text-[12px] font-bold leading-[18px] sm:h-[36px] sm:text-[12px] md:h-[40px] md:text-[13px] md:leading-[20px] lg:h-[44px] lg:text-[15px] lg:leading-[22px]'
                 : isFlashMode
-                  ? 'line-clamp-2 min-h-[34px] text-[11px] font-normal leading-[1.42] sm:min-h-[36px] sm:text-[11px] md:min-h-[38px] md:text-[12px] lg:min-h-[46px] lg:text-[14px]'
-                  : 'line-clamp-2 min-h-[38px] text-[12px] font-normal leading-[1.5] sm:min-h-[40px] sm:text-[12px] md:min-h-[42px] md:text-[13px] lg:min-h-[46px] lg:text-[14px]',
+                  ? 'line-clamp-2 h-[32px] text-[11px] font-normal leading-[16px] sm:h-[32px] sm:text-[11px] md:h-[36px] md:text-[12px] md:leading-[18px] lg:h-[40px] lg:text-[14px] lg:leading-[20px]'
+                  : 'line-clamp-2 h-[36px] text-[12px] font-normal leading-[18px] sm:h-[36px] sm:text-[12px] md:h-[40px] md:text-[13px] md:leading-[20px] lg:h-[40px] lg:text-[14px] lg:leading-[20px]',
             )}
           >
-            {product.title}
+            {displayTitle}
           </h3>
         </Link>
 

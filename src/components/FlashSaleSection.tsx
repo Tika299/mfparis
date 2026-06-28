@@ -323,30 +323,25 @@ function PaydayPromotionCard({
     primaryVoucher:
     | FlashSaleVoucherDTO
     | null
-
     secondaryVoucher:
     | FlashSaleVoucherDTO
     | null
 }>) {
-    /**
-     * Không có voucher khả dụng:
-     * Vẫn giữ layout nhưng thông báo chưa có ưu đãi.
-     */
     if (!primaryVoucher) {
         return (
             <div className="flex min-h-[170px] items-center justify-center rounded-[16px] bg-[linear-gradient(145deg,#8f0000_0%,#bd0008_46%,#d2050d_100%)] px-4 text-center text-white sm:min-h-[210px] sm:rounded-[18px] lg:min-h-[410px] lg:rounded-[20px]">
                 <div>
                     <Zap
-                        size={42}
+                        size={34}
                         fill="currentColor"
-                        className="mx-auto text-[#ffdc76]"
+                        className="mx-auto text-[#ffdc76] sm:h-10 sm:w-10 lg:h-[42px] lg:w-[42px]"
                     />
 
-                    <p className="mt-4 text-[21px] font-bold uppercase">
+                    <p className="mt-3 text-[18px] font-bold uppercase sm:text-[20px] lg:mt-4 lg:text-[21px]">
                         Flash Sale
                     </p>
 
-                    <p className="mt-2 text-sm text-white/80">
+                    <p className="mt-2 text-[12px] text-white/80 sm:text-[13px] lg:text-sm">
                         Voucher mới sẽ sớm được cập nhật
                     </p>
                 </div>
@@ -357,121 +352,62 @@ function PaydayPromotionCard({
     return (
         <Link
             href="/vouchers"
-            className="group relative min-h-[185px] overflow-hidden rounded-[16px] bg-[radial-gradient(circle_at_90%_18%,rgba(255,50,50,0.65),transparent_35%),linear-gradient(145deg,#8f0000_0%,#bd0008_46%,#d2050d_100%)] px-4 py-4 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] sm:min-h-[230px] sm:rounded-[18px] sm:px-5 sm:py-5 lg:min-h-[410px] lg:rounded-[20px] lg:px-6 lg:py-7"
+            className="group relative flex min-h-[185px] flex-col justify-between overflow-hidden rounded-[16px] bg-[linear-gradient(145deg,#8f0000_0%,#bd0008_46%,#d2050d_100%)] px-4 py-4 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] sm:min-h-[230px] sm:rounded-[18px] sm:px-5 sm:py-5 lg:min-h-[410px] lg:rounded-[20px] lg:px-6 lg:py-6"
             aria-label={`Xem voucher ${primaryVoucher.code}`}
         >
-            {/* Nền sáng */}
-            <div className="pointer-events-none absolute -right-16 -top-14 h-52 w-52 rounded-full bg-red-400/20 blur-3xl" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.16),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(255,220,118,0.12),transparent_26%)]" />
 
-            <div className="pointer-events-none absolute -bottom-16 -left-12 h-48 w-48 rounded-full bg-[#720000]/70 blur-3xl" />
-
-            {/* Đường trang trí vàng */}
-            <svg
-                aria-hidden="true"
-                viewBox="0 0 180 120"
-                className="pointer-events-none absolute right-2 top-[70px] h-[120px] w-[180px] opacity-90"
-                fill="none"
-            >
-                <path
-                    d="M8 102C18 54 58 24 91 40C112 51 115 12 145 17C164 20 176 38 169 61"
-                    stroke="#d8ab3b"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                />
-
-                <circle
-                    cx="91"
-                    cy="40"
-                    r="2.5"
-                    fill="#d8ab3b"
-                />
-            </svg>
-
-            {/* Nội dung voucher chính */}
             <div className="relative z-10">
-                <h3 className="line-clamp-1 text-[25px] font-medium uppercase leading-none tracking-[-0.02em] sm:text-[27px] pt-2">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#ffd66f] sm:text-[12px]">
+                    Flash Voucher
+                </p>
+
+                <h3 className="mt-2 line-clamp-2 text-[18px] font-semibold uppercase leading-tight sm:text-[20px] lg:text-[24px]">
                     {primaryVoucher.title}
                 </h3>
 
-                <p className="mt-5 text-[16px] font-normal">
+                <p className="mt-4 text-[12px] text-white/85 sm:text-[13px] lg:text-[15px]">
                     Sale thêm đến
                 </p>
 
-                <p className="mt-1 font-heading text-[66px] font-bold italic leading-none text-[#ffdc76] drop-shadow-sm">
+                <p className="mt-1 font-heading text-[40px] font-bold italic leading-none text-[#ffdc76] sm:text-[48px] lg:text-[64px]">
                     {primaryVoucher.value}
                 </p>
 
-                <p className="mt-3 line-clamp-2 text-[15px] font-normal">
+                <p className="mt-3 line-clamp-2 max-w-[240px] text-[12px] text-white/90 sm:text-[13px] lg:max-w-none lg:text-[15px]">
                     {primaryVoucher.sub}
                 </p>
 
                 {secondaryVoucher ? (
-                    <>
-                        <div className="my-5 h-px w-[72%] bg-gradient-to-r from-[#ffd879] via-[#ffd879]/80 to-transparent" />
-
-                        <p className="line-clamp-1 text-[16px] font-bold text-[#ffe189]">
-                            + Giảm thêm{' '}
-                            {secondaryVoucher.value}
+                    <div className="mt-4 rounded-[12px] border border-white/12 bg-white/8 px-3 py-2 backdrop-blur-[2px] lg:mt-5">
+                        <p className="line-clamp-1 text-[12px] font-bold text-[#ffe189] lg:text-[14px]">
+                            + Giảm thêm {secondaryVoucher.value}
                         </p>
 
-                        <p className="mt-3 line-clamp-2 text-[15px]">
+                        <p className="mt-1 line-clamp-2 text-[11px] text-white/85 lg:text-[13px]">
                             {secondaryVoucher.sub}
                         </p>
-                    </>
+                    </div>
                 ) : null}
             </div>
 
-            <GiftArtwork />
-
-            {/* Mã voucher */}
-            <div className="absolute bottom-7 left-6 z-20 flex min-h-[56px] w-[74%] items-center justify-between rounded-[11px] bg-white px-4 py-2.5 text-[#b40008] shadow-[0_8px_20px_rgba(78,0,0,0.18)] transition-transform duration-300 group-hover:-translate-y-0.5">
+            <div className="relative z-10 mt-5 flex items-center justify-between rounded-[12px] bg-white px-3 py-3 text-[#b40008] shadow-[0_8px_20px_rgba(78,0,0,0.18)] sm:px-4 lg:mt-6">
                 <div className="min-w-0">
-                    <p className="text-[10px] font-medium text-[#777777]">
+                    <p className="text-[9px] font-medium uppercase tracking-[0.12em] text-[#777777] sm:text-[10px]">
                         Nhập mã
                     </p>
 
-                    <p className="mt-1 truncate text-[15px] font-bold uppercase tracking-[0.18em]">
+                    <p className="mt-1 truncate text-[13px] font-bold uppercase tracking-[0.14em] sm:text-[14px] lg:text-[15px]">
                         {primaryVoucher.code}
                     </p>
                 </div>
 
                 <ChevronRight
                     aria-hidden="true"
-                    size={17}
+                    size={16}
                     className="shrink-0 text-[#d39b9b]"
                 />
             </div>
         </Link>
-    )
-}
-
-/* =========================================================
-   GIFT ARTWORK
-========================================================= */
-
-function GiftArtwork() {
-    return (
-        <div
-            aria-hidden="true"
-            className="pointer-events-none absolute bottom-0 right-[-11px] z-10 h-[185px] w-[180px]"
-        >
-            <div className="absolute bottom-[-15px] right-1 h-14 w-40 rounded-full bg-[#620000]/45 blur-xl" />
-
-            <div className="absolute bottom-0 right-0 h-[112px] w-[145px] rounded-t-[3px] bg-[linear-gradient(135deg,#ed1119_0%,#b10007_48%,#f12028_100%)] shadow-[-12px_14px_25px_rgba(77,0,0,0.35)]">
-                <div className="absolute left-[57px] top-0 h-full w-[25px] bg-[linear-gradient(90deg,#c89224,#ffe591,#b47a13)]" />
-
-                <div className="absolute left-0 top-[27px] h-[25px] w-full bg-[linear-gradient(180deg,#f4d467,#b37814,#f7dc75)]" />
-            </div>
-
-            <div className="absolute bottom-[102px] right-[-4px] h-[28px] w-[153px] rotate-[-2deg] rounded-[3px] bg-[linear-gradient(180deg,#ff2930,#b30008)] shadow-[0_6px_12px_rgba(77,0,0,0.3)]">
-                <div className="absolute left-[61px] top-0 h-full w-[26px] bg-[linear-gradient(90deg,#c28b20,#ffe68c,#ad7110)]" />
-            </div>
-
-            <div className="absolute bottom-[124px] right-[75px] h-[48px] w-[66px] rotate-[17deg] rounded-[50%_50%_45%_55%] border-[8px] border-[#e2b53f] border-r-[#ffea8e]" />
-
-            <div className="absolute bottom-[123px] right-[23px] h-[47px] w-[65px] rotate-[-18deg] rounded-[50%_50%_55%_45%] border-[8px] border-[#e2b53f] border-l-[#ffea8e]" />
-
-            <div className="absolute bottom-[121px] right-[70px] h-[30px] w-[34px] rotate-[-4deg] rounded-[45%] bg-[radial-gradient(circle_at_35%_30%,#fff1a6,#ca8e18_72%)] shadow-md" />
-        </div>
     )
 }
