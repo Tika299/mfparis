@@ -246,11 +246,11 @@ export function FlashSaleSection({
     const displayedProducts = products
 
     return (
-        <section className="container-ux mt-8 md:mt-10">
-            <div className="overflow-hidden rounded-[22px] border border-[#e8e8e8] bg-white px-4 pb-4 pt-5 shadow-[0_6px_24px_rgba(0,0,0,0.035)] sm:px-5 sm:pb-5 lg:px-6 lg:pb-6 lg:pt-6">
+        <section className="container-ux mt-6 md:mt-8 lg:mt-10">
+            <div className="overflow-hidden rounded-[16px] border border-[#e8e8e8] bg-white px-3 pb-3 pt-4 shadow-[0_6px_24px_rgba(0,0,0,0.035)] sm:rounded-[20px] sm:px-4 sm:pb-4 sm:pt-5 lg:rounded-[22px] lg:px-6 lg:pb-6 lg:pt-6">
                 {/* =================================================
-            HEADER
-        ================================================== */}
+                        HEADER
+                    ================================================== */}
                 <div className="mb-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center lg:gap-6">
                     <div>
                         <div className="flex items-center gap-2">
@@ -293,19 +293,23 @@ export function FlashSaleSection({
                 {/* =================================================
             VOUCHER + SẢN PHẨM
         ================================================== */}
-                <div className="grid items-stretch gap-3 md:gap-4 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
-                    <PaydayPromotionCard
-                        primaryVoucher={
-                            primaryVoucher
-                        }
-                        secondaryVoucher={
-                            secondaryVoucher
-                        }
-                    />
+                <div className="grid items-stretch gap-2.5 md:gap-3 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
+                    <div className="order-2 min-w-0 lg:order-1">
+                        <PaydayPromotionCard
+                            primaryVoucher={
+                                primaryVoucher
+                            }
+                            secondaryVoucher={
+                                secondaryVoucher
+                            }
+                        />
+                        <div className="order-1 min-w-0 w-full lg:order-2">
+                            <FlashSaleProductsCarouselClient
+                                products={displayedProducts}
+                            />
+                        </div>
+                    </div>
 
-                    <FlashSaleProductsCarouselClient
-                        products={displayedProducts}
-                    />
                 </div>
             </div>
         </section>
@@ -334,7 +338,7 @@ function PaydayPromotionCard({
      */
     if (!primaryVoucher) {
         return (
-            <div className="flex min-h-[410px] items-center justify-center rounded-[20px] bg-[linear-gradient(145deg,#8f0000_0%,#bd0008_46%,#d2050d_100%)] px-6 text-center text-white">
+            <div className="flex min-h-[170px] items-center justify-center rounded-[16px] bg-[linear-gradient(145deg,#8f0000_0%,#bd0008_46%,#d2050d_100%)] px-4 text-center text-white sm:min-h-[210px] sm:rounded-[18px] lg:min-h-[410px] lg:rounded-[20px]">
                 <div>
                     <Zap
                         size={42}
@@ -357,7 +361,7 @@ function PaydayPromotionCard({
     return (
         <Link
             href="/vouchers"
-            className="group relative min-h-[410px] overflow-hidden rounded-[20px] bg-[radial-gradient(circle_at_90%_18%,rgba(255,50,50,0.65),transparent_35%),linear-gradient(145deg,#8f0000_0%,#bd0008_46%,#d2050d_100%)] px-6 py-7 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+            className="group relative min-h-[185px] overflow-hidden rounded-[16px] bg-[radial-gradient(circle_at_90%_18%,rgba(255,50,50,0.65),transparent_35%),linear-gradient(145deg,#8f0000_0%,#bd0008_46%,#d2050d_100%)] px-4 py-4 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] sm:min-h-[230px] sm:rounded-[18px] sm:px-5 sm:py-5 lg:min-h-[410px] lg:rounded-[20px] lg:px-6 lg:py-7"
             aria-label={`Xem voucher ${primaryVoucher.code}`}
         >
             {/* Nền sáng */}

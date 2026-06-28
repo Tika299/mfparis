@@ -24,21 +24,23 @@ export function FlashSaleProductsCarouselClient({
     products,
 }: FlashSaleProductsCarouselClientProps) {
     return (
-        <LazySection
-            minHeight={410}
-            rootMargin="300px"
-            placeholder={
-                <div className="grid min-h-[410px] grid-cols-2 gap-2.5 md:grid-cols-3 md:gap-3 lg:grid-cols-4 lg:gap-4">
-                    <div className="animate-pulse rounded-[18px] bg-neutral-100" />
-                    <div className="animate-pulse rounded-[18px] bg-neutral-100" />
-                    <div className="hidden animate-pulse rounded-[18px] bg-neutral-100 md:block" />
-                    <div className="hidden animate-pulse rounded-[18px] bg-neutral-100 lg:block" />
-                </div>
-            }
-        >
-            <FlashSaleProductsCarousel
-                products={products}
-            />
-        </LazySection>
+        <div className="min-w-0 w-full">
+            <LazySection
+                minHeight={220}
+                rootMargin="250px"
+                placeholder={
+                    <div className="grid min-h-[220px] grid-cols-2 gap-2 sm:min-h-[250px] sm:gap-2.5 md:min-h-[280px] md:grid-cols-3 md:gap-3 lg:min-h-[410px] lg:grid-cols-4 lg:gap-4">
+                        <div className="animate-pulse rounded-[12px] bg-neutral-100 sm:rounded-[14px] lg:rounded-[18px]" />
+                        <div className="animate-pulse rounded-[12px] bg-neutral-100 sm:rounded-[14px] lg:rounded-[18px]" />
+                        <div className="hidden animate-pulse rounded-[12px] bg-neutral-100 md:block sm:rounded-[14px] lg:rounded-[18px]" />
+                        <div className="hidden animate-pulse rounded-[12px] bg-neutral-100 lg:block sm:rounded-[14px] lg:rounded-[18px]" />
+                    </div>
+                }
+            >
+                <FlashSaleProductsCarousel
+                    products={products}
+                />
+            </LazySection>
+        </div>
     )
 }

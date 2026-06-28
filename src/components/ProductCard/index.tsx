@@ -310,6 +310,9 @@ export const ProductCard = ({
     rank >= 1 &&
     rank <= 3
 
+  const isFlashMode =
+    mode === 'flash'
+
   const productCardSizes =
     '(min-width: 1536px) 23vw, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 48vw'
 
@@ -367,7 +370,12 @@ export const ProductCard = ({
 
         <Link
           href={`/products/${product.slug}`}
-          className="relative flex h-full w-full items-center justify-center p-2 sm:p-2.5 md:p-3 lg:p-4"
+          className={cn(
+            'relative flex h-full w-full items-center justify-center',
+            isFlashMode
+              ? 'p-1.5 sm:p-2 md:p-2.5 lg:p-4'
+              : 'p-2 sm:p-2.5 md:p-3 lg:p-4',
+          )}
           aria-label={product.title}
         >
           <div className="relative h-full w-full transition-transform duration-500 group-hover:scale-[1.04]">
@@ -382,7 +390,14 @@ export const ProductCard = ({
         </Link>
       </div>
 
-      <div className="flex flex-1 flex-col px-2.5 pb-3 sm:px-3 sm:pb-3.5 md:px-3.5 lg:px-4 lg:pb-4">
+      <div
+        className={cn(
+          'flex flex-1 flex-col',
+          isFlashMode
+            ? 'px-2 pb-2.5 sm:px-2.5 sm:pb-3 md:px-3 lg:px-4 lg:pb-4'
+            : 'px-2.5 pb-3 sm:px-3 sm:pb-3.5 md:px-3.5 lg:px-4 lg:pb-4',
+        )}
+      >
         {showBrand &&
           brandName ? (
           <p className="mb-0.5 line-clamp-1 text-[10px] font-bold leading-4 text-[#222222] sm:text-[11px] md:text-[12px] lg:mb-1 lg:text-[14px]">
@@ -399,7 +414,9 @@ export const ProductCard = ({
               'text-[#252525] transition-colors hover:text-[#b40008]',
               mode === 'combo'
                 ? 'line-clamp-2 min-h-[38px] text-[12px] font-bold leading-[1.5] sm:min-h-[40px] sm:text-[12px] md:min-h-[42px] md:text-[13px] lg:min-h-[46px] lg:text-[15px]'
-                : 'line-clamp-2 min-h-[38px] text-[12px] font-normal leading-[1.5] sm:min-h-[40px] sm:text-[12px] md:min-h-[42px] md:text-[13px] lg:min-h-[46px] lg:text-[14px]',
+                : isFlashMode
+                  ? 'line-clamp-2 min-h-[34px] text-[11px] font-normal leading-[1.42] sm:min-h-[36px] sm:text-[11px] md:min-h-[38px] md:text-[12px] lg:min-h-[46px] lg:text-[14px]'
+                  : 'line-clamp-2 min-h-[38px] text-[12px] font-normal leading-[1.5] sm:min-h-[40px] sm:text-[12px] md:min-h-[42px] md:text-[13px] lg:min-h-[46px] lg:text-[14px]',
             )}
           >
             {product.title}
@@ -413,7 +430,14 @@ export const ProductCard = ({
         ) : null}
 
         {showRating ? (
-          <div className="mt-1.5 flex min-h-5 items-center gap-1 sm:mt-2 sm:min-h-6">
+          <div
+            className={cn(
+              'flex items-center gap-1',
+              isFlashMode
+                ? 'mt-1 min-h-4 sm:mt-1.5 sm:min-h-5'
+                : 'mt-1.5 min-h-5 sm:mt-2 sm:min-h-6',
+            )}
+          >
             {hasRating ? (
               <>
                 <Star
@@ -446,14 +470,28 @@ export const ProductCard = ({
           </div>
         ) : null}
 
-        <div className="mt-auto pt-4">
+        <div
+          className={cn(
+            'mt-auto',
+            isFlashMode
+              ? 'pt-2.5 sm:pt-3'
+              : 'pt-4',
+          )}
+        >
           {mode === 'flash' && isSale ? (
-            <div className="flex min-h-[48px] flex-col justify-end">
-              <span className="text-[10px] font-normal leading-none tabular-nums text-[#999999] line-through sm:text-[11px] lg:text-[13px]">
+            <div
+              className={cn(
+                'flex flex-col justify-end',
+                isFlashMode
+                  ? 'min-h-[40px] sm:min-h-[42px] lg:min-h-[48px]'
+                  : 'min-h-[48px]',
+              )}
+            >
+              <span className="text-[9px] font-normal leading-none tabular-nums text-[#999999] line-through sm:text-[10px] lg:text-[13px]">
                 {formatPrice(basePrice)}đ
               </span>
 
-              <span className="mt-1.5 text-[14px] font-bold leading-none tabular-nums text-[#c40008] sm:text-[15px] md:text-[16px] lg:mt-2 lg:text-[17px]">
+              <span className="mt-1 text-[13px] font-bold leading-none tabular-nums text-[#c40008] sm:text-[14px] md:text-[15px] lg:mt-2 lg:text-[17px]">
                 {formatPrice(salePrice)}đ
               </span>
             </div>

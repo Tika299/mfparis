@@ -29,7 +29,7 @@ export function FlashSaleProductsCarousel({
             opts={{
                 align: 'start',
                 containScroll: 'trimSnaps',
-                loop: products.length > 4,
+                loop: products.length > 6,
                 dragFree: false,
             }}
             className="relative min-w-0 w-full"
@@ -39,23 +39,27 @@ export function FlashSaleProductsCarousel({
                     <CarouselItem
                         key={product.id}
                         className={[
+                            /*
+                             * Mobile: một card lớn, thấy một phần card tiếp theo.
+                             * Tablet: 2–4 card.
+                             * Desktop lớn: đúng 6 card.
+                             */
                             'basis-1/2 pl-2.5',
                             'md:basis-1/3 md:pl-3',
                             'lg:basis-1/4 lg:pl-4',
-                            'xl:basis-1/4',
-                            '2xl:basis-1/4',
+                            'xl:basis-1/6',
                         ].join(' ')}
                     >
                         <ProductCard
                             product={product}
                             mode="flash"
-                            className="h-full rounded-[18px] shadow-none hover:-translate-y-1 hover:shadow-[0_10px_24px_rgba(0,0,0,0.055)]"
+                            className="h-full rounded-[12px] sm:rounded-[14px] lg:rounded-[18px] shadow-none hover:-translate-y-1 hover:shadow-[0_10px_24px_rgba(0,0,0,0.055)]"
                         />
                     </CarouselItem>
                 ))}
             </CarouselContent>
 
-            {products.length > 4 ? (
+            {products.length > 6 ? (
                 <>
                     <CarouselPrevious
                         aria-label="Xem sản phẩm Flash Sale trước"

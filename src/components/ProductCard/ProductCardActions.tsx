@@ -255,12 +255,9 @@ function AddToCartAction({
                             : `Thêm ${productTitle} vào giỏ hàng`
             }
             className={cn(
-                'mt-3 flex min-h-10 w-full min-w-0 items-center justify-center gap-1 rounded-[10px]',
-                'border border-[#eed4d4] bg-white px-1 text-[9px] font-bold leading-none text-[#b40008]',
-                'min-[390px]:px-1.5 min-[390px]:text-[10px]',
-                'sm:min-h-[42px] sm:px-2 sm:text-[11px]',
-                'md:min-h-11 md:text-[12px]',
-                'lg:mt-4 lg:min-h-[46px] lg:rounded-[12px] lg:px-3 lg:text-[14px]',
+                mode === 'flash'
+                    ? 'mt-2.5 flex min-h-9 w-full min-w-0 items-center justify-center gap-1 rounded-[9px] border border-[#eed4d4] bg-white px-1 text-[9px] font-bold leading-none text-[#b40008] min-[390px]:px-1.5 min-[390px]:text-[10px] sm:min-h-10 sm:px-2 sm:text-[10px] md:min-h-[42px] md:text-[11px] lg:mt-4 lg:min-h-[46px] lg:rounded-[12px] lg:px-3 lg:text-[14px]'
+                    : 'mt-3 flex min-h-10 w-full min-w-0 items-center justify-center gap-1 rounded-[10px] border border-[#eed4d4] bg-white px-1 text-[9px] font-bold leading-none text-[#b40008] min-[390px]:px-1.5 min-[390px]:text-[10px] sm:min-h-[42px] sm:px-2 sm:text-[11px] md:min-h-11 md:text-[12px] lg:mt-4 lg:min-h-[46px] lg:rounded-[12px] lg:px-3 lg:text-[14px]',
                 'transition-colors duration-200 hover:border-[#b40008] hover:bg-[#b40008] hover:text-white',
                 'disabled:cursor-not-allowed disabled:border-[#e5e5e5] disabled:bg-[#f5f5f5] disabled:text-[#aaaaaa]',
             )}
@@ -288,14 +285,20 @@ function AddToCartAction({
                 )}
             >
                 {isVariableProduct
-                    ? 'Chọn phân loại'
+                    ? mode === 'flash'
+                        ? 'Chọn loại'
+                        : 'Chọn phân loại'
                     : isOutOfStock
                         ? 'Hết hàng'
                         : isContactPrice
                             ? 'Liên hệ'
                             : added
-                                ? 'Đã thêm vào giỏ'
-                                : 'Thêm vào giỏ'}
+                                ? mode === 'flash'
+                                    ? 'Đã thêm'
+                                    : 'Đã thêm vào giỏ'
+                                : mode === 'flash'
+                                    ? 'Thêm giỏ'
+                                    : 'Thêm vào giỏ'}
             </span>
         </button>
     )
