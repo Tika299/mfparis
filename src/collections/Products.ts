@@ -79,9 +79,29 @@ const syncVariantPrice: CollectionBeforeChangeHook = async ({ data }) => {
 }
 
 const revalidateProductTags = async () => {
-  revalidateTag('products', 'max')
-  revalidateTag('categories', 'max')
-  revalidateTag('brands', 'max')
+  try {
+    revalidateTag('products', 'max')
+    revalidateTag('categories', 'max')
+    revalidateTag('brands', 'max')
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : String(error)
+
+    if (
+      message.includes(
+        'static generation store missing',
+      )
+    ) {
+      console.warn(
+        '[revalidateTag] Bỏ qua vì đang chạy ngoài ngữ cảnh Next.js request/render.',
+      )
+      return
+    }
+
+    throw error
+  }
 }
 
 export const Products: CollectionConfig = {
