@@ -1334,7 +1334,7 @@ async function importProducts(payload: any) {
                             variant.salePrice === ''
                             ? undefined
                             : toNumber(variant.salePrice, 0),
-                    stock: toNumber(variant.stock, 0),
+                    stock: toNumber(variant.stock, 99),
                     image: imageId || undefined,
                     isActive: variant.isActive !== false,
                 }),
@@ -1371,7 +1371,7 @@ async function importProducts(payload: any) {
                 stock: toNumber(
                     itemPrice.stock,
                     activeVariants.reduce((total, variant) => {
-                        return total + toNumber(variant.stock, 0)
+                        return total + toNumber(variant.stock, 99)
                     }, 0),
                 ),
             }
@@ -1385,7 +1385,7 @@ async function importProducts(payload: any) {
                     itemPrice.salePrice === ''
                     ? undefined
                     : toNumber(itemPrice.salePrice, 0),
-            stock: toNumber(itemPrice.stock, 0),
+            stock: toNumber(itemPrice.stock, 99),
         }
     }
 
