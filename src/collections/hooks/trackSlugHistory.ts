@@ -232,6 +232,12 @@ function createTrackSlugHistoryHook(
         previousDoc,
         req,
     }) => {
+        if (
+            process.env.DISABLE_SLUG_HISTORY === 'true'
+        ) {
+            return doc
+        }
+
         if (operation !== 'update') {
             return doc
         }

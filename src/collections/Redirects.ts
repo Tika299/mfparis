@@ -123,6 +123,17 @@ function invalidateRedirectCache(): void {
                 ? error.message
                 : 'Unknown cache invalidation error'
 
+        if (
+            message.includes(
+                'static generation store missing',
+            )
+        ) {
+            console.warn(
+                '[Redirects] Bỏ qua revalidateTag vì đang chạy ngoài ngữ cảnh Next.js request/render.',
+            )
+            return
+        }
+
         console.error(
             `[Redirects] Không thể xóa cache redirects: ${message}`,
         )
