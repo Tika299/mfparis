@@ -1,10 +1,6 @@
 'use client'
 
-import {
-    useCallback,
-    useEffect,
-    useState,
-} from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import {
     Sheet,
@@ -37,61 +33,33 @@ import {
 
 import { useFilterNavigation } from './useFilterNavigation'
 
-import type {
-    PriceRange,
-    SearchFiltersProps,
-} from './search-filters.types'
+import type { PriceRange, SearchFiltersProps } from './search-filters.types'
 
-const normalizePriceRange = (
-    values: PriceRange,
-): PriceRange => {
-    const min = Math.max(
-        PRICE_MIN,
-        Math.min(values[0], PRICE_MAX),
-    )
+import './search-filters.css'
 
-    const max = Math.max(
-        PRICE_MIN,
-        Math.min(values[1], PRICE_MAX),
-    )
+const normalizePriceRange = (values: PriceRange): PriceRange => {
+    const min = Math.max(PRICE_MIN, Math.min(values[0], PRICE_MAX))
+    const max = Math.max(PRICE_MIN, Math.min(values[1], PRICE_MAX))
 
-    return min <= max
-        ? [min, max]
-        : [max, min]
+    return min <= max ? [min, max] : [max, min]
 }
 
-const parsePriceParam = (
-    value: string | null,
-    fallback: number,
-) => {
-    if (value === null || value.trim() === '') {
-        return fallback
-    }
+const parsePriceParam = (value: string | null, fallback: number) => {
+    if (value === null || value.trim() === '') return fallback
 
     const parsedValue = Number(value)
-
-    return Number.isFinite(parsedValue)
-        ? parsedValue
-        : fallback
+    return Number.isFinite(parsedValue) ? parsedValue : fallback
 }
 
 export const SearchFilters = ({
     brands,
     categories = [],
-    variant = 'sidebar',
+    resultCount,
+    variant = 'responsive',
     sticky = true,
-    routeContext = {
-        type: 'listing',
-    },
+    routeContext = { type: 'listing' },
 }: SearchFiltersProps) => {
-    const [sheetOpen, setSheetOpen] =
-        useState(false)
-
-    const [brandOpen, setBrandOpen] =
-        useState(false)
-
-    const [categoryOpen, setCategoryOpen] =
-        useState(false)
+    const [sheetOpen, setSheetOpen] = useState(false)
 
     const {
         activeBrand,
@@ -105,52 +73,25 @@ export const SearchFilters = ({
         clearAll,
     } = useFilterNavigation(routeContext)
 
-    const [range, setRange] =
-        useState<PriceRange>(() =>
-            normalizePriceRange([
-                parsePriceParam(
-                    minParam,
-                    PRICE_MIN,
-                ),
-                parsePriceParam(
-                    maxParam,
-                    PRICE_MAX,
-                ),
-            ]),
-        )
+    const [range, setRange] = useState<PriceRange>(() =>
+        normalizePriceRange([
+            parsePriceParam(minParam, PRICE_MIN),
+            parsePriceParam(maxParam, PRICE_MAX),
+        ]),
+    )
 
     useEffect(() => {
         setRange(
             normalizePriceRange([
-                parsePriceParam(
-                    minParam,
-                    PRICE_MIN,
-                ),
-                parsePriceParam(
-                    maxParam,
-                    PRICE_MAX,
-                ),
+                parsePriceParam(minParam, PRICE_MIN),
+                parsePriceParam(maxParam, PRICE_MAX),
             ]),
         )
     }, [minParam, maxParam])
 
-    useEffect(() => {
-        if (activeBrand) {
-            setBrandOpen(true)
-        }
-    }, [activeBrand])
-
-    useEffect(() => {
-        if (activeCategory) {
-            setCategoryOpen(true)
-        }
-    }, [activeCategory])
-
     const applyPriceRange = useCallback(
         (nextRange: PriceRange) => {
-            const normalizedRange =
-                normalizePriceRange(nextRange)
-
+            const normalizedRange = normalizePriceRange(nextRange)
             setRange(normalizedRange)
 
             updateFilters({
@@ -158,7 +99,6 @@ export const SearchFilters = ({
                     normalizedRange[0] === PRICE_MIN
                         ? null
                         : String(normalizedRange[0]),
-
                 max:
                     normalizedRange[1] === PRICE_MAX
                         ? null
@@ -168,12 +108,12 @@ export const SearchFilters = ({
         [updateFilters],
     )
 
-    const handleClearAll = () => {
+    const handleClearAll = useCallback(() => {
         setRange([PRICE_MIN, PRICE_MAX])
         clearAll()
-    }
+    }, [clearAll])
 
-    const panel = (
+    const renderPanel = (closeSheetAfterAction = false) => (
         <FilterPanel
             brands={brands}
             categories={categories}
@@ -183,55 +123,115 @@ export const SearchFilters = ({
             range={range}
             isPending={isPending}
             hasActiveFilters={hasActiveFilters}
-            brandOpen={brandOpen}
-            categoryOpen={categoryOpen}
-            onBrandOpenChange={setBrandOpen}
-            onCategoryOpenChange={
-                setCategoryOpen
-            }
-            onBrandChange={(slug) => {
-                updateFilters({
-                    brand: slug,
-                })
-            }}
-            onCategoryChange={(slug) => {
-                updateFilters({
-                    category: slug,
-                })
-            }}
+            resultCount={resultCount}
+            onBrandChange={(slug) => updateFilters({ brand: slug })}
+            onCategoryChange={(slug) => updateFilters({ category: slug })}
             onSortChange={(value) => {
                 updateFilters({
-                    sort:
-                        value === DEFAULT_SORT
-                            ? null
-                            : value,
+                    sort: value === DEFAULT_SORT ? null : value,
                 })
             }}
             onRangeChange={(nextRange) => {
-                setRange(
-                    normalizePriceRange(nextRange),
-                )
+                setRange(normalizePriceRange(nextRange))
             }}
-            onRangeCommit={(nextRange) => {
-                applyPriceRange(nextRange)
-            }}
+            onRangeCommit={applyPriceRange}
             onApplyPrice={() => {
                 applyPriceRange(range)
+
+                if (closeSheetAfterAction) {
+                    setSheetOpen(false)
+                }
             }}
-            onClearAll={handleClearAll}
+            onClearAll={() => {
+                handleClearAll()
+
+                if (closeSheetAfterAction) {
+                    setSheetOpen(false)
+                }
+            }}
         />
     )
+
+    const resultLabel =
+        typeof resultCount === 'number'
+            ? `${resultCount.toLocaleString('vi-VN')} sản phẩm`
+            : 'Lọc và sắp xếp sản phẩm'
+
+    if (variant === 'responsive') {
+        return (
+            <>
+                {/* Desktop từ 1280px: hiển thị sidebar cố định. */}
+                <aside
+                    className={cn(
+                        'search-filter-shell search-filter-shell--sidebar hidden xl:block',
+                        sticky && 'sticky top-24',
+                    )}
+                >
+                    {renderPanel()}
+                </aside>
+
+                {/* Tablet và mobile: dùng nút mở bottom sheet. */}
+                <div
+                    className={cn(
+                        'responsive-filter-area xl:hidden',
+                        sticky && 'responsive-filter-area--sticky',
+                    )}
+                >
+                    <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+                        <SheetTrigger asChild>
+                            <button
+                                type="button"
+                                className="responsive-filter-trigger"
+                                aria-label="Mở bộ lọc và sắp xếp"
+                            >
+                                <span className="responsive-filter-trigger__icon">
+                                    <SlidersHorizontal aria-hidden="true" />
+                                </span>
+
+                                <span className="responsive-filter-trigger__content">
+                                    <strong>Bộ lọc &amp; sắp xếp</strong>
+                                    <small>{resultLabel}</small>
+                                </span>
+
+                                {hasActiveFilters && (
+                                    <span className="responsive-filter-trigger__status">
+                                        Đang lọc
+                                    </span>
+                                )}
+                            </button>
+                        </SheetTrigger>
+
+                        <SheetContent
+                            side="bottom"
+                            className="search-filter-sheet-content"
+                        >
+                            <SheetHeader className="sr-only">
+                                <SheetTitle>Bộ lọc &amp; sắp xếp</SheetTitle>
+                            </SheetHeader>
+
+                            <div className="search-filter-sheet-inner">
+                                <div className="search-filter-sheet-handle" />
+
+                                <div className="search-filter-shell search-filter-shell--sheet">
+                                    {renderPanel(true)}
+                                </div>
+                            </div>
+                        </SheetContent>
+                    </Sheet>
+                </div>
+            </>
+        )
+    }
 
     if (variant === 'sidebar') {
         return (
             <aside
                 className={cn(
-                    'rounded-2xl border border-gray-100 bg-white p-4 shadow-sm',
-                    sticky &&
-                    'scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-200 sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto',
+                    'search-filter-shell search-filter-shell--sidebar',
+                    sticky && 'sticky top-24',
                 )}
             >
-                {panel}
+                {renderPanel()}
             </aside>
         )
     }
@@ -240,62 +240,56 @@ export const SearchFilters = ({
         return (
             <div
                 className={cn(
-                    'lc-card flex flex-wrap items-center gap-2 rounded-2xl bg-white px-4 py-3',
-                    sticky &&
-                    'sticky top-20 z-40 shadow-sm backdrop-blur',
+                    'lc-card flex flex-wrap items-center gap-2 rounded-2xl bg-white px-3 py-3 sm:px-4',
+                    sticky && 'sticky top-20 z-40 shadow-sm backdrop-blur',
                 )}
             >
                 <Select
                     value={activeSort}
                     onValueChange={(value) => {
                         updateFilters({
-                            sort:
-                                value === DEFAULT_SORT
-                                    ? null
-                                    : value,
+                            sort: value === DEFAULT_SORT ? null : value,
                         })
                     }}
                 >
-                    <SelectTrigger className="h-9 min-w-[150px] rounded-xl border border-gray-200 bg-white text-[10px] font-black uppercase tracking-wider">
+                    <SelectTrigger className="h-11 min-w-0 flex-1 rounded-xl border border-gray-200 bg-white text-[11px] font-black uppercase tracking-wider sm:min-w-[170px] sm:flex-none">
                         <SelectValue placeholder="Sắp xếp" />
                     </SelectTrigger>
 
                     <SelectContent className="border border-gray-200 bg-white">
                         {SORT_OPTIONS.map((option) => (
-                            <SelectItem
-                                key={option.value}
-                                value={option.value}
-                            >
+                            <SelectItem key={option.value} value={option.value}>
                                 {option.label}
                             </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
 
-                <Sheet
-                    open={sheetOpen}
-                    onOpenChange={setSheetOpen}
-                >
+                <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                     <SheetTrigger asChild>
                         <button
                             type="button"
-                            className="ml-auto rounded-xl border border-gray-200 bg-white px-3 py-2 text-[10px] font-black uppercase"
+                            className="h-11 rounded-xl border border-gray-200 bg-white px-3 text-[11px] font-black uppercase sm:px-4"
                         >
-                            Thêm bộ lọc
+                            Bộ lọc
                         </button>
                     </SheetTrigger>
 
                     <SheetContent
-                        side="right"
-                        className="w-[320px] overflow-y-auto bg-white p-6"
+                        side="bottom"
+                        className="search-filter-sheet-content"
                     >
-                        <SheetHeader className="mb-4">
-                            <SheetTitle>
-                                Bộ lọc nâng cao
-                            </SheetTitle>
+                        <SheetHeader className="sr-only">
+                            <SheetTitle>Bộ lọc nâng cao</SheetTitle>
                         </SheetHeader>
 
-                        {panel}
+                        <div className="search-filter-sheet-inner">
+                            <div className="search-filter-sheet-handle" />
+
+                            <div className="search-filter-shell search-filter-shell--sheet">
+                                {renderPanel(true)}
+                            </div>
+                        </div>
                     </SheetContent>
                 </Sheet>
             </div>
@@ -303,33 +297,33 @@ export const SearchFilters = ({
     }
 
     return (
-        <Sheet
-            open={sheetOpen}
-            onOpenChange={setSheetOpen}
-        >
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
                 <button
                     type="button"
-                    className="rounded-full bg-black px-5 py-3 text-[11px] font-black uppercase tracking-widest text-white shadow-xl"
+                    className="mobile-filter-fab"
+                    aria-label="Mở bộ lọc"
                 >
-                    <span className="inline-flex items-center gap-2">
-                        <SlidersHorizontal size={14} />
-                        Bộ lọc
-                    </span>
+                    <SlidersHorizontal aria-hidden="true" />
+                    <span>Bộ lọc</span>
                 </button>
             </SheetTrigger>
 
             <SheetContent
                 side="bottom"
-                className="max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-white px-5 pb-8 pt-6"
+                className="search-filter-sheet-content"
             >
-                <SheetHeader className="mb-5">
-                    <SheetTitle>
-                        Bộ lọc &amp; Sắp xếp
-                    </SheetTitle>
+                <SheetHeader className="sr-only">
+                    <SheetTitle>Bộ lọc &amp; sắp xếp</SheetTitle>
                 </SheetHeader>
 
-                {panel}
+                <div className="search-filter-sheet-inner">
+                    <div className="search-filter-sheet-handle" />
+
+                    <div className="search-filter-shell search-filter-shell--sheet">
+                        {renderPanel(true)}
+                    </div>
+                </div>
             </SheetContent>
         </Sheet>
     )

@@ -831,7 +831,7 @@ export default async function AllProductsPage({
       <div className="container-ux mt-6 md:mt-10">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
           <aside className="hidden lg:block lg:w-[250px] lg:shrink-0">
-            <div className="lc-card rounded-2xl bg-white p-5 shadow-sm">
+            <div className="lc-card rounded-2xl bg-white shadow-sm">
               <SearchFilters
                 brands={filterOptions.brands}
                 categories={filterOptions.categories}

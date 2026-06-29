@@ -542,7 +542,7 @@ export default async function BrandProductsPage({
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-8">
           {/* Desktop */}
           <aside className="hidden lg:sticky lg:top-24 lg:block lg:max-h-[calc(100dvh-7rem)] lg:w-[250px] lg:shrink-0 lg:self-start lg:overflow-y-auto lg:pr-1">
-            <div className="lc-card rounded-2xl p-5">
+            <div className="lc-card rounded-2xl">
               <SearchFilters
                 brands={filterOptions.brands}
                 categories={filterOptions.categories}

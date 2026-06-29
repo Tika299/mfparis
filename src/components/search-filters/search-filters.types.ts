@@ -8,6 +8,7 @@ export type FilterItem = {
 export type PriceRange = [number, number]
 
 export type SearchFiltersVariant =
+    | 'responsive'
     | 'sidebar'
     | 'horizontal'
     | 'mobile-fab'
@@ -44,6 +45,7 @@ export type FilterUpdates = Partial<
 export type SearchFiltersProps = {
     brands: FilterItem[]
     categories?: FilterItem[]
+    resultCount?: number
     variant?: SearchFiltersVariant
     sticky?: boolean
     routeContext?: FilterRouteContext

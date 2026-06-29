@@ -1,8 +1,6 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Slider } from '@/components/ui/slider'
+import type { ChangeEvent, PointerEvent } from 'react'
 
 import {
     PRICE_MAX,
@@ -14,32 +12,27 @@ import type { PriceRange } from './search-filters.types'
 
 type PriceFilterProps = {
     range: PriceRange
-    isPending: boolean
     onRangeChange: (range: PriceRange) => void
     onRangeCommit: (range: PriceRange) => void
-    onApply: () => void
 }
 
-const clamp = (
-    value: number,
-    min: number,
-    max: number,
-) => {
-    return Math.min(Math.max(value, min), max)
-}
+const clamp = (value: number, min: number, max: number) =>
+    Math.min(Math.max(value, min), max)
+
+const money = new Intl.NumberFormat('vi-VN')
+const formatPrice = (value: number) => `${money.format(value)}đ`
 
 export const PriceFilter = ({
     range,
-    isPending,
     onRangeChange,
     onRangeCommit,
-    onApply,
 }: PriceFilterProps) => {
-    const handleMinChange = (
-        event: React.ChangeEvent<HTMLInputElement>,
-    ) => {
-        const value = Number(event.target.value)
+    const total = PRICE_MAX - PRICE_MIN
+    const minPercent = ((range[0] - PRICE_MIN) / total) * 100
+    const maxPercent = ((range[1] - PRICE_MIN) / total) * 100
 
+    const handleMinInput = (event: ChangeEvent<HTMLInputElement>) => {
+        const value = Number(event.target.value)
         if (!Number.isFinite(value)) return
 
         onRangeChange([
@@ -48,11 +41,8 @@ export const PriceFilter = ({
         ])
     }
 
-    const handleMaxChange = (
-        event: React.ChangeEvent<HTMLInputElement>,
-    ) => {
+    const handleMaxInput = (event: ChangeEvent<HTMLInputElement>) => {
         const value = Number(event.target.value)
-
         if (!Number.isFinite(value)) return
 
         onRangeChange([
@@ -61,58 +51,95 @@ export const PriceFilter = ({
         ])
     }
 
+    const commitMin = (event: PointerEvent<HTMLInputElement>) => {
+        const value = Number(event.currentTarget.value)
+        onRangeCommit([clamp(value, PRICE_MIN, range[1]), range[1]])
+    }
+
+    const commitMax = (event: PointerEvent<HTMLInputElement>) => {
+        const value = Number(event.currentTarget.value)
+        onRangeCommit([range[0], clamp(value, range[0], PRICE_MAX)])
+    }
+
     return (
-        <div className="space-y-4">
-            <h3 className="border-b pb-2 text-[11px] font-black uppercase tracking-[0.2em] text-gray-500">
-                Khoảng giá
-            </h3>
+        <div className="filter-section">
+            <h3>Khoảng giá</h3>
 
-            <Slider
-                value={range}
-                min={PRICE_MIN}
-                max={PRICE_MAX}
-                step={PRICE_STEP}
-                onValueChange={(values) => {
-                    onRangeChange(values as PriceRange)
-                }}
-                onValueCommit={(values) => {
-                    onRangeCommit(values as PriceRange)
-                }}
-                className="py-2"
-            />
+            <div className="price-range">
+                <div className="price-display-row">
+                    <span className="min-price-display">
+                        {formatPrice(range[0])}
+                    </span>
+                    <span className="max-price-display">
+                        {formatPrice(range[1])}
+                    </span>
+                </div>
 
-            <div className="grid grid-cols-2 gap-2">
-                <Input
-                    type="number"
-                    value={range[0]}
-                    min={PRICE_MIN}
-                    max={range[1]}
-                    step={PRICE_STEP}
-                    onChange={handleMinChange}
-                    className="h-9 rounded-lg border-gray-200 bg-white text-xs"
-                />
+                <div className="slider-wrapper">
+                    <div className="slider-track" />
+                    <div
+                        className="slider-range"
+                        style={{
+                            left: `${minPercent}%`,
+                            right: `${100 - maxPercent}%`,
+                        }}
+                    />
 
-                <Input
-                    type="number"
-                    value={range[1]}
-                    min={range[0]}
-                    max={PRICE_MAX}
-                    step={PRICE_STEP}
-                    onChange={handleMaxChange}
-                    className="h-9 rounded-lg border-gray-200 bg-white text-xs"
-                />
+                    <input
+                        type="range"
+                        min={PRICE_MIN}
+                        max={PRICE_MAX}
+                        step={PRICE_STEP}
+                        value={range[0]}
+                        aria-label="Giá thấp nhất"
+                        className="slider slider-min"
+                        onChange={handleMinInput}
+                        onPointerUp={commitMin}
+                    />
+
+                    <input
+                        type="range"
+                        min={PRICE_MIN}
+                        max={PRICE_MAX}
+                        step={PRICE_STEP}
+                        value={range[1]}
+                        aria-label="Giá cao nhất"
+                        className="slider slider-max"
+                        onChange={handleMaxInput}
+                        onPointerUp={commitMax}
+                    />
+                </div>
             </div>
 
-            <Button
-                type="button"
-                disabled={isPending}
-                onClick={onApply}
-                className="h-10 w-full rounded-xl bg-black text-[10px] font-black uppercase tracking-widest text-white disabled:cursor-not-allowed disabled:opacity-60"
-            >
-                {isPending
-                    ? 'Đang cập nhật...'
-                    : 'Áp dụng giá'}
-            </Button>
+            <div className="price-inputs">
+                <div className="input-group">
+                    <input
+                        type="number"
+                        value={range[0]}
+                        min={PRICE_MIN}
+                        max={range[1]}
+                        step={PRICE_STEP}
+                        aria-label="Nhập giá thấp nhất"
+                        onChange={handleMinInput}
+                    />
+                    <span>đ</span>
+                </div>
+
+                <span>-</span>
+
+                <div className="input-group">
+                    <input
+                        type="number"
+                        value={range[1]}
+                        min={range[0]}
+                        max={PRICE_MAX}
+                        step={PRICE_STEP}
+                        aria-label="Nhập giá cao nhất"
+                        onChange={handleMaxInput}
+                    />
+                    <span>đ</span>
+                </div>
+            </div>
         </div>
     )
 }
