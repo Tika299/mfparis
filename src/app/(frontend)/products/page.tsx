@@ -86,9 +86,16 @@ const getCachedProducts = unstable_cache(
         id: true,
         title: true,
         slug: true,
+
         brand: true,
-        price: true,
         images: true,
+
+        price: true,
+        sku: true,
+
+        productType: true,
+        variants: true,
+
         averageRating: true,
         reviewCount: true,
         status: true,
@@ -861,11 +868,14 @@ export default async function AllProductsPage({
 
             {productsRes.docs.length > 0 ? (
               <>
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-5 lg:grid-cols-3 xl:grid-cols-4 xl:gap-6">
                   {productsRes.docs.map((product) => (
                     <ProductCard
-                      key={product.id}
+                      key={String(product.id)}
                       product={product}
+                      mode="standard"
+                      showRating
+                      showAddToCart
                     />
                   ))}
                 </div>
