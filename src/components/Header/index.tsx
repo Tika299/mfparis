@@ -15,6 +15,7 @@ import { CartCount } from './CartCount'
 import { WishlistButton } from './WishlistButton'
 import { MobileMenu } from '../MobileMenu'
 import { getSiteSettings } from '@/data/getSiteSettings'
+import { HeaderHeightSync } from './HeaderHeightSync'
 
 type HeaderNavItem = {
   id: string
@@ -124,7 +125,11 @@ export const Header = async () => {
       : fallbackNavItems
 
   return (
-    <header className="sticky top-0 z-[100] w-full bg-white font-sans text-[#202020]">
+    <header
+      data-site-header
+      className="sticky top-0 z-[100] w-full bg-white font-sans text-[#202020]"
+    >
+      <HeaderHeightSync />
       {/* =====================================================
           DESKTOP HEADER
           Hiển thị từ 1024 px trở lên

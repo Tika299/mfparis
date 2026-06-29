@@ -164,7 +164,7 @@ export const SearchFilters = ({
                 <aside
                     className={cn(
                         'search-filter-shell search-filter-shell--sidebar hidden xl:block',
-                        sticky && 'sticky top-24',
+                        sticky && 'search-filter-sticky',
                     )}
                 >
                     {renderPanel()}
@@ -209,11 +209,18 @@ export const SearchFilters = ({
                                 <SheetTitle>Bộ lọc &amp; sắp xếp</SheetTitle>
                             </SheetHeader>
 
-                            <div className="search-filter-sheet-inner">
-                                <div className="search-filter-sheet-handle" />
+                            <div className="search-filter-sheet-frame">
+                                <div
+                                    className="search-filter-sheet-topbar"
+                                    aria-hidden="true"
+                                >
+                                    <div className="search-filter-sheet-handle" />
+                                </div>
 
-                                <div className="search-filter-shell search-filter-shell--sheet">
-                                    {renderPanel(true)}
+                                <div className="search-filter-sheet-scroll">
+                                    <div className="search-filter-shell search-filter-shell--sheet">
+                                        {renderPanel(true)}
+                                    </div>
                                 </div>
                             </div>
                         </SheetContent>
@@ -228,7 +235,7 @@ export const SearchFilters = ({
             <aside
                 className={cn(
                     'search-filter-shell search-filter-shell--sidebar',
-                    sticky && 'sticky top-24',
+                    sticky && 'search-filter-sticky',
                 )}
             >
                 {renderPanel()}
@@ -241,7 +248,7 @@ export const SearchFilters = ({
             <div
                 className={cn(
                     'lc-card flex flex-wrap items-center gap-2 rounded-2xl bg-white px-3 py-3 sm:px-4',
-                    sticky && 'sticky top-20 z-40 shadow-sm backdrop-blur',
+                    sticky && 'search-filter-horizontal-sticky z-40 shadow-sm backdrop-blur',
                 )}
             >
                 <Select
@@ -283,11 +290,18 @@ export const SearchFilters = ({
                             <SheetTitle>Bộ lọc nâng cao</SheetTitle>
                         </SheetHeader>
 
-                        <div className="search-filter-sheet-inner">
-                            <div className="search-filter-sheet-handle" />
+                        <div className="search-filter-sheet-frame">
+                            <div
+                                className="search-filter-sheet-topbar"
+                                aria-hidden="true"
+                            >
+                                <div className="search-filter-sheet-handle" />
+                            </div>
 
-                            <div className="search-filter-shell search-filter-shell--sheet">
-                                {renderPanel(true)}
+                            <div className="search-filter-sheet-scroll">
+                                <div className="search-filter-shell search-filter-shell--sheet">
+                                    {renderPanel(true)}
+                                </div>
                             </div>
                         </div>
                     </SheetContent>
@@ -317,11 +331,18 @@ export const SearchFilters = ({
                     <SheetTitle>Bộ lọc &amp; sắp xếp</SheetTitle>
                 </SheetHeader>
 
-                <div className="search-filter-sheet-inner">
-                    <div className="search-filter-sheet-handle" />
+                <div className="search-filter-sheet-frame">
+                    <div
+                        className="search-filter-sheet-topbar"
+                        aria-hidden="true"
+                    >
+                        <div className="search-filter-sheet-handle" />
+                    </div>
 
-                    <div className="search-filter-shell search-filter-shell--sheet">
-                        {renderPanel(true)}
+                    <div className="search-filter-sheet-scroll">
+                        <div className="search-filter-shell search-filter-shell--sheet">
+                            {renderPanel(true)}
+                        </div>
                     </div>
                 </div>
             </SheetContent>
