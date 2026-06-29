@@ -140,6 +140,7 @@ type DiscountAllocation = {
 type TrustedOrderAmounts = Readonly<{
     subtotalAmount: number
     discountAmount: number
+    shippingFee: number
     totalAmount: number
 }>
 
@@ -172,6 +173,11 @@ function validateTrustedOrderAmounts(
     const discountAmount = Math.max(
         0,
         toMoney(order.discountAmount),
+    )
+
+    const shippingFee = Math.max(
+        0,
+        toMoney(order.shippingFee),
     )
 
     const totalAmount = toMoney(
@@ -209,7 +215,7 @@ function validateTrustedOrderAmounts(
 
     const expectedTotal = Math.max(
         0,
-        storedSubtotal - discountAmount,
+        storedSubtotal - discountAmount + shippingFee,
     )
 
     if (
@@ -241,6 +247,7 @@ function validateTrustedOrderAmounts(
     return {
         subtotalAmount: storedSubtotal,
         discountAmount,
+        shippingFee,
         totalAmount,
     }
 }

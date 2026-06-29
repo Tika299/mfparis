@@ -618,6 +618,7 @@ export interface Order {
   };
   subtotalAmount?: number | null;
   discountAmount?: number | null;
+  shippingFee?: number | null;
   voucherCode?: string | null;
   voucherId?: (number | null) | Voucher;
   updatedAt: string;
@@ -1264,6 +1265,7 @@ export interface OrdersSelect<T extends boolean = true> {
       };
   subtotalAmount?: T;
   discountAmount?: T;
+  shippingFee?: T;
   voucherCode?: T;
   voucherId?: T;
   updatedAt?: T;
@@ -1572,10 +1574,32 @@ export interface SiteSetting {
   };
   contact?: {
     phone?: string | null;
+    email?: string | null;
+    zalo?: string | null;
     zaloLink?: string | null;
     address?: string | null;
     facebookUrl?: string | null;
     googleMapUrl?: string | null;
+  };
+  footer?: {
+    description?: string | null;
+    workingHours?: string | null;
+    chatUrl?: string | null;
+    social?:
+      | {
+          icon: 'facebook' | 'instagram' | 'youtube' | 'tiktok' | 'zalo';
+          name: string;
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+    policyLinks?:
+      | {
+          label: string;
+          link: string;
+          id?: string | null;
+        }[]
+      | null;
   };
   flashSale?: {
     enabled?: boolean | null;
@@ -1665,10 +1689,34 @@ export interface SiteSettingsSelect<T extends boolean = true> {
     | T
     | {
         phone?: T;
+        email?: T;
+        zalo?: T;
         zaloLink?: T;
         address?: T;
         facebookUrl?: T;
         googleMapUrl?: T;
+      };
+  footer?:
+    | T
+    | {
+        description?: T;
+        workingHours?: T;
+        chatUrl?: T;
+        social?:
+          | T
+          | {
+              icon?: T;
+              name?: T;
+              url?: T;
+              id?: T;
+            };
+        policyLinks?:
+          | T
+          | {
+              label?: T;
+              link?: T;
+              id?: T;
+            };
       };
   flashSale?:
     | T

@@ -51,8 +51,25 @@ export default function CheckoutPage() {
     const items = useCartStore((state) => state.items)
     const clearCart = useCartStore((state) => state.clearCart)
     const totalPrice = items.reduce((acc, item) => acc + item.price * item.quantity, 0)
+    const FREE_SHIPPING_THRESHOLD = 1000000
+    const FLAT_SHIPPING_FEE = 30000
+
+    const subtotalAmount = items.reduce(
+        (acc, item) => acc + item.price * item.quantity,
+        0,
+    )
+
     const discountAmount = Number(voucherData?.discountAmount || 0)
-    const finalTotalPrice = Math.max(0, totalPrice - discountAmount)
+
+    const shippingFee =
+        subtotalAmount >= FREE_SHIPPING_THRESHOLD
+            ? 0
+            : FLAT_SHIPPING_FEE
+
+    const finalTotalPrice = Math.max(
+        0,
+        subtotalAmount - discountAmount + shippingFee,
+    )
 
     const invalidItems = items.filter((item: any) => {
         const stock = Number(item.stock || 0)
@@ -266,6 +283,9 @@ export default function CheckoutPage() {
                 voucherCode:
                     voucherData?.voucher
                         ?.code ?? null,
+
+                shippingFee,
+                totalAmount: finalTotalPrice,
             }
 
             const response = await fetch(
@@ -389,7 +409,7 @@ export default function CheckoutPage() {
                 },
                 body: JSON.stringify({
                     code: voucherCode,
-                    subtotalAmount: totalPrice,
+                    subtotalAmount,
                 }),
             })
 
@@ -592,8 +612,8 @@ export default function CheckoutPage() {
 
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-400">Phí vận chuyển</span>
-                                    <span className="text-emerald-600 font-bold uppercase text-[10px]">
-                                        {finalTotalPrice >= 500000 ? 'Miễn phí' : 'Báo giá sau'}
+                                    <span className="font-bold text-gray-800">
+                                        {shippingFee === 0 ? 'Miễn phí' : `${formatPrice(shippingFee)}₫`}
                                     </span>
                                 </div>
 

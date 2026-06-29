@@ -616,6 +616,13 @@ export const Orders: CollectionConfig = {
       defaultValue: 0,
     },
     {
+      name: 'shippingFee',
+      type: 'number',
+      label: 'Phí vận chuyển',
+      defaultValue: 0,
+      min: 0,
+    },
+    {
       name: 'voucherCode',
       type: 'text',
       index: true,

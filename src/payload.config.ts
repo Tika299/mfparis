@@ -81,15 +81,15 @@ export default buildConfig({
   sharp,
   plugins: [],
   email: nodemailerAdapter({
-    defaultFromAddress: 'mfparisvn@gmail.com', // Email gửi đi
+    defaultFromAddress: 'mfparisvn@gmail.com',
     defaultFromName: 'MF PARIS - Hệ thống Đơn hàng',
     transportOptions: {
       host: 'smtp.gmail.com',
       port: 465,
-      secure: true, // dùng SSL
+      secure: true,
       auth: {
         user: 'mfparisvn@gmail.com',
-        pass: 'jrkbgahkrkewjvbf', // Mật khẩu ứng dụng vừa tạo
+        pass: process.env.SMTP_PASSWORD,
       },
     },
   }),

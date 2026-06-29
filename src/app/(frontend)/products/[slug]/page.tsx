@@ -910,6 +910,120 @@ const getApprovedReviews = cache(
   },
 )
 
+const getEffectivePrice = (
+  basePrice: unknown,
+  salePrice: unknown,
+): number | null => {
+  const normalizedBasePrice = Number(basePrice ?? 0)
+  const normalizedSalePrice = Number(salePrice ?? 0)
+
+  if (
+    normalizedSalePrice > 0 &&
+    normalizedBasePrice > 0 &&
+    normalizedSalePrice < normalizedBasePrice
+  ) {
+    return normalizedSalePrice
+  }
+
+  return normalizedBasePrice > 0 ? normalizedBasePrice : null
+}
+
+const getOfferAvailability = (
+  seoStatus: ProductSeoStatus,
+  stock: unknown,
+): string => {
+  if (seoStatus === 'temporarily_out_of_stock') {
+    return 'https://schema.org/OutOfStock'
+  }
+
+  if (
+    seoStatus === 'discontinued_keep_page' ||
+    seoStatus === 'discontinued_redirect'
+  ) {
+    return 'https://schema.org/Discontinued'
+  }
+
+  const normalizedStock = Number(stock ?? 0)
+
+  return normalizedStock > 0
+    ? 'https://schema.org/InStock'
+    : 'https://schema.org/OutOfStock'
+}
+
+const buildProductOffers = (
+  currentProduct: Product,
+) => {
+  const canonicalUrl = getProductCanonicalUrl(
+    currentProduct.slug,
+  )
+  const currentSeoStatus =
+    getProductSeoStatus(currentProduct)
+
+  if (
+    currentProduct.productType === 'variable' &&
+    Array.isArray(currentProduct.variants)
+  ) {
+    return currentProduct.variants
+      .filter((variant) => variant?.isActive !== false)
+      .map((variant) => {
+        const price = getEffectivePrice(
+          variant.basePrice,
+          variant.salePrice,
+        )
+
+        if (!price) {
+          return null
+        }
+
+        return {
+          '@type': 'Offer',
+          url: canonicalUrl,
+          name: variant.name
+            ? `${currentProduct.title} - ${variant.name}`
+            : currentProduct.title,
+          sku:
+            variant.sku ||
+            currentProduct.sku ||
+            undefined,
+          price,
+          priceCurrency: 'VND',
+          availability: getOfferAvailability(
+            currentSeoStatus,
+            variant.stock,
+          ),
+          itemCondition:
+            'https://schema.org/NewCondition',
+        }
+      })
+      .filter(Boolean)
+  }
+
+  const price = getEffectivePrice(
+    currentProduct.price?.basePrice,
+    currentProduct.price?.salePrice,
+  )
+
+  if (!price) {
+    return undefined
+  }
+
+  return [
+    {
+      '@type': 'Offer',
+      url: canonicalUrl,
+      sku: currentProduct.sku || undefined,
+      price,
+      priceCurrency: 'VND',
+      availability: getOfferAvailability(
+        currentSeoStatus,
+        currentProduct.price?.stock,
+      ),
+      itemCondition:
+        'https://schema.org/NewCondition',
+    },
+  ]
+}
+
 function ProductRatingStars({
   rating,
 }: Readonly<{
@@ -1282,39 +1396,11 @@ export default async function ProductPage({
       )
   }
 
-  const getProductOfferPrice = (
-    currentProduct: Product,
-  ): number | null => {
-    const basePrice = Number(
-      currentProduct.price?.basePrice ?? 0,
-    )
-    const salePrice = Number(
-      currentProduct.price?.salePrice ?? 0,
-    )
-
-    if (
-      salePrice > 0 &&
-      salePrice < basePrice
-    ) {
-      return salePrice
-    }
-
-    if (basePrice > 0) {
-      return basePrice
-    }
-
-    return null
-  }
-
   const buildProductJsonLd = (
     currentProduct: Product,
   ) => {
     const currentBrand =
       getProductBrand(currentProduct)
-    const currentSeoStatus =
-      getProductSeoStatus(currentProduct)
-    const price =
-      getProductOfferPrice(currentProduct)
     const normalizedReviewCount =
       normalizeReviewCount(
         currentProduct.reviewCount,
@@ -1351,19 +1437,7 @@ export default async function ProductPage({
           name: currentBrand.name,
         }
         : undefined,
-      offers: price
-        ? {
-          '@type': 'Offer',
-          url: canonicalUrl,
-          price,
-          priceCurrency: 'VND',
-          availability: `https://schema.org/${getSchemaAvailability(
-            currentSeoStatus,
-          )}`,
-          itemCondition:
-            'https://schema.org/NewCondition',
-        }
-        : undefined,
+      offers: buildProductOffers(currentProduct),
     }
 
     if (

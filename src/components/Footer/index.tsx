@@ -11,6 +11,7 @@ import {
   Phone,
 } from 'lucide-react'
 import { getSiteSettings } from '@/data/getSiteSettings'
+import { SITE_ORIGIN } from '@/utilities/seo'
 
 type FooterLink = {
   id?: string | number | null
@@ -18,20 +19,25 @@ type FooterLink = {
   link?: string | null
 }
 
+type FooterSocialIcon =
+  | 'facebook'
+  | 'instagram'
+  | 'youtube'
+  | 'tiktok'
+  | 'zalo'
+
+type FooterSocialLink = {
+  id?: string | number | null
+  icon?: FooterSocialIcon | null
+  name?: string | null
+  url?: string | null
+}
+
 type FooterSettings = {
   description?: string | null
-
   workingHours?: string | null
-
   chatUrl?: string | null
-
-  social?: {
-    facebook?: string | null
-    instagram?: string | null
-    youtube?: string | null
-    tiktok?: string | null
-  } | null
-
+  social?: FooterSocialLink[] | null
   aboutLinks?: FooterLink[] | null
   policyLinks?: FooterLink[] | null
 }
@@ -147,50 +153,69 @@ function YoutubeIcon({
 }
 
 const fallbackAboutLinks: FooterLink[] = [
-  {
-    id: 'about',
-    label: 'Giới thiệu',
-    link: '/about',
-  },
-  {
-    id: 'stores',
-    label: 'Hệ thống cửa hàng',
-    link: '/stores',
-  },
-  {
-    id: 'careers',
-    label: 'Tuyển dụng',
-    link: '/tuyen-dung',
-  },
-  {
-    id: 'cooperation',
-    label: 'Liên hệ hợp tác',
-    link: '/contact',
-  },
+  { id: 'about', label: 'Giới thiệu', link: '/about' },
+  { id: 'contact', label: 'Liên hệ', link: '/contact' },
+  { id: 'products', label: 'Sản phẩm', link: '/products' },
+  { id: 'brands', label: 'Thương hiệu', link: '/brands' },
 ]
 
 const fallbackPolicyLinks: FooterLink[] = [
+  { id: 'return-policy', label: 'Chính sách đổi trả', link: '/chinh-sach-doi-tra' },
+  { id: 'shipping-policy', label: 'Chính sách vận chuyển', link: '/chinh-sach-van-chuyen' },
+  { id: 'privacy-policy', label: 'Chính sách bảo mật', link: '/chinh-sach-bao-mat' },
+  { id: 'terms', label: 'Điều khoản sử dụng', link: '/dieu-khoan-su-dung' },
   {
-    id: 'return-policy',
-    label: 'Chính sách đổi trả',
-    link: '/chinh-sach-doi-tra',
-  },
-  {
-    id: 'shipping-policy',
-    label: 'Chính sách vận chuyển',
-    link: '/chinh-sach-van-chuyen',
-  },
-  {
-    id: 'privacy-policy',
-    label: 'Chính sách bảo mật',
-    link: '/chinh-sach-bao-mat',
-  },
-  {
-    id: 'terms',
-    label: 'Điều khoản sử dụng',
-    link: '/dieu-khoan-su-dung',
+    id: 'payment-methods',
+    label: 'Phương thức thanh toán',
+    link: '/phuong-thuc-thanh-toan',
   },
 ]
+
+type NormalizedFooterLink = FooterLink & {
+  label: string
+  link: string
+}
+
+const knownSafeInternalRoutes = new Set<string>([
+  '/',
+  '/about',
+  '/contact',
+  '/products',
+  '/categories',
+  '/brands',
+  '/blog',
+  '/chinh-sach-doi-tra',
+  '/chinh-sach-van-chuyen',
+  '/chinh-sach-bao-mat',
+  '/dieu-khoan-su-dung',
+  '/phuong-thuc-thanh-toan',
+])
+
+function normalizeInternalPath(
+  value: string,
+): string | null {
+  const normalizedValue = value.trim()
+
+  if (!normalizedValue.startsWith('/')) {
+    return null
+  }
+
+  try {
+    const url = new URL(
+      normalizedValue,
+      SITE_ORIGIN,
+    )
+
+    const pathname =
+      url.pathname.replace(/\/+$/u, '') || '/'
+
+    return knownSafeInternalRoutes.has(pathname)
+      ? pathname
+      : null
+  } catch {
+    return null
+  }
+}
 
 function normalizeLinks(
   links: FooterLink[] | null | undefined,
@@ -200,15 +225,26 @@ function normalizeLinks(
     return fallback
   }
 
-  const normalizedLinks = links.filter(
-    (item) =>
-      typeof item?.label === 'string' &&
-      item.label.trim() &&
-      typeof item?.link === 'string' &&
-      item.link.trim(),
-  )
+  const normalizedLinks: NormalizedFooterLink[] = []
 
-  return normalizedLinks.length
+  for (const item of links) {
+    const label = item.label?.trim()
+    const link = item.link
+      ? normalizeInternalPath(item.link)
+      : null
+
+    if (!label || !link) {
+      continue
+    }
+
+    normalizedLinks.push({
+      id: item.id ?? null,
+      label,
+      link,
+    })
+  }
+
+  return normalizedLinks.length > 0
     ? normalizedLinks
     : fallback
 }
@@ -230,6 +266,78 @@ function normalizeExternalUrl(
   }
 
   return `https://${normalizedValue}`
+}
+
+type NormalizedSocialLink = {
+  id: string | number
+  icon: FooterSocialIcon
+  label: string
+  href: string
+}
+
+function getSocialLabel(
+  icon: FooterSocialIcon,
+): string {
+  switch (icon) {
+    case 'facebook':
+      return 'Facebook'
+    case 'instagram':
+      return 'Instagram'
+    case 'youtube':
+      return 'YouTube'
+    case 'tiktok':
+      return 'TikTok'
+    case 'zalo':
+      return 'Zalo'
+  }
+}
+
+function getSocialIcon(
+  icon: FooterSocialIcon,
+): React.ReactNode {
+  switch (icon) {
+    case 'facebook':
+      return <FacebookIcon size={21} />
+    case 'instagram':
+      return <InstagramIcon size={21} />
+    case 'youtube':
+      return <YoutubeIcon size={22} />
+    case 'tiktok':
+      return <TikTokIcon size={22} />
+    case 'zalo':
+      return <MessageCircle size={22} />
+  }
+}
+
+function normalizeSocialLinks(
+  links: FooterSocialLink[] | null | undefined,
+): NormalizedSocialLink[] {
+  if (!Array.isArray(links)) {
+    return []
+  }
+
+  const normalizedLinks: NormalizedSocialLink[] = []
+
+  links.forEach((item, index) => {
+    if (!item.icon) {
+      return
+    }
+
+    const href = normalizeExternalUrl(item.url)
+
+    if (href === '#') {
+      return
+    }
+
+    normalizedLinks.push({
+      id: item.id ?? `${item.icon}-${index}`,
+      icon: item.icon,
+      label: item.name?.trim() || getSocialLabel(item.icon),
+      href,
+    })
+  })
+
+  return normalizedLinks
 }
 
 function getChatUrl(
@@ -375,25 +483,9 @@ export const Footer = async () => {
      SOCIAL
   ====================================================== */
 
-  const facebookUrl =
-    normalizeExternalUrl(
-      footerSettings?.social?.facebook,
-    )
-
-  const instagramUrl =
-    normalizeExternalUrl(
-      footerSettings?.social?.instagram,
-    )
-
-  const youtubeUrl =
-    normalizeExternalUrl(
-      footerSettings?.social?.youtube,
-    )
-
-  const tiktokUrl =
-    normalizeExternalUrl(
-      footerSettings?.social?.tiktok,
-    )
+  const socialLinks = normalizeSocialLinks(
+    footerSettings?.social,
+  )
 
   const chatUrl = getChatUrl(
     footerSettings?.chatUrl,
@@ -453,37 +545,19 @@ export const Footer = async () => {
             </p>
 
             {/* SOCIAL */}
-            <div className="mt-6 flex items-center gap-3">
-              <SocialButton
-                href={facebookUrl}
-                label="Facebook"
-              >
-                <FacebookIcon size={21} />
-              </SocialButton>
-
-              <SocialButton
-                href={instagramUrl}
-                label="Instagram"
-              >
-                <InstagramIcon size={21} />
-              </SocialButton>
-
-              <SocialButton
-                href={youtubeUrl}
-                label="YouTube"
-              >
-                <YoutubeIcon size={22} />
-              </SocialButton>
-
-              <SocialButton
-                href={tiktokUrl}
-                label="TikTok"
-              >
-                <TikTokIcon
-                  size={22}
-                />
-              </SocialButton>
-            </div>
+            {socialLinks.length > 0 ? (
+              <div className="mt-6 flex items-center gap-3">
+                {socialLinks.map((item) => (
+                  <SocialButton
+                    key={item.id}
+                    href={item.href}
+                    label={item.label}
+                  >
+                    {getSocialIcon(item.icon)}
+                  </SocialButton>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           {/* ===============================================

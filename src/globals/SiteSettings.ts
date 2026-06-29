@@ -73,6 +73,7 @@ export const SiteSettings: GlobalConfig = {
     {
       name: 'contact',
       type: 'group',
+      label: 'Thông tin liên hệ',
       fields: [
         {
           name: 'phone',
@@ -81,14 +82,114 @@ export const SiteSettings: GlobalConfig = {
           admin: { width: '50%' },
         },
         {
-          name: 'zaloLink',
+          name: 'email',
           type: 'text',
-          label: 'Link Zalo (Zalo ME)',
+          label: 'Email chăm sóc khách hàng',
           admin: { width: '50%' },
         },
-        { name: 'address', type: 'textarea' },
-        { name: 'facebookUrl', type: 'text' },
-        { name: 'googleMapUrl', type: 'text' },
+        {
+          name: 'zalo',
+          type: 'text',
+          label: 'Số Zalo hoặc Zalo ID',
+          admin: { width: '50%' },
+        },
+        {
+          name: 'zaloLink',
+          type: 'text',
+          label: 'Link Zalo',
+          admin: { width: '50%' },
+        },
+        {
+          name: 'address',
+          type: 'textarea',
+          label: 'Địa chỉ cửa hàng',
+        },
+        {
+          name: 'facebookUrl',
+          type: 'text',
+          label: 'Facebook URL',
+        },
+        {
+          name: 'googleMapUrl',
+          type: 'text',
+          label: 'Google Maps URL',
+        },
+      ],
+    },
+    {
+      name: 'footer',
+      type: 'group',
+      label: 'Footer',
+      fields: [
+        {
+          name: 'description',
+          type: 'textarea',
+          label: 'Mô tả ngắn',
+        },
+        {
+          name: 'workingHours',
+          type: 'text',
+          label: 'Giờ làm việc',
+        },
+        {
+          name: 'chatUrl',
+          type: 'text',
+          label: 'Link chat mặc định',
+        },
+        {
+          name: 'social',
+          type: 'array',
+          label: 'Mạng xã hội',
+          fields: [
+            {
+              name: 'icon',
+              type: 'select',
+              label: 'Biểu tượng',
+              required: true,
+              options: [
+                { label: 'Facebook', value: 'facebook' },
+                { label: 'Instagram', value: 'instagram' },
+                { label: 'YouTube', value: 'youtube' },
+                { label: 'TikTok', value: 'tiktok' },
+                { label: 'Zalo', value: 'zalo' },
+              ],
+            },
+            {
+              name: 'name',
+              type: 'text',
+              label: 'Tên hiển thị',
+              required: true,
+            },
+            {
+              name: 'url',
+              type: 'text',
+              label: 'URL',
+              required: true,
+            },
+          ],
+        },
+        {
+          name: 'policyLinks',
+          type: 'array',
+          label: 'Liên kết chính sách',
+          fields: [
+            {
+              name: 'label',
+              type: 'text',
+              label: 'Tên chính sách',
+              required: true,
+            },
+            {
+              name: 'link',
+              type: 'text',
+              label: 'Đường dẫn',
+              required: true,
+              admin: {
+                placeholder: '/chinh-sach-doi-tra',
+              },
+            },
+          ],
+        },
       ],
     },
     {

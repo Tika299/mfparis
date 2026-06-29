@@ -40,6 +40,8 @@ type CreateOrderInput = Readonly<{
   ward: string | null
   paymentMethod: PaymentMethod
   voucherCode: string | null
+  shippingFee: number
+  totalAmount: number
   items: CheckoutItemInput[]
 }>
 
@@ -295,6 +297,59 @@ function finiteNumber(
   }
 
   return fallback
+}
+
+const FREE_SHIPPING_THRESHOLD = 1000000
+const FLAT_SHIPPING_FEE = 30000
+
+function normalizeShippingFee(
+  value: unknown,
+): number {
+  const shippingFee = Math.floor(
+    finiteNumber(value, Number.NaN),
+  )
+
+  if (
+    !Number.isFinite(shippingFee) ||
+    shippingFee < 0
+  ) {
+    throw new CheckoutError(
+      'Phí vận chuyển không hợp lệ.',
+      400,
+      'INVALID_SHIPPING_FEE',
+    )
+  }
+
+  return shippingFee
+}
+
+function normalizeClientTotalAmount(
+  value: unknown,
+): number {
+  const totalAmount = Math.floor(
+    finiteNumber(value, Number.NaN),
+  )
+
+  if (
+    !Number.isFinite(totalAmount) ||
+    totalAmount < 0
+  ) {
+    throw new CheckoutError(
+      'Tổng tiền đơn hàng không hợp lệ.',
+      400,
+      'INVALID_TOTAL_AMOUNT',
+    )
+  }
+
+  return totalAmount
+}
+
+function calculateShippingFee(
+  subtotalAmount: number,
+): number {
+  return subtotalAmount >= FREE_SHIPPING_THRESHOLD
+    ? 0
+    : FLAT_SHIPPING_FEE
 }
 
 function relationshipID(
@@ -573,6 +628,13 @@ async function readCreateOrderInput(
 
     items: Array.from(
       mergedItems.values(),
+    ),
+    shippingFee: normalizeShippingFee(
+      body.shippingFee,
+    ),
+
+    totalAmount: normalizeClientTotalAmount(
+      body.totalAmount,
     ),
   }
 }
@@ -1359,11 +1421,29 @@ export async function POST(
         validatedVoucher
           ?.discountAmount ?? 0
 
+      const expectedShippingFee =
+        calculateShippingFee(subtotalAmount)
+
+      if (input.shippingFee !== expectedShippingFee) {
+        throw new CheckoutError(
+          'Phí vận chuyển đã thay đổi. Vui lòng kiểm tra lại đơn hàng.',
+          409,
+          'SHIPPING_FEE_MISMATCH',
+        )
+      }
+
       const totalAmount = Math.max(
         0,
-        subtotalAmount -
-        discountAmount,
+        subtotalAmount - discountAmount + expectedShippingFee,
       )
+
+      if (input.totalAmount !== totalAmount) {
+        throw new CheckoutError(
+          'Tổng tiền đơn hàng không khớp. Vui lòng kiểm tra lại giỏ hàng.',
+          409,
+          'TOTAL_AMOUNT_MISMATCH',
+        )
+      }
 
       const order =
         await payload.create({
@@ -1420,6 +1500,7 @@ export async function POST(
 
             subtotalAmount,
             discountAmount,
+            shippingFee: expectedShippingFee,
             totalAmount,
 
             paymentMethod:
