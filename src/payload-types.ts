@@ -593,6 +593,7 @@ export interface Order {
     district?: string | null;
     ward?: string | null;
   };
+  deliveryMethod?: ('home_delivery' | 'store_pickup') | null;
   items?:
     | {
         product: number | Product;
@@ -610,6 +611,7 @@ export interface Order {
     | null;
   totalAmount: number;
   paymentMethod?: ('cod' | 'bank_transfer' | 'fundiin') | null;
+  paymentStatus?: ('unpaid' | 'pending' | 'paid' | 'failed' | 'refunded') | null;
   status?: ('pending' | 'confirmed' | 'shipping' | 'completed' | 'cancelled' | 'failed') | null;
   fundiin?: {
     transactionId?: string | null;
@@ -1241,6 +1243,7 @@ export interface OrdersSelect<T extends boolean = true> {
         district?: T;
         ward?: T;
       };
+  deliveryMethod?: T;
   items?:
     | T
     | {
@@ -1255,6 +1258,7 @@ export interface OrdersSelect<T extends boolean = true> {
       };
   totalAmount?: T;
   paymentMethod?: T;
+  paymentStatus?: T;
   status?: T;
   fundiin?:
     | T
@@ -1581,6 +1585,13 @@ export interface SiteSetting {
     facebookUrl?: string | null;
     googleMapUrl?: string | null;
   };
+  payment?: {
+    bankName?: string | null;
+    bankAccountName?: string | null;
+    bankAccountNumber?: string | null;
+    bankBranch?: string | null;
+    bankQrImage?: (number | null) | Media;
+  };
   footer?: {
     description?: string | null;
     workingHours?: string | null;
@@ -1695,6 +1706,15 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         address?: T;
         facebookUrl?: T;
         googleMapUrl?: T;
+      };
+  payment?:
+    | T
+    | {
+        bankName?: T;
+        bankAccountName?: T;
+        bankAccountNumber?: T;
+        bankBranch?: T;
+        bankQrImage?: T;
       };
   footer?:
     | T

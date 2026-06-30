@@ -36,7 +36,7 @@ export const RelatedProducts = ({ products }: { products: any[] }) => {
           {products.map((product) => (
             <CarouselItem
               key={product.id}
-              className="basis-full pl-4 sm:basis-full md:basis-1/3 lg:basis-1/4 xl:basis-1/4"
+              className="basis-1/2 pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5"
             >
               <ProductCard product={product} />
             </CarouselItem>

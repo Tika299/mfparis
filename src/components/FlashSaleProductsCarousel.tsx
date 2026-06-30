@@ -47,7 +47,7 @@ export function FlashSaleProductsCarousel({
                             'basis-1/2 pl-2.5',
                             'md:basis-1/3 md:pl-3',
                             'lg:basis-1/4 lg:pl-4',
-                            'xl:basis-1/5',
+                            'xl:basis-1/4',
                         ].join(' ')}
                     >
                         <ProductCard

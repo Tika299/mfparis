@@ -7,10 +7,26 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { ChevronLeft, Loader2, ShieldCheck, Truck, CreditCard } from 'lucide-react'
+import {
+    ChevronLeft,
+    Loader2,
+    ShieldCheck,
+    Truck,
+    CreditCard,
+    Store,
+    Landmark,
+} from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { toast } from 'sonner'
 import { FundiinCheckoutElement } from '@/components/FundiinCheckoutElement'
+import {
+    calculateShippingFee,
+    getFreeShippingThreshold,
+    normalizeDeliveryMethod,
+    VIETNAM_PROVINCES,
+    type DeliveryMethod,
+} from '@/lib/shipping'
 
 type ValidatedCheckoutItem = Readonly<{
     id: string | number
@@ -37,11 +53,28 @@ type CartValidationResponse = Readonly<{
     error?: string
 }>
 
-export default function CheckoutPage() {
+export type BankTransferSettings = Readonly<{
+    bankName?: string | null
+    bankAccountName?: string | null
+    bankAccountNumber?: string | null
+    bankBranch?: string | null
+    bankQrImageUrl?: string | null
+}>
+
+export default function CheckoutPage({
+    bankTransfer,
+}: Readonly<{
+    bankTransfer: BankTransferSettings
+}>) {
     const router = useRouter()
     const [isClient, setIsClient] = useState(false)
     const [loading, setLoading] = useState(false)
-    const [paymentMethod, setPaymentMethod] = useState('cod')
+    const [paymentMethod, setPaymentMethod] = useState('bank_transfer')
+    const [deliveryMethod, setDeliveryMethod] =
+        useState<DeliveryMethod>('home_delivery')
+
+    const [selectedProvince, setSelectedProvince] =
+        useState('Thành phố Hồ Chí Minh')
     const [voucherCode, setVoucherCode] = useState('')
     const [voucherData, setVoucherData] = useState<any>(null)
     const [applyingVoucher, setApplyingVoucher] = useState(false)
@@ -51,8 +84,6 @@ export default function CheckoutPage() {
     const items = useCartStore((state) => state.items)
     const clearCart = useCartStore((state) => state.clearCart)
     const totalPrice = items.reduce((acc, item) => acc + item.price * item.quantity, 0)
-    const FREE_SHIPPING_THRESHOLD = 1000000
-    const FLAT_SHIPPING_FEE = 30000
 
     const subtotalAmount = items.reduce(
         (acc, item) => acc + item.price * item.quantity,
@@ -61,10 +92,24 @@ export default function CheckoutPage() {
 
     const discountAmount = Number(voucherData?.discountAmount || 0)
 
-    const shippingFee =
-        subtotalAmount >= FREE_SHIPPING_THRESHOLD
-            ? 0
-            : FLAT_SHIPPING_FEE
+    const normalizedDeliveryMethod =
+        normalizeDeliveryMethod(deliveryMethod)
+
+    const shippingFee = calculateShippingFee({
+        subtotalAmount,
+        province: selectedProvince,
+        deliveryMethod: normalizedDeliveryMethod,
+    })
+
+    const freeShippingThreshold = getFreeShippingThreshold({
+        province: selectedProvince,
+        deliveryMethod: normalizedDeliveryMethod,
+    })
+
+    const shippingDiscount =
+        normalizedDeliveryMethod === 'store_pickup' || shippingFee === 0
+            ? 19000
+            : 0
 
     const finalTotalPrice = Math.max(
         0,
@@ -121,13 +166,18 @@ export default function CheckoutPage() {
             formData.get('email') ?? '',
         ).trim()
 
-        const address = String(
-            formData.get('address') ?? '',
-        ).trim()
+        const isStorePickup =
+            normalizedDeliveryMethod === 'store_pickup'
 
-        const province = String(
-            formData.get('province') ?? '',
-        ).trim()
+        const address = isStorePickup
+            ? 'Nhận tại cửa hàng'
+            : String(
+                formData.get('address') ?? '',
+            ).trim()
+
+        const province = isStorePickup
+            ? 'Nhận tại cửa hàng'
+            : selectedProvince
 
         const district = String(
             formData.get('district') ?? '',
@@ -277,6 +327,8 @@ export default function CheckoutPage() {
                         ),
                     }),
                 ),
+
+                deliveryMethod: normalizedDeliveryMethod,
 
                 paymentMethod,
 
@@ -467,19 +519,145 @@ export default function CheckoutPage() {
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
                                     <Label htmlFor="province" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Tỉnh / Thành phố</Label>
-                                    <Input id="province" name="province" placeholder="Hồ Chí Minh" required className="h-12 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#b72828]/20" />
+                                    <select
+                                        id="province"
+                                        name="province"
+                                        value={selectedProvince}
+                                        onChange={(event) => setSelectedProvince(event.target.value)}
+                                        disabled={deliveryMethod === 'store_pickup'}
+                                        required={deliveryMethod !== 'store_pickup'}
+                                        className="h-12 w-full rounded-xl border-none bg-gray-50 px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-[#b72828]/20 disabled:cursor-not-allowed disabled:text-gray-400"
+                                    >
+                                        {VIETNAM_PROVINCES.map((province) => (
+                                            <option key={province} value={province}>
+                                                {province}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
                                     <Label htmlFor="address" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Địa chỉ cụ thể</Label>
-                                    <Input id="address" name="address" placeholder="Số nhà, tên đường, phường..." required className="h-12 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#b72828]/20" />
+                                    <Input
+                                        id="address"
+                                        name="address"
+                                        placeholder="Số nhà, tên đường, phường..."
+                                        required={deliveryMethod !== 'store_pickup'}
+                                        disabled={deliveryMethod === 'store_pickup'}
+                                        className="h-12 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#b72828]/20 disabled:cursor-not-allowed disabled:text-gray-400"
+                                    />
+                                    <section className="bg-white rounded-[2rem] p-8 md:p-10 shadow-sm border border-gray-50">
+                                        <h2 className="text-2xl font-bold font-serif italic text-gray-900 mb-6">
+                                            Hình thức nhận hàng
+                                        </h2>
+
+                                        <RadioGroup
+                                            value={deliveryMethod}
+                                            onValueChange={(value) =>
+                                                setDeliveryMethod(normalizeDeliveryMethod(value))
+                                            }
+                                            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                                        >
+                                            <Label
+                                                htmlFor="home_delivery"
+                                                className={`flex items-center gap-4 p-5 rounded-2xl border-2 cursor-pointer ${deliveryMethod === 'home_delivery'
+                                                    ? 'border-[#b72828] bg-red-50/30'
+                                                    : 'border-gray-50 bg-gray-50'
+                                                    }`}
+                                            >
+                                                <RadioGroupItem value="home_delivery" id="home_delivery" />
+                                                <Truck size={20} />
+                                                <span className="text-sm font-bold">Giao hàng tận nơi</span>
+                                            </Label>
+
+                                            <Label
+                                                htmlFor="store_pickup"
+                                                className={`flex items-center gap-4 p-5 rounded-2xl border-2 cursor-pointer ${deliveryMethod === 'store_pickup'
+                                                    ? 'border-[#b72828] bg-red-50/30'
+                                                    : 'border-gray-50 bg-gray-50'
+                                                    }`}
+                                            >
+                                                <RadioGroupItem value="store_pickup" id="store_pickup" />
+                                                <Store size={20} />
+                                                <span className="text-sm font-bold">Nhận tại cửa hàng</span>
+                                            </Label>
+                                        </RadioGroup>
+                                    </section>
                                 </div>
                             </div>
                         </section>
 
                         <section className="bg-white rounded-[2rem] p-8 md:p-10 shadow-sm border border-gray-50">
                             <h2 className="text-xl font-bold text-gray-900 mb-8">Phương thức thanh toán</h2>
-                            <RadioGroup defaultValue="cod" onValueChange={setPaymentMethod} className="space-y-4">
+                            <RadioGroup defaultValue="bank_transfer" onValueChange={setPaymentMethod} className="space-y-4">
+                                <div
+                                    className={`rounded-2xl border-2 transition-all ${paymentMethod === 'bank_transfer'
+                                        ? 'border-[#b72828] bg-red-50/30'
+                                        : 'border-gray-50 bg-gray-50'
+                                        }`}
+                                >
+                                    <Label
+                                        htmlFor="bank_transfer"
+                                        className="flex cursor-pointer items-center justify-between p-5"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <RadioGroupItem
+                                                value="bank_transfer"
+                                                id="bank_transfer"
+                                                className="text-[#b72828]"
+                                            />
 
+                                            <div>
+                                                <p className="text-sm font-bold">
+                                                    Chuyển khoản ngân hàng
+                                                </p>
+                                                <p className="text-[10px] uppercase tracking-tighter text-gray-400">
+                                                    Quét QR hoặc chuyển khoản theo thông tin bên dưới
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <Landmark size={20} className="text-gray-400" />
+                                    </Label>
+
+                                    {paymentMethod === 'bank_transfer' ? (
+                                        <div className="grid gap-4 px-5 pb-5 md:grid-cols-[140px_1fr]">
+                                            {bankTransfer.bankQrImageUrl ? (
+                                                <div className="relative aspect-square overflow-hidden rounded-2xl bg-white">
+                                                    <Image
+                                                        src={bankTransfer.bankQrImageUrl}
+                                                        alt="QR chuyển khoản MF Paris"
+                                                        fill
+                                                        sizes="140px"
+                                                        className="object-contain p-2"
+                                                    />
+                                                </div>
+                                            ) : null}
+
+                                            <div className="rounded-2xl bg-white p-4 text-sm leading-6 text-gray-700">
+                                                <p>
+                                                    <strong>Ngân hàng:</strong>{' '}
+                                                    {bankTransfer.bankName || 'Admin cập nhật trong Site Settings'}
+                                                </p>
+                                                <p>
+                                                    <strong>Chủ tài khoản:</strong>{' '}
+                                                    {bankTransfer.bankAccountName || 'Admin cập nhật trong Site Settings'}
+                                                </p>
+                                                <p>
+                                                    <strong>Số tài khoản:</strong>{' '}
+                                                    {bankTransfer.bankAccountNumber || 'Admin cập nhật trong Site Settings'}
+                                                </p>
+                                                {bankTransfer.bankBranch ? (
+                                                    <p>
+                                                        <strong>Chi nhánh:</strong> {bankTransfer.bankBranch}
+                                                    </p>
+                                                ) : null}
+                                                <p>
+                                                    <strong>Nội dung:</strong> MF PARIS + số điện thoại đặt hàng
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ) : null}
+                                </div>
                                 {/* Lựa chọn COD */}
                                 <Label
                                     htmlFor="cod"
@@ -610,12 +788,40 @@ export default function CheckoutPage() {
                                     </div>
                                 )}
 
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-400">Phí vận chuyển</span>
-                                    <span className="font-bold text-gray-800">
-                                        {shippingFee === 0 ? 'Miễn phí' : `${formatPrice(shippingFee)}₫`}
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-400">
+                                        Phí vận chuyển
+                                    </span>
+
+                                    <span
+                                        className={
+                                            shippingFee === 0
+                                                ? 'font-bold text-green-600'
+                                                : 'font-bold text-gray-800'
+                                        }
+                                    >
+                                        {shippingFee === 0
+                                            ? deliveryMethod === 'store_pickup'
+                                                ? 'Nhận tại cửa hàng'
+                                                : 'Freeship'
+                                            : `${formatPrice(shippingFee)}₫`}
                                     </span>
                                 </div>
+
+                                {shippingFee > 0 && freeShippingThreshold ? (
+                                    <div className="flex justify-end text-sm">
+                                        <p className="text-xs font-bold text-red-500">
+                                            Mua thêm{' '}
+                                            {formatPrice(
+                                                Math.max(
+                                                    0,
+                                                    freeShippingThreshold - subtotalAmount,
+                                                ),
+                                            )}
+                                            ₫ để được miễn phí ship.
+                                        </p>
+                                    </div>
+                                ) : null}
 
                                 <div className="flex justify-between items-center pt-4">
                                     <span className="text-lg font-black uppercase tracking-widest text-[#b72828]">

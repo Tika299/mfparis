@@ -5,6 +5,12 @@ import {
   type Payload,
   type Where,
 } from 'payload'
+import {
+  calculateShippingFee,
+  isKnownProvince,
+  normalizeDeliveryMethod,
+  type DeliveryMethod,
+} from '@/lib/shipping'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -38,6 +44,7 @@ type CreateOrderInput = Readonly<{
   province: string
   district: string | null
   ward: string | null
+  deliveryMethod: DeliveryMethod
   paymentMethod: PaymentMethod
   voucherCode: string | null
   shippingFee: number
@@ -299,9 +306,6 @@ function finiteNumber(
   return fallback
 }
 
-const FREE_SHIPPING_THRESHOLD = 1000000
-const FLAT_SHIPPING_FEE = 30000
-
 function normalizeShippingFee(
   value: unknown,
 ): number {
@@ -342,14 +346,6 @@ function normalizeClientTotalAmount(
   }
 
   return totalAmount
-}
-
-function calculateShippingFee(
-  subtotalAmount: number,
-): number {
-  return subtotalAmount >= FREE_SHIPPING_THRESHOLD
-    ? 0
-    : FLAT_SHIPPING_FEE
 }
 
 function relationshipID(
@@ -586,6 +582,28 @@ async function readCreateOrderInput(
     )
   }
 
+  const deliveryMethod = normalizeDeliveryMethod(body.deliveryMethod)
+
+  const province =
+    deliveryMethod === 'store_pickup'
+      ? 'Nhận tại cửa hàng'
+      : requiredText(
+        body.province,
+        'Tỉnh/Thành phố',
+        120,
+      )
+
+  if (
+    deliveryMethod === 'home_delivery' &&
+    !isKnownProvince(province)
+  ) {
+    throw new CheckoutError(
+      'Tỉnh/Thành phố không hợp lệ.',
+      400,
+      'INVALID_PROVINCE',
+    )
+  }
+
   return {
     fullName: requiredText(
       body.fullName,
@@ -597,17 +615,16 @@ async function readCreateOrderInput(
 
     email: normalizeEmail(body.email),
 
-    address: requiredText(
-      body.address,
-      'Địa chỉ',
-      300,
-    ),
+    address:
+      deliveryMethod === 'store_pickup'
+        ? 'Nhận tại cửa hàng'
+        : requiredText(
+          body.address,
+          'Địa chỉ',
+          300,
+        ),
 
-    province: requiredText(
-      body.province,
-      'Tỉnh/Thành phố',
-      120,
-    ),
+    province,
 
     district: optionalText(
       body.district,
@@ -619,6 +636,8 @@ async function readCreateOrderInput(
       120,
     ),
 
+    deliveryMethod,
+
     paymentMethod,
 
     voucherCode:
@@ -629,6 +648,7 @@ async function readCreateOrderInput(
     items: Array.from(
       mergedItems.values(),
     ),
+
     shippingFee: normalizeShippingFee(
       body.shippingFee,
     ),
@@ -1422,7 +1442,11 @@ export async function POST(
           ?.discountAmount ?? 0
 
       const expectedShippingFee =
-        calculateShippingFee(subtotalAmount)
+        calculateShippingFee({
+          subtotalAmount,
+          province: input.province,
+          deliveryMethod: input.deliveryMethod,
+        })
 
       if (input.shippingFee !== expectedShippingFee) {
         throw new CheckoutError(
@@ -1505,6 +1529,14 @@ export async function POST(
 
             paymentMethod:
               input.paymentMethod,
+
+            deliveryMethod:
+              input.deliveryMethod,
+
+            paymentStatus:
+              input.paymentMethod === 'fundiin'
+                ? 'pending'
+                : 'unpaid',
 
             status: 'pending',
 

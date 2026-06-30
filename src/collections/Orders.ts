@@ -497,6 +497,23 @@ export const Orders: CollectionConfig = {
       ],
     },
     {
+      name: 'deliveryMethod',
+      type: 'select',
+      defaultValue: 'home_delivery',
+      index: true,
+      label: 'Hình thức nhận hàng',
+      options: [
+        {
+          label: 'Giao hàng tận nơi',
+          value: 'home_delivery',
+        },
+        {
+          label: 'Nhận tại cửa hàng',
+          value: 'store_pickup',
+        },
+      ],
+    },
+    {
       name: 'items',
       type: 'array',
       label: 'Danh sách sản phẩm',
@@ -575,6 +592,35 @@ export const Orders: CollectionConfig = {
         { label: 'COD (Thanh toán khi nhận hàng)', value: 'cod' },
         { label: 'Chuyển khoản ngân hàng', value: 'bank_transfer' },
         { label: 'Thanh toán qua Fundiin', value: 'fundiin' },
+      ],
+    },
+    {
+      name: 'paymentStatus',
+      type: 'select',
+      defaultValue: 'unpaid',
+      index: true,
+      label: 'Trạng thái thanh toán',
+      options: [
+        {
+          label: 'Chưa thanh toán',
+          value: 'unpaid',
+        },
+        {
+          label: 'Chờ xác nhận',
+          value: 'pending',
+        },
+        {
+          label: 'Đã thanh toán',
+          value: 'paid',
+        },
+        {
+          label: 'Thanh toán thất bại',
+          value: 'failed',
+        },
+        {
+          label: 'Đã hoàn tiền',
+          value: 'refunded',
+        },
       ],
     },
     {

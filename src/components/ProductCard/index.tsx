@@ -479,15 +479,21 @@ export const ProductCard = ({
         >
           <h3
             className={cn(
-              'overflow-hidden text-[#252525] [display:-webkit-box] [-webkit-box-orient:vertical] whitespace-normal break-normal transition-colors hover:text-[#b40008]',
+              'overflow-hidden text-[#252525] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] whitespace-normal break-words transition-colors hover:text-[#b40008]',
               mode === 'combo'
-                ? '[-webkit-line-clamp:2] h-[36px] text-[12px] font-bold leading-[18px] sm:h-[36px] sm:text-[12px] md:h-[40px] md:text-[13px] md:leading-[20px] lg:h-[44px] lg:text-[15px] lg:leading-[22px]'
+                ? 'h-[36px] text-[12px] font-bold leading-[18px] sm:h-[36px] sm:text-[12px] md:h-[40px] md:text-[13px] md:leading-[20px] lg:h-[44px] lg:text-[15px] lg:leading-[22px]'
                 : isFlashMode
-                  ? '[-webkit-line-clamp:2] h-[32px] text-[11px] font-normal leading-[16px] sm:h-[32px] sm:text-[11px] md:h-[36px] md:text-[12px] md:leading-[18px] lg:h-[40px] lg:text-[14px] lg:leading-[20px]'
-                  : '[-webkit-line-clamp:2] h-[36px] text-[12px] font-normal leading-[18px] sm:h-[36px] sm:text-[12px] md:h-[40px] md:text-[13px] md:leading-[20px] lg:h-[40px] lg:text-[14px] lg:leading-[20px]',
+                  ? 'h-[32px] text-[11px] font-normal leading-[16px] sm:h-[32px] sm:text-[11px] md:h-[36px] md:text-[12px] md:leading-[18px] lg:h-[40px] lg:text-[14px] lg:leading-[20px]'
+                  : 'h-[36px] text-[12px] font-normal leading-[18px] sm:h-[36px] sm:text-[12px] md:h-[40px] md:text-[13px] md:leading-[20px] lg:h-[40px] lg:text-[14px] lg:leading-[20px]',
             )}
           >
-            {displayTitle}
+            <span className="lg:hidden">
+              {product.title}
+            </span>
+
+            <span className="hidden lg:inline">
+              {displayTitle}
+            </span>
           </h3>
         </Link>
 

@@ -2,8 +2,45 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 export const fetchCache = 'force-no-store'
 
-import CheckoutClient from './CheckoutClient'
+import { getSiteSettings } from '@/data/getSiteSettings'
+import CheckoutClient, {
+  type BankTransferSettings,
+} from './CheckoutClient'
 
-export default function CheckoutPage() {
-  return <CheckoutClient />
+function getMediaUrl(value: unknown): string | null {
+  if (!value || typeof value !== 'object') {
+    return null
+  }
+
+  const record = value as {
+    url?: unknown
+  }
+
+  return typeof record.url === 'string' && record.url.trim()
+    ? record.url
+    : null
+}
+
+export default async function CheckoutPage() {
+  const settings = await getSiteSettings()
+
+  const payment = (settings as unknown as {
+    payment?: {
+      bankName?: string | null
+      bankAccountName?: string | null
+      bankAccountNumber?: string | null
+      bankBranch?: string | null
+      bankQrImage?: unknown
+    } | null
+  }).payment
+
+  const bankTransfer: BankTransferSettings = {
+    bankName: payment?.bankName?.trim() || null,
+    bankAccountName: payment?.bankAccountName?.trim() || null,
+    bankAccountNumber: payment?.bankAccountNumber?.trim() || null,
+    bankBranch: payment?.bankBranch?.trim() || null,
+    bankQrImageUrl: getMediaUrl(payment?.bankQrImage),
+  }
+
+  return <CheckoutClient bankTransfer={bankTransfer} />
 }

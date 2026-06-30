@@ -1582,12 +1582,14 @@ export default async function ProductPage({
             <DiscontinuedBanner />
           ) : null}
 
-          <div className="grid grid-cols-1 overflow-hidden rounded-3xl bg-white shadow-sm lg:grid-cols-12">
+          <div className="grid grid-cols-1 overflow-visible rounded-3xl bg-white shadow-sm lg:grid-cols-12">
             <div className="bg-white p-3 sm:p-4 md:p-6 lg:col-span-7 lg:border-r lg:border-gray-100 lg:p-8">
-              <div className="overflow-hidden rounded-2xl">
-                <ProductGallery
-                  images={product.images ?? []}
-                />
+              <div className="lg:sticky lg:top-44">
+                <div className="overflow-hidden rounded-2xl">
+                  <ProductGallery
+                    images={product.images ?? []}
+                  />
+                </div>
               </div>
             </div>
 
@@ -1602,7 +1604,7 @@ export default async function ProductPage({
                   </Link>
                 ) : null}
 
-                <h1 className="mt-3 font-sans text-2xl font-bold leading-tight md:text-3xl lg:text-[2.1rem]">
+                <h1 className="mt-3 font-sans text-xl font-bold leading-tight md:text-3xl lg:text-[2.1rem]">
                   {product.title}
                 </h1>
 

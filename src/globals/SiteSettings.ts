@@ -117,6 +117,39 @@ export const SiteSettings: GlobalConfig = {
       ],
     },
     {
+      name: 'payment',
+      type: 'group',
+      label: 'Cấu hình thanh toán',
+      fields: [
+        {
+          name: 'bankName',
+          type: 'text',
+          label: 'Tên ngân hàng',
+        },
+        {
+          name: 'bankAccountName',
+          type: 'text',
+          label: 'Tên chủ tài khoản',
+        },
+        {
+          name: 'bankAccountNumber',
+          type: 'text',
+          label: 'Số tài khoản',
+        },
+        {
+          name: 'bankBranch',
+          type: 'text',
+          label: 'Chi nhánh',
+        },
+        {
+          name: 'bankQrImage',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Ảnh QR chuyển khoản',
+        },
+      ],
+    },
+    {
       name: 'footer',
       type: 'group',
       label: 'Footer',
