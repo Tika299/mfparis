@@ -6,6 +6,7 @@ import type {
 } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { trackProductSlugHistory } from '@/collections/hooks/trackSlugHistory'
+import { ensureLegacyProductRedirectHook } from '@/collections/hooks/ensureLegacyProductRedirect'
 import { productSeoLifecycleFields } from '@/collections/fields/productSeoLifecycleFields'
 
 type EntityID = string | number
@@ -120,6 +121,7 @@ export const Products: CollectionConfig = {
   hooks: {
     afterChange: [
       trackProductSlugHistory,
+      ensureLegacyProductRedirectHook,
       async () => {
         await revalidateProductTags()
       },

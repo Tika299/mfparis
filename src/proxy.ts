@@ -8,6 +8,7 @@ import {
     normalizeRedirectSource,
     REDIRECT_LOOKUP_ENDPOINT,
     REDIRECT_LOOKUP_HEADER,
+    shouldLookupRedirectPath,
     type RedirectLookupResponse,
 } from '@/utilities/redirects'
 
@@ -94,6 +95,10 @@ export async function proxy(
     )
 
     if (!normalizedRequestPath) {
+        return NextResponse.next()
+    }
+
+    if (!shouldLookupRedirectPath(normalizedRequestPath)) {
         return NextResponse.next()
     }
 

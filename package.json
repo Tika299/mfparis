@@ -37,7 +37,9 @@
     "convert:categories-desc": "tsx src/scripts/convert-categories-description.ts",
     "convert:brands-desc": "tsx src/scripts/convert-brands-description.ts",
     "convert:posts-content": "tsx src/scripts/convert-posts-content.ts",
-    "clear:products": "tsx src/scripts/clear-data.ts"
+    "clear:products": "tsx src/scripts/clear-data.ts",
+    "redirects:backfill-products": "tsx src/scripts/backfill-wordpress-product-redirects.ts",
+    "redirects:audit": "tsx src/scripts/audit-redirects.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.85.0",

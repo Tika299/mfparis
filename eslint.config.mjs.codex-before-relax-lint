@@ -6,15 +6,6 @@ const eslintConfig = [
   ...nextTypescript,
   {
     rules: {
-      // Next 16 enables stricter React Compiler lint rules. Keep them as warnings
-      // until the existing UI components are refactored one by one.
-      'react-hooks/set-state-in-effect': 'warn',
-      'react-hooks/refs': 'warn',
-      'react-hooks/purity': 'warn',
-      'react-hooks/immutability': 'warn',
-      'prefer-const': 'warn',
-      '@typescript-eslint/no-require-imports': 'warn',
-      'react/no-unescaped-entities': 'warn',
       '@typescript-eslint/ban-ts-comment': 'warn',
       '@typescript-eslint/no-empty-object-type': 'warn',
       '@typescript-eslint/no-explicit-any': 'warn',

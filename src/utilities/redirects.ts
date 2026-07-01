@@ -8,6 +8,35 @@ export const REDIRECT_LOOKUP_ENDPOINT =
 
 export const MAX_REDIRECT_HOPS = 8 as const
 
+export const PRODUCT_ROUTE_PREFIX = '/products' as const
+
+export const RESERVED_ROOT_PATHS = [
+    'account',
+    'admin',
+    'api',
+    'blog',
+    'brand',
+    'brands',
+    'cart',
+    'categories',
+    'category',
+    'checkout',
+    'favicon.ico',
+    'login',
+    'media',
+    'next',
+    'product',
+    'products',
+    'register',
+    'robots.txt',
+    'search',
+    'sitemap.xml',
+    '_next',
+] as const satisfies readonly string[]
+
+const RESERVED_ROOT_PATH_SET = new Set<string>(
+    RESERVED_ROOT_PATHS,
+)
 export type RedirectStatusCode = 301 | 302
 
 export type RedirectLookupResponse =
@@ -119,6 +148,100 @@ export function normalizeRedirectPathname(
     return withoutTrailingSlash || '/'
 }
 
+export function normalizeProductSlug(
+    value: null | string | undefined,
+): string | null {
+    if (typeof value !== 'string') {
+        return null
+    }
+
+    const normalizedSlug = value
+        .trim()
+        .toLowerCase()
+        .replace(/^\/+/gu, '')
+        .replace(/\/+$/gu, '')
+
+    if (
+        !normalizedSlug ||
+        normalizedSlug.includes('/') ||
+        normalizedSlug.includes('?') ||
+        normalizedSlug.includes('#')
+    ) {
+        return null
+    }
+
+    return normalizedSlug
+}
+
+export function getRootPathSegment(
+    pathname: string,
+): string | null {
+    const normalizedPathname =
+        normalizeRedirectSource(pathname)
+
+    if (!normalizedPathname || normalizedPathname === '/') {
+        return null
+    }
+
+    return (
+        normalizedPathname
+            .replace(/^\/+/u, '')
+            .split('/', 1)[0] || null
+    )
+}
+
+export function isReservedRootPath(
+    pathnameOrSlug: string,
+): boolean {
+    const slug =
+        normalizeProductSlug(pathnameOrSlug) ??
+        getRootPathSegment(pathnameOrSlug)
+
+    return Boolean(
+        slug && RESERVED_ROOT_PATH_SET.has(slug),
+    )
+}
+
+export function buildLegacyProductPath(
+    slug: string,
+): string | null {
+    const normalizedSlug = normalizeProductSlug(slug)
+
+    if (!normalizedSlug || isReservedRootPath(normalizedSlug)) {
+        return null
+    }
+
+    return normalizeRedirectPathname(normalizedSlug)
+}
+
+export function buildProductPath(
+    slug: string,
+): string | null {
+    const normalizedSlug = normalizeProductSlug(slug)
+
+    if (!normalizedSlug) {
+        return null
+    }
+
+    return normalizeRedirectPathname(
+        `${PRODUCT_ROUTE_PREFIX}/${normalizedSlug}`,
+    )
+}
+
+export function isProductPathname(pathname: string): boolean {
+    const normalizedPathname =
+        normalizeRedirectSource(pathname)
+
+    return (
+        normalizedPathname === PRODUCT_ROUTE_PREFIX ||
+        Boolean(
+            normalizedPathname?.startsWith(
+                `${PRODUCT_ROUTE_PREFIX}/`,
+            ),
+        )
+    )
+}
+
 function splitRelativeLocation(value: string): Readonly<{
     pathname: string
     search: string
@@ -186,6 +309,36 @@ export function normalizeRedirectSource(
  * - Chuyển về chữ thường.
  * - Loại bỏ trailing slash.
  */
+export function shouldLookupRedirectPath(
+    pathname: string,
+): boolean {
+    const normalizedPathname =
+        normalizeRedirectSource(pathname)
+
+    if (!normalizedPathname || normalizedPathname === '/') {
+        return false
+    }
+
+    if (isProductPathname(normalizedPathname)) {
+        return false
+    }
+
+    const rootSegment = getRootPathSegment(normalizedPathname)
+
+    if (
+        rootSegment &&
+        RESERVED_ROOT_PATH_SET.has(rootSegment)
+    ) {
+        return false
+    }
+
+    if (/\/[^/]+\.[^/]+$/u.test(normalizedPathname)) {
+        return false
+    }
+
+    return true
+}
+
 export function normalizeRedirectDestination(
     value: string,
 ): string | null {
