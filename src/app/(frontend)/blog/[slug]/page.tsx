@@ -15,8 +15,10 @@ import {
   Link as LinkIcon,
   ChevronRight,
 } from 'lucide-react'
-import RichText from '@/components/RichText'
-import { ExpandableContent } from '@/components/ExpandableContent'
+import {
+  BlogRichTextContent,
+  BlogTocNav,
+} from '@/components/Blog/BlogRichTextContent'
 import RelatedPostsCarousel from '@/components/Blog/RelatedPostsCarousel'
 import { SITE_ORIGIN } from '@/utilities/seo'
 import '@/styles/blog.css'
@@ -240,6 +242,18 @@ function buildTocItems(children: LexicalNode[]) {
     }>
 }
 
+function getBlogHeadingClassName(tag?: string) {
+  if (tag === 'h2') {
+    return 'scroll-mt-28 mt-12 mb-5 text-2xl font-black leading-tight text-gray-950 md:text-3xl'
+  }
+
+  if (tag === 'h3') {
+    return 'mt-9 mb-4 text-xl font-bold leading-snug text-gray-900 md:text-2xl'
+  }
+
+  return 'mt-8 mb-4 text-lg font-bold leading-snug text-gray-900'
+}
+
 export async function generateMetadata({
   params,
 }: BlogPostPageProps): Promise<Metadata> {
@@ -329,6 +343,47 @@ export default async function BlogPostPage({
   const tocItems = buildTocItems(
     post.content?.root?.children || [],
   )
+
+  const contentChildren =
+    post.content?.root?.children || []
+
+  const headingIdByNode = new Map<LexicalNode, string>()
+
+  contentChildren.forEach((node: LexicalNode) => {
+    if (node?.type !== 'heading' || node?.tag !== 'h2') {
+      return
+    }
+
+    const text = getTextFromNode(node).trim()
+    const item = tocItems.find(
+      (tocItem) => tocItem.text === text,
+    )
+
+    if (item) {
+      headingIdByNode.set(node, item.id)
+    }
+  })
+
+  const richTextConverters = ({ defaultConverters }: any) => ({
+    ...defaultConverters,
+
+    heading: ({ node, nodesToJSX }: any) => {
+      const Tag = node.tag || 'h2'
+      const id =
+        node.tag === 'h2'
+          ? headingIdByNode.get(node)
+          : undefined
+
+      return (
+        <Tag
+          id={id}
+          className={getBlogHeadingClassName(node.tag)}
+        >
+          {nodesToJSX({ nodes: node.children })}
+        </Tag>
+      )
+    },
+  })
 
   const [featuredPosts, relatedPosts] =
     await Promise.all([
@@ -443,14 +498,11 @@ export default async function BlogPostPage({
                 />
               </div>
 
-              <div className="max-w-none">
-                <ExpandableContent maxHeight={500}>
-                  <RichText
-                    content={post.content}
-                    showToc={false}
-                  />
-                </ExpandableContent>
-              </div>
+              <BlogRichTextContent
+                content={post.content}
+                tocItems={tocItems}
+                maxHeight={500}
+              />
 
               <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-gray-100 pt-10 md:flex-row">
                 <div
@@ -529,17 +581,7 @@ export default async function BlogPostPage({
                     Mục lục
                   </h3>
 
-                  <nav className="space-y-2">
-                    {tocItems.map((item, index) => (
-                      <a
-                        key={item.id}
-                        href={`#${item.id}`}
-                        className="block rounded-xl px-3 py-2 text-sm leading-6 text-gray-700 transition hover:bg-gray-50 hover:text-primary"
-                      >
-                        {index + 1}. {item.text}
-                      </a>
-                    ))}
-                  </nav>
+                  <BlogTocNav tocItems={tocItems} />
                 </div>
               </div>
             )}

@@ -263,6 +263,19 @@ export function FloatingContactMenu({
                 </a>
             </FloatingAction>
 
+            {!open ? (
+                <span className="contact-cta pointer-events-none absolute right-[66px] top-1/2 z-20 flex -translate-y-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-white/95 px-3.5 py-2 text-xs font-black text-[#b72828] shadow-[0_12px_32px_rgba(183,40,40,0.22)] ring-1 ring-[#b72828]/10 backdrop-blur sm:right-[76px]">
+                    <span className="relative flex h-2 w-2">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#b72828] opacity-60" />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-[#b72828]" />
+                    </span>
+
+                    <span>Liên hệ</span>
+
+                    <span className="absolute -right-1 h-2.5 w-2.5 rotate-45 bg-white/95 ring-r ring-t ring-[#b72828]/10" />
+                </span>
+            ) : null}
+
             <button
                 type="button"
                 onClick={toggleMenu}

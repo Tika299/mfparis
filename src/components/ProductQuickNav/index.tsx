@@ -10,6 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { RichText as PayloadRichText } from '@payloadcms/richtext-lexical/react'
 
 type LexicalNode = Record<string, any>
 
@@ -42,6 +43,18 @@ const getTextFromNode = (node: LexicalNode): string => {
   }
 
   return ''
+}
+
+const getHeadingClassName = (tag?: string) => {
+  if (tag === 'h2') {
+    return 'scroll-mt-28 mt-8 mb-4 text-[22px] font-black leading-snug text-gray-950 md:text-2xl'
+  }
+
+  if (tag === 'h3') {
+    return 'mt-6 mb-3 text-[18px] font-bold leading-snug text-gray-900 md:text-xl'
+  }
+
+  return 'mt-6 mb-3 font-bold leading-snug text-gray-900'
 }
 
 const slugify = (text: string) => {
@@ -80,16 +93,26 @@ const buildTocItems = (children: LexicalNode[]) => {
 }
 
 const scrollToHeading = (id: string) => {
-  const element = document.getElementById(id)
+  const scroll = (attempt = 0) => {
+    const element = document.getElementById(id)
 
-  if (!element) return
+    if (!element) {
+      if (attempt < 10) {
+        requestAnimationFrame(() => scroll(attempt + 1))
+      }
 
-  element.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start',
-  })
+      return
+    }
 
-  window.history.replaceState(null, '', `#${id}`)
+    element.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+
+    window.history.replaceState(null, '', `#${id}`)
+  }
+
+  requestAnimationFrame(() => scroll())
 }
 
 const PRODUCT_CONTENT_SCROLL_EVENT = 'product-content-scroll-to-heading'
@@ -396,6 +419,25 @@ export function ProductRichTextContent({
 
   const tocItems = useMemo(() => buildTocItems(children), [children])
 
+  const headingIdByNode = useMemo(() => {
+    const map = new Map<LexicalNode, string>()
+    let index = 0
+
+    children.forEach((node: LexicalNode) => {
+      if (node?.type !== 'heading' || node?.tag !== 'h2') return
+
+      const id = tocItems[index]?.id
+
+      if (id) {
+        map.set(node, id)
+      }
+
+      index += 1
+    })
+
+    return map
+  }, [children, tocItems])
+
   useEffect(() => {
     const onRequestScroll = (event: Event) => {
       const customEvent = event as CustomEvent<{ id?: string }>
@@ -450,17 +492,22 @@ export function ProductRichTextContent({
 
   if (!hasRichTextContent(description)) return null
 
-  let h2Index = 0
+  const richTextConverters = ({ defaultConverters }: any) => ({
+    ...defaultConverters,
 
-  const articleContent = children.map((node: LexicalNode, index: number) => {
-    let headingId: string | undefined
+    heading: ({ node, nodesToJSX }: any) => {
+      const Tag = node.tag || 'h2'
+      const id =
+        node.tag === 'h2'
+          ? headingIdByNode.get(node)
+          : undefined
 
-    if (node.type === 'heading' && node.tag === 'h2') {
-      headingId = tocItems[h2Index]?.id
-      h2Index++
-    }
-
-    return renderNode(node, index, headingId)
+      return (
+        <Tag id={id} className={getHeadingClassName(node.tag)}>
+          {nodesToJSX({ nodes: node.children })}
+        </Tag>
+      )
+    },
   })
 
   if (!tocItems.length) {
@@ -476,10 +523,16 @@ export function ProductRichTextContent({
             onExpandedChange={setContentExpanded}
             collapseScrollTargetId={PRODUCT_DETAIL_CONTENT_ID}
           >
-            <div>{articleContent}</div>
+            <PayloadRichText
+              data={description}
+              converters={richTextConverters}
+            />
           </ExpandableContent>
         ) : (
-          <div>{articleContent}</div>
+          <PayloadRichText
+            data={description}
+            converters={richTextConverters}
+          />
         )}
       </section>
     )
@@ -551,10 +604,16 @@ export function ProductRichTextContent({
               onExpandedChange={setContentExpanded}
               collapseScrollTargetId={PRODUCT_DETAIL_CONTENT_ID}
             >
-              <div>{articleContent}</div>
+              <PayloadRichText
+                data={description}
+                converters={richTextConverters}
+              />
             </ExpandableContent>
           ) : (
-            <div>{articleContent}</div>
+            <PayloadRichText
+              data={description}
+              converters={richTextConverters}
+            />
           )}
         </article>
       </div>

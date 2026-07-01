@@ -8,10 +8,11 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import '@/styles/prose.css'
 import { ProductCard } from '@/components/ProductCard'
-import { RichText } from '@/components/RichText'
+import { RichText as PayloadRichText } from '@payloadcms/richtext-lexical/react'
 import { SearchFilters } from '@/components/search-filters/SearchFilters'
 import { getProductFilterOptions } from '@/data/getProductFilterOptions'
 import { SITE_ORIGIN } from '@/utilities/seo'
+import { ExpandableContent } from '@/components/ExpandableContent'
 
 const PRODUCTS_PER_PAGE = 20
 const DEFAULT_SORT = '-createdAt'
@@ -669,14 +670,13 @@ export default async function BrandProductsPage({
                   </h2>
 
                   <div className="brand-description prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
-                    <RichText
-                      data={
-                        currentBrand.description
-                      }
-                      showToc
-                      expandable
-                      maxHeight={1200}
-                    />
+                    <ExpandableContent maxHeight={500}>
+                      <PayloadRichText
+                        data={
+                          currentBrand.description
+                        }
+                      />
+                    </ExpandableContent>
                   </div>
                 </section>
               )}

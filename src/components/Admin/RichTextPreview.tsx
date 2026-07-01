@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import { useField } from '@payloadcms/ui'
-import { RichText } from '@/components/RichText'
+import { RichText as PayloadRichText } from '@payloadcms/richtext-lexical/react'
 
 export const RichTextPreview: React.FC<{ path: string }> = ({ path }) => {
   // Lấy giá trị đang gõ trong ô mô tả
@@ -23,7 +23,21 @@ export const RichTextPreview: React.FC<{ path: string }> = ({ path }) => {
         {' '}
         {/* Màu nền trang web của bạn */}
         {value ? (
-          <RichText content={value} />
+          <PayloadRichText
+            data={
+              (value ?? {
+                root: {
+                  type: 'root',
+                  children: [],
+                  direction: null,
+                  format: '',
+                  indent: 0,
+                  version: 1,
+                },
+                version: 1,
+              }) as any
+            }
+          />
         ) : (
           <p className="text-gray-300 italic text-sm text-center">
             Chưa có nội dung để hiển thị...
