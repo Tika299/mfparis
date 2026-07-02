@@ -29,9 +29,13 @@ async function fetchRedirectResult(
         return null
     }
 
+    const lookupOrigin =
+        process.env.REDIRECT_LOOKUP_ORIGIN?.trim() ||
+        request.nextUrl.origin
+
     const lookupUrl = new URL(
         REDIRECT_LOOKUP_ENDPOINT,
-        request.nextUrl.origin,
+        lookupOrigin,
     )
 
     lookupUrl.searchParams.set('path', pathname)
