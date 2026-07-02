@@ -13,7 +13,7 @@ type PageProps = {
 
 export const metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_BASE_URL || 'https://maraisdefrance.vn',
+    process.env.NEXT_PUBLIC_BASE_URL || 'https://mfparis.vn',
   ),
   title: 'Thương hiệu | MF Paris Chính Hãng',
   description:

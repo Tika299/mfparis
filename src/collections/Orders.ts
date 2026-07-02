@@ -2,7 +2,7 @@ import type {
   CollectionAfterChangeHook,
   CollectionConfig,
 } from 'payload'
-
+const NEXT_PUBLIC_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://mfparis.vn'
 type EntityID = string | number
 
 type RelationshipValue =
@@ -437,7 +437,7 @@ const sendOrderEmail = async ({ doc, operation, req }: any) => {
         </div>
         
         <p style="text-align: center; margin-top: 30px;">
-          <a href="https://maraisdefrance.vn/admin/collections/orders/${doc.id}" 
+          <a href="${NEXT_PUBLIC_URL}/admin/collections/orders/${doc.id}" 
              style="background: #000; color: #fff; padding: 12px 25px; text-decoration: none; font-weight: bold;">
             XEM ĐƠN TRONG ADMIN
           </a>

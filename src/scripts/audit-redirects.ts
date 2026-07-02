@@ -203,7 +203,7 @@ async function run(): Promise<void> {
     const baseUrl =
         getArg('base-url') ??
         process.env.NEXT_PUBLIC_BASE_URL ??
-        'https://maraisdefrance.vn'
+        'https://mfparis.vn'
     const maxHops = Number(getArg('max-hops') ?? DEFAULT_MAX_HOPS)
 
     if (!input) {

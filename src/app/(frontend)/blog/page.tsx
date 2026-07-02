@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Search, Sparkles, X } from 'lucide-react'
 import '@/styles/blog.css'
 
 export const metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://maraisdefrance.vn'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://mfparis.vn'),
   title: 'Blog | MF Paris Chính Hãng',
   description: 'Cập nhật kiến thức nước hoa, mỹ phẩm, chăm sóc da và sức khỏe từ MF Paris.',
 }

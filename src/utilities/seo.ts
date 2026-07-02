@@ -1,4 +1,4 @@
-export const SITE_ORIGIN = 'https://maraisdefrance.vn' as const
+export const SITE_ORIGIN = process.env.NEXT_PUBLIC_BASE_URL || 'https://mfparis.vn' as const
 
 export const INDEXABLE_FACET_KEYS = [
     'brand',
