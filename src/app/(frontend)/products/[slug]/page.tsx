@@ -1861,3 +1861,4 @@ export default async function ProductPage({
     </div>
   )
 }
+

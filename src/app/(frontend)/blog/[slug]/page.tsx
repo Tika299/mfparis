@@ -4,6 +4,7 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { notFound } from 'next/navigation'
 import { OptimizedImage } from '@/components/OptimizedImage'
+import { JsonLd } from '@/components/JsonLd'
 import Link from 'next/link'
 import {
   Calendar,
@@ -22,6 +23,7 @@ import {
 import RelatedPostsCarousel from '@/components/Blog/RelatedPostsCarousel'
 import { SITE_ORIGIN } from '@/utilities/seo'
 import { extractHtmlHeadings, htmlToPlainText } from '@/lib/html/contentHtml'
+import { buildBlogPostingSchemaGraph } from '@/lib/structured-data'
 import '@/styles/blog.css'
 import '@/styles/prose.css'
 import '@/styles/carousel-overrides.css'
@@ -381,6 +383,49 @@ export default async function BlogPostPage({
     },
   })
 
+  const canonicalUrl = `/blog/${encodeURIComponent(slug)}`
+  const description = getPostDescription(post)
+  const imageUrl = getMediaUrl(post.thumbnail)
+  const articleSection = Array.isArray(post.categories)
+    ? post.categories
+      .map((category: any) => category?.title || category?.name)
+      .filter(Boolean)
+      .join(', ')
+    : undefined
+  const schemaGraph = buildBlogPostingSchemaGraph({
+    page: {
+      url: canonicalUrl,
+      name: post.title,
+      description,
+      type: 'WebPage',
+    },
+    article: {
+      url: canonicalUrl,
+      headline: post.title,
+      description,
+      image: imageUrl,
+      datePublished: post.createdAt,
+      dateModified: post.updatedAt,
+      authorName: 'MF Paris Editorial',
+      articleSection,
+      wordCount: htmlToPlainText(post.content).split(/\s+/u).filter(Boolean).length,
+    },
+    breadcrumb: [
+      {
+        name: 'Trang chu',
+        url: '/',
+      },
+      {
+        name: 'Blog',
+        url: '/blog',
+      },
+      {
+        name: post.title,
+        url: canonicalUrl,
+      },
+    ],
+  })
+
   const [featuredPosts, relatedPosts] =
     await Promise.all([
       payload.find({
@@ -415,6 +460,7 @@ export default async function BlogPostPage({
 
   return (
     <div className="min-h-screen bg-[#FDFBF9] pb-20 font-sans">
+      <JsonLd data={schemaGraph} />
       <div className="mx-auto max-w-[1240px] px-4 py-6">
         <nav className="mb-10 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
           <Link
@@ -587,3 +633,4 @@ export default async function BlogPostPage({
     </div>
   )
 }
+

@@ -8,12 +8,14 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import '@/styles/prose.css'
 import { ProductCard } from '@/components/ProductCard'
+import { JsonLd } from '@/components/JsonLd'
 import { SearchFilters } from '@/components/search-filters/SearchFilters'
 import { getProductFilterOptions } from '@/data/getProductFilterOptions'
 import { SITE_ORIGIN } from '@/utilities/seo'
 import { ExpandableContent } from '@/components/ExpandableContent'
 import { SafeHtmlContent } from '@/components/SafeHtmlContent'
 import { htmlToPlainText, normalizeContentHtml } from '@/lib/html/contentHtml'
+import { buildCollectionPageSchemaGraph } from '@/lib/structured-data'
 
 const PRODUCTS_PER_PAGE = 20
 const DEFAULT_SORT = '-createdAt'
@@ -440,6 +442,29 @@ export default async function BrandProductsPage({
     normalizeContentHtml(currentBrand.description),
   )
 
+  const brandUrl = `/brands/${encodeURIComponent(slug)}`
+  const schemaGraph = buildCollectionPageSchemaGraph({
+    page: {
+      url: brandUrl,
+      name: currentBrand.name,
+      description: getBrandDescription(currentBrand),
+      breadcrumb: [
+        {
+          name: 'Trang chu',
+          url: '/',
+        },
+        {
+          name: currentBrand.name,
+          url: brandUrl,
+        },
+      ],
+      items: productsRes.docs.map((product) => ({
+        name: product.title,
+        url: `/products/${product.slug}`,
+      })),
+    },
+  })
+
   const buildPageHref = (
     pageNumber: number,
   ): string => {
@@ -508,6 +533,7 @@ export default async function BrandProductsPage({
 
   return (
     <div className="min-h-screen bg-[#F4F6F8] pb-16">
+      <JsonLd data={schemaGraph} />
       <div className="border-b border-gray-100 bg-white">
         <div className="container-ux py-5 md:py-7 lg:py-9">
           <h1 className="text-2xl font-black uppercase tracking-wide md:text-3xl lg:text-4xl">
@@ -695,3 +721,5 @@ export default async function BrandProductsPage({
     </div>
   )
 }
+
+

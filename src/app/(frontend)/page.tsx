@@ -17,7 +17,9 @@ import { HeroSlider } from '@/components/HeroSlider'
 import { FlashSaleSection } from '@/components/FlashSaleSection'
 import { StoreIntro } from '@/components/home/StoreIntro'
 import { GoogleReviews } from '@/components/home/GoogleReviews'
+import { JsonLd } from '@/components/JsonLd'
 import { SITE_ORIGIN } from '@/utilities/seo'
+import { buildHomeSchemaGraph } from '@/lib/structured-data'
 import { FeaturedCategoriesSectionClient } from '@/components/FeaturedCategoriesSectionClient'
 import { BrandPartnersSectionClient } from '@/components/BrandPartnersSectionClient'
 import { HomeProductTabsSectionClient } from '@/components/HomeProductTabsSectionClient'
@@ -212,8 +214,14 @@ export default async function HomePage() {
     }),
   ])
 
+  const schemaGraph = buildHomeSchemaGraph({
+    title: homeTitle,
+    description: homeDescription,
+  })
+
   return (
     <main className="min-h-screen pb-16 antialiased">
+      <JsonLd data={schemaGraph} />
       <h1 className="sr-only">
         Nước hoa, mỹ phẩm và sản phẩm làm đẹp chính hãng từ Pháp tại MF Paris
       </h1>
@@ -445,3 +453,6 @@ function BrandPartnersSection({
     </section>
   )
 }
+
+
+
