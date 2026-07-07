@@ -1,46 +1,29 @@
 'use client'
+
 import React from 'react'
 import { useField } from '@payloadcms/ui'
-import { RichText as PayloadRichText } from '@payloadcms/richtext-lexical/react'
+import { SafeHtmlContent } from '@/components/SafeHtmlContent'
 
 export const RichTextPreview: React.FC<{ path: string }> = ({ path }) => {
-  // Lấy giá trị đang gõ trong ô mô tả
-  const { value } = useField<any>({ path })
+  const { value } = useField<unknown>({ path })
 
   return (
-    <div className="mt-4 border border-dashed border-gray-300 rounded-2xl overflow-hidden">
-      <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
+    <div className="mt-4 overflow-hidden rounded-2xl border border-dashed border-gray-300">
+      <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-4 py-2">
         <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-          Chế độ xem trước (Giao diện người dùng)
+          Che do xem truoc
         </span>
-        <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">
-          Live Preview
+        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+          HTML Preview
         </span>
       </div>
 
-      {/* Khu vực hiển thị nội dung */}
-      <div className="p-8 bg-[#FDFBF9]">
-        {' '}
-        {/* Màu nền trang web của bạn */}
+      <div className="bg-[#FDFBF9] p-8">
         {value ? (
-          <PayloadRichText
-            data={
-              (value ?? {
-                root: {
-                  type: 'root',
-                  children: [],
-                  direction: null,
-                  format: '',
-                  indent: 0,
-                  version: 1,
-                },
-                version: 1,
-              }) as any
-            }
-          />
+          <SafeHtmlContent html={value} className="prose max-w-none" />
         ) : (
-          <p className="text-gray-300 italic text-sm text-center">
-            Chưa có nội dung để hiển thị...
+          <p className="text-center text-sm italic text-gray-300">
+            Chua co noi dung de hien thi...
           </p>
         )}
       </div>

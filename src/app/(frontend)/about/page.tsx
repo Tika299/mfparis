@@ -4,7 +4,7 @@ export const fetchCache = 'force-no-store'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { OptimizedImage } from '@/components/OptimizedImage'
-import { RichText as PayloadRichText } from '@payloadcms/richtext-lexical/react'
+import { SafeHtmlContent } from '@/components/SafeHtmlContent'
 import Link from 'next/link'
 import { CheckCircle2, Heart, Award, Sparkles } from 'lucide-react'
 import '@/styles/prose.css'
@@ -52,21 +52,7 @@ export default async function AboutPage() {
             </h2>
             <div className="w-16 h-1 px-1 bg-amber-200"></div>
             <div className="text-gray-600 leading-[2] text-lg">
-              <PayloadRichText
-                data={
-                  (settings.story?.content ?? {
-                    root: {
-                      type: 'root',
-                      children: [],
-                      direction: null,
-                      format: '',
-                      indent: 0,
-                      version: 1,
-                    },
-                    version: 1,
-                  }) as any
-                }
-              />
+              <SafeHtmlContent html={settings.story?.content} />
             </div>
           </div>
 

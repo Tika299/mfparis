@@ -8,6 +8,7 @@ import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { trackProductSlugHistory } from '@/collections/hooks/trackSlugHistory'
 import { ensureLegacyProductRedirectHook } from '@/collections/hooks/ensureLegacyProductRedirect'
 import { productSeoLifecycleFields } from '@/collections/fields/productSeoLifecycleFields'
+import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 
 type EntityID = string | number
 
@@ -636,15 +637,12 @@ export const Products: CollectionConfig = {
         {
           label: 'Nội dung chi tiết',
           fields: [
-            {
+            htmlEditorField({
               name: 'description',
-              type: 'richText',
-              label: 'Mô tả sản phẩm',
-              admin: {
-                description:
-                  'Nội dung chi tiết sản phẩm được convert từ HTML WordPress sang RichText. Giữ H2, H3, list, link, bảng nếu editor hỗ trợ.',
-              },
-            },
+              label: 'Mo ta san pham',
+              description:
+                'Noi dung chi tiet san pham luu dang HTML. Co the soan truc quan, dan noi dung tu WordPress hoac chinh ma HTML.',
+            }),
           ],
         },
 

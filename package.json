@@ -6,8 +6,9 @@
   "type": "module",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=2048\" next build --webpack",
-    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
-    "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "dev": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=4096\" next dev --webpack",
+    "dev:turbo": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=4096\" next dev",
+    "devsafe": "node -e \"fs.rmSync('.next',{recursive:true,force:true})\" && cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=4096\" next dev --webpack",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
@@ -33,11 +34,7 @@
     "import:wp:products:no-media": "tsx src/scripts/import-wp-data.ts --only=products --skip-media",
     "import:wp:products:update": "tsx src/scripts/import-wp-data.ts --only=products --update",
     "import:wp:all": "tsx src/scripts/import-wp-data.ts --only=all",
-    "convert:products-richtext": "tsx src/scripts/convert-products-html-to-richtext.ts",
-    "convert:categories-desc": "tsx src/scripts/convert-categories-description.ts",
-    "convert:brands-desc": "tsx src/scripts/convert-brands-description.ts",
-    "convert:posts-content": "tsx src/scripts/convert-posts-content.ts",
-    "clear:products": "tsx src/scripts/clear-data.ts",
+    "clear:products": "tsx src/scripts/clear-imported-data.ts",
     "redirects:backfill-products": "tsx src/scripts/backfill-wordpress-product-redirects.ts",
     "redirects:audit": "tsx src/scripts/audit-redirects.ts",
     "redirects:backfill-content": "tsx src/scripts/backfill-legacy-content-redirects.ts"
@@ -46,7 +43,6 @@
     "@payloadcms/db-postgres": "3.85.0",
     "@payloadcms/email-nodemailer": "^3.85.0",
     "@payloadcms/next": "3.85.0",
-    "@payloadcms/richtext-lexical": "^3.85.0",
     "@payloadcms/ui": "3.85.0",
     "@tailwindcss/postcss": "^4.2.4",
     "class-variance-authority": "^0.7.1",
@@ -72,7 +68,8 @@
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.2.4",
     "tw-animate-css": "^1.4.0",
-    "zustand": "^5.0.12"
+    "zustand": "^5.0.12",
+    "@tinymce/tinymce-react": "^6.3.0"
   },
   "devDependencies": {
     "@playwright/test": "1.58.2",

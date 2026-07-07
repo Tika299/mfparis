@@ -266,28 +266,14 @@ export interface Brand {
   id: number;
   name: string;
   /**
-   * Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO
+   * Tu dong tao tu ten, co the chinh sua thu cong de toi uu SEO
    */
   slug: string;
   logo?: (number | null) | Media;
   /**
-   * Bạn có thể dùng trình soạn thảo trực quan hoặc dán mã HTML vào.
+   * Mo ta thuong hieu luu dang HTML, co the soan truc quan hoac chinh ma HTML.
    */
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  description?: string | null;
   isFeatured?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -401,23 +387,9 @@ export interface Product {
       }[]
     | null;
   /**
-   * Nội dung chi tiết sản phẩm được convert từ HTML WordPress sang RichText. Giữ H2, H3, list, link, bảng nếu editor hỗ trợ.
+   * Noi dung chi tiet san pham luu dang HTML. Co the soan truc quan, dan noi dung tu WordPress hoac chinh ma HTML.
    */
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  description?: string | null;
   isCombo?: boolean | null;
   comboItems?: (number | Product)[] | null;
   seoTitle?: string | null;
@@ -448,25 +420,11 @@ export interface Category {
   name: string;
   image?: (number | null) | Media;
   /**
-   * Mô tả danh mục đã được convert sang RichText.
+   * Mo ta danh muc luu dang HTML, co the soan truc quan hoac chinh ma HTML.
    */
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  description?: string | null;
   /**
-   * Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO
+   * Tu dong tao tu ten, co the chinh sua thu cong de toi uu SEO
    */
   slug: string;
   parent?: (number | null) | Category;
@@ -680,29 +638,15 @@ export interface Post {
   id: number;
   title: string;
   /**
-   * Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO
+   * Tu dong tao tu ten, co the chinh sua thu cong de toi uu SEO
    */
   slug: string;
   thumbnail: number | Media;
   categories?: (number | PostCategory)[] | null;
   /**
-   * Bạn có thể dùng trình soạn thảo trực quan hoặc dán mã HTML vào.
+   * Noi dung bai viet luu dang HTML, co the soan truc quan hoac chinh ma HTML.
    */
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  content?: string | null;
   excerpt?: string | null;
   seo?: {
     metaTitle?: string | null;
@@ -1635,28 +1579,17 @@ export interface AboutPage {
   };
   story?: {
     heading?: string | null;
-    content?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
+    /**
+     * Noi dung HTML. Co the soan truc quan hoac chinh truc tiep ma HTML.
+     */
+    content?: string | null;
     image?: (number | null) | Media;
     /**
-     * Dán link YouTube, YouTube Shorts, youtu.be hoặc Vimeo. Ví dụ: https://www.youtube.com/watch?v=VIDEO_ID
+     * Dan link YouTube, YouTube Shorts, youtu.be hoac Vimeo.
      */
     videoUrl?: string | null;
     /**
-     * Nội dung này được dùng làm title cho iframe và hỗ trợ khả năng truy cập.
+     * Noi dung nay duoc dung lam title cho iframe va ho tro kha nang truy cap.
      */
     videoTitle?: string | null;
   };

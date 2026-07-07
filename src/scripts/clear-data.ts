@@ -7,6 +7,8 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 
 async function clearProductsOnly() {
+    const configPromise = (await import('@payload-config')).default
+
     const payload = await getPayload({
         config: configPromise,
     })

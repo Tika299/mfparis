@@ -2,10 +2,24 @@ import { revalidateTag } from 'next/cache'
 import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { trackCategorySlugHistory } from '@/collections/hooks/trackSlugHistory'
+import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 
 const revalidateCategoryTags = async () => {
-  revalidateTag('categories', 'max')
-  revalidateTag('products', 'max')
+  try {
+    revalidateTag('categories', 'max')
+    revalidateTag('products', 'max')
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+
+    if (message.includes('static generation store missing')) {
+      console.warn(
+        '[revalidateTag] Bo qua vi dang chay ngoai ngu canh Next.js request/render.',
+      )
+      return
+    }
+
+    throw error
+  }
 }
 
 export const Categories: CollectionConfig = {
@@ -27,14 +41,13 @@ export const Categories: CollectionConfig = {
   fields: [
     { name: 'name', type: 'text', required: true },
     { name: 'image', type: 'upload', relationTo: 'media' },
-    {
+    htmlEditorField({
       name: 'description',
-      type: 'richText',
-      label: 'Mô tả danh mục',
-      admin: {
-        description: 'Mô tả danh mục đã được convert sang RichText.',
-      },
-    },
+      label: 'Mo ta danh muc',
+      description:
+        'Mo ta danh muc luu dang HTML, co the soan truc quan hoac chinh ma HTML.',
+      rows: 20,
+    }),
     {
       name: 'slug',
       type: 'text',
@@ -43,14 +56,15 @@ export const Categories: CollectionConfig = {
       hooks: { beforeChange: [beforeChangeSlug] },
       admin: {
         position: 'sidebar',
-        description: 'Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO',
+        description:
+          'Tu dong tao tu ten, co the chinh sua thu cong de toi uu SEO',
       },
     },
     {
       name: 'parent',
       type: 'relationship',
       relationTo: 'categories',
-      label: 'Danh mục cha',
+      label: 'Danh muc cha',
     },
   ],
 }

@@ -41,7 +41,6 @@ import {
   ProductReviews,
   type ProductReviewItem,
 } from '@/components/product/ProductReviews'
-import { RichText as PayloadRichText } from '@payloadcms/richtext-lexical/react'
 
 export const revalidate = 300
 export const dynamicParams = true

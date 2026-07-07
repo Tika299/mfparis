@@ -6,6 +6,7 @@ import * as migration_20260619_063815_add_site_settings_google_map_url from './2
 import * as migration_20260625_044942_update_media_sizes from './20260625_044942_update_media_sizes';
 import * as migration_20260629_090136 from './20260629_090136';
 import * as migration_20260630_075143_add_site_settings_payment_fields from './20260630_075143_add_site_settings_payment_fields';
+import * as migration_20260705_090000 from './20260705_090000';
 
 export const migrations = [
   {
@@ -46,6 +47,11 @@ export const migrations = [
   {
     up: migration_20260630_075143_add_site_settings_payment_fields.up,
     down: migration_20260630_075143_add_site_settings_payment_fields.down,
-    name: '20260630_075143_add_site_settings_payment_fields'
+    name: '20260630_075143_add_site_settings_payment_fields',
+  },
+  {
+    up: migration_20260705_090000.up,
+    down: migration_20260705_090000.down,
+    name: '20260705_090000'
   },
 ];

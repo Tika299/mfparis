@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 
 import { SITE_ORIGIN } from '@/utilities/seo'
 import type { Media, Product } from '@/payload-types'
+import { htmlToPlainText } from '@/lib/html/contentHtml'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -177,7 +178,7 @@ function getProductDescription(product: Product): string {
     return (
         stripHtml(product.seoDescription) ||
         stripHtml(product.shortDescription) ||
-        getRichTextPlainText(product.description) ||
+        htmlToPlainText(product.description) ||
         `Sản phẩm ${product.title} chính hãng tại MF Paris.`
     ).slice(0, 5000)
 }

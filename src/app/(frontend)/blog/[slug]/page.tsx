@@ -21,6 +21,7 @@ import {
 } from '@/components/Blog/BlogRichTextContent'
 import RelatedPostsCarousel from '@/components/Blog/RelatedPostsCarousel'
 import { SITE_ORIGIN } from '@/utilities/seo'
+import { extractHtmlHeadings, htmlToPlainText } from '@/lib/html/contentHtml'
 import '@/styles/blog.css'
 import '@/styles/prose.css'
 import '@/styles/carousel-overrides.css'
@@ -139,10 +140,7 @@ function getPostDescription(
     )
   }
 
-  const contentText =
-    extractPlainTextFromRichText(
-      post.content,
-    )
+  const contentText = htmlToPlainText(post.content)
 
   if (contentText) {
     return truncateText(contentText, 160)
@@ -340,9 +338,7 @@ export default async function BlogPostPage({
       (cat: any) => cat.id,
     ) || []
 
-  const tocItems = buildTocItems(
-    post.content?.root?.children || [],
-  )
+  const tocItems = extractHtmlHeadings(post.content)
 
   const contentChildren =
     post.content?.root?.children || []

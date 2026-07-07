@@ -8,11 +8,12 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import '@/styles/prose.css'
 import { ProductCard } from '@/components/ProductCard'
-import { RichText as PayloadRichText } from '@payloadcms/richtext-lexical/react'
 import { SearchFilters } from '@/components/search-filters/SearchFilters'
 import { getProductFilterOptions } from '@/data/getProductFilterOptions'
 import { SITE_ORIGIN } from '@/utilities/seo'
 import { ExpandableContent } from '@/components/ExpandableContent'
+import { SafeHtmlContent } from '@/components/SafeHtmlContent'
+import { htmlToPlainText, normalizeContentHtml } from '@/lib/html/contentHtml'
 
 const PRODUCTS_PER_PAGE = 20
 const DEFAULT_SORT = '-createdAt'
@@ -137,10 +138,7 @@ function getCategoryDescription(
     description?: unknown
   },
 ): string {
-  const description =
-    extractPlainTextFromRichText(
-      category.description,
-    )
+  const description = htmlToPlainText(category.description)
 
   if (description) {
     return truncateText(description, 160)
@@ -439,10 +437,9 @@ export default async function CategoryPage({
   const totalDocs =
     productsRes.totalDocs || 0
 
-  const hasDescription =
-    hasRichTextContent(
-      currentCategory.description,
-    )
+  const hasDescription = Boolean(
+    normalizeContentHtml(currentCategory.description),
+  )
 
   /*
    * Giữ nguyên filter khi người dùng chuyển trang.
@@ -681,8 +678,8 @@ export default async function CategoryPage({
 
                   <div className="category-description prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
                     <ExpandableContent maxHeight={500}>
-                      <PayloadRichText
-                        data={
+                      <SafeHtmlContent
+                        html={
                           currentCategory.description
                         }
                       />

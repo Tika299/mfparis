@@ -1,10 +1,24 @@
 import { revalidateTag } from 'next/cache'
 import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
+import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 
 const revalidateBrandTags = async () => {
-  revalidateTag('brands', 'max')
-  revalidateTag('products', 'max')
+  try {
+    revalidateTag('brands', 'max')
+    revalidateTag('products', 'max')
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+
+    if (message.includes('static generation store missing')) {
+      console.warn(
+        '[revalidateTag] Bo qua vi dang chay ngoai ngu canh Next.js request/render.',
+      )
+      return
+    }
+
+    throw error
+  }
 }
 
 export const Brands: CollectionConfig = {
@@ -34,25 +48,22 @@ export const Brands: CollectionConfig = {
       },
       admin: {
         position: 'sidebar',
-        description: 'Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO',
+        description:
+          'Tu dong tao tu ten, co the chinh sua thu cong de toi uu SEO',
       },
     },
     { name: 'logo', type: 'upload', relationTo: 'media' },
-    {
+    htmlEditorField({
       name: 'description',
-      type: 'richText',
-      label: 'Mô tả thương hiệu',
-      admin: {
-        description: 'Bạn có thể dùng trình soạn thảo trực quan hoặc dán mã HTML vào.',
-        components: {
-          afterInput: [
-            {
-              path: '@/components/Admin/RichTextPreview#RichTextPreview',
-            },
-          ],
-        },
-      },
+      label: 'Mo ta thuong hieu',
+      description:
+        'Mo ta thuong hieu luu dang HTML, co the soan truc quan hoac chinh ma HTML.',
+      rows: 20,
+    }),
+    {
+      name: 'isFeatured',
+      type: 'checkbox',
+      label: 'Thuong hieu noi bat',
     },
-    { name: 'isFeatured', type: 'checkbox', label: 'Thương hiệu nổi bật' },
   ],
 }

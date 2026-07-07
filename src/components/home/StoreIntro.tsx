@@ -1,8 +1,8 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
-import { RichText } from '@payloadcms/richtext-lexical/react'
 import { PlayCircle } from 'lucide-react'
 import { LiteYouTube } from '@/components/LiteYouTube'
+import { SafeHtmlContent } from '@/components/SafeHtmlContent'
 
 /**
  * Chỉ chấp nhận các nguồn video được cho phép.
@@ -99,9 +99,7 @@ export async function StoreIntro() {
 
                         {story?.content ? (
                             <div className="prose mt-5 max-w-none text-sm leading-7 text-neutral-600 sm:text-[15px]">
-                                <RichText
-                                    data={story.content}
-                                />
+                                <SafeHtmlContent html={story.content} />
                             </div>
                         ) : (
                             <p className="mt-5 text-sm leading-7 text-neutral-500 sm:text-[15px]">

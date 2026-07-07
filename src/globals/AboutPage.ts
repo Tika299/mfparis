@@ -1,61 +1,67 @@
 import { GlobalConfig } from 'payload'
+import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 
 export const AboutPage: GlobalConfig = {
   slug: 'about-page',
-  label: 'Trang Giới thiệu',
+  label: 'Trang Gioi thieu',
   admin: {
-    group: 'Nội dung',
+    group: 'Noi dung',
   },
   fields: [
     {
       name: 'hero',
       type: 'group',
       fields: [
-        { name: 'title', type: 'text', label: 'Tiêu đề lớn' },
-        { name: 'image', type: 'upload', relationTo: 'media', label: 'Ảnh Hero (16:9)' },
+        { name: 'title', type: 'text', label: 'Tieu de lon' },
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Anh Hero (16:9)',
+        },
       ],
     },
     {
       name: 'story',
       type: 'group',
       fields: [
-        { name: 'heading', type: 'text', label: 'Tiêu đề câu chuyện' },
-        { name: 'content', type: 'richText', label: 'Nội dung kể chuyện' },
-        { name: 'image', type: 'upload', relationTo: 'media', label: 'Ảnh minh họa câu chuyện' },
-        /*
-         * Video được dùng cho StoreIntro
-         * ở cuối trang chủ.
-         */
+        { name: 'heading', type: 'text', label: 'Tieu de cau chuyen' },
+        htmlEditorField({
+          name: 'content',
+          label: 'Noi dung ke chuyen',
+          rows: 20,
+        }),
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Anh minh hoa cau chuyen',
+        },
         {
           name: 'videoUrl',
           type: 'text',
-          label: 'Link video giới thiệu',
-
+          label: 'Link video gioi thieu',
           admin: {
             description:
-              'Dán link YouTube, YouTube Shorts, youtu.be hoặc Vimeo. Ví dụ: https://www.youtube.com/watch?v=VIDEO_ID',
+              'Dan link YouTube, YouTube Shorts, youtu.be hoac Vimeo.',
           },
         },
         {
           name: 'videoTitle',
           type: 'text',
-          label: 'Tiêu đề mô tả video',
-
-          defaultValue:
-            'Video giới thiệu Marais de France',
-
+          label: 'Tieu de mo ta video',
+          defaultValue: 'Video gioi thieu Marais de France',
           admin: {
             description:
-              'Nội dung này được dùng làm title cho iframe và hỗ trợ khả năng truy cập.',
+              'Noi dung nay duoc dung lam title cho iframe va ho tro kha nang truy cap.',
           },
         },
       ],
     },
-
     {
       name: 'values',
       type: 'array',
-      label: 'Giá trị cốt lõi',
+      label: 'Gia tri cot loi',
       fields: [
         { name: 'title', type: 'text' },
         { name: 'description', type: 'textarea' },

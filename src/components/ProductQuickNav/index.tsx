@@ -10,87 +10,24 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { RichText as PayloadRichText } from '@payloadcms/richtext-lexical/react'
-
-type LexicalNode = Record<string, any>
+import {
+  addHeadingIds,
+  extractHtmlHeadings,
+  normalizeContentHtml,
+} from '@/lib/html/contentHtml'
 
 type ProductQuickNavProps = {
-  description?: any
+  description?: unknown
 }
 
-type ProductRichTextContentProps = {
-  description?: any
+type ProductHtmlContentProps = {
+  description?: unknown
   expandable?: boolean
   maxHeight?: number
 }
 
-const hasRichTextContent = (content: any) => {
-  return (
-    content &&
-    typeof content === 'object' &&
-    Array.isArray(content.root?.children) &&
-    content.root.children.length > 0
-  )
-}
-
-const getTextFromNode = (node: LexicalNode): string => {
-  if (!node) return ''
-
-  if (typeof node.text === 'string') return node.text
-
-  if (Array.isArray(node.children)) {
-    return node.children.map(getTextFromNode).join('')
-  }
-
-  return ''
-}
-
-const getHeadingClassName = (tag?: string) => {
-  if (tag === 'h2') {
-    return 'scroll-mt-28 mt-8 mb-4 text-[22px] font-black leading-snug text-gray-950 md:text-2xl'
-  }
-
-  if (tag === 'h3') {
-    return 'mt-6 mb-3 text-[18px] font-bold leading-snug text-gray-900 md:text-xl'
-  }
-
-  return 'mt-6 mb-3 font-bold leading-snug text-gray-900'
-}
-
-const slugify = (text: string) => {
-  return String(text || '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[đĐ]/g, 'd')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-}
-
-const buildTocItems = (children: LexicalNode[]) => {
-  const used = new Map<string, number>()
-
-  return children
-    .map((node) => {
-      if (node?.type !== 'heading' || node?.tag !== 'h2') return null
-
-      const text = getTextFromNode(node).trim()
-      if (!text) return null
-
-      const baseId = slugify(text) || 'section'
-      const count = used.get(baseId) || 0
-
-      used.set(baseId, count + 1)
-
-      return {
-        id: count === 0 ? baseId : `${baseId}-${count + 1}`,
-        title: text,
-      }
-    })
-    .filter(Boolean) as Array<{ id: string; title: string }>
-}
+const PRODUCT_CONTENT_SCROLL_EVENT = 'product-content-scroll-to-heading'
+const PRODUCT_DETAIL_CONTENT_ID = 'product-detail-content'
 
 const scrollToHeading = (id: string) => {
   const scroll = (attempt = 0) => {
@@ -115,9 +52,6 @@ const scrollToHeading = (id: string) => {
   requestAnimationFrame(() => scroll())
 }
 
-const PRODUCT_CONTENT_SCROLL_EVENT = 'product-content-scroll-to-heading'
-const PRODUCT_DETAIL_CONTENT_ID = 'product-detail-content'
-
 const requestOpenContentAndScroll = (id: string) => {
   window.dispatchEvent(
     new CustomEvent(PRODUCT_CONTENT_SCROLL_EVENT, {
@@ -126,192 +60,12 @@ const requestOpenContentAndScroll = (id: string) => {
   )
 }
 
-const renderFormattedText = (node: LexicalNode, index: number) => {
-  let content: React.ReactNode = node.text || ''
-
-  if (node.format & 1) content = <strong>{content}</strong>
-  if (node.format & 2) content = <em>{content}</em>
-  if (node.format & 8) content = <u>{content}</u>
-  if (node.format & 16) {
-    content = (
-      <code className="rounded bg-gray-100 px-1 py-0.5 text-sm">
-        {content}
-      </code>
-    )
-  }
-
-  return <span key={index}>{content}</span>
-}
-
-const renderChildren = (children: LexicalNode[] = []) => {
-  return children.map((child, index) => renderNode(child, index))
-}
-
-const renderNode = (
-  node: LexicalNode,
-  index: number,
-  headingId?: string,
-): React.ReactNode => {
-  if (!node?.type) return null
-
-  if (node.type === 'text') {
-    return renderFormattedText(node, index)
-  }
-
-  if (node.type === 'linebreak') {
-    return <br key={index} />
-  }
-
-  if (node.type === 'link') {
-    return (
-      <a
-        key={index}
-        href={node.fields?.url || '#'}
-        target={node.fields?.newTab ? '_blank' : undefined}
-        rel={node.fields?.newTab ? 'noopener noreferrer' : undefined}
-        className="font-medium text-blue-600 underline underline-offset-4 hover:text-[#b72828]"
-      >
-        {renderChildren(node.children)}
-      </a>
-    )
-  }
-
-  if (node.type === 'paragraph') {
-    const hasContent = getTextFromNode(node).trim()
-
-    if (!hasContent) return null
-
-    return (
-      <p key={index} className="mb-4 text-[15px] leading-8 text-gray-700 md:text-base">
-        {renderChildren(node.children)}
-      </p>
-    )
-  }
-
-  if (node.type === 'heading') {
-    if (node.tag === 'h2') {
-      return (
-        <h2
-          key={index}
-          id={headingId}
-          className="scroll-mt-28 mt-8 mb-4 text-[22px] font-black leading-snug text-gray-950 md:text-2xl"
-        >
-          {renderChildren(node.children)}
-        </h2>
-      )
-    }
-
-    if (node.tag === 'h3') {
-      return (
-        <h3
-          key={index}
-          className="mt-6 mb-3 text-[18px] font-bold leading-snug text-gray-900 md:text-xl"
-        >
-          {renderChildren(node.children)}
-        </h3>
-      )
-    }
-
-    return (
-      <h2
-        key={index}
-        id={headingId}
-        className="scroll-mt-28 mt-8 mb-4 text-[22px] font-black text-gray-950 md:text-2xl"
-      >
-        {renderChildren(node.children)}
-      </h2>
-    )
-  }
-
-  if (node.type === 'list') {
-    const Tag = node.tag === 'ol' || node.listType === 'number' ? 'ol' : 'ul'
-
-    return (
-      <Tag
-        key={index}
-        className={
-          Tag === 'ol'
-            ? 'mb-5 list-decimal space-y-2 pl-6 text-[15px] leading-8 text-gray-700 md:text-base'
-            : 'mb-5 list-disc space-y-2 pl-6 text-[15px] leading-8 text-gray-700 md:text-base'
-        }
-      >
-        {renderChildren(node.children)}
-      </Tag>
-    )
-  }
-
-  if (node.type === 'listitem') {
-    return (
-      <li key={index} className="pl-1">
-        {renderChildren(node.children)}
-      </li>
-    )
-  }
-
-  if (node.type === 'quote') {
-    return (
-      <blockquote
-        key={index}
-        className="my-6 rounded-2xl border-l-4 border-[#b72828] bg-red-50/60 px-5 py-4 text-[15px] italic leading-8 text-gray-700"
-      >
-        {renderChildren(node.children)}
-      </blockquote>
-    )
-  }
-
-  if (node.type === 'horizontalrule') {
-    return <hr key={index} className="my-8 border-gray-200" />
-  }
-
-  if (node.type === 'table') {
-    return (
-      <div key={index} className="my-6 overflow-x-auto rounded-2xl border border-gray-200">
-        <table className="w-full min-w-[640px] border-collapse bg-white text-sm">
-          <tbody>{renderChildren(node.children)}</tbody>
-        </table>
-      </div>
-    )
-  }
-
-  if (node.type === 'tablerow') {
-    return <tr key={index}>{renderChildren(node.children)}</tr>
-  }
-
-  if (node.type === 'tablecell') {
-    const isHeader = node.headerState && node.headerState !== 0
-    const CellTag = isHeader ? 'th' : 'td'
-
-    return (
-      <CellTag
-        key={index}
-        colSpan={node.colSpan || 1}
-        rowSpan={node.rowSpan || 1}
-        className={
-          isHeader
-            ? 'border border-gray-200 bg-gray-50 px-4 py-3 text-left font-bold text-gray-900'
-            : 'border border-gray-200 px-4 py-3 text-gray-700'
-        }
-      >
-        {renderChildren(node.children)}
-      </CellTag>
-    )
-  }
-
-  if (node.type === 'upload') {
-    return null
-  }
-
-  return null
-}
-
 export function ProductQuickNav({ description }: ProductQuickNavProps) {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [scrollPercent, setScrollPercent] = useState(0)
   const [showTopButton, setShowTopButton] = useState(false)
 
-  const children = description?.root?.children || []
-
-  const items = useMemo(() => buildTocItems(children), [children])
+  const items = useMemo(() => extractHtmlHeadings(description), [description])
 
   useEffect(() => {
     const onScroll = () => {
@@ -349,7 +103,7 @@ export function ProductQuickNav({ description }: ProductQuickNavProps) {
             <SheetTrigger asChild>
               <button className="flex h-10 items-center gap-2 rounded-full bg-black px-4 text-[10px] font-black uppercase tracking-wider text-white shadow-lg sm:h-11 sm:text-[11px]">
                 <List size={14} />
-                Mục lục
+                Muc luc
               </button>
             </SheetTrigger>
 
@@ -358,7 +112,7 @@ export function ProductQuickNav({ description }: ProductQuickNavProps) {
               className="max-h-[82dvh] rounded-t-3xl bg-white px-5 pb-8 pt-6"
             >
               <SheetHeader className="mb-4">
-                <SheetTitle className="text-left">Mục lục nội dung</SheetTitle>
+                <SheetTitle className="text-left">Muc luc noi dung</SheetTitle>
               </SheetHeader>
 
               <div className="space-y-2 overflow-y-auto">
@@ -375,7 +129,7 @@ export function ProductQuickNav({ description }: ProductQuickNavProps) {
                     }}
                     className="block w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700"
                   >
-                    {item.title}
+                    {item.text}
                   </button>
                 ))}
               </div>
@@ -387,7 +141,7 @@ export function ProductQuickNav({ description }: ProductQuickNavProps) {
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-[#b72828] text-white shadow-lg sm:h-11 sm:w-11"
-            aria-label="Lên đầu trang"
+            aria-label="Len dau trang"
           >
             <ChevronUp size={18} />
           </button>
@@ -401,10 +155,15 @@ export function ProductRichTextContent({
   description,
   expandable = true,
   maxHeight = 1100,
-}: ProductRichTextContentProps) {
+}: ProductHtmlContentProps) {
   const [activeId, setActiveId] = useState<string>('')
-
   const [contentExpanded, setContentExpanded] = useState(false)
+
+  const tocItems = useMemo(() => extractHtmlHeadings(description), [description])
+  const html = useMemo(
+    () => addHeadingIds(description, tocItems),
+    [description, tocItems],
+  )
 
   const handleTocClick = useCallback((id: string) => {
     setActiveId(id)
@@ -414,29 +173,6 @@ export function ProductRichTextContent({
       scrollToHeading(id)
     }, 120)
   }, [])
-
-  const children = description?.root?.children || []
-
-  const tocItems = useMemo(() => buildTocItems(children), [children])
-
-  const headingIdByNode = useMemo(() => {
-    const map = new Map<LexicalNode, string>()
-    let index = 0
-
-    children.forEach((node: LexicalNode) => {
-      if (node?.type !== 'heading' || node?.tag !== 'h2') return
-
-      const id = tocItems[index]?.id
-
-      if (id) {
-        map.set(node, id)
-      }
-
-      index += 1
-    })
-
-    return map
-  }, [children, tocItems])
 
   useEffect(() => {
     const onRequestScroll = (event: Event) => {
@@ -488,27 +224,16 @@ export function ProductRichTextContent({
     headings.forEach((heading) => observer.observe(heading))
 
     return () => observer.disconnect()
-  }, [tocItems.length])
+  }, [activeId, tocItems])
 
-  if (!hasRichTextContent(description)) return null
+  if (!normalizeContentHtml(description)) return null
 
-  const richTextConverters = ({ defaultConverters }: any) => ({
-    ...defaultConverters,
-
-    heading: ({ node, nodesToJSX }: any) => {
-      const Tag = node.tag || 'h2'
-      const id =
-        node.tag === 'h2'
-          ? headingIdByNode.get(node)
-          : undefined
-
-      return (
-        <Tag id={id} className={getHeadingClassName(node.tag)}>
-          {nodesToJSX({ nodes: node.children })}
-        </Tag>
-      )
-    },
-  })
+  const content = (
+    <div
+      className="product-html-content prose max-w-none"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  )
 
   if (!tocItems.length) {
     return (
@@ -523,16 +248,10 @@ export function ProductRichTextContent({
             onExpandedChange={setContentExpanded}
             collapseScrollTargetId={PRODUCT_DETAIL_CONTENT_ID}
           >
-            <PayloadRichText
-              data={description}
-              converters={richTextConverters}
-            />
+            {content}
           </ExpandableContent>
         ) : (
-          <PayloadRichText
-            data={description}
-            converters={richTextConverters}
-          />
+          content
         )}
       </section>
     )
@@ -558,7 +277,7 @@ export function ProductRichTextContent({
                         : 'block w-full rounded-xl px-4 py-4 text-left text-[15px] font-medium leading-6 text-gray-500 transition hover:bg-white hover:text-gray-950'
                     }
                   >
-                    {item.title}
+                    {item.text}
                   </button>
                 )
               })}
@@ -568,7 +287,7 @@ export function ProductRichTextContent({
 
         <div className="border-b border-gray-100 bg-white p-4 lg:hidden">
           <p className="mb-3 text-xs font-black uppercase tracking-widest text-gray-400">
-            Mục lục
+            Muc luc
           </p>
 
           <nav className="flex gap-2 overflow-x-auto pb-1">
@@ -586,7 +305,7 @@ export function ProductRichTextContent({
                       : 'shrink-0 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-600'
                   }
                 >
-                  {item.title}
+                  {item.text}
                 </button>
               )
             })}
@@ -604,16 +323,10 @@ export function ProductRichTextContent({
               onExpandedChange={setContentExpanded}
               collapseScrollTargetId={PRODUCT_DETAIL_CONTENT_ID}
             >
-              <PayloadRichText
-                data={description}
-                converters={richTextConverters}
-              />
+              {content}
             </ExpandableContent>
           ) : (
-            <PayloadRichText
-              data={description}
-              converters={richTextConverters}
-            />
+            content
           )}
         </article>
       </div>
