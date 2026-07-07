@@ -1,4 +1,4 @@
-﻿import { SITE_ORIGIN } from '@/utilities/seo'
+import { SITE_ORIGIN } from '@/utilities/seo'
 
 type SchemaValue =
   | string
@@ -323,6 +323,11 @@ export function buildWebSiteSchema(siteName = DEFAULT_SITE_NAME): SchemaObject {
       '@id': schemaId(SITE_ORIGIN, 'organization'),
     },
     inLanguage: DEFAULT_LANGUAGE,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${SITE_ORIGIN}/search?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
   }
 }
 
@@ -853,5 +858,27 @@ export function buildStaticPageSchemaGraph(input: {
     input.faq ? buildFAQPageSchema(input.faq, input.page.url) : null,
     input.video ? buildVideoObjectSchema(input.video, input.page.url) : null,
     input.localBusiness ? buildLocalBusinessSchema(input.localBusiness) : null,
+  ])
+}
+
+export function buildSiteIdentitySchemaGraph(input?: {
+  logo?: ImageInput | string | null
+  organization?: OrganizationInput
+}): SchemaObject {
+  return buildSchemaGraph([
+    buildOrganizationSchema({
+      ...(input?.organization || {}),
+      logo: input?.organization?.logo || input?.logo,
+      returnPolicy: input?.organization?.returnPolicy || {
+        applicableCountry: 'VN',
+        merchantReturnDays: 7,
+      },
+      shippingService: input?.organization?.shippingService || {
+        name: 'Giao hang MF Paris',
+        areaServed: 'VN',
+        description: 'MF Paris giao hang toan quoc tai Viet Nam.',
+      },
+    }),
+    buildWebSiteSchema(),
   ])
 }

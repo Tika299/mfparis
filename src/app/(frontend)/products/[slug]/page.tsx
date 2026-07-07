@@ -1332,6 +1332,9 @@ export default async function ProductPage({
   const seoStatus =
     getProductSeoStatus(product)
 
+  const metadataContent =
+    getProductMetadataContent(product)
+
   const schemaAvailability =
     getSchemaAvailability(seoStatus)
 
@@ -1422,6 +1425,7 @@ export default async function ProductPage({
     > = {
       '@context': 'https://schema.org',
       '@type': 'Product',
+      '@id': `${canonicalUrl}#product`,
       name: currentProduct.title,
       url: canonicalUrl,
       description:
@@ -1471,6 +1475,7 @@ export default async function ProductPage({
     return {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
+      '@id': `${getProductCanonicalUrl(currentProduct.slug)}#breadcrumb`,
       itemListElement: [
         {
           '@type': 'ListItem',
@@ -1510,6 +1515,24 @@ export default async function ProductPage({
     buildProductJsonLd(product)
   const breadcrumbJsonLd =
     buildProductBreadcrumbJsonLd(product)
+  const productWebPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': `${getProductCanonicalUrl(product.slug)}#webpage`,
+    url: getProductCanonicalUrl(product.slug),
+    name: metadataContent.title,
+    description: metadataContent.description,
+    isPartOf: {
+      '@id': `${SITE_ORIGIN}/#website`,
+    },
+    breadcrumb: {
+      '@id': `${getProductCanonicalUrl(product.slug)}#breadcrumb`,
+    },
+    mainEntity: {
+      '@id': `${getProductCanonicalUrl(product.slug)}#product`,
+    },
+    inLanguage: 'vi-VN',
+  }
 
   return (
     <div
@@ -1519,6 +1542,14 @@ export default async function ProductPage({
         schemaAvailability
       }
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            productWebPageJsonLd,
+          ),
+        }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
