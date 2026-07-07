@@ -9,6 +9,7 @@ import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
 import { ProductCard } from '@/components/ProductCard'
+import { JsonLd } from '@/components/JsonLd'
 import { SearchFilters } from '@/components/search-filters/SearchFilters'
 import { cn } from '@/utilities'
 import {
@@ -16,6 +17,7 @@ import {
   INDEXABLE_FACET_KEYS,
 } from '@/utilities/seo'
 import { getProductFilterOptions } from '@/data/getProductFilterOptions'
+import { buildCollectionPageSchemaGraph } from '@/lib/structured-data'
 
 const PRODUCTS_PATHNAME = '/products'
 const PRODUCTS_PER_PAGE = 12
@@ -812,9 +814,31 @@ export default async function AllProductsPage({
 
     return `${PRODUCTS_PATHNAME}?${queryString}`
   }
+  const schemaGraph = buildCollectionPageSchemaGraph({
+    page: {
+      url: createPageUrl(currentPage),
+      name: seoContent.heading,
+      description: seoContent.description,
+      breadcrumb: [
+        {
+          name: 'Trang chu',
+          url: '/',
+        },
+        {
+          name: 'San pham',
+          url: createPageUrl(currentPage),
+        },
+      ],
+      items: productsRes.docs.map((product) => ({
+        name: product.title,
+        url: `/products/${product.slug}`,
+      })),
+    },
+  })
 
   return (
     <div className="min-h-screen bg-[#F4F6F8] pb-20">
+      <JsonLd data={schemaGraph} />
       <div className="border-b border-gray-100 bg-white">
         <div className="container-ux py-8 md:py-12">
           <h1 className="text-2xl font-black uppercase tracking-wider text-neutral-900 md:text-4xl">

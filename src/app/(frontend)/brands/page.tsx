@@ -2,6 +2,8 @@ import { unstable_cache } from 'next/cache'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { OptimizedImage } from '@/components/OptimizedImage'
+import { JsonLd } from '@/components/JsonLd'
+import { buildCollectionPageSchemaGraph } from '@/lib/structured-data'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -73,9 +75,32 @@ export default async function AllBrandsPage({
 
     return pages
   }
+  const schemaGraph = buildCollectionPageSchemaGraph({
+    page: {
+      url: currentPage > 1 ? `/brands?page=${currentPage}` : '/brands',
+      name: 'Thuong hieu',
+      description:
+        'Kham pha cac thuong hieu nuoc hoa, my pham va thuc pham chuc nang chinh hang tai MF Paris.',
+      breadcrumb: [
+        {
+          name: 'Trang chu',
+          url: '/',
+        },
+        {
+          name: 'Thuong hieu',
+          url: currentPage > 1 ? `/brands?page=${currentPage}` : '/brands',
+        },
+      ],
+      items: brandsRes.docs.map((brand: any) => ({
+        name: brand.name,
+        url: `/brands/${brand.slug}`,
+      })),
+    },
+  })
 
   return (
     <div className="bg-[#FDFBF9] min-h-screen pb-20">
+      <JsonLd data={schemaGraph} />
       <div className="max-w-[1440px] mx-auto px-6 md:px-10 py-16">
         <header className="text-center mb-16 space-y-4">
           <h1 className="text-5xl font-bold font-sans">

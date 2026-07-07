@@ -1,4 +1,6 @@
-import type { Metadata } from 'next'
+import type { Metadata } from 'next'
+import { JsonLd } from '@/components/JsonLd'
+import { buildStaticPageSchemaGraph } from '@/lib/structured-data'
 
 export const metadata: Metadata = {
     title: 'Chính sách bảo mật | MF Paris',
@@ -6,8 +8,28 @@ export const metadata: Metadata = {
 }
 
 export default function PrivacyPolicyPage() {
+    const schemaGraph = buildStaticPageSchemaGraph({
+        page: {
+            url: '/chinh-sach-bao-mat',
+            name: 'Chinh sach bao mat',
+            description: 'Chinh sach bao mat va xu ly thong tin ca nhan tai MF Paris.',
+            type: 'WebPage',
+        },
+        breadcrumb: [
+            {
+                name: 'Trang chu',
+                url: '/',
+            },
+            {
+                name: 'Chinh sach bao mat',
+                url: '/chinh-sach-bao-mat',
+            },
+        ],
+    })
+
     return (
         <main className="bg-[#f7f7f7] py-12">
+            <JsonLd data={schemaGraph} />
             <article className="mx-auto max-w-4xl rounded-2xl bg-white px-6 py-10 shadow-sm md:px-10">
                 <h1 className="text-3xl font-black text-gray-950">Chính sách bảo mật</h1>
 

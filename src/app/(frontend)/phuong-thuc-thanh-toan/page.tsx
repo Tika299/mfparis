@@ -1,4 +1,6 @@
-import type { Metadata } from 'next'
+import type { Metadata } from 'next'
+import { JsonLd } from '@/components/JsonLd'
+import { buildStaticPageSchemaGraph } from '@/lib/structured-data'
 
 export const metadata: Metadata = {
     title: 'Phương thức thanh toán | MF Paris',
@@ -28,8 +30,28 @@ const paymentMethods = [
 ]
 
 export default function PaymentMethodsPage() {
+    const schemaGraph = buildStaticPageSchemaGraph({
+        page: {
+            url: '/phuong-thuc-thanh-toan',
+            name: 'Phuong thuc thanh toan',
+            description: 'Cac phuong thuc thanh toan duoc ho tro tai MF Paris.',
+            type: 'WebPage',
+        },
+        breadcrumb: [
+            {
+                name: 'Trang chu',
+                url: '/',
+            },
+            {
+                name: 'Phuong thuc thanh toan',
+                url: '/phuong-thuc-thanh-toan',
+            },
+        ],
+    })
+
     return (
         <main className="bg-[#f7f7f7] py-12">
+            <JsonLd data={schemaGraph} />
             <section className="mx-auto max-w-5xl px-5">
                 <div className="rounded-2xl bg-white px-6 py-10 shadow-sm md:px-10">
                     <p className="text-sm font-bold uppercase tracking-widest text-[#b72828]">

@@ -1,5 +1,7 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
+import { JsonLd } from '@/components/JsonLd'
+import { buildStaticPageSchemaGraph } from '@/lib/structured-data'
 
 import { VoucherPageClient } from '@/components/vouchers/VoucherPageClient'
 import {
@@ -88,11 +90,32 @@ export default async function VouchersPage() {
             referenceNow,
         )
     })
+    const schemaGraph = buildStaticPageSchemaGraph({
+        page: {
+            url: '/vouchers',
+            name: 'Voucher MF Paris',
+            description: 'Ma uu dai va chuong trinh khuyen mai cong khai tai MF Paris.',
+            type: 'WebPage',
+        },
+        breadcrumb: [
+            {
+                name: 'Trang chu',
+                url: '/',
+            },
+            {
+                name: 'Voucher',
+                url: '/vouchers',
+            },
+        ],
+    })
 
     return (
-        <VoucherPageClient
+        <>
+            <JsonLd data={schemaGraph} />
+            <VoucherPageClient
             vouchers={vouchers}
             referenceNow={referenceNow.toISOString()}
         />
+        </>
     )
 }

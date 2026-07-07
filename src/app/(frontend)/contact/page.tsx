@@ -1,4 +1,6 @@
-import type { Metadata } from 'next'
+import type { Metadata } from 'next'
+import { JsonLd } from '@/components/JsonLd'
+import { buildStaticPageSchemaGraph } from '@/lib/structured-data'
 
 export const metadata: Metadata = {
     title: 'Liên hệ | MF Paris',
@@ -6,8 +8,28 @@ export const metadata: Metadata = {
 }
 
 export default function ContactPage() {
+    const schemaGraph = buildStaticPageSchemaGraph({
+        page: {
+            url: '/contact',
+            name: 'Lien he MF Paris',
+            description: 'Thong tin lien he, hotline, email va dia chi ho tro khach hang cua MF Paris.',
+            type: 'ContactPage',
+        },
+        breadcrumb: [
+            {
+                name: 'Trang chu',
+                url: '/',
+            },
+            {
+                name: 'Lien he MF Paris',
+                url: '/contact',
+            },
+        ],
+    })
+
     return (
         <main className="bg-[#f7f7f7] py-12">
+            <JsonLd data={schemaGraph} />
             <section className="mx-auto max-w-4xl rounded-2xl bg-white px-6 py-10 shadow-sm md:px-10">
                 <p className="text-sm font-bold uppercase tracking-widest text-[#b72828]">
                     MF Paris

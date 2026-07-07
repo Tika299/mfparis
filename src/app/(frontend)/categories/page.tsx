@@ -4,6 +4,8 @@ import configPromise from '@payload-config'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react'
 import { OptimizedImage } from '@/components/OptimizedImage'
+import { JsonLd } from '@/components/JsonLd'
+import { buildCollectionPageSchemaGraph } from '@/lib/structured-data'
 
 export const metadata = {
     metadataBase: new URL(
@@ -154,9 +156,32 @@ export default async function AllCategoriesPage({
 
         return pages
     }
+    const schemaGraph = buildCollectionPageSchemaGraph({
+        page: {
+            url: currentPage > 1 ? `/categories?page=${currentPage}` : '/categories',
+            name: 'Danh muc san pham',
+            description:
+                'Kham pha cac dong san pham nuoc hoa, my pham va thuc pham chuc nang cao cap tu Phap tai MF Paris.',
+            breadcrumb: [
+                {
+                    name: 'Trang chu',
+                    url: '/',
+                },
+                {
+                    name: 'Danh muc san pham',
+                    url: currentPage > 1 ? `/categories?page=${currentPage}` : '/categories',
+                },
+            ],
+            items: categoriesRes.docs.map((category: any) => ({
+                name: category.name,
+                url: `/categories/${category.slug}`,
+            })),
+        },
+    })
 
     return (
         <div className="bg-[#F4F6F8] min-h-screen pb-20 antialiased font-sans">
+            <JsonLd data={schemaGraph} />
             {/* SECTION 1: BREADCRUMB */}
             <div className="bg-white border-b border-gray-100 mb-10">
                 <nav className="container-ux h-12 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">

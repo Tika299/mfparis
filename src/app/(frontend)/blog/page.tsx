@@ -1,9 +1,11 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { OptimizedImage } from '@/components/OptimizedImage'
+import { JsonLd } from '@/components/JsonLd'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Search, Sparkles, X } from 'lucide-react'
 import '@/styles/blog.css'
+import { buildCollectionPageSchemaGraph } from '@/lib/structured-data'
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://mfparis.vn'),
@@ -89,9 +91,33 @@ export default async function BlogPage({ searchParams }: PageProps) {
 
     return pages
   }
+  const blogUrl = getPageHref(currentPage)
+  const schemaGraph = buildCollectionPageSchemaGraph({
+    page: {
+      url: blogUrl,
+      name: q ? `Ket qua tim kiem blog: ${q}` : 'Blog MF Paris',
+      description:
+        'Cap nhat kien thuc nuoc hoa, my pham, cham soc da va suc khoe tu MF Paris.',
+      breadcrumb: [
+        {
+          name: 'Trang chu',
+          url: '/',
+        },
+        {
+          name: 'Blog',
+          url: blogUrl,
+        },
+      ],
+      items: posts.docs.map((post: any) => ({
+        name: post.title,
+        url: `/blog/${post.slug}`,
+      })),
+    },
+  })
 
   return (
     <main className="blog-page-bg min-h-screen">
+      <JsonLd data={schemaGraph} />
       <section className="container-ux pt-10 pb-16 md:pt-14 md:pb-24">
         {/* HERO */}
         <header className="relative overflow-hidden rounded-[2rem] border border-red-100/70 bg-white px-5 py-12 text-center shadow-sm md:rounded-[2.5rem] md:px-10 md:py-16">

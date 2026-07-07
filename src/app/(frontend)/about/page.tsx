@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 export const fetchCache = 'force-no-store'
 import { getPayload } from 'payload'
+import { JsonLd } from '@/components/JsonLd'
+import { buildStaticPageSchemaGraph } from '@/lib/structured-data'
 import configPromise from '@payload-config'
 import { OptimizedImage } from '@/components/OptimizedImage'
 import { SafeHtmlContent } from '@/components/SafeHtmlContent'
@@ -19,9 +21,29 @@ export const metadata = {
 export default async function AboutPage() {
   const payload = await getPayload({ config: configPromise })
   const settings = await payload.findGlobal({ slug: 'about-page' })
+    const schemaGraph = buildStaticPageSchemaGraph({
+        page: {
+            url: '/about',
+            name: 'Gioi thieu ve MF Paris',
+            description: 'Cau chuyen thuong hieu va cam ket cua MF Paris.',
+            type: 'AboutPage',
+        },
+        breadcrumb: [
+            {
+                name: 'Trang chu',
+                url: '/',
+            },
+            {
+                name: 'Gioi thieu ve MF Paris',
+                url: '/about',
+            },
+        ],
+    })
+
 
   return (
     <div className="bg-[#FDFBF9] min-h-screen pb-32">
+      <JsonLd data={schemaGraph} />
       {/* 1. HERO SECTION */}
       <section className="relative w-full h-[60vh] md:h-[80vh] flex items-center justify-center overflow-hidden">
         <OptimizedImage
