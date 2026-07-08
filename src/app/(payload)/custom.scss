@@ -1,7 +1,7 @@
 ﻿/* --- LUXURY OVERRIDE FOR PAYLOAD CMS 3.0 --- */
 
 :root {
-    /* MÃ u chá»§ Ä‘áº¡o MF Paris */
+    /* Màu chủ đạo MF Paris */
     --theme-bg: #fdfbf9;
     --theme-elevation-0: #fdfbf9;
     --theme-elevation-50: #ffffff;
@@ -10,14 +10,14 @@
     --color-primary-600: #113530;
     --color-success-500: #22c55e;
 
-    /* DÃ¹ng Ä‘Ãºng biáº¿n font tá»« next/font */
+    /* Dùng đúng biến font từ next/font */
     --font-be-vietnam: var(--font-be-vietnam), sans-serif;
     --font-heading: var(--font-playfair), serif;
 
     --primary-color: #b72828;
 }
 
-/* 1. Ná»n toÃ n cá»¥c */
+/* 1. Nền toàn cục */
 body,
 .template-default,
 .app-header,
@@ -26,13 +26,13 @@ body,
     font-family: var(--font-be-vietnam) !important;
 }
 
-/* Ã‰p toÃ n bá»™ admin dÃ¹ng font body máº·c Ä‘á»‹nh */
+/* Ép toàn bộ admin dùng font body mặc định */
 .payload-admin-fonts,
 .payload-admin-fonts * {
     font-family: var(--font-be-vietnam);
 }
 
-/* 2. Thanh Sidebar bÃªn trÃ¡i (Navigation) */
+/* 2. Thanh Sidebar bên trái (Navigation) */
 .nav {
     background-color: #ffffff !important;
     border-right: 1px solid rgba(22, 66, 60, 0.05) !important;
@@ -78,7 +78,7 @@ body,
     color: #aaa;
 }
 
-/* 4. CÃ¡c tháº» Collection/Global trÃªn Dashboard */
+/* 4. Các thẻ Collection/Global trên Dashboard */
 .collections__group {
     margin-bottom: 40px;
 }
@@ -147,7 +147,7 @@ body,
     background: var(--color-primary-500);
 }
 
-/* 7. NÃºt Logout */
+/* 7. Nút Logout */
 .nav__log-out {
     margin: 20px !important;
     border-radius: 10px !important;
@@ -159,7 +159,7 @@ body,
     background: #fef2f2 !important;
 }
 
-/* 8. áº¨n logo Payload máº·c Ä‘á»‹nh */
+/* 8. Ẩn logo Payload mặc định */
 .graphic-icon {
     fill: var(--color-primary-500) !important;
 }
@@ -224,7 +224,7 @@ body,
     margin: 0;
 }
 
-/* Hiá»‡u á»©ng nháº¥p nhÃ¡y cho cháº¥m xanh */
+/* Hiệu ứng nhấp nháy cho chấm xanh */
 .chat-card__ping {
     width: 8px;
     height: 8px;

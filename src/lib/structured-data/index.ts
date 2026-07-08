@@ -26,13 +26,18 @@ export type ImageInput = {
 
 export type OrganizationInput = {
   name?: string | null
-  alternateName?: string | null
+  alternateName?: string | string[] | null
+  legalName?: string | null
   url?: string | null
   logo?: ImageInput | string | null
   telephone?: string | null
   email?: string | null
   address?: SchemaObject | string | null
   taxID?: string | null
+  vatID?: string | null
+  foundingDate?: string | null
+  identifier?: SchemaObject | SchemaObject[] | string | null
+  contactPoint?: SchemaObject | SchemaObject[] | null
   sameAs?: string[] | null
   returnPolicy?: MerchantReturnPolicyInput | null
   shippingService?: ShippingServiceInput | null
@@ -192,6 +197,77 @@ export type VideoInput = {
 const DEFAULT_SITE_NAME = 'MF Paris'
 const DEFAULT_LANGUAGE = 'vi-VN'
 const DEFAULT_CURRENCY = 'VND'
+const MF_PARIS_LOGO_URL =
+  'https://mfparis.vn/wp-content/uploads/2024/08/logo-mfparis-512x512-2.png'
+
+const MF_PARIS_DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/og/og-mfparis.png`
+
+const MF_PARIS_SAME_AS = [
+  'https://mfparis.vn',
+  'https://www.facebook.com/mfparisofficial/',
+  'https://www.facebook.com/www.mfparis.vn/',
+  'https://www.instagram.com/maraisdefrance/',
+  'https://www.tiktok.com/@marais.de.france',
+  'https://www.youtube.com/@mfparisvn',
+  'https://www.pinterest.com/mfparisvn/',
+  'https://www.linkedin.com/in/mf-paris/',
+  'https://zalo.me/2731577726641619342',
+  'https://zalo.me/0792979299',
+  'https://shopee.vn/mfparis',
+  'https://www.lazada.vn/shop/perfumes-and-cosmetics-mffrance/',
+  'https://maps.app.goo.gl/pS7KGh78XnVHYwX56',
+]
+
+const MF_PARIS_POSTAL_ADDRESS: SchemaObject = {
+  '@type': 'PostalAddress',
+  streetAddress: '220/24 Nguyễn Oanh',
+  addressLocality: 'Phường Gò Vấp',
+  addressRegion: 'Thành phố Hồ Chí Minh',
+  postalCode: '71413',
+  addressCountry: 'VN',
+}
+
+const MF_PARIS_BUSINESS_IDENTIFIER: SchemaObject[] = [
+  {
+    '@type': 'PropertyValue',
+    name: 'Mã số thuế',
+    value: '058095006998',
+  },
+  {
+    '@type': 'PropertyValue',
+    name: 'Giấy phép đăng ký kinh doanh',
+    value: '41M8043902',
+  },
+  {
+    '@type': 'PropertyValue',
+    name: 'Ngày cấp giấy phép đăng ký kinh doanh',
+    value: '2021-03-12',
+  },
+  {
+    '@type': 'PropertyValue',
+    name: 'Cơ quan cấp giấy phép đăng ký kinh doanh',
+    value: 'Sở KH & ĐT Thành phố Hồ Chí Minh',
+  },
+]
+
+const MF_PARIS_CONTACT_POINTS: SchemaObject[] = [
+  {
+    '@type': 'ContactPoint',
+    telephone: '+84792979299',
+    contactType: 'customer service',
+    email: 'cskh@maraisdefrance.vn',
+    areaServed: 'VN',
+    availableLanguage: ['vi', 'en'],
+  },
+  {
+    '@type': 'ContactPoint',
+    telephone: '+84792979299',
+    contactType: 'sales',
+    email: 'mfparisvn@gmail.com',
+    areaServed: 'VN',
+    availableLanguage: ['vi', 'en'],
+  },
+]
 
 function cleanString(value: unknown): string | undefined {
   if (typeof value !== 'string') {
@@ -296,13 +372,20 @@ export function buildOrganizationSchema(input: OrganizationInput = {}): SchemaOb
     '@type': 'Organization',
     '@id': schemaId(url, 'organization'),
     name: cleanString(input.name) || DEFAULT_SITE_NAME,
-    alternateName: cleanString(input.alternateName) || 'Marais de France',
+    alternateName: Array.isArray(input.alternateName)
+      ? input.alternateName
+      : cleanString(input.alternateName) || undefined,
+    legalName: cleanString(input.legalName),
     url,
     logo: buildImageObject(input.logo, schemaId(url, 'logo')),
     telephone: cleanString(input.telephone),
     email: cleanString(input.email),
     address: typeof input.address === 'string' ? input.address : input.address || undefined,
     taxID: cleanString(input.taxID),
+    vatID: cleanString(input.vatID),
+    foundingDate: cleanString(input.foundingDate),
+    identifier: input.identifier || undefined,
+    contactPoint: input.contactPoint || undefined,
     sameAs: input.sameAs?.map(absoluteUrl).filter(isString),
     hasMerchantReturnPolicy: input.returnPolicy
       ? buildMerchantReturnPolicySchema(input.returnPolicy)
@@ -688,11 +771,12 @@ export function buildLocalBusinessSchema(input: LocalBusinessInput): SchemaObjec
   const url = absoluteUrl(input.url) || SITE_ORIGIN
 
   return stripEmpty({
-    '@type': 'LocalBusiness',
-    '@id': schemaId(url, 'localbusiness'),
+    '@type': 'Store',
+    '@id': schemaId(url, 'store'),
     name: cleanString(input.name) || DEFAULT_SITE_NAME,
     url,
-    image: buildImageObject(input.image || input.logo, schemaId(url, 'localbusiness-image')),
+    image: buildImageObject(input.image || input.logo, schemaId(url, 'store-image')),
+    logo: buildImageObject(input.logo, schemaId(url, 'store-logo')),
     telephone: cleanString(input.telephone),
     email: cleanString(input.email),
     address: typeof input.address === 'string' ? input.address : input.address || undefined,
@@ -703,8 +787,10 @@ export function buildLocalBusinessSchema(input: LocalBusinessInput): SchemaObjec
         longitude: input.geo.longitude,
       }
       : undefined,
-    openingHoursSpecification: input.openingHours,
+    openingHours: input.openingHours,
+    areaServed: 'VN',
     priceRange: cleanString(input.priceRange),
+    sameAs: input.sameAs?.map(absoluteUrl).filter(isString),
   })
 }
 
@@ -865,20 +951,61 @@ export function buildSiteIdentitySchemaGraph(input?: {
   logo?: ImageInput | string | null
   organization?: OrganizationInput
 }): SchemaObject {
+  const organization: OrganizationInput = {
+    name: 'Marais de France',
+    alternateName: [
+      'MF Paris',
+      'MFParis',
+      'MARAIS DE FRANCE - MF PARIS',
+      'mfparis.vn',
+    ],
+    legalName: 'HỘ KINH DOANH MARAIS DE FRANCE',
+    url: SITE_ORIGIN,
+    logo: input?.organization?.logo || input?.logo || MF_PARIS_LOGO_URL,
+    telephone: '+84792979299',
+    email: 'cskh@maraisdefrance.vn',
+    address: MF_PARIS_POSTAL_ADDRESS,
+    taxID: '058095006998',
+    vatID: '058095006998',
+    foundingDate: '2018',
+    identifier: MF_PARIS_BUSINESS_IDENTIFIER,
+    contactPoint: MF_PARIS_CONTACT_POINTS,
+    sameAs: MF_PARIS_SAME_AS,
+    returnPolicy: {
+      applicableCountry: 'VN',
+      merchantReturnDays: 7,
+      returnPolicyCategory:
+        'https://schema.org/MerchantReturnFiniteReturnWindow',
+      returnFees:
+        'https://schema.org/ReturnFeesCustomerResponsibility',
+    },
+    shippingService: {
+      name: 'Giao hàng toàn quốc MF Paris',
+      areaServed: 'VN',
+      description:
+        'Giao hàng toàn quốc qua đối tác vận chuyển. Nội thành TP.HCM 1-2 ngày làm việc, tỉnh thành khác 2-5 ngày làm việc.',
+    },
+    ...(input?.organization || {}),
+  }
+
   return buildSchemaGraph([
-    buildOrganizationSchema({
-      ...(input?.organization || {}),
-      logo: input?.organization?.logo || input?.logo,
-      returnPolicy: input?.organization?.returnPolicy || {
-        applicableCountry: 'VN',
-        merchantReturnDays: 7,
+    buildOrganizationSchema(organization),
+    buildWebSiteSchema('Marais de France'),
+    buildLocalBusinessSchema({
+      name: 'Marais de France',
+      url: SITE_ORIGIN,
+      logo: MF_PARIS_LOGO_URL,
+      image: MF_PARIS_DEFAULT_OG_IMAGE,
+      telephone: '+84792979299',
+      email: 'cskh@maraisdefrance.vn',
+      address: MF_PARIS_POSTAL_ADDRESS,
+      geo: {
+        latitude: 10.8240504,
+        longitude: 106.6789258,
       },
-      shippingService: input?.organization?.shippingService || {
-        name: 'Giao hang MF Paris',
-        areaServed: 'VN',
-        description: 'MF Paris giao hang toan quoc tai Viet Nam.',
-      },
+      openingHours: ['Mo-Su 08:00-22:00'],
+      priceRange: '$$',
+      sameAs: MF_PARIS_SAME_AS,
     }),
-    buildWebSiteSchema(),
   ])
 }

@@ -1,21 +1,21 @@
 ﻿# Structured Data cho MF Paris
 
-Bá»™ nÃ y táº¡o JSON-LD theo dáº¡ng `@graph`, dÃ¹ng chung cho toÃ n site:
+Bộ này tạo JSON-LD theo dạng `@graph`, dùng chung cho toàn site:
 
 - Home: `Organization`, `WebSite`, `WebPage`
-- Product detail: `WebPage`, `BreadcrumbList`, `Product` hoáº·c `ProductGroup`
+- Product detail: `WebPage`, `BreadcrumbList`, `Product` hoặc `ProductGroup`
 - Category/Brand/Product listing: `CollectionPage`, `ItemList`, `BreadcrumbList`
 - Blog detail: `WebPage`, `BreadcrumbList`, `BlogPosting`
-- Static pages: `AboutPage`, `ContactPage`, `WebPage`, cÃ³ thá»ƒ thÃªm `FAQPage`, `VideoObject`, `LocalBusiness` khi cÃ³ dá»¯ liá»‡u tháº­t
+- Static pages: `AboutPage`, `ContactPage`, `WebPage`, có thể thêm `FAQPage`, `VideoObject`, `LocalBusiness` khi có dữ liệu thật
 
-NguyÃªn táº¯c:
+Nguyên tắc:
 
-- KhÃ´ng xuáº¥t field rá»—ng.
-- KhÃ´ng xuáº¥t rating/review náº¿u chÆ°a cÃ³ Ä‘Ã¡nh giÃ¡ tháº­t.
-- KhÃ´ng xuáº¥t FAQ/video náº¿u ná»™i dung Ä‘Ã³ khÃ´ng hiá»ƒn thá»‹ trÃªn trang.
-- URL dÃ¹ng `SITE_ORIGIN` Ä‘á»ƒ thá»‘ng nháº¥t canonical.
+- Không xuất field rỗng.
+- Không xuất rating/review nếu chưa có đánh giá thật.
+- Không xuất FAQ/video nếu nội dung đó không hiển thị trên trang.
+- URL dùng `SITE_ORIGIN` để thống nhất canonical.
 
-VÃ­ dá»¥ trong page:
+Ví dụ trong page:
 
 ```tsx
 import { JsonLd } from '@/components/JsonLd'
@@ -23,7 +23,7 @@ import { buildHomeSchemaGraph } from '@/lib/structured-data'
 
 const schema = buildHomeSchemaGraph({
   title: 'MF Paris',
-  description: 'NÆ°á»›c hoa, má»¹ pháº©m chÃ­nh hÃ£ng tá»« PhÃ¡p',
+  description: 'Nước hoa, mỹ phẩm chính hãng từ Pháp',
 })
 
 return (
