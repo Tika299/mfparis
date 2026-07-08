@@ -196,7 +196,7 @@ export async function generateMetadata({
     }
   }
 
-  const title = `${category.name} | MF Paris`
+  const title = `${category.name} Chính Hãng`
   const description =
     getCategoryDescription(category)
   const canonicalUrl = `/categories/${encodeURIComponent(
@@ -451,7 +451,7 @@ export default async function CategoryPage({
       description: getCategoryDescription(currentCategory),
       breadcrumb: [
         {
-          name: 'Trang chu',
+          name: 'Trang chủ',
           url: '/',
         },
         {

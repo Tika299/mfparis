@@ -70,6 +70,7 @@ export type OfferInput = {
   priceValidUntil?: string | null
   shippingDetails?: OfferShippingDetailsInput | null
   returnPolicy?: MerchantReturnPolicyInput | null
+  seller?: SchemaObject | null
 }
 
 export type ProductReviewInput = {
@@ -111,6 +112,13 @@ export type ProductGroupInput = {
   brandName?: string | null
 }
 
+export type CollectionSubjectInput = {
+  type?: 'Brand' | 'Thing'
+  name: string
+  url?: string | null
+  description?: string | null
+}
+
 export type CollectionPageInput = {
   url: string
   name: string
@@ -118,8 +126,11 @@ export type CollectionPageInput = {
   items?: Array<{
     url: string
     name?: string | null
+    image?: ImageInput | string | null
+    brandName?: string | null
   }> | null
   breadcrumb?: BreadcrumbItem[] | null
+  subject?: CollectionSubjectInput | null
 }
 
 export type BlogPostingInput = {
@@ -502,6 +513,10 @@ export function buildOfferSchema(input: OfferInput): SchemaObject | null {
     availability: cleanString(input.availability) || 'https://schema.org/InStock',
     itemCondition: cleanString(input.itemCondition) || 'https://schema.org/NewCondition',
     priceValidUntil: cleanString(input.priceValidUntil),
+    seller:
+      input.seller || {
+        '@id': schemaId(SITE_ORIGIN, 'organization'),
+      },
     shippingDetails: input.shippingDetails
       ? buildOfferShippingDetailsSchema(input.shippingDetails)
       : undefined,
@@ -609,23 +624,67 @@ export function buildProductGroupSchema(input: ProductGroupInput): SchemaObject 
   })
 }
 
-export function buildCollectionPageSchema(input: CollectionPageInput): SchemaObject {
+function buildCollectionSubjectSchema(input: CollectionPageInput): SchemaObject | null {
+  if (!input.subject?.name) {
+    return null
+  }
+
+  const subjectUrl = input.subject.url || input.url
+  const subjectType = input.subject.type || 'Thing'
+
+  return stripEmpty({
+    '@type': subjectType,
+    '@id': schemaId(subjectUrl, subjectType === 'Brand' ? 'brand' : 'thing'),
+    name: input.subject.name,
+    url: absoluteUrl(subjectUrl),
+    description: cleanString(input.subject.description),
+  })
+}
+
+function buildCollectionItemListSchema(input: CollectionPageInput): SchemaObject | null {
   const url = absoluteUrl(input.url) || SITE_ORIGIN
-  const itemList = input.items?.length
-    ? {
-      '@type': 'ItemList',
-      '@id': schemaId(url, 'itemlist'),
-      numberOfItems: input.items.length,
-      itemListElement: input.items.map((item, index) =>
-        stripEmpty({
-          '@type': 'ListItem',
-          position: index + 1,
+
+  if (!input.items?.length) {
+    return null
+  }
+
+  return {
+    '@type': 'ItemList',
+    '@id': schemaId(url, 'itemlist'),
+    numberOfItems: input.items.length,
+    itemListElement: input.items.map((item, index) =>
+      stripEmpty({
+        '@type': 'ListItem',
+        position: index + 1,
+        item: stripEmpty({
+          '@type': 'Product',
+          '@id': schemaId(item.url, 'product'),
           name: cleanString(item.name),
           url: absoluteUrl(item.url),
+          image:
+            typeof item.image === 'string'
+              ? absoluteUrl(item.image)
+              : absoluteUrl(item.image?.url || undefined),
+          brand: input.subject?.type === 'Brand'
+            ? {
+              '@id': schemaId(input.subject.url || input.url, 'brand'),
+            }
+            : item.brandName
+              ? {
+                '@type': 'Brand',
+                name: item.brandName,
+              }
+              : undefined,
         }),
-      ),
-    }
-    : undefined
+      }),
+    ),
+  }
+}
+
+export function buildCollectionPageSchema(input: CollectionPageInput): SchemaObject {
+  const url = absoluteUrl(input.url) || SITE_ORIGIN
+  const itemList = buildCollectionItemListSchema(input)
+  const subject = buildCollectionSubjectSchema(input)
 
   return stripEmpty({
     '@type': 'CollectionPage',
@@ -637,12 +696,21 @@ export function buildCollectionPageSchema(input: CollectionPageInput): SchemaObj
       '@id': schemaId(SITE_ORIGIN, 'website'),
     },
     inLanguage: DEFAULT_LANGUAGE,
+    about: subject
+      ? {
+        '@id': subject['@id'] as string,
+      }
+      : undefined,
     breadcrumb: input.breadcrumb
       ? {
         '@id': schemaId(url, 'breadcrumb'),
       }
       : undefined,
-    mainEntity: itemList,
+    mainEntity: itemList
+      ? {
+        '@id': schemaId(url, 'itemlist'),
+      }
+      : undefined,
   })
 }
 
@@ -844,11 +912,6 @@ export function buildHomeSchemaGraph(input?: {
   organization?: OrganizationInput
 }): SchemaObject {
   return buildSchemaGraph([
-    buildOrganizationSchema({
-      ...(input?.organization || {}),
-      logo: input?.organization?.logo || input?.logo,
-    }),
-    buildWebSiteSchema(),
     buildWebPageSchema({
       url: '/',
       name: input?.title || DEFAULT_SITE_NAME,
@@ -868,8 +931,6 @@ export function buildProductPageSchemaGraph(input: {
   const breadcrumb = buildBreadcrumbListSchema(input.page.url, input.breadcrumb)
 
   return buildSchemaGraph([
-    buildOrganizationSchema(input.organization),
-    buildWebSiteSchema(),
     buildWebPageSchema({
       ...input.page,
       breadcrumbId: breadcrumb ? schemaId(input.page.url, 'breadcrumb') : undefined,
@@ -891,9 +952,9 @@ export function buildCollectionPageSchemaGraph(input: {
     : null
 
   return buildSchemaGraph([
-    buildOrganizationSchema(input.organization),
-    buildWebSiteSchema(),
+    buildCollectionSubjectSchema(input.page),
     buildCollectionPageSchema(input.page),
+    buildCollectionItemListSchema(input.page),
     breadcrumb,
   ])
 }
@@ -907,8 +968,6 @@ export function buildBlogPostingSchemaGraph(input: {
   const breadcrumb = buildBreadcrumbListSchema(input.page.url, input.breadcrumb)
 
   return buildSchemaGraph([
-    buildOrganizationSchema(input.organization),
-    buildWebSiteSchema(),
     buildWebPageSchema({
       ...input.page,
       breadcrumbId: breadcrumb ? schemaId(input.page.url, 'breadcrumb') : undefined,
@@ -934,8 +993,6 @@ export function buildStaticPageSchemaGraph(input: {
     : null
 
   return buildSchemaGraph([
-    buildOrganizationSchema(input.organization),
-    buildWebSiteSchema(),
     buildWebPageSchema({
       ...input.page,
       breadcrumbId: breadcrumb ? schemaId(input.page.url, 'breadcrumb') : undefined,
@@ -943,7 +1000,6 @@ export function buildStaticPageSchemaGraph(input: {
     breadcrumb,
     input.faq ? buildFAQPageSchema(input.faq, input.page.url) : null,
     input.video ? buildVideoObjectSchema(input.video, input.page.url) : null,
-    input.localBusiness ? buildLocalBusinessSchema(input.localBusiness) : null,
   ])
 }
 

@@ -119,8 +119,30 @@ export function lexicalToHtml(value: unknown): string {
   return childrenToHtml(children)
 }
 
+function parseLexicalJsonString(value: string): unknown {
+  const trimmed = value.trim()
+
+  if (!trimmed.startsWith('{') || !trimmed.includes('"root"')) {
+    return null
+  }
+
+  try {
+    const parsed = JSON.parse(trimmed)
+
+    return parsed && typeof parsed === 'object' && 'root' in parsed ? parsed : null
+  } catch {
+    return null
+  }
+}
+
 export function normalizeContentHtml(value: unknown): string {
   if (typeof value === 'string') {
+    const lexicalValue = parseLexicalJsonString(value)
+
+    if (lexicalValue) {
+      return sanitizeWordPressHtml(lexicalToHtml(lexicalValue))
+    }
+
     return sanitizeWordPressHtml(value)
   }
 

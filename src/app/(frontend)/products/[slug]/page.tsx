@@ -993,6 +993,9 @@ const buildProductOffers = (
           ),
           itemCondition:
             'https://schema.org/NewCondition',
+          seller: {
+            '@id': `${SITE_ORIGIN}/#organization`,
+          },
         }
       })
       .filter(Boolean)
@@ -1020,6 +1023,9 @@ const buildProductOffers = (
       ),
       itemCondition:
         'https://schema.org/NewCondition',
+      seller: {
+        '@id': `${SITE_ORIGIN}/#organization`,
+      },
     },
   ]
 }

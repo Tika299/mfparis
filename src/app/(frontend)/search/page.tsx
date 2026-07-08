@@ -1,9 +1,21 @@
+import type { Metadata } from 'next'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { ProductCard } from '@/components/ProductCard'
 import { SearchFilters } from '@/components/search-filters/SearchFilters'
 import { SearchIcon, X } from 'lucide-react'
 import Link from 'next/link'
+export const metadata: Metadata = {
+  title: 'Tìm kiếm',
+  description: 'Tìm kiếm sản phẩm chính hãng tại MF Paris.',
+  robots: {
+    index: false,
+    follow: true,
+  },
+  alternates: {
+    canonical: '/search',
+  },
+}
 
 export default async function SearchPage({
   searchParams,

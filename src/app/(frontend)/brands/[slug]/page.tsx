@@ -192,7 +192,7 @@ export async function generateMetadata({
     }
   }
 
-  const title = `${brand.name} | MF Paris`
+  const title = `${brand.name} Chính Hãng`
   const description =
     getBrandDescription(brand)
   const canonicalUrl = `/brands/${encodeURIComponent(
@@ -450,14 +450,24 @@ export default async function BrandProductsPage({
       description: getBrandDescription(currentBrand),
       breadcrumb: [
         {
-          name: 'Trang chu',
+          name: 'Trang chủ',
           url: '/',
+        },
+        {
+          name: 'Thương hiệu',
+          url: '/brands',
         },
         {
           name: currentBrand.name,
           url: brandUrl,
         },
       ],
+      subject: {
+        type: 'Brand',
+        name: currentBrand.name,
+        url: brandUrl,
+        description: getBrandDescription(currentBrand),
+      },
       items: productsRes.docs.map((product) => ({
         name: product.title,
         url: `/products/${product.slug}`,
