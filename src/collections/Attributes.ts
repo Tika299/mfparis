@@ -516,5 +516,27 @@ export const Attributes: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'wooAttributeId',
+      type: 'number',
+      unique: true,
+      index: true,
+      label: 'WooCommerce attribute ID',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'wooTaxonomySlug',
+      type: 'text',
+      index: true,
+      label: 'WooCommerce taxonomy slug',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Vi du: pa_dung-tich, pa_nhom-huong.',
+      },
+    }
   ],
 }

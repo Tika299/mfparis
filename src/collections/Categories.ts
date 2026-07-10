@@ -66,5 +66,34 @@ export const Categories: CollectionConfig = {
       relationTo: 'categories',
       label: 'Danh muc cha',
     },
+    {
+      name: 'wpId',
+      type: 'number',
+      unique: true,
+      index: true,
+      label: 'WordPress ID',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'sourceUrl',
+      type: 'text',
+      label: 'URL goc',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'importNotes',
+      type: 'textarea',
+      label: 'Ghi chu import category',
+      admin: {
+        position: 'sidebar',
+        rows: 3,
+      },
+    }
   ],
 }

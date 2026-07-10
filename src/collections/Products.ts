@@ -163,6 +163,26 @@ export const Products: CollectionConfig = {
                     width: '30%',
                   },
                 },
+                {
+                  name: 'gtin',
+                  type: 'text',
+                  label: 'GTIN / EAN / Barcode',
+                  admin: {
+                    width: '20%',
+                    description:
+                      'Nhập mã vạch chuẩn nếu sản phẩm có. Ví dụ EAN-13 cho hàng nhập khẩu.',
+                  },
+                },
+                {
+                  name: 'mpn',
+                  type: 'text',
+                  label: 'MPN / Mã hãng',
+                  admin: {
+                    width: '20%',
+                    description:
+                      'Dùng khi không có GTIN hoặc cần mã định danh từ hãng.',
+                  },
+                },
               ],
             },
 
@@ -547,6 +567,15 @@ export const Products: CollectionConfig = {
                       },
                     },
                     {
+                      name: 'wpVariationId',
+                      type: 'number',
+                      label: 'WooCommerce variation ID',
+                      admin: {
+                        width: '30%',
+                        readOnly: true,
+                      },
+                    },
+                    {
                       name: 'isDefault',
                       type: 'checkbox',
                       label: 'Biến thể mặc định',
@@ -801,5 +830,34 @@ export const Products: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'wpId',
+      type: 'number',
+      unique: true,
+      index: true,
+      label: 'WooCommerce product ID',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'sourceUrl',
+      type: 'text',
+      label: 'URL san pham goc',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'importNotes',
+      type: 'textarea',
+      label: 'Ghi chu import product',
+      admin: {
+        position: 'sidebar',
+        rows: 3,
+      },
+    }
   ],
 }

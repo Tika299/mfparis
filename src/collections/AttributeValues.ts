@@ -600,5 +600,25 @@ export const AttributeValues: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'wooTermId',
+      type: 'number',
+      index: true,
+      label: 'WooCommerce term ID',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'wooTaxonomySlug',
+      type: 'text',
+      index: true,
+      label: 'WooCommerce taxonomy slug',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    }
   ],
 }

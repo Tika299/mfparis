@@ -1,5 +1,6 @@
 import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
+import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 
 export const PostCategories: CollectionConfig = {
   slug: 'post-categories',
@@ -29,5 +30,41 @@ export const PostCategories: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    htmlEditorField({
+      name: 'description',
+      label: 'Mo ta danh muc bai viet',
+      description:
+        'Mo ta danh muc bai viet luu dang HTML. Khi import se thay anh trong HTML bang media Payload.',
+      rows: 20,
+    }),
+    {
+      name: 'wpId',
+      type: 'number',
+      unique: true,
+      index: true,
+      label: 'WordPress ID',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'sourceUrl',
+      type: 'text',
+      label: 'URL goc',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'importNotes',
+      type: 'textarea',
+      label: 'Ghi chu import post category',
+      admin: {
+        position: 'sidebar',
+        rows: 3,
+      },
+    }
   ],
 }

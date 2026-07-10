@@ -75,5 +75,67 @@ export const Media: CollectionConfig = {
       required: true,
       label: 'Mô tả hình ảnh (SEO)',
     },
+    {
+      name: 'title',
+      type: 'text',
+      label: 'Ten hien thi',
+      admin: {
+        description:
+          'Ten de quan tri tim kiem media. Doi ten nay se cap nhat o cac noi dung dung relationship media.',
+      },
+    },
+    {
+      name: 'caption',
+      type: 'textarea',
+      label: 'Chu thich anh',
+      admin: {
+        rows: 3,
+      },
+    },
+    {
+      name: 'wpId',
+      type: 'number',
+      unique: true,
+      index: true,
+      label: 'WordPress media ID',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'sourceUrl',
+      type: 'text',
+      index: true,
+      label: 'URL anh goc',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'sourceFilename',
+      type: 'text',
+      index: true,
+      label: 'Ten file goc',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'importedFrom',
+      type: 'select',
+      label: 'Nguon import',
+      defaultValue: 'manual',
+      options: [
+        { label: 'Nhap tay', value: 'manual' },
+        { label: 'WordPress', value: 'wordpress' },
+        { label: 'WooCommerce', value: 'woocommerce' },
+      ],
+      admin: {
+        position: 'sidebar',
+      },
+    }
   ],
 }

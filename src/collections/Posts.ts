@@ -66,5 +66,34 @@ export const Posts: CollectionConfig = {
         { name: 'metaDescription', type: 'textarea' },
       ],
     },
+    {
+      name: 'wpId',
+      type: 'number',
+      unique: true,
+      index: true,
+      label: 'WordPress ID',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'sourceUrl',
+      type: 'text',
+      label: 'URL goc',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'importNotes',
+      type: 'textarea',
+      label: 'Ghi chu import post',
+      admin: {
+        position: 'sidebar',
+        rows: 3,
+      },
+    }
   ],
 }

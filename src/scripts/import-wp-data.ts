@@ -11,6 +11,26 @@ import { sanitizeWordPressHtml } from '@/lib/html/sanitizeWordPressHtml'
 type AnyRecord = Record<string, any>
 type ID = string | number
 
+type MediaRef = {
+  id: ID
+  url: string
+  filename: string
+}
+
+type ImportMaps = {
+  attributes: Map<number | string, ID>
+  attributeValues: Map<string, ID>
+  brands: Map<number, ID>
+  productCategories: Map<number, ID>
+  postCategories: Map<number, ID>
+}
+
+type HtmlMediaContext = {
+  altFallback: string
+  importedFrom?: 'wordpress' | 'woocommerce'
+  preferredMediaByFilename?: Map<string, MediaRef>
+}
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const projectRoot = path.resolve(__dirname, '../..')
@@ -34,23 +54,25 @@ const DRY_RUN = hasFlag('--dry-run')
 const USE_PLACEHOLDER_FEATURED = hasFlag('--placeholder-featured')
 const DISABLE_FALLBACK_BRAND = hasFlag('--no-fallback-brand')
 
-const MEDIA_CONCURRENCY = Math.max(1, Number(getArg('--media-concurrency', '2')) || 2)
+const MEDIA_CONCURRENCY = Math.max(1, Number(getArg('--media-concurrency', '3')) || 3)
 const ITEM_LIMIT = Math.max(0, Number(getArg('--limit', '0')) || 0)
 const ITEM_OFFSET = Math.max(0, Number(getArg('--offset', '0')) || 0)
 
 const mediaLimit = pLimit(MEDIA_CONCURRENCY)
 
-const WP_BASE_URL = 'https://mfparis.vn'
-const DATA_DIR = path.resolve(
-  getArg('--data-dir', process.env.WP_IMPORT_DATA_DIR || 'D:\\new'),
-)
+const WP_BASE_URL = getArg('--wp-base-url', process.env.WP_BASE_URL || 'https://mfparis.vn')
+const DATA_DIR = path.resolve(getArg('--data-dir', process.env.WP_IMPORT_DATA_DIR || 'D:\\new\\export'))
 
 const DATA_FILES = {
   brands: 'brands.merged.json',
   brandsFallback: 'brands.json',
-  productCategories: 'product-categories.json',
-  postCategories: 'post-categories.json',
-  productsRaw: 'products.json',
+  productCategories: 'product-categories.merged.json',
+  productCategoriesFallback: 'product-categories.json',
+  postCategories: 'post-categories.merged.json',
+  postCategoriesFallback: 'post-categories.json',
+  productAttributes: 'product-attributes-with-terms.json',
+  productsRaw: 'products-with-variations.json',
+  productsRawFallback: 'products.json',
   productsPrepared: 'payload_products_import.json',
   posts: 'posts.json',
 }
@@ -58,15 +80,12 @@ const DATA_FILES = {
 const USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
 
-const allowedDisplayLocations = new Set([
-  'best-seller',
-  'combo',
-  'new-arrival',
-  'flash-sale',
-])
+const allowedDisplayLocations = new Set(['best-seller', 'combo', 'new-arrival', 'flash-sale'])
+const mediaBySourceUrl = new Map<string, MediaRef>()
+const mediaByFilename = new Map<string, MediaRef>()
 
-const formatSlug = (value: string): string =>
-  String(value || '')
+function formatSlug(value: string): string {
+  return String(value || '')
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -76,8 +95,9 @@ const formatSlug = (value: string): string =>
     .replace(/(\s+)/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '')
+}
 
-const makeSafeSlug = (value: string, fallbackId?: string | number): string => {
+function makeSafeSlug(value: string, fallbackId?: string | number): string {
   let slug = formatSlug(value)
 
   if (!slug) {
@@ -91,34 +111,38 @@ const makeSafeSlug = (value: string, fallbackId?: string | number): string => {
   return slug || `item-${fallbackId || Date.now()}`
 }
 
-const stripHTML = (html: unknown) =>
-  typeof html === 'string'
-    ? html
+function decodeBasicEntities(value: string): string {
+  return value
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&#215;/g, 'x')
+}
+
+function stripHTML(html: unknown): string {
+  return typeof html === 'string'
+    ? decodeBasicEntities(html)
         .replace(/<\/?[^>]+(>|$)/g, ' ')
-        .replace(/&nbsp;/g, ' ')
-        .replace(/&amp;/g, '&')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, "'")
         .replace(/\s+/g, ' ')
         .trim()
     : ''
+}
 
-const toNumber = (value: unknown, fallback = 0) => {
+function toNumber(value: unknown, fallback = 0): number {
   const number = Number(value)
   return Number.isFinite(number) ? number : fallback
 }
 
-const optionalNumber = (value: unknown) => {
+function optionalNumber(value: unknown): number | undefined {
   const number = Number(value)
   return Number.isFinite(number) && number > 0 ? number : undefined
 }
 
-const withoutUndefined = (object: AnyRecord) => {
-  return Object.fromEntries(
-    Object.entries(object).filter(([, value]) => value !== undefined),
-  )
+function withoutUndefined(object: AnyRecord) {
+  return Object.fromEntries(Object.entries(object).filter(([, value]) => value !== undefined))
 }
 
 function resolveDataFile(filename: string, fallback?: string) {
@@ -139,7 +163,7 @@ function resolveDataFile(filename: string, fallback?: string) {
   return primary
 }
 
-const applySlice = <T>(items: T[]) => {
+function applySlice<T>(items: T[]) {
   const offsetItems = ITEM_OFFSET > 0 ? items.slice(ITEM_OFFSET) : items
   return ITEM_LIMIT > 0 ? offsetItems.slice(0, ITEM_LIMIT) : offsetItems
 }
@@ -148,15 +172,14 @@ function readJSON<T = AnyRecord>(filename: string, fallback?: string): T[] {
   const filePath = resolveDataFile(filename, fallback)
 
   if (!fs.existsSync(filePath)) {
-    console.warn(`⚠️ Không tìm thấy file: ${filePath}`)
+    console.warn(`Missing data file: ${filePath}`)
     return []
   }
 
-  const raw = fs.readFileSync(filePath, 'utf-8')
-  const data = JSON.parse(raw)
+  const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
 
   if (!Array.isArray(data)) {
-    console.warn(`⚠️ File không phải array JSON: ${filePath}`)
+    console.warn(`Data file is not a JSON array: ${filePath}`)
     return []
   }
 
@@ -179,19 +202,14 @@ function getRendered(value: unknown): string {
   return ''
 }
 
-function normalizeHtml(value: unknown): string {
+function normalizeHtmlOnly(value: unknown): string {
   if (typeof value === 'string') {
     return sanitizeWordPressHtml(value)
   }
 
   if (value && typeof value === 'object') {
     const rendered = getRendered(value)
-
-    if (rendered) {
-      return sanitizeWordPressHtml(rendered)
-    }
-
-    return sanitizeWordPressHtml(lexicalToHtml(value))
+    return sanitizeWordPressHtml(rendered || lexicalToHtml(value))
   }
 
   return ''
@@ -206,43 +224,33 @@ function getRankMathMeta(item: AnyRecord, key: string) {
   return typeof found?.value === 'string' ? found.value : ''
 }
 
-async function findBySlug(payload: any, collection: string, slug: string) {
-  const result = await payload.find({
-    collection,
-    where: { slug: { equals: slug } },
-    limit: 1,
-    pagination: false,
-  })
-
-  return result.docs[0] || null
-}
-
 async function findOne(payload: any, collection: string, where: AnyRecord) {
   const result = await payload.find({
     collection,
     where,
     limit: 1,
     pagination: false,
+    overrideAccess: true,
   })
 
   return result.docs[0] || null
 }
 
-async function createOrUpdateBySlug(
-  payload: any,
-  collection: string,
-  slug: string,
-  data: AnyRecord,
-) {
+async function findBySlug(payload: any, collection: string, slug: string) {
+  return findOne(payload, collection, { slug: { equals: slug } })
+}
+
+async function createOrUpdateBySlug(payload: any, collection: string, slug: string, data: AnyRecord) {
   const existing = await findBySlug(payload, collection, slug)
 
   if (existing?.id && !UPDATE_EXISTING) {
-    return { id: existing.id, action: 'skip' as const }
+    return { id: existing.id, doc: existing, action: 'skip' as const }
   }
 
   if (DRY_RUN) {
     return {
       id: existing?.id || `dry-${collection}-${slug}`,
+      doc: { ...(existing || {}), id: existing?.id || `dry-${collection}-${slug}`, ...data },
       action: existing?.id ? ('dry-update' as const) : ('dry-create' as const),
     }
   }
@@ -255,7 +263,7 @@ async function createOrUpdateBySlug(
       overrideAccess: true,
     })
 
-    return { id: updated.id, action: 'update' as const }
+    return { id: updated.id, doc: updated, action: 'update' as const }
   }
 
   const created = await payload.create({
@@ -264,7 +272,7 @@ async function createOrUpdateBySlug(
     overrideAccess: true,
   })
 
-  return { id: created.id, action: 'create' as const }
+  return { id: created.id, doc: created, action: 'create' as const }
 }
 
 function getImageUrl(image: unknown): string {
@@ -273,7 +281,7 @@ function getImageUrl(image: unknown): string {
   }
 
   const record = image as AnyRecord
-  return record.src || record.thumbnail || record.url || ''
+  return record.src || record.source_url || record.thumbnail || record.url || ''
 }
 
 function getImageAlt(image: unknown, fallback: string): string {
@@ -282,7 +290,16 @@ function getImageAlt(image: unknown, fallback: string): string {
   }
 
   const record = image as AnyRecord
-  return record.alt || record.name || record.title || fallback
+  return stripHTML(record.alt || record.name || record.title || fallback)
+}
+
+function getImageCaption(image: unknown): string {
+  if (!image || typeof image !== 'object') {
+    return ''
+  }
+
+  const record = image as AnyRecord
+  return stripHTML(record.caption || record.description || '')
 }
 
 function getFilenameFromUrl(url: string, fallback = 'wp-media') {
@@ -295,18 +312,100 @@ function getFilenameFromUrl(url: string, fallback = 'wp-media') {
   }
 }
 
+function normalizeFilenameKey(value: string): string {
+  const filename = getFilenameFromUrl(value).toLowerCase()
+  return filename
+    .replace(/\?.*$/g, '')
+    .replace(/-\d+x\d+(?=\.[a-z0-9]+$)/i, '')
+}
+
 function getMimeType(filename: string) {
   const ext = path.extname(filename).toLowerCase()
-
   if (ext === '.png') return 'image/png'
   if (ext === '.gif') return 'image/gif'
   if (ext === '.webp') return 'image/webp'
   if (ext === '.avif') return 'image/avif'
-
+  if (ext === '.svg') return 'image/svg+xml'
   return 'image/jpeg'
 }
 
-async function uploadMedia(payload: any, url: string, alt: string) {
+function getPayloadMediaUrl(doc: AnyRecord, fallbackFilename: string) {
+  return doc.url || `/api/media/file/${doc.filename || fallbackFilename}`
+}
+
+function rememberMedia(ref: MediaRef, sourceUrl?: string) {
+  if (sourceUrl) {
+    mediaBySourceUrl.set(new URL(sourceUrl, WP_BASE_URL).toString(), ref)
+  }
+
+  mediaByFilename.set(normalizeFilenameKey(ref.filename), ref)
+}
+
+async function findExistingMedia(payload: any, normalizedUrl: string, filename: string) {
+  const cachedByUrl = mediaBySourceUrl.get(normalizedUrl)
+  if (cachedByUrl) return cachedByUrl
+
+  const filenameKey = normalizeFilenameKey(filename)
+  const cachedByFilename = mediaByFilename.get(filenameKey)
+  if (cachedByFilename) return cachedByFilename
+
+  const sourceUrlExisting = await findOne(payload, 'media', {
+    sourceUrl: { equals: normalizedUrl },
+  })
+
+  if (sourceUrlExisting?.id) {
+    const ref = {
+      id: sourceUrlExisting.id,
+      url: getPayloadMediaUrl(sourceUrlExisting, filename),
+      filename: sourceUrlExisting.filename || filename,
+    }
+    rememberMedia(ref, normalizedUrl)
+    return ref
+  }
+
+  const sourceFilenameExisting = await findOne(payload, 'media', {
+    sourceFilename: { equals: filename },
+  })
+
+  if (sourceFilenameExisting?.id) {
+    const ref = {
+      id: sourceFilenameExisting.id,
+      url: getPayloadMediaUrl(sourceFilenameExisting, filename),
+      filename: sourceFilenameExisting.filename || filename,
+    }
+    rememberMedia(ref, normalizedUrl)
+    return ref
+  }
+
+  const filenameExisting = await findOne(payload, 'media', {
+    filename: { equals: filename },
+  })
+
+  if (filenameExisting?.id) {
+    const ref = {
+      id: filenameExisting.id,
+      url: getPayloadMediaUrl(filenameExisting, filename),
+      filename: filenameExisting.filename || filename,
+    }
+    rememberMedia(ref, normalizedUrl)
+    return ref
+  }
+
+  return null
+}
+
+async function uploadMedia(
+  payload: any,
+  url: string,
+  alt: string,
+  options: {
+    caption?: string
+    title?: string
+    wpId?: number
+    importedFrom?: 'wordpress' | 'woocommerce'
+    preferredMediaByFilename?: Map<string, MediaRef>
+  } = {},
+): Promise<MediaRef | null> {
   if (!url || SKIP_MEDIA) {
     return null
   }
@@ -314,17 +413,29 @@ async function uploadMedia(payload: any, url: string, alt: string) {
   return mediaLimit(async () => {
     const normalizedUrl = new URL(url, WP_BASE_URL).toString()
     const filename = getFilenameFromUrl(normalizedUrl, makeSafeSlug(alt || 'wp-media'))
+    const filenameKey = normalizeFilenameKey(filename)
+    const preferred = options.preferredMediaByFilename?.get(filenameKey)
 
-    const existing = await findOne(payload, 'media', {
-      filename: { equals: filename },
-    })
+    if (preferred) {
+      mediaBySourceUrl.set(normalizedUrl, preferred)
+      return preferred
+    }
 
-    if (existing?.id) {
-      return existing.id
+    const existing = await findExistingMedia(payload, normalizedUrl, filename)
+
+    if (existing) {
+      return existing
+    }
+
+    const dryRef = {
+      id: `dry-media-${filename}`,
+      url: `/api/media/file/${filename}`,
+      filename,
     }
 
     if (DRY_RUN) {
-      return `dry-media-${filename}`
+      rememberMedia(dryRef, normalizedUrl)
+      return dryRef
     }
 
     const response = await fetch(normalizedUrl, {
@@ -332,17 +443,22 @@ async function uploadMedia(payload: any, url: string, alt: string) {
     })
 
     if (!response.ok) {
-      throw new Error(`Không tải được ảnh ${normalizedUrl}: ${response.status}`)
+      throw new Error(`Cannot download image ${normalizedUrl}: ${response.status}`)
     }
 
-    const arrayBuffer = await response.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
+    const buffer = Buffer.from(await response.arrayBuffer())
 
     const media = await payload.create({
       collection: 'media',
-      data: {
+      data: withoutUndefined({
         alt: alt || filename,
-      },
+        title: options.title || alt || filename,
+        caption: options.caption || undefined,
+        wpId: options.wpId || undefined,
+        sourceUrl: normalizedUrl,
+        sourceFilename: filename,
+        importedFrom: options.importedFrom || 'wordpress',
+      }),
       file: {
         data: buffer,
         name: filename,
@@ -352,15 +468,111 @@ async function uploadMedia(payload: any, url: string, alt: string) {
       overrideAccess: true,
     })
 
-    return media.id
+    const ref = {
+      id: media.id,
+      url: getPayloadMediaUrl(media, filename),
+      filename: media.filename || filename,
+    }
+
+    rememberMedia(ref, normalizedUrl)
+    return ref
   })
 }
 
-async function fetchWPFeaturedMediaUrl(mediaId: unknown) {
+function extractAttribute(tag: string, attribute: string) {
+  const match = tag.match(new RegExp(`${attribute}=["']([^"']+)["']`, 'i'))
+  return match?.[1] || ''
+}
+
+function isImportableImageUrl(url: string) {
+  if (!url || url.startsWith('data:') || url.startsWith('#')) {
+    return false
+  }
+
+  if (url.includes('/themes/woodmart/images/lazy.svg')) {
+    return false
+  }
+
+  return (
+    /wp-content\/uploads/i.test(url) ||
+    /\.(jpe?g|png|gif|webp|avif|svg)(\?|#|$)/i.test(url)
+  )
+}
+
+function srcsetUrls(value: string) {
+  return value
+    .split(',')
+    .map((part) => part.trim().split(/\s+/)[0])
+    .filter(Boolean)
+}
+
+function extractImageUrlsFromHtml(html: string) {
+  const urls = new Set<string>()
+  const imgTags = html.match(/<img\b[^>]*>/gi) || []
+
+  for (const tag of imgTags) {
+    for (const attr of ['data-src', 'data-lazy-src', 'data-original', 'src']) {
+      const value = extractAttribute(tag, attr)
+      if (isImportableImageUrl(value)) {
+        urls.add(value)
+      }
+    }
+
+    for (const attr of ['srcset', 'data-srcset']) {
+      for (const url of srcsetUrls(extractAttribute(tag, attr))) {
+        if (isImportableImageUrl(url)) {
+          urls.add(url)
+        }
+      }
+    }
+  }
+
+  return Array.from(urls)
+}
+
+function replaceAllLiteral(value: string, from: string, to: string) {
+  return value.split(from).join(to)
+}
+
+async function normalizeHtmlWithMedia(
+  payload: any,
+  value: unknown,
+  context: HtmlMediaContext,
+) {
+  let html = normalizeHtmlOnly(value)
+
+  if (!html || SKIP_MEDIA) {
+    return html
+  }
+
+  const urls = extractImageUrlsFromHtml(html)
+  const replacements = new Map<string, string>()
+
+  for (const sourceUrl of urls) {
+    const alt = context.altFallback || getFilenameFromUrl(sourceUrl)
+    const media = await uploadMedia(payload, sourceUrl, alt, {
+      importedFrom: context.importedFrom || 'wordpress',
+      preferredMediaByFilename: context.preferredMediaByFilename,
+    })
+
+    if (media?.url) {
+      replacements.set(sourceUrl, media.url)
+      replacements.set(new URL(sourceUrl, WP_BASE_URL).toString(), media.url)
+    }
+  }
+
+  for (const [from, to] of replacements) {
+    html = replaceAllLiteral(html, from, to)
+  }
+
+  return sanitizeWordPressHtml(html)
+}
+
+async function fetchWPFeaturedMedia(mediaId: unknown) {
   const id = Number(mediaId)
 
   if (!Number.isFinite(id) || id <= 0 || SKIP_MEDIA) {
-    return ''
+    return null
   }
 
   try {
@@ -369,28 +581,35 @@ async function fetchWPFeaturedMediaUrl(mediaId: unknown) {
     })
 
     if (!response.ok) {
-      return ''
+      return null
     }
 
     const media = (await response.json()) as AnyRecord
-
-    return (
+    const url =
       media.source_url ||
       media.guid?.rendered ||
       media.media_details?.sizes?.full?.source_url ||
       ''
-    )
+
+    if (!url) {
+      return null
+    }
+
+    return {
+      url,
+      alt: media.alt_text || stripHTML(media.title?.rendered || ''),
+      caption: stripHTML(media.caption?.rendered || ''),
+      title: stripHTML(media.title?.rendered || ''),
+      wpId: id,
+    }
   } catch {
-    return ''
+    return null
   }
 }
 
 async function createPlaceholderMedia(payload: any) {
   const filename = 'mfparis-placeholder-featured.png'
-
-  const existing = await findOne(payload, 'media', {
-    filename: { equals: filename },
-  })
+  const existing = await findOne(payload, 'media', { filename: { equals: filename } })
 
   if (existing?.id) {
     return existing.id
@@ -400,14 +619,18 @@ async function createPlaceholderMedia(payload: any) {
     return 'dry-placeholder-media'
   }
 
-  const pngBase64 =
-    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII='
-  const buffer = Buffer.from(pngBase64, 'base64')
+  const buffer = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=',
+    'base64',
+  )
 
   const media = await payload.create({
     collection: 'media',
     data: {
       alt: 'MF Paris Placeholder',
+      title: 'MF Paris Placeholder',
+      sourceFilename: filename,
+      importedFrom: 'manual',
     },
     file: {
       data: buffer,
@@ -426,87 +649,259 @@ async function getFallbackBrand(payload: any) {
     return undefined
   }
 
-  const slug = 'mf-paris'
-
-  const result = await createOrUpdateBySlug(payload, 'brands', slug, {
+  const result = await createOrUpdateBySlug(payload, 'brands', 'mf-paris', {
     name: 'MF Paris',
-    slug,
-    description: '<p>Thương hiệu tạm dùng cho dữ liệu import chưa map được brand.</p>',
+    slug: 'mf-paris',
+    description: '<p>Thuong hieu tam dung cho du lieu import chua map duoc brand.</p>',
     isFeatured: false,
   })
 
   return result.id
 }
 
+async function createOrUpdateAttribute(payload: any, item: AnyRecord) {
+  const wooAttributeId = Number(item.id)
+  const taxonomySlug = String(item.slug || '')
+  const slug = makeSafeSlug(taxonomySlug.replace(/^pa_/, '') || item.name || `attribute-${item.id}`, item.id)
+  const existing =
+    (Number.isFinite(wooAttributeId)
+      ? await findOne(payload, 'attributes', { wooAttributeId: { equals: wooAttributeId } })
+      : null) || (await findBySlug(payload, 'attributes', slug))
+
+  const variantOption = taxonomySlug === 'pa_dung-tich' || taxonomySlug === 'pa_mau' || item.has_archives === true
+
+  const data = withoutUndefined({
+    name: item.name || slug,
+    slug,
+    description: stripHTML(item.description || ''),
+    scope: taxonomySlug.includes('huong') || taxonomySlug.includes('nong-do') ? 'fragrance' : 'general',
+    valueType: item.type === 'number' || item.type === 'range' ? item.type : 'multi_select',
+    filterable: true,
+    comparable: true,
+    variantOption,
+    allowsMultiple: true,
+    displayStyle: taxonomySlug === 'pa_mau' ? 'color' : 'checkbox',
+    sortOrder: toNumber(item.menu_order || item.order, 0),
+    isActive: true,
+    wooAttributeId: Number.isFinite(wooAttributeId) ? wooAttributeId : undefined,
+    wooTaxonomySlug: taxonomySlug || undefined,
+  })
+
+  if (existing?.id && !UPDATE_EXISTING) {
+    return { id: existing.id, action: 'skip' as const }
+  }
+
+  if (DRY_RUN) {
+    return {
+      id: existing?.id || `dry-attribute-${slug}`,
+      action: existing?.id ? ('dry-update' as const) : ('dry-create' as const),
+    }
+  }
+
+  if (existing?.id) {
+    const updated = await payload.update({
+      collection: 'attributes',
+      id: existing.id,
+      data,
+      overrideAccess: true,
+    })
+    return { id: updated.id, action: 'update' as const }
+  }
+
+  const created = await payload.create({
+    collection: 'attributes',
+    data,
+    overrideAccess: true,
+  })
+  return { id: created.id, action: 'create' as const }
+}
+
+function attributeValueKey(attributeId: ID, slug: string) {
+  return `${attributeId}:${slug}`
+}
+
+async function createOrUpdateAttributeValue(
+  payload: any,
+  attributeId: ID,
+  taxonomySlug: string,
+  term: AnyRecord,
+) {
+  const wooTermId = Number(term.id)
+  const slug = makeSafeSlug(term.slug || term.name || `term-${term.id}`, term.id)
+  const existing = await findOne(payload, 'attribute-values', {
+    and: [{ attribute: { equals: attributeId } }, { slug: { equals: slug } }],
+  })
+
+  const data = withoutUndefined({
+    attribute: attributeId,
+    label: term.name || slug,
+    slug,
+    description: stripHTML(term.description || ''),
+    sortOrder: toNumber(term.menu_order, 0),
+    isActive: true,
+    wooTermId: Number.isFinite(wooTermId) ? wooTermId : undefined,
+    wooTaxonomySlug: taxonomySlug || undefined,
+  })
+
+  if (existing?.id && !UPDATE_EXISTING) {
+    return { id: existing.id, action: 'skip' as const }
+  }
+
+  if (DRY_RUN) {
+    return {
+      id: existing?.id || `dry-attribute-value-${slug}`,
+      action: existing?.id ? ('dry-update' as const) : ('dry-create' as const),
+    }
+  }
+
+  if (existing?.id) {
+    const updated = await payload.update({
+      collection: 'attribute-values',
+      id: existing.id,
+      data,
+      overrideAccess: true,
+    })
+    return { id: updated.id, action: 'update' as const }
+  }
+
+  const created = await payload.create({
+    collection: 'attribute-values',
+    data,
+    overrideAccess: true,
+  })
+  return { id: created.id, action: 'create' as const }
+}
+
+async function importAttributes(payload: any) {
+  const data = readJSON<AnyRecord>(DATA_FILES.productAttributes)
+  const attributeMap = new Map<number | string, ID>()
+  const attributeValueMap = new Map<string, ID>()
+
+  console.log(`\nImport attributes: ${data.length}`)
+
+  for (const item of data) {
+    try {
+      const attribute = await createOrUpdateAttribute(payload, item)
+      const taxonomySlug = String(item.slug || '')
+
+      if (item.id) attributeMap.set(Number(item.id), attribute.id)
+      if (taxonomySlug) attributeMap.set(taxonomySlug, attribute.id)
+      attributeMap.set(makeSafeSlug(taxonomySlug.replace(/^pa_/, '') || item.name || '', item.id), attribute.id)
+
+      for (const term of Array.isArray(item.terms) ? item.terms : []) {
+        const value = await createOrUpdateAttributeValue(payload, attribute.id, taxonomySlug, term)
+        const termSlug = makeSafeSlug(term.slug || term.name || `term-${term.id}`, term.id)
+
+        attributeValueMap.set(attributeValueKey(attribute.id, termSlug), value.id)
+        if (term.id) attributeValueMap.set(attributeValueKey(attribute.id, String(term.id)), value.id)
+        if (term.name) attributeValueMap.set(attributeValueKey(attribute.id, String(term.name).toLowerCase()), value.id)
+      }
+
+      console.log(`   ${attribute.action} attribute: ${item.name || item.slug}`)
+    } catch (error: any) {
+      console.error(`   Attribute error: ${item.name || item.id} - ${error.message}`)
+    }
+  }
+
+  return { attributeMap, attributeValueMap }
+}
+
+function mapBySlug(items: AnyRecord[]) {
+  const map = new Map<string, AnyRecord>()
+  for (const item of items) {
+    if (item.slug) map.set(String(item.slug), item)
+  }
+  return map
+}
+
 async function importBrands(payload: any) {
-  const brandsData = readJSON<AnyRecord>(
-    DATA_FILES.brands,
-    DATA_FILES.brandsFallback,
-  )
+  const brandsData = readJSON<AnyRecord>(DATA_FILES.brands, DATA_FILES.brandsFallback)
   const brandMap = new Map<number, ID>()
 
-  console.log(`\n📦 Import Brands: ${brandsData.length}`)
+  console.log(`\nImport brands: ${brandsData.length}`)
 
   for (const item of brandsData) {
     try {
       const slug = makeSafeSlug(item.slug || item.name || `brand-${item.id}`, item.id)
       const imageUrl = getImageUrl(item.image)
-      const logo = imageUrl ? await uploadMedia(payload, imageUrl, item.name || slug) : null
+      const logo = imageUrl
+        ? await uploadMedia(payload, imageUrl, item.name || slug, {
+            title: item.name || slug,
+            caption: getImageCaption(item.image),
+            wpId: Number(item.image?.id) || undefined,
+            importedFrom: 'woocommerce',
+          })
+        : null
+
+      const description = await normalizeHtmlWithMedia(payload, item.description, {
+        altFallback: item.name || slug,
+        importedFrom: 'wordpress',
+      })
 
       const result = await createOrUpdateBySlug(payload, 'brands', slug, {
         name: item.name || slug,
         slug,
-        description: normalizeHtml(item.description),
-        logo: logo || undefined,
+        description,
+        logo: logo?.id || undefined,
         isFeatured: Boolean(item.count && Number(item.count) > 0),
+        wpId: Number(item.id) || undefined,
+        sourceUrl: item.link || item._links?.self?.[0]?.href || undefined,
       })
 
-      if (item.id) {
-        brandMap.set(Number(item.id), result.id)
-      }
-
-      console.log(`   ${result.action === 'skip' ? '⏩' : '✅'} Brand: ${item.name || slug}`)
+      if (item.id) brandMap.set(Number(item.id), result.id)
+      console.log(`   ${result.action} brand: ${item.name || slug}`)
     } catch (error: any) {
-      console.error(`   ❌ Brand lỗi: ${item.name || item.slug || item.id} - ${error.message}`)
+      console.error(`   Brand error: ${item.name || item.slug || item.id} - ${error.message}`)
     }
   }
 
   await getFallbackBrand(payload)
-
   return brandMap
 }
 
 async function importProductCategories(payload: any) {
-  const categoriesData = readJSON<AnyRecord>(DATA_FILES.productCategories)
+  const categoriesData = readJSON<AnyRecord>(
+    DATA_FILES.productCategories,
+    DATA_FILES.productCategoriesFallback,
+  )
   const categoryMap = new Map<number, ID>()
   const pendingParents: Array<{ id: number; parent: number }> = []
 
-  console.log(`\n📦 Import Product Categories: ${categoriesData.length}`)
+  console.log(`\nImport product categories: ${categoriesData.length}`)
 
   for (const item of categoriesData) {
     try {
       const slug = makeSafeSlug(item.slug || item.name || `category-${item.id}`, item.id)
       const imageUrl = getImageUrl(item.image)
-      const image = imageUrl ? await uploadMedia(payload, imageUrl, item.name || slug) : null
+      const image = imageUrl
+        ? await uploadMedia(payload, imageUrl, item.name || slug, {
+            title: item.name || slug,
+            caption: getImageCaption(item.image),
+            wpId: Number(item.image?.id) || undefined,
+            importedFrom: 'woocommerce',
+          })
+        : null
+
+      const description = await normalizeHtmlWithMedia(payload, item.description, {
+        altFallback: item.name || slug,
+        importedFrom: 'wordpress',
+      })
 
       const result = await createOrUpdateBySlug(payload, 'categories', slug, {
         name: item.name || slug,
         slug,
-        description: normalizeHtml(item.description),
-        image: image || undefined,
+        description,
+        image: image?.id || undefined,
+        wpId: Number(item.id) || undefined,
+        sourceUrl: item.link || item._links?.self?.[0]?.href || undefined,
       })
 
-      if (item.id) {
-        categoryMap.set(Number(item.id), result.id)
-      }
+      if (item.id) categoryMap.set(Number(item.id), result.id)
+      if (item.id && item.parent) pendingParents.push({ id: Number(item.id), parent: Number(item.parent) })
 
-      if (item.id && item.parent) {
-        pendingParents.push({ id: Number(item.id), parent: Number(item.parent) })
-      }
-
-      console.log(`   ${result.action === 'skip' ? '⏩' : '✅'} Category: ${item.name || slug}`)
+      console.log(`   ${result.action} category: ${item.name || slug}`)
     } catch (error: any) {
-      console.error(`   ❌ Category lỗi: ${item.name || item.slug || item.id} - ${error.message}`)
+      console.error(`   Category error: ${item.name || item.slug || item.id} - ${error.message}`)
     }
   }
 
@@ -514,10 +909,7 @@ async function importProductCategories(payload: any) {
     for (const item of pendingParents) {
       const currentId = categoryMap.get(item.id)
       const parentId = categoryMap.get(item.parent)
-
-      if (!currentId || !parentId) {
-        continue
-      }
+      if (!currentId || !parentId) continue
 
       await payload.update({
         collection: 'categories',
@@ -532,109 +924,97 @@ async function importProductCategories(payload: any) {
 }
 
 async function importPostCategories(payload: any) {
-  const categoriesData = readJSON<AnyRecord>(DATA_FILES.postCategories)
+  const categoriesData = readJSON<AnyRecord>(DATA_FILES.postCategories, DATA_FILES.postCategoriesFallback)
   const categoryMap = new Map<number, ID>()
 
-  console.log(`\n📦 Import Post Categories: ${categoriesData.length}`)
+  console.log(`\nImport post categories: ${categoriesData.length}`)
 
   for (const item of categoriesData) {
     try {
-      const slug = makeSafeSlug(item.slug || item.name || `post-category-${item.id}`, item.id)
-
-      const result = await createOrUpdateBySlug(payload, 'post-categories', slug, {
-        title: item.name || slug,
-        slug,
-        description: stripHTML(item.description),
+      const title = stripHTML(item.name || item.title || `post-category-${item.id}`)
+      const slug = makeSafeSlug(item.slug || title, item.id)
+      const description = await normalizeHtmlWithMedia(payload, item.description, {
+        altFallback: title || slug,
+        importedFrom: 'wordpress',
       })
 
-      if (item.id) {
-        categoryMap.set(Number(item.id), result.id)
-      }
+      const result = await createOrUpdateBySlug(payload, 'post-categories', slug, {
+        title,
+        slug,
+        description,
+        wpId: Number(item.id) || undefined,
+        sourceUrl: item.link || item._links?.self?.[0]?.href || undefined,
+      })
 
-      console.log(`   ${result.action === 'skip' ? '⏩' : '✅'} Post Category: ${item.name || slug}`)
+      if (item.id) categoryMap.set(Number(item.id), result.id)
+      console.log(`   ${result.action} post category: ${title}`)
     } catch (error: any) {
-      console.error(`   ❌ Post Category lỗi: ${item.name || item.slug || item.id} - ${error.message}`)
+      console.error(`   Post category error: ${item.name || item.slug || item.id} - ${error.message}`)
     }
   }
 
   return categoryMap
 }
 
-function mapBySlug(items: AnyRecord[]) {
-  const map = new Map<string, AnyRecord>()
+function resolveAttribute(payloadMaps: ImportMaps, attribute: AnyRecord) {
+  const keys = [
+    attribute.id,
+    Number(attribute.id),
+    attribute.slug,
+    attribute.taxonomy,
+    makeSafeSlug(String(attribute.slug || '').replace(/^pa_/, '') || attribute.name || ''),
+  ].filter((value) => value !== undefined && value !== null && value !== '')
 
-  for (const item of items) {
-    if (item.slug) {
-      map.set(String(item.slug), item)
-    }
+  for (const key of keys) {
+    const found = payloadMaps.attributes.get(key)
+    if (found) return found
   }
 
-  return map
+  return null
 }
 
-async function resolveBrandIds(payload: any, rawProduct: AnyRecord, brandMap: Map<number, ID>) {
-  const brands = Array.isArray(rawProduct.brands) ? rawProduct.brands : []
+function resolveAttributeValue(payloadMaps: ImportMaps, attributeId: ID, rawValue: unknown) {
+  const raw = String(rawValue || '').trim()
+  const keys = [
+    raw,
+    raw.toLowerCase(),
+    makeSafeSlug(raw),
+  ]
 
-  for (const brand of brands) {
-    const byId = brandMap.get(Number(brand.id))
-
-    if (byId) {
-      return byId
-    }
-
-    const slug = makeSafeSlug(brand.slug || brand.name || `brand-${brand.id}`, brand.id)
-    const existing = await findBySlug(payload, 'brands', slug)
-
-    if (existing?.id) {
-      return existing.id
-    }
-
-    const result = await createOrUpdateBySlug(payload, 'brands', slug, {
-      name: brand.name || slug,
-      slug,
-      description: '',
-    })
-
-    return result.id
+  for (const key of keys) {
+    const found = payloadMaps.attributeValues.get(attributeValueKey(attributeId, key))
+    if (found) return found
   }
 
-  return getFallbackBrand(payload)
+  return null
 }
 
-async function resolveCategoryIds(
-  payload: any,
-  rawProduct: AnyRecord,
-  categoryMap: Map<number, ID>,
-) {
-  const categories = Array.isArray(rawProduct.categories) ? rawProduct.categories : []
-  const ids: ID[] = []
+function normalizeProductAttributes(rawProduct: AnyRecord, payloadMaps: ImportMaps) {
+  const rows: AnyRecord[] = []
+  const attributes = Array.isArray(rawProduct.attributes) ? rawProduct.attributes : []
 
-  for (const category of categories) {
-    const byId = categoryMap.get(Number(category.id))
+  for (const attribute of attributes) {
+    const attributeId = resolveAttribute(payloadMaps, attribute)
+    if (!attributeId) continue
 
-    if (byId) {
-      ids.push(byId)
-      continue
-    }
+    const options: unknown[] = Array.isArray(attribute.options)
+      ? attribute.options
+      : [attribute.option || attribute.value].filter(Boolean)
 
-    const slug = makeSafeSlug(category.slug || category.name || `category-${category.id}`, category.id)
-    const existing = await findBySlug(payload, 'categories', slug)
+    const valueIds = options
+      .map((option) => resolveAttributeValue(payloadMaps, attributeId, option))
+      .filter(Boolean)
 
-    if (existing?.id) {
-      ids.push(existing.id)
-      continue
-    }
-
-    const result = await createOrUpdateBySlug(payload, 'categories', slug, {
-      name: category.name || slug,
-      slug,
-      description: '',
-    })
-
-    ids.push(result.id)
+    rows.push(
+      withoutUndefined({
+        attribute: attributeId,
+        values: valueIds.length ? Array.from(new Set(valueIds)) : undefined,
+        textValue: valueIds.length ? undefined : options.join(', '),
+      }),
+    )
   }
 
-  return Array.from(new Set(ids))
+  return rows
 }
 
 function normalizeSpecifications(rawProduct: AnyRecord, preparedProduct?: AnyRecord) {
@@ -654,30 +1034,68 @@ function normalizeSpecifications(rawProduct: AnyRecord, preparedProduct?: AnyRec
     .filter((item: AnyRecord) => item.label && item.value)
 }
 
-function normalizeVariants(preparedProduct?: AnyRecord) {
-  const variants = Array.isArray(preparedProduct?.variants)
-    ? preparedProduct.variants
-    : []
+function getVariationOptionValues(variation: AnyRecord, payloadMaps: ImportMaps) {
+  const attributes = Array.isArray(variation.attributes) ? variation.attributes : []
+  const ids: ID[] = []
 
-  return variants
-    .map((variant: AnyRecord, index: number) =>
-      withoutUndefined({
-        name: variant.name || `Variant ${index + 1}`,
-        sku: variant.sku || '',
-        isDefault: Boolean(variant.isDefault || index === 0),
-        basePrice: toNumber(variant.basePrice || variant.price || variant.regularPrice, 0),
-        salePrice: optionalNumber(variant.salePrice),
-        stock: toNumber(variant.stock, 0),
-        isActive: variant.isActive !== false,
-      }),
-    )
-    .filter((variant: AnyRecord) => variant.name && variant.basePrice > 0)
+  for (const attribute of attributes) {
+    const attributeId = resolveAttribute(payloadMaps, attribute)
+    if (!attributeId) continue
+
+    const value = attribute.option || attribute.value || attribute.name
+    const valueId = resolveAttributeValue(payloadMaps, attributeId, value)
+    if (valueId) ids.push(valueId)
+  }
+
+  return Array.from(new Set(ids))
 }
 
-function normalizePrice(rawProduct: AnyRecord, preparedProduct?: AnyRecord, variants: AnyRecord[] = []) {
+async function normalizeVariants(payload: any, rawProduct: AnyRecord, payloadMaps: ImportMaps) {
+  const variations = Array.isArray(rawProduct.variations_full) ? rawProduct.variations_full : []
+
+  return (
+    await Promise.all(
+      variations.map(async (variation: AnyRecord, index: number) => {
+        const optionText = Array.isArray(variation.attributes)
+          ? variation.attributes.map((attribute: AnyRecord) => attribute.option || attribute.value).filter(Boolean).join(' / ')
+          : ''
+        const name = optionText || variation.name || `Variant ${index + 1}`
+        const imageUrl = getImageUrl(variation.image)
+        const image = imageUrl
+          ? await uploadMedia(payload, imageUrl, getImageAlt(variation.image, name), {
+              title: name,
+              wpId: Number(variation.image?.id) || undefined,
+              importedFrom: 'woocommerce',
+            })
+          : null
+
+        const basePrice = toNumber(variation.regular_price || variation.price, 0)
+        const salePrice = optionalNumber(variation.sale_price)
+
+        return withoutUndefined({
+          name,
+          sku: variation.sku || '',
+          wpVariationId: Number(variation.id) || undefined,
+          isDefault: index === 0,
+          optionValues: getVariationOptionValues(variation, payloadMaps),
+          basePrice,
+          salePrice,
+          stock: toNumber(
+            variation.stock_quantity ??
+              (variation.stock_status === 'instock' ? 1 : 0),
+            0,
+          ),
+          image: image?.id || undefined,
+          isActive: variation.status ? variation.status === 'publish' : true,
+        })
+      }),
+    )
+  ).filter((variant) => variant.name && variant.basePrice > 0)
+}
+
+function normalizePrice(rawProduct: AnyRecord, preparedProduct: AnyRecord | undefined, variants: AnyRecord[] = []) {
   if (variants.length > 0) {
     const defaultVariant = variants.find((variant) => variant.isDefault) || variants[0]
-
     return withoutUndefined({
       basePrice: toNumber(defaultVariant.basePrice, 0),
       salePrice: optionalNumber(defaultVariant.salePrice),
@@ -688,12 +1106,7 @@ function normalizePrice(rawProduct: AnyRecord, preparedProduct?: AnyRecord, vari
   const preparedPrice = preparedProduct?.price || {}
 
   return withoutUndefined({
-    basePrice: toNumber(
-      preparedPrice.basePrice ||
-        rawProduct.regular_price ||
-        rawProduct.price,
-      0,
-    ),
+    basePrice: toNumber(preparedPrice.basePrice || rawProduct.regular_price || rawProduct.price, 0),
     salePrice: optionalNumber(preparedPrice.salePrice || rawProduct.sale_price),
     stock: toNumber(
       preparedPrice.stock ??
@@ -706,41 +1119,76 @@ function normalizePrice(rawProduct: AnyRecord, preparedProduct?: AnyRecord, vari
 
 function normalizeDisplayLocation(preparedProduct?: AnyRecord) {
   const value = preparedProduct?.displayLocation
-
-  if (!Array.isArray(value)) {
-    return undefined
-  }
+  if (!Array.isArray(value)) return undefined
 
   const locations = value.filter((item) => allowedDisplayLocations.has(item))
-
   return locations.length ? locations : undefined
 }
 
 async function normalizeProductImages(payload: any, rawProduct: AnyRecord) {
   const images = Array.isArray(rawProduct.images) ? rawProduct.images : []
   const uploaded: Array<{ image: ID }> = []
+  const preferredMediaByFilename = new Map<string, MediaRef>()
 
   for (const image of images) {
     const url = getImageUrl(image)
-    const mediaId = url ? await uploadMedia(payload, url, getImageAlt(image, rawProduct.name)) : null
+    const media = url
+      ? await uploadMedia(payload, url, getImageAlt(image, rawProduct.name), {
+          title: getImageAlt(image, rawProduct.name),
+          caption: getImageCaption(image),
+          wpId: Number((image as AnyRecord).id) || undefined,
+          importedFrom: 'woocommerce',
+        })
+      : null
 
-    if (mediaId) {
-      uploaded.push({ image: mediaId })
+    if (media) {
+      uploaded.push({ image: media.id })
+      preferredMediaByFilename.set(normalizeFilenameKey(url || media.filename), media)
     }
   }
 
-  return uploaded
+  return { images: uploaded, preferredMediaByFilename }
 }
 
-async function importProducts(
-  payload: any,
-  brandMap = new Map<number, ID>(),
-  categoryMap = new Map<number, ID>(),
-) {
-  const rawProducts = readJSON<AnyRecord>(DATA_FILES.productsRaw)
+async function resolveBrandId(payload: any, rawProduct: AnyRecord, maps: ImportMaps) {
+  const brands = Array.isArray(rawProduct.brands) ? rawProduct.brands : []
+
+  for (const brand of brands) {
+    const byId = maps.brands.get(Number(brand.id))
+    if (byId) return byId
+
+    const slug = makeSafeSlug(brand.slug || brand.name || `brand-${brand.id}`, brand.id)
+    const existing = await findBySlug(payload, 'brands', slug)
+    if (existing?.id) return existing.id
+  }
+
+  return getFallbackBrand(payload)
+}
+
+async function resolveCategoryIds(payload: any, rawProduct: AnyRecord, maps: ImportMaps) {
+  const categories = Array.isArray(rawProduct.categories) ? rawProduct.categories : []
+  const ids: ID[] = []
+
+  for (const category of categories) {
+    const byId = maps.productCategories.get(Number(category.id))
+    if (byId) {
+      ids.push(byId)
+      continue
+    }
+
+    const slug = makeSafeSlug(category.slug || category.name || `category-${category.id}`, category.id)
+    const existing = await findBySlug(payload, 'categories', slug)
+    if (existing?.id) ids.push(existing.id)
+  }
+
+  return Array.from(new Set(ids))
+}
+
+async function importProducts(payload: any, maps: ImportMaps) {
+  const rawProducts = readJSON<AnyRecord>(DATA_FILES.productsRaw, DATA_FILES.productsRawFallback)
   const preparedBySlug = mapBySlug(readJSON<AnyRecord>(DATA_FILES.productsPrepared))
 
-  console.log(`\n📦 Import Products: ${rawProducts.length}`)
+  console.log(`\nImport products: ${rawProducts.length}`)
 
   for (const rawProduct of rawProducts) {
     const name = rawProduct.name || rawProduct.title || rawProduct.slug || `Product ${rawProduct.id}`
@@ -748,17 +1196,26 @@ async function importProducts(
     try {
       const slug = makeSafeSlug(rawProduct.slug || name, rawProduct.id)
       const preparedProduct = preparedBySlug.get(slug)
-      const brandId = await resolveBrandIds(payload, rawProduct, brandMap)
-      const categoryIds = await resolveCategoryIds(payload, rawProduct, categoryMap)
-      const variants = normalizeVariants(preparedProduct)
-      const productType =
-        preparedProduct?.productType === 'variable' || rawProduct.type === 'variable'
-          ? 'variable'
-          : 'simple'
+      const brandId = await resolveBrandId(payload, rawProduct, maps)
+      const categoryIds = await resolveCategoryIds(payload, rawProduct, maps)
+      const productImages = await normalizeProductImages(payload, rawProduct)
+      const variants = await normalizeVariants(payload, rawProduct, maps)
+      const productType = variants.length || rawProduct.type === 'variable' ? 'variable' : 'simple'
+      const description = await normalizeHtmlWithMedia(
+        payload,
+        rawProduct.description || preparedProduct?.description || '',
+        {
+          altFallback: name,
+          importedFrom: 'woocommerce',
+          preferredMediaByFilename: productImages.preferredMediaByFilename,
+        },
+      )
 
       const productData = withoutUndefined({
         title: preparedProduct?.title || name,
         sku: preparedProduct?.sku || rawProduct.sku || '',
+        gtin: preparedProduct?.gtin || rawProduct.gtin || undefined,
+        mpn: preparedProduct?.mpn || rawProduct.mpn || undefined,
         slug,
         brand: brandId,
         categories: categoryIds,
@@ -766,74 +1223,54 @@ async function importProducts(
         price: normalizePrice(rawProduct, preparedProduct, variants),
         shortDescription: stripHTML(rawProduct.short_description || preparedProduct?.shortDescription || ''),
         specifications: normalizeSpecifications(rawProduct, preparedProduct),
-        description: normalizeHtml(rawProduct.description || preparedProduct?.description || ''),
+        productAttributes: normalizeProductAttributes(rawProduct, maps),
+        description,
         isCombo: Boolean(preparedProduct?.isCombo),
         comboItems: Array.isArray(preparedProduct?.comboItems) ? preparedProduct.comboItems : [],
         variants: productType === 'variable' && variants.length ? variants : undefined,
-        images: await normalizeProductImages(payload, rawProduct),
+        images: productImages.images.length ? productImages.images : undefined,
         seoTitle: getRankMathMeta(rawProduct, 'rank_math_title') || undefined,
         seoDescription:
           getRankMathMeta(rawProduct, 'rank_math_description') ||
           stripHTML(rawProduct.short_description) ||
           undefined,
-        status:
-          preparedProduct?.status === 'published' || rawProduct.status === 'publish'
-            ? 'published'
-            : 'draft',
+        status: preparedProduct?.status === 'published' || rawProduct.status === 'publish' ? 'published' : 'draft',
         displayLocation: normalizeDisplayLocation(preparedProduct),
+        wpId: Number(rawProduct.id) || undefined,
+        sourceUrl: rawProduct.permalink || undefined,
       })
 
-      if (!productData.images?.length) {
-        delete productData.images
-      }
-
       const result = await createOrUpdateBySlug(payload, 'products', slug, productData)
-
-      console.log(`   ${result.action === 'skip' ? '⏩' : '✅'} Product: ${name}`)
+      console.log(`   ${result.action} product: ${name}`)
     } catch (error: any) {
-      console.error(`   ❌ Product lỗi: ${name} - ${error.message}`)
+      console.error(`   Product error: ${name} - ${error.message}`)
     }
   }
 }
 
-async function resolvePostCategoryIds(
-  payload: any,
-  post: AnyRecord,
-  postCategoryMap: Map<number, ID>,
-) {
+async function resolvePostCategoryIds(payload: any, post: AnyRecord, maps: ImportMaps) {
   const categoryIds: ID[] = []
 
   for (const wpCategoryId of Array.isArray(post.categories) ? post.categories : []) {
-    const byId = postCategoryMap.get(Number(wpCategoryId))
-
+    const byId = maps.postCategories.get(Number(wpCategoryId))
     if (byId) {
       categoryIds.push(byId)
       continue
     }
 
-    const category = readJSON<AnyRecord>(DATA_FILES.postCategories).find(
-      (item) => Number(item.id) === Number(wpCategoryId),
-    )
+    const existing = await findOne(payload, 'post-categories', {
+      wpId: { equals: Number(wpCategoryId) },
+    })
 
-    if (!category) {
-      continue
-    }
-
-    const slug = makeSafeSlug(category.slug || category.name || `post-category-${category.id}`, category.id)
-    const existing = await findBySlug(payload, 'post-categories', slug)
-
-    if (existing?.id) {
-      categoryIds.push(existing.id)
-    }
+    if (existing?.id) categoryIds.push(existing.id)
   }
 
   return Array.from(new Set(categoryIds))
 }
 
-async function importPosts(payload: any, postCategoryMap = new Map<number, ID>()) {
+async function importPosts(payload: any, maps: ImportMaps) {
   const postsData = readJSON<AnyRecord>(DATA_FILES.posts)
-
-  console.log(`\n📦 Import Posts: ${postsData.length}`)
+  console.log(`\nImport posts: ${postsData.length}`)
 
   let placeholderMediaId: ID | null = null
 
@@ -846,87 +1283,109 @@ async function importPosts(payload: any, postCategoryMap = new Map<number, ID>()
 
     try {
       const slug = makeSafeSlug(item.slug || title, item.id)
-      const categories = await resolvePostCategoryIds(payload, item, postCategoryMap)
-      const featuredImageUrl = await fetchWPFeaturedMediaUrl(item.featured_media)
-      const featuredImageId =
-        (featuredImageUrl ? await uploadMedia(payload, featuredImageUrl, title) : null) ||
-        placeholderMediaId
+      const categories = await resolvePostCategoryIds(payload, item, maps)
+      const featuredMedia = await fetchWPFeaturedMedia(item.featured_media)
+      const featuredImage =
+        featuredMedia?.url
+          ? await uploadMedia(payload, featuredMedia.url, featuredMedia.alt || title, {
+              title: featuredMedia.title || title,
+              caption: featuredMedia.caption,
+              wpId: featuredMedia.wpId,
+              importedFrom: 'wordpress',
+            })
+          : null
+      const featuredImageId = featuredImage?.id || placeholderMediaId
 
       if (!featuredImageId) {
-        console.warn(`   ⚠️ Bỏ qua post vì thiếu thumbnail required: ${title}`)
+        console.warn(`   Skip post without required thumbnail: ${title}`)
         continue
       }
+
+      const content = await normalizeHtmlWithMedia(payload, item.content, {
+        altFallback: title,
+        importedFrom: 'wordpress',
+      })
 
       const result = await createOrUpdateBySlug(payload, 'posts', slug, {
         title,
         slug,
         thumbnail: featuredImageId,
         categories,
-        content: normalizeHtml(item.content),
+        content,
         excerpt: stripHTML(getRendered(item.excerpt) || item.excerpt || ''),
         seo: withoutUndefined({
           metaTitle: title || undefined,
           metaDescription: stripHTML(getRendered(item.excerpt) || '').slice(0, 160) || undefined,
         }),
+        wpId: Number(item.id) || undefined,
+        sourceUrl: item.link || undefined,
       })
 
-      console.log(`   ${result.action === 'skip' ? '⏩' : '✅'} Post: ${title}`)
+      console.log(`   ${result.action} post: ${title}`)
     } catch (error: any) {
-      console.error(`   ❌ Post lỗi: ${title} - ${error.message}`)
+      console.error(`   Post error: ${title} - ${error.message}`)
     }
   }
 }
 
 async function run() {
-  console.log(`📂 Data dir: ${DATA_DIR}`)
-  console.log(`🎯 Mode: ${ONLY}`)
-  console.log(`🧪 Dry run: ${DRY_RUN ? 'yes' : 'no'}`)
-  console.log(`🖼️ Skip media: ${SKIP_MEDIA ? 'yes' : 'no'}`)
+  console.log(`Data dir: ${DATA_DIR}`)
+  console.log(`Mode: ${ONLY}`)
+  console.log(`Dry run: ${DRY_RUN ? 'yes' : 'no'}`)
+  console.log(`Skip media: ${SKIP_MEDIA ? 'yes' : 'no'}`)
 
   const configPromise = (await import('@payload-config')).default
   const payload = await getPayload({ config: configPromise })
 
-  let brandMap = new Map<number, ID>()
-  let productCategoryMap = new Map<number, ID>()
-  let postCategoryMap = new Map<number, ID>()
+  const maps: ImportMaps = {
+    attributes: new Map(),
+    attributeValues: new Map(),
+    brands: new Map(),
+    productCategories: new Map(),
+    postCategories: new Map(),
+  }
+
+  if (ONLY === 'all' || ONLY === 'attributes' || ONLY === 'taxonomies') {
+    const result = await importAttributes(payload)
+    maps.attributes = result.attributeMap
+    maps.attributeValues = result.attributeValueMap
+  }
 
   if (ONLY === 'all' || ONLY === 'taxonomies' || ONLY === 'brands') {
-    brandMap = await importBrands(payload)
+    maps.brands = await importBrands(payload)
   }
 
   if (ONLY === 'all' || ONLY === 'taxonomies' || ONLY === 'product-categories') {
-    productCategoryMap = await importProductCategories(payload)
+    maps.productCategories = await importProductCategories(payload)
   }
 
   if (ONLY === 'all' || ONLY === 'taxonomies' || ONLY === 'post-categories') {
-    postCategoryMap = await importPostCategories(payload)
+    maps.postCategories = await importPostCategories(payload)
   }
 
   if (ONLY === 'all' || ONLY === 'products') {
-    if (!brandMap.size) {
-      brandMap = await importBrands(payload)
+    if (!maps.attributes.size) {
+      const result = await importAttributes(payload)
+      maps.attributes = result.attributeMap
+      maps.attributeValues = result.attributeValueMap
     }
 
-    if (!productCategoryMap.size) {
-      productCategoryMap = await importProductCategories(payload)
-    }
+    if (!maps.brands.size) maps.brands = await importBrands(payload)
+    if (!maps.productCategories.size) maps.productCategories = await importProductCategories(payload)
 
-    await importProducts(payload, brandMap, productCategoryMap)
+    await importProducts(payload, maps)
   }
 
   if (ONLY === 'all' || ONLY === 'posts') {
-    if (!postCategoryMap.size) {
-      postCategoryMap = await importPostCategories(payload)
-    }
-
-    await importPosts(payload, postCategoryMap)
+    if (!maps.postCategories.size) maps.postCategories = await importPostCategories(payload)
+    await importPosts(payload, maps)
   }
 
-  console.log('\n✅ Import hoàn tất.')
+  console.log('\nImport completed.')
   process.exit(0)
 }
 
 run().catch((error) => {
-  console.error('❌ Import thất bại:', error)
+  console.error('Import failed:', error)
   process.exit(1)
 })

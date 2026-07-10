@@ -65,5 +65,34 @@ export const Brands: CollectionConfig = {
       type: 'checkbox',
       label: 'Thuong hieu noi bat',
     },
+    {
+      name: 'wpId',
+      type: 'number',
+      unique: true,
+      index: true,
+      label: 'WordPress ID',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'sourceUrl',
+      type: 'text',
+      label: 'URL goc',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'importNotes',
+      type: 'textarea',
+      label: 'Ghi chu import brand',
+      admin: {
+        position: 'sidebar',
+        rows: 3,
+      },
+    }
   ],
 }

@@ -285,7 +285,7 @@ function getProductMetadataContent(
   product: Product,
 ): ProductMetadataContent {
   return {
-    title: `${product.title} | MF PARIS Chính Hãng`,
+    title: `${product.title} Chính Hãng`,
     description: getProductDescription(product),
   }
 }
@@ -676,6 +676,8 @@ const getRelatedProducts = unstable_cache(
         title: true,
         slug: true,
         sku: true,
+        gtin: true,
+        mpn: true,
         brand: true,
         price: true,
         images: true,
@@ -804,6 +806,78 @@ function normalizeReviewUser(
     lastName: getOptionalString(
       value.lastName,
     ),
+  }
+}
+
+function getReviewAuthorName(
+  user: ProductReviewItem['user'],
+): string {
+  if (!user || typeof user !== 'object') {
+    return 'Khách hàng ẩn danh'
+  }
+
+  const displayName =
+    user.displayName?.trim()
+
+  if (displayName) {
+    return displayName
+  }
+
+  const name = user.name?.trim()
+
+  if (name) {
+    return name
+  }
+
+  const fullName = [
+    user.firstName?.trim(),
+    user.lastName?.trim(),
+  ]
+    .filter(
+      (value): value is string =>
+        typeof value === 'string' &&
+        value.length > 0,
+    )
+    .join(' ')
+
+  return fullName || 'Khách hàng ẩn danh'
+}
+
+function buildProductReviewJsonLd(
+  review: ProductReviewItem,
+  canonicalUrl: string,
+) {
+  const reviewBody =
+    review.comment?.trim()
+  const ratingValue = Number(review.rating)
+
+  if (
+    !reviewBody ||
+    !Number.isFinite(ratingValue) ||
+    ratingValue < 1 ||
+    ratingValue > 5
+  ) {
+    return null
+  }
+
+  return {
+    '@type': 'Review',
+    '@id': `${canonicalUrl}#review-${review.id}`,
+    author: {
+      '@type': 'Person',
+      name: getReviewAuthorName(review.user),
+    },
+    datePublished:
+      review.createdAt || undefined,
+    dateModified:
+      review.updatedAt || undefined,
+    reviewBody,
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue,
+      bestRating: 5,
+      worstRating: 1,
+    },
   }
 }
 
@@ -950,6 +1024,37 @@ const getOfferAvailability = (
     : 'https://schema.org/OutOfStock'
 }
 
+const DEFAULT_OFFER_RETURN_POLICY = {
+  '@type': 'MerchantReturnPolicy',
+  applicableCountry: 'VN',
+  returnPolicyCategory:
+    'https://schema.org/MerchantReturnFiniteReturnWindow',
+  merchantReturnDays: 7,
+}
+
+const DEFAULT_OFFER_SHIPPING_DETAILS = {
+  '@type': 'OfferShippingDetails',
+  shippingDestination: {
+    '@type': 'DefinedRegion',
+    addressCountry: 'VN',
+  },
+  deliveryTime: {
+    '@type': 'ShippingDeliveryTime',
+    handlingTime: {
+      '@type': 'QuantitativeValue',
+      minValue: 0,
+      maxValue: 1,
+      unitCode: 'DAY',
+    },
+    transitTime: {
+      '@type': 'QuantitativeValue',
+      minValue: 1,
+      maxValue: 5,
+      unitCode: 'DAY',
+    },
+  },
+}
+
 const buildProductOffers = (
   currentProduct: Product,
 ) => {
@@ -996,6 +1101,10 @@ const buildProductOffers = (
           seller: {
             '@id': `${SITE_ORIGIN}/#organization`,
           },
+          hasMerchantReturnPolicy:
+            DEFAULT_OFFER_RETURN_POLICY,
+          shippingDetails:
+            DEFAULT_OFFER_SHIPPING_DETAILS,
         }
       })
       .filter(Boolean)
@@ -1026,6 +1135,10 @@ const buildProductOffers = (
       seller: {
         '@id': `${SITE_ORIGIN}/#organization`,
       },
+      hasMerchantReturnPolicy:
+        DEFAULT_OFFER_RETURN_POLICY,
+      shippingDetails:
+        DEFAULT_OFFER_SHIPPING_DETAILS,
     },
   ]
 }
@@ -1407,6 +1520,7 @@ export default async function ProductPage({
 
   const buildProductJsonLd = (
     currentProduct: Product,
+    reviews: ProductReviewItem[],
   ) => {
     const currentBrand =
       getProductBrand(currentProduct)
@@ -1424,6 +1538,22 @@ export default async function ProductPage({
       )
     const imageUrls =
       getProductImageUrls(currentProduct)
+    const reviewJsonLd = reviews
+      .map((review) =>
+        buildProductReviewJsonLd(
+          review,
+          canonicalUrl,
+        ),
+      )
+      .filter(
+        (
+          review,
+        ): review is NonNullable<
+          ReturnType<
+            typeof buildProductReviewJsonLd
+          >
+        > => review !== null,
+      )
 
     const jsonLd: Record<
       string,
@@ -1441,6 +1571,10 @@ export default async function ProductPage({
       image: imageUrls,
       sku:
         currentProduct.sku || undefined,
+      gtin:
+        currentProduct.gtin || undefined,
+      mpn:
+        currentProduct.mpn || undefined,
       brand: currentBrand
         ? {
           '@type': 'Brand',
@@ -1448,6 +1582,10 @@ export default async function ProductPage({
         }
         : undefined,
       offers: buildProductOffers(currentProduct),
+    }
+
+    if (reviewJsonLd.length > 0) {
+      jsonLd.review = reviewJsonLd
     }
 
     if (
@@ -1518,7 +1656,10 @@ export default async function ProductPage({
   }
 
   const productJsonLd =
-    buildProductJsonLd(product)
+    buildProductJsonLd(
+      product,
+      approvedReviews,
+    )
   const breadcrumbJsonLd =
     buildProductBreadcrumbJsonLd(product)
   const productWebPageJsonLd = {

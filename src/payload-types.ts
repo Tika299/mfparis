@@ -204,6 +204,15 @@ export interface User {
 export interface Media {
   id: number;
   alt: string;
+  /**
+   * Ten de quan tri tim kiem media. Doi ten nay se cap nhat o cac noi dung dung relationship media.
+   */
+  title?: string | null;
+  caption?: string | null;
+  wpId?: number | null;
+  sourceUrl?: string | null;
+  sourceFilename?: string | null;
+  importedFrom?: ('manual' | 'wordpress' | 'woocommerce') | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -275,6 +284,9 @@ export interface Brand {
    */
   description?: string | null;
   isFeatured?: boolean | null;
+  wpId?: number | null;
+  sourceUrl?: string | null;
+  importNotes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -294,6 +306,14 @@ export interface Product {
   relatedProduct?: (number | null) | Product;
   title: string;
   sku?: string | null;
+  /**
+   * Nhập mã vạch chuẩn nếu sản phẩm có. Ví dụ EAN-13 cho hàng nhập khẩu.
+   */
+  gtin?: string | null;
+  /**
+   * Dùng khi không có GTIN hoặc cần mã định danh từ hãng.
+   */
+  mpn?: string | null;
   brand: number | Brand;
   categories?: (number | Category)[] | null;
   /**
@@ -373,6 +393,7 @@ export interface Product {
     | {
         name: string;
         sku?: string | null;
+        wpVariationId?: number | null;
         isDefault?: boolean | null;
         /**
          * Ví dụ: 50ml, màu đỏ, fullbox hoặc tester.
@@ -408,6 +429,9 @@ export interface Product {
   reviewCount?: number | null;
   status?: ('draft' | 'published') | null;
   displayLocation?: ('best-seller' | 'combo' | 'new-arrival' | 'flash-sale')[] | null;
+  wpId?: number | null;
+  sourceUrl?: string | null;
+  importNotes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -428,6 +452,9 @@ export interface Category {
    */
   slug: string;
   parent?: (number | null) | Category;
+  wpId?: number | null;
+  sourceUrl?: string | null;
+  importNotes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -464,6 +491,11 @@ export interface Attribute {
     step?: number | null;
   };
   isActive?: boolean | null;
+  wooAttributeId?: number | null;
+  /**
+   * Vi du: pa_dung-tich, pa_nhom-huong.
+   */
+  wooTaxonomySlug?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -507,6 +539,8 @@ export interface AttributeValue {
       }[]
     | null;
   isActive?: boolean | null;
+  wooTermId?: number | null;
+  wooTaxonomySlug?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -652,6 +686,9 @@ export interface Post {
     metaTitle?: string | null;
     metaDescription?: string | null;
   };
+  wpId?: number | null;
+  sourceUrl?: string | null;
+  importNotes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -663,6 +700,13 @@ export interface PostCategory {
   id: number;
   title: string;
   slug: string;
+  /**
+   * Mo ta danh muc bai viet luu dang HTML. Khi import se thay anh trong HTML bang media Payload.
+   */
+  description?: string | null;
+  wpId?: number | null;
+  sourceUrl?: string | null;
+  importNotes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -999,6 +1043,12 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  title?: T;
+  caption?: T;
+  wpId?: T;
+  sourceUrl?: T;
+  sourceFilename?: T;
+  importedFrom?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1075,6 +1125,9 @@ export interface BrandsSelect<T extends boolean = true> {
   logo?: T;
   description?: T;
   isFeatured?: T;
+  wpId?: T;
+  sourceUrl?: T;
+  importNotes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1087,6 +1140,8 @@ export interface ProductsSelect<T extends boolean = true> {
   relatedProduct?: T;
   title?: T;
   sku?: T;
+  gtin?: T;
+  mpn?: T;
   brand?: T;
   categories?: T;
   productType?: T;
@@ -1135,6 +1190,7 @@ export interface ProductsSelect<T extends boolean = true> {
     | {
         name?: T;
         sku?: T;
+        wpVariationId?: T;
         isDefault?: T;
         optionValues?: T;
         basePrice?: T;
@@ -1154,6 +1210,9 @@ export interface ProductsSelect<T extends boolean = true> {
   reviewCount?: T;
   status?: T;
   displayLocation?: T;
+  wpId?: T;
+  sourceUrl?: T;
+  importNotes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1167,6 +1226,9 @@ export interface CategoriesSelect<T extends boolean = true> {
   description?: T;
   slug?: T;
   parent?: T;
+  wpId?: T;
+  sourceUrl?: T;
+  importNotes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1236,6 +1298,9 @@ export interface PostsSelect<T extends boolean = true> {
         metaTitle?: T;
         metaDescription?: T;
       };
+  wpId?: T;
+  sourceUrl?: T;
+  importNotes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1246,6 +1311,10 @@ export interface PostsSelect<T extends boolean = true> {
 export interface PostCategoriesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  description?: T;
+  wpId?: T;
+  sourceUrl?: T;
+  importNotes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1345,6 +1414,8 @@ export interface AttributesSelect<T extends boolean = true> {
         step?: T;
       };
   isActive?: T;
+  wooAttributeId?: T;
+  wooTaxonomySlug?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1376,6 +1447,8 @@ export interface AttributeValuesSelect<T extends boolean = true> {
         id?: T;
       };
   isActive?: T;
+  wooTermId?: T;
+  wooTaxonomySlug?: T;
   updatedAt?: T;
   createdAt?: T;
 }
