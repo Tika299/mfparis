@@ -196,16 +196,42 @@ function isAllowedAttribute(tagName: string, attrName: string): boolean {
   return attributesByTag[tagName]?.has(attrName) ?? false
 }
 
+function isWordPressLazyPlaceholder(value: string): boolean {
+  return /\/themes\/woodmart\/images\/lazy\.svg(?:$|[?#])/i.test(value)
+}
+
 function sanitizeAttributes(tagName: string, attrs = ''): string {
   const sanitized: string[] = []
+  const attrValues = new Map<string, string>()
   const attrPattern =
     /([^\s"'<>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g
   let match: RegExpExecArray | null
 
   while ((match = attrPattern.exec(attrs)) !== null) {
-    const attrName = match[1].toLowerCase()
-    const attrValue = match[2] ?? match[3] ?? match[4] ?? ''
+    attrValues.set(
+      match[1].toLowerCase(),
+      match[2] ?? match[3] ?? match[4] ?? '',
+    )
+  }
 
+  if (tagName === 'img') {
+    const currentSrc = attrValues.get('src') || ''
+    const lazySrc =
+      attrValues.get('data-src') ||
+      attrValues.get('data-lazy-src') ||
+      attrValues.get('data-original') ||
+      ''
+
+    if (
+      lazySrc &&
+      (!currentSrc || isWordPressLazyPlaceholder(currentSrc)) &&
+      isSafeUrl(lazySrc, 'img', 'src')
+    ) {
+      attrValues.set('src', lazySrc)
+    }
+  }
+
+  for (const [attrName, attrValue] of attrValues) {
     if (attrName.startsWith('on')) {
       continue
     }
@@ -232,6 +258,15 @@ function sanitizeAttributes(tagName: string, attrs = ''): string {
     }
 
     if (tagName === 'a' && attrName === 'target' && attrValue !== '_blank') {
+      continue
+    }
+
+    if (
+      tagName === 'img' &&
+      (attrName === 'srcset' ||
+        attrName === 'data-srcset' ||
+        attrName === 'data-lazy-srcset')
+    ) {
       continue
     }
 

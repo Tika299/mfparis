@@ -37,8 +37,7 @@
     "clear:products": "tsx src/scripts/clear-imported-data.ts",
     "redirects:backfill-products": "tsx src/scripts/backfill-wordpress-product-redirects.ts",
     "redirects:audit": "tsx src/scripts/audit-redirects.ts",
-    "redirects:backfill-content": "tsx src/scripts/backfill-legacy-content-redirects.ts",
-    "repair:wp-images": "tsx src/scripts/repair-wordpress-lazy-images.ts"
+    "redirects:backfill-content": "tsx src/scripts/backfill-legacy-content-redirects.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.85.0",

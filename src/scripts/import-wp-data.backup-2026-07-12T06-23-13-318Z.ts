@@ -53,7 +53,6 @@ const SKIP_MEDIA = hasFlag('--skip-media')
 const DRY_RUN = hasFlag('--dry-run')
 const USE_PLACEHOLDER_FEATURED = hasFlag('--placeholder-featured')
 const DISABLE_FALLBACK_BRAND = hasFlag('--no-fallback-brand')
-const IMPORT_STOCK_QUANTITY = Math.max(0, Number(getArg('--import-stock', '99')) || 99)
 
 const MEDIA_CONCURRENCY = Math.max(1, Number(getArg('--media-concurrency', '3')) || 3)
 const ITEM_LIMIT = Math.max(0, Number(getArg('--limit', '0')) || 0)
@@ -203,21 +202,17 @@ function getRendered(value: unknown): string {
   return ''
 }
 
-function getRawHtml(value: unknown): string {
+function normalizeHtmlOnly(value: unknown): string {
   if (typeof value === 'string') {
-    return value
+    return sanitizeWordPressHtml(value)
   }
 
   if (value && typeof value === 'object') {
     const rendered = getRendered(value)
-    return rendered || lexicalToHtml(value)
+    return sanitizeWordPressHtml(rendered || lexicalToHtml(value))
   }
 
   return ''
-}
-
-function normalizeHtmlOnly(value: unknown): string {
-  return sanitizeWordPressHtml(getRawHtml(value))
 }
 
 function getRankMathMeta(item: AnyRecord, key: string) {
@@ -489,21 +484,6 @@ function extractAttribute(tag: string, attribute: string) {
   return match?.[1] || ''
 }
 
-function removeAttribute(tag: string, attribute: string) {
-  return tag.replace(new RegExp(`\\s${attribute}=["'][^"']*["']`, 'gi'), '')
-}
-
-function setAttribute(tag: string, attribute: string, value: string) {
-  const escapedValue = value.replace(/"/g, '&quot;')
-  const attributePattern = new RegExp(`(\\s${attribute}=)["'][^"']*["']`, 'i')
-
-  if (attributePattern.test(tag)) {
-    return tag.replace(attributePattern, `$1"${escapedValue}"`)
-  }
-
-  return tag.replace(/\/?>$/, (ending) => ` ${attribute}="${escapedValue}"${ending}`)
-}
-
 function isImportableImageUrl(url: string) {
   if (!url || url.startsWith('data:') || url.startsWith('#')) {
     return false
@@ -554,77 +534,18 @@ function replaceAllLiteral(value: string, from: string, to: string) {
   return value.split(from).join(to)
 }
 
-function getReplacementUrl(replacements: Map<string, string>, sourceUrl: string) {
-  if (!sourceUrl) {
-    return ''
-  }
-
-  const direct = replacements.get(sourceUrl)
-  if (direct) {
-    return direct
-  }
-
-  try {
-    return replacements.get(new URL(sourceUrl, WP_BASE_URL).toString()) || ''
-  } catch {
-    return ''
-  }
-}
-
-function getBestImageReplacement(tag: string, replacements: Map<string, string>) {
-  for (const attr of ['data-src', 'data-lazy-src', 'data-original', 'src']) {
-    const replacement = getReplacementUrl(replacements, extractAttribute(tag, attr))
-    if (replacement) {
-      return replacement
-    }
-  }
-
-  for (const attr of ['data-srcset', 'srcset']) {
-    for (const url of srcsetUrls(extractAttribute(tag, attr))) {
-      const replacement = getReplacementUrl(replacements, url)
-      if (replacement) {
-        return replacement
-      }
-    }
-  }
-
-  return ''
-}
-
-function rewriteImageTagsWithMediaUrls(html: string, replacements: Map<string, string>) {
-  return html.replace(/<img\b[^>]*>/gi, (tag) => {
-    const replacement = getBestImageReplacement(tag, replacements)
-
-    if (!replacement) {
-      return tag
-    }
-
-    let nextTag = tag
-    nextTag = setAttribute(nextTag, 'src', replacement)
-    nextTag = removeAttribute(nextTag, 'srcset')
-    nextTag = removeAttribute(nextTag, 'data-src')
-    nextTag = removeAttribute(nextTag, 'data-lazy-src')
-    nextTag = removeAttribute(nextTag, 'data-original')
-    nextTag = removeAttribute(nextTag, 'data-srcset')
-    nextTag = removeAttribute(nextTag, 'data-lazy-srcset')
-
-    return nextTag
-  })
-}
-
 async function normalizeHtmlWithMedia(
   payload: any,
   value: unknown,
   context: HtmlMediaContext,
 ) {
-  const rawHtml = getRawHtml(value)
-  let html = rawHtml
+  let html = normalizeHtmlOnly(value)
 
   if (!html || SKIP_MEDIA) {
-    return sanitizeWordPressHtml(html)
+    return html
   }
 
-  const urls = extractImageUrlsFromHtml(rawHtml)
+  const urls = extractImageUrlsFromHtml(html)
   const replacements = new Map<string, string>()
 
   for (const sourceUrl of urls) {
@@ -639,8 +560,6 @@ async function normalizeHtmlWithMedia(
       replacements.set(new URL(sourceUrl, WP_BASE_URL).toString(), media.url)
     }
   }
-
-  html = rewriteImageTagsWithMediaUrls(rawHtml, replacements)
 
   for (const [from, to] of replacements) {
     html = replaceAllLiteral(html, from, to)
@@ -1161,7 +1080,11 @@ async function normalizeVariants(payload: any, rawProduct: AnyRecord, payloadMap
           optionValues: getVariationOptionValues(variation, payloadMaps),
           basePrice,
           salePrice,
-          stock: IMPORT_STOCK_QUANTITY,
+          stock: toNumber(
+            variation.stock_quantity ??
+              (variation.stock_status === 'instock' ? 1 : 0),
+            0,
+          ),
           image: image?.id || undefined,
           isActive: variation.status ? variation.status === 'publish' : true,
         })
@@ -1176,7 +1099,7 @@ function normalizePrice(rawProduct: AnyRecord, preparedProduct: AnyRecord | unde
     return withoutUndefined({
       basePrice: toNumber(defaultVariant.basePrice, 0),
       salePrice: optionalNumber(defaultVariant.salePrice),
-      stock: IMPORT_STOCK_QUANTITY,
+      stock: variants.reduce((total, variant) => total + toNumber(variant.stock, 0), 0),
     })
   }
 
@@ -1185,7 +1108,12 @@ function normalizePrice(rawProduct: AnyRecord, preparedProduct: AnyRecord | unde
   return withoutUndefined({
     basePrice: toNumber(preparedPrice.basePrice || rawProduct.regular_price || rawProduct.price, 0),
     salePrice: optionalNumber(preparedPrice.salePrice || rawProduct.sale_price),
-    stock: IMPORT_STOCK_QUANTITY,
+    stock: toNumber(
+      preparedPrice.stock ??
+        rawProduct.stock_quantity ??
+        (rawProduct.stock_status === 'instock' ? 1 : 0),
+      0,
+    ),
   })
 }
 
