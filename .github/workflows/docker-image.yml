@@ -35,6 +35,7 @@ jobs:
           NEXT_PUBLIC_SERVER_URL: https://maraisdefrance.vn
           NEXT_PUBLIC_SOCKET_URL: https://socket.maraisdefrance.vn
           SOCKET_SERVER_URL: https://socket.maraisdefrance.vn
+          NEXT_PUBLIC_TINYMCE_API_KEY: g2eh723b7ow18gsaeyfjnc2leorul317r0xaps7ik1y7lkaj
           MEDIA_DIR: /app/media
           NODE_ENV: production
 
@@ -58,4 +59,5 @@ jobs:
             NEXT_PUBLIC_SERVER_URL=https://maraisdefrance.vn
             NEXT_PUBLIC_SOCKET_URL=https://socket.maraisdefrance.vn
             SOCKET_SERVER_URL=https://socket.maraisdefrance.vn
+            NEXT_PUBLIC_TINYMCE_API_KEY=g2eh723b7ow18gsaeyfjnc2leorul317r0xaps7ik1y7lkaj
             MEDIA_DIR=/app/media
