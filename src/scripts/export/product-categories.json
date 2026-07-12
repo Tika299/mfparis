@@ -1,0 +1,3451 @@
+[
+  {
+    "id": 8683,
+    "name": "Canxi",
+    "slug": "canxi",
+    "parent": 8563,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8683",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8560,
+    "name": "Chăm sóc cá nhân",
+    "slug": "cham-soc-ca-nhan",
+    "parent": 0,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 21,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8560",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8594,
+    "name": "Chống lão hóa",
+    "slug": "chong-lao-hoa",
+    "parent": 7766,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 9,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8594",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7766"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8551,
+    "name": "Chống nắng",
+    "slug": "chong-nang",
+    "parent": 8523,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8551",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8090,
+    "name": "Chưa phân loại",
+    "slug": "chua-phan-loai",
+    "parent": 0,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8090",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8534,
+    "name": "Collagen",
+    "slug": "collagen",
+    "parent": 8523,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 43560,
+      "date_created": "2025-07-30T12:46:47",
+      "date_created_gmt": "2025-07-30T05:46:47",
+      "date_modified": "2025-07-30T12:47:31",
+      "date_modified_gmt": "2025-07-30T05:47:31",
+      "src": "https://mfparis.vn/wp-content/uploads/2025/07/goi-bo-sung-collagen-forte-pharma-expert-collagen-intense-2x14-1.jpg",
+      "name": "Gói Bổ Sung Collagen Forté Pharma Expert Collagen Intense 2&#215;14",
+      "alt": "Gói Bổ Sung Collagen Forté Pharma Expert Collagen Intense 2x14"
+    },
+    "menu_order": 0,
+    "count": 14,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8534",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8679,
+    "name": "D3",
+    "slug": "d3",
+    "parent": 8563,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8679",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8559,
+    "name": "Da",
+    "slug": "da",
+    "parent": 8523,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 3,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8559",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8564,
+    "name": "Dầu cá",
+    "slug": "dau-ca",
+    "parent": 8563,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8564",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7768,
+    "name": "Dầu Gội",
+    "slug": "dau-goi",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 33261,
+      "date_created": "2024-04-09T16:48:57",
+      "date_created_gmt": "2024-04-09T09:48:57",
+      "date_modified": "2024-04-09T16:49:08",
+      "date_modified_gmt": "2024-04-09T09:49:08",
+      "src": "https://mfparis.vn/wp-content/uploads/2024/04/dau-goi-da-nhay-cam-bioderma-node-non-detergent-7.jpg",
+      "name": "Dầu Gội Da Nhạy Cảm Bioderma Nodé Non-Detergent",
+      "alt": "Dầu Gội Da Nhạy Cảm Bioderma Nodé Non-Detergent"
+    },
+    "menu_order": 0,
+    "count": 11,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7768",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8109,
+    "name": "Dầu khô",
+    "slug": "dau-kho",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 3,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8109",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8111,
+    "name": "Dầu xả",
+    "slug": "dau-xa",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 23747,
+      "date_created": "2023-03-13T16:39:02",
+      "date_created_gmt": "2023-03-13T09:39:02",
+      "date_modified": "2023-03-13T16:39:48",
+      "date_modified_gmt": "2023-03-13T09:39:48",
+      "src": "https://mfparis.vn/wp-content/uploads/2023/03/dau-xa-giu-mau-toc-phyto-color-protecting-mask-150ml.jpg",
+      "name": "Dầu Xả Giữ Màu Tóc Phyto Color Protecting Mask",
+      "alt": "Dầu Xả Giữ Màu Tóc Phyto Color Protecting Mask"
+    },
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8111",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8566,
+    "name": "DHA",
+    "slug": "dha",
+    "parent": 8563,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8566",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7895,
+    "name": "Dung Dịch Vệ Sinh",
+    "slug": "dung-dich-ve-sinh",
+    "parent": 50,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 0,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7895",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8580,
+    "name": "Dung dịch vệ sinh phụ nữ",
+    "slug": "dung-dich-ve-sinh-phu-nu",
+    "parent": 8579,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 44707,
+      "date_created": "2025-09-18T16:35:05",
+      "date_created_gmt": "2025-09-18T09:35:05",
+      "date_modified": "2025-09-18T16:35:25",
+      "date_modified_gmt": "2025-09-18T09:35:25",
+      "src": "https://mfparis.vn/wp-content/uploads/2025/09/dung-dich-ve-sinh-soin-lavant-intime-hydratant.jpg",
+      "name": "Dung Dịch Vệ Sinh Cavailles Soin Lavant Intime Hydratant",
+      "alt": "Dung Dịch Vệ Sinh Cavailles Soin Lavant Intime Hydratant"
+    },
+    "menu_order": 0,
+    "count": 16,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8580",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8579"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8118,
+    "name": "Dưỡng môi",
+    "slug": "duong-moi",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 41366,
+      "date_created": "2025-01-20T14:43:03",
+      "date_created_gmt": "2025-01-20T07:43:03",
+      "date_modified": "2025-01-20T14:43:18",
+      "date_modified_gmt": "2025-01-20T07:43:18",
+      "src": "https://mfparis.vn/wp-content/uploads/2025/01/sap-duong-moi-nuxe-moisturizing-rose-lip-balm-15g.jpg",
+      "name": "Sáp Dưỡng Môi Nuxe Moisturizing Rose Lip Balm 15g",
+      "alt": "Sáp Dưỡng Môi Nuxe Moisturizing Rose Lip Balm 15g"
+    },
+    "menu_order": 0,
+    "count": 4,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8118",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8113,
+    "name": "Dưỡng thể",
+    "slug": "duong-the",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 27003,
+      "date_created": "2023-07-25T15:19:58",
+      "date_created_gmt": "2023-07-25T08:19:58",
+      "date_modified": "2023-07-25T15:28:33",
+      "date_modified_gmt": "2023-07-25T08:28:33",
+      "src": "https://mfparis.vn/wp-content/uploads/2023/07/duong-the-eucerin-urearepair-plus-lotion-5-urea-41WxbKNXGmL.jpg",
+      "name": "Sữa Dưỡng Thể Eucerin UreaRepair Plus Lotion 5% Urea",
+      "alt": "Sữa Dưỡng Thể Eucerin UreaRepair Plus Lotion 5% Urea"
+    },
+    "menu_order": 0,
+    "count": 5,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8113",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8547,
+    "name": "Gan",
+    "slug": "gan",
+    "parent": 8536,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 41485,
+      "date_created": "2025-02-08T15:56:14",
+      "date_created_gmt": "2025-02-08T08:56:14",
+      "date_modified": "2025-02-08T15:56:25",
+      "date_modified_gmt": "2025-02-08T08:56:25",
+      "src": "https://mfparis.vn/wp-content/uploads/2025/02/giai-doc-gan-biocyte-hepato-detox-60-vien-3.jpg",
+      "name": "Giải Độc Gan Biocyte Hepato Detox 60 viên",
+      "alt": "Giải Độc Gan Biocyte Hepato Detox 60 viên"
+    },
+    "menu_order": 0,
+    "count": 3,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8547",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8562,
+    "name": "Gel bôi trơn",
+    "slug": "gel-boi-tron",
+    "parent": 8561,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 44532,
+      "date_created": "2025-09-04T20:08:36",
+      "date_created_gmt": "2025-09-04T13:08:36",
+      "date_modified": "2025-09-04T20:09:01",
+      "date_modified_gmt": "2025-09-04T13:09:01",
+      "src": "https://mfparis.vn/wp-content/uploads/2023/10/mucogyne-iprad-8x5ml.jpg",
+      "name": "Mucogyne Iprad 8x5ml",
+      "alt": "Mucogyne Iprad 8x5ml"
+    },
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8562",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8561"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8116,
+    "name": "Gel tắm",
+    "slug": "gel-tam",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 19891,
+      "date_created": "2022-08-14T19:28:35",
+      "date_created_gmt": "2022-08-14T12:28:35",
+      "date_modified": "2023-04-11T13:43:37",
+      "date_modified_gmt": "2023-04-11T06:43:37",
+      "src": "https://mfparis.vn/wp-content/uploads/2022/08/sua-tam-cho-da-kho-bioderma-atoderm-gel-1lit-mfparis.jpg",
+      "name": "Sữa Tắm Bioderma Atoderm Gel 1 lit",
+      "alt": "Sữa Tắm Bioderma Atoderm Gel 1 lit"
+    },
+    "menu_order": 0,
+    "count": 7,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8116",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8602,
+    "name": "Giảm mỡ",
+    "slug": "giam-mo",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 3,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8602",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8613,
+    "name": "Giảm mỡ",
+    "slug": "giam-mo-than-hinh",
+    "parent": 8612,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8613",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8612"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8512,
+    "name": "Giảm Nghẹt Mũi",
+    "slug": "giam-nghet-mui",
+    "parent": 8511,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8512",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8511"
+        }
+      ]
+    }
+  },
+  {
+    "id": 622,
+    "name": "Gift Set",
+    "slug": "gift-set",
+    "parent": 0,
+    "description": "Gift Set thường được phối những loại mỹ phẩm hay nước hoa lại với nhau để tạo thành những gói quà tiện lợi. Do đó bạn có thể tặng bạn bè hay người thân vừa có cả chai nước hoa hoặc mỹ phẩm được đóng gói rất đẹp.",
+    "display": "default",
+    "image": {
+      "id": 15511,
+      "date_created": "2021-12-12T13:55:37",
+      "date_created_gmt": "2021-12-12T06:55:37",
+      "date_modified": "2021-12-12T13:55:49",
+      "date_modified_gmt": "2021-12-12T06:55:49",
+      "src": "https://mfparis.vn/wp-content/uploads/2021/12/set-qua-tang-my-pham-Estee-Laude-Estee-Lauder-Blockbuster-2021-Gift-Set-GWP-Full-Reveal-2-mfparis.jpg",
+      "name": "set-qua-tang-my-pham-Estee-Laude-Estee-Lauder-Blockbuster-2021-Gift-Set-GWP-Full-Reveal-2-mfparis",
+      "alt": "Set Mỹ Phẩm Trang Điểm Estee Lauder Limited Edition Holiday 2021"
+    },
+    "menu_order": 0,
+    "count": 34,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/622",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 251,
+    "name": "Hàng Nội Địa Pháp",
+    "slug": "hang-noi-dia-phap",
+    "parent": 0,
+    "description": "<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\"><a href=\"https://mfparis.vn/hang-noi-dia-phap/\">Hàng Nội Đia Pháp</a> là loại hàng mà nước pháp sản xuất dành riêng cho công dân của riêng người dân sinh sống trên nước pháp sử dụng.</span></span>\r\n\r\nChính vì vậy, chất lượng của hàng nội địa pháp lúc nào cũng được đánh giá cao vì sản xuất cho công dân pháp sử dụng. Bên cạnh đó, đất nước pháp sẽ đưa ra những tiêu chí đánh giá tất cả các mặt hàng cho người sử dụng.Từ nguồn nguyên liệu, nhà máy sản xuất và công nhân sản xuất luôn được kiểm tra chất lượng thường xuyên.\r\n\r\nNước pháp là kinh đô thời trang và tất cả những mặt hàng như nước hoa và mỹ phẩm hoặc những mặt hàng liên quan đến ngành sức khỏe và sắc đẹp luôn đề cao.\r\n\r\nNgười dùng hàng nội địa pháp đều đánh giá rất cao về sản phẩm sản xuất tại pháp. Để sử dụng hàng nội địa pháp bạn có nhiều cách để mua và sử dụng. Ví dụ như bạn nhờ người thân bạn bè mua về sử dụng.\r\n\r\nHoặc thông qua các công ty nhập khẩu chính ngạch để được đảm bảo chất lượng sản phẩm. Đa phần bạn phải tốn rất nhiều chi phí để có thể mua được hàng nội địa pháp. Vì mặt hàng chỉ sản xuất cho người pháp sử dụng chứ không đem đi xuất khẩu.",
+    "display": "default",
+    "image": {
+      "id": 26271,
+      "date_created": "2023-07-07T11:37:57",
+      "date_created_gmt": "2023-07-07T04:37:57",
+      "date_modified": "2023-07-07T11:37:57",
+      "date_modified_gmt": "2023-07-07T04:37:57",
+      "src": "https://mfparis.vn/wp-content/uploads/2023/07/danh-muc-hang-phap.jpg",
+      "name": "danh-muc-hang-phap",
+      "alt": ""
+    },
+    "menu_order": 0,
+    "count": 142,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/251",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 252,
+    "name": "Hàng Nội Địa Úc",
+    "slug": "hang-noi-dia-uc",
+    "parent": 0,
+    "description": "Hàng Nội Địa Úc hay còn gọi là những mặt hàng tại Australia được sản xuất tại nước Úc. Đất nước úc luôn được biết đến với nguồn thực phẩm sạch tốt nhất thế giới. Đến đây bạn sẽ mang về cho gia đình những sản phẩm chăm sóc sức khỏe cá nhân hay làm đẹp. Và bên cạnh đó không thiếu những mặt hàng thiết yếu cho gia đình của bạn.",
+    "display": "default",
+    "image": {
+      "id": 26272,
+      "date_created": "2023-07-07T11:38:00",
+      "date_created_gmt": "2023-07-07T04:38:00",
+      "date_modified": "2023-07-07T11:38:00",
+      "date_modified_gmt": "2023-07-07T04:38:00",
+      "src": "https://mfparis.vn/wp-content/uploads/2023/07/danh-muc-hang-uc.jpg",
+      "name": "danh-muc-hang-uc",
+      "alt": ""
+    },
+    "menu_order": 0,
+    "count": 13,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/252",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8540,
+    "name": "Hô hấp, ho, xoang",
+    "slug": "ho-hap-ho-xoang",
+    "parent": 8536,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 6,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8540",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8536,
+    "name": "Hỗ trợ điều trị",
+    "slug": "ho-tro-dieu-tri",
+    "parent": 50,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 15,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8524,
+    "name": "Hỗ trợ giảm cân",
+    "slug": "ho-tro-giam-can",
+    "parent": 8523,
+    "description": "Bạn đang tìm kiếm sản phẩm hỗ trợ giảm cân để bổ sung vào kế hoạch kiểm soát cân nặng hằng ngày? Tại MF Paris, khách hàng có thể tham khảo nhiều lựa chọn như viên uống hỗ trợ chuyển hóa chất béo, nước uống kiểm soát cân nặng, sản phẩm hỗ trợ đào thải nước dư thừa và công thức sử dụng vào những thời điểm khác nhau trong ngày.\r\n\r\nMỗi sản phẩm có thành phần, dạng dùng và đối tượng phù hợp riêng. Vì vậy, người dùng nên dựa trên nhu cầu thực tế, chế độ sinh hoạt, khả năng dung nạp thành phần và hướng dẫn của nhà sản xuất để đưa ra lựa chọn phù hợp.\r\n\r\nCác sản phẩm trong danh mục chỉ đóng vai trò hỗ trợ, không thay thế chế độ ăn uống cân bằng, vận động thường xuyên hoặc phương pháp điều trị y tế. Hãy đọc kỹ thành phần, liều dùng và lưu ý an toàn trước khi sử dụng. Khám phá các sản phẩm bên dưới để lựa chọn giải pháp hỗ trợ kiểm soát cân nặng phù hợp với nhu cầu của bạn.",
+    "display": "default",
+    "image": {
+      "id": 44396,
+      "date_created": "2025-08-30T10:36:17",
+      "date_created_gmt": "2025-08-30T03:36:17",
+      "date_modified": "2025-08-30T10:37:16",
+      "date_modified_gmt": "2025-08-30T03:37:16",
+      "src": "https://mfparis.vn/wp-content/uploads/2025/07/nuoc-uong-ho-tro-giam-can-superdiet-actimincyl-bio.jpg",
+      "name": "Nước Uống Giảm Cân Superdiet Actimincyl Bio, 20 ống",
+      "alt": "Nước Uống Giảm Cân Superdiet Actimincyl Bio, 20 ống"
+    },
+    "menu_order": 0,
+    "count": 5,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8524",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8523,
+    "name": "Hỗ trợ làm đẹp",
+    "slug": "ho-tro-lam-dep",
+    "parent": 50,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 35,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8561,
+    "name": "Hỗ trợ tình dục",
+    "slug": "ho-tro-tinh-duc",
+    "parent": 8560,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8561",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8560"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7765,
+    "name": "Kem Chống Nắng",
+    "slug": "kem-chong-nang",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 39135,
+      "date_created": "2024-11-11T16:59:28",
+      "date_created_gmt": "2024-11-11T09:59:28",
+      "date_modified": "2024-11-11T16:59:43",
+      "date_modified_gmt": "2024-11-11T09:59:43",
+      "src": "https://mfparis.vn/wp-content/uploads/2022/07/kem-chong-nang-ngua-ung-thu-isdin-eryfotona-ak-nmsc-spf-100-fluid-8.jpg",
+      "name": "Kem Chống Nắng Ngừa Ung Thư Isdin Eryfotona AK-NMSC SPF 100+ Fluid",
+      "alt": "Kem Chống Nắng Ngừa Ung Thư Isdin Eryfotona AK-NMSC SPF 100+ Fluid"
+    },
+    "menu_order": 0,
+    "count": 37,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7765",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7766,
+    "name": "Kem Dưỡng",
+    "slug": "kem-duong",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 42728,
+      "date_created": "2025-04-13T14:37:55",
+      "date_created_gmt": "2025-04-13T07:37:55",
+      "date_modified": "2025-04-13T14:38:06",
+      "date_modified_gmt": "2025-04-13T07:38:06",
+      "src": "https://mfparis.vn/wp-content/uploads/2025/04/kem-duong-nuxe-merveillance-lift-firming-powdery-cream.jpg",
+      "name": "NUXE Merveillance LIFT Firming Powdery Cream",
+      "alt": "NUXE Merveillance LIFT Firming Powdery Cream"
+    },
+    "menu_order": 0,
+    "count": 89,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7766",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8675,
+    "name": "Kem Dưỡng Ẩm Vùng Kín",
+    "slug": "kem-duong-am-vung-kin",
+    "parent": 8579,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8675",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8579"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8110,
+    "name": "Kem Dưỡng Da Tay",
+    "slug": "kem-duong-da-tay",
+    "parent": 7766,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 22954,
+      "date_created": "2023-02-15T10:53:27",
+      "date_created_gmt": "2023-02-15T03:53:27",
+      "date_modified": "2023-04-10T15:18:11",
+      "date_modified_gmt": "2023-04-10T08:18:11",
+      "src": "https://mfparis.vn/wp-content/uploads/2023/02/kem-duong-da-tay-avene-cold-cream-4.jpg",
+      "name": "Kem Dưỡng Da Tay Avene Cold Cream",
+      "alt": "Kem Dưỡng Da Tay Avene Cold Cream"
+    },
+    "menu_order": 0,
+    "count": 4,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8110",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7766"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8610,
+    "name": "Kem Nền",
+    "slug": "kem-nen",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8610",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8616,
+    "name": "khớp",
+    "slug": "khop",
+    "parent": 8536,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8616",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7767,
+    "name": "Lăn Khử Mùi",
+    "slug": "lan-khu-mui",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 29714,
+      "date_created": "2023-11-07T14:29:13",
+      "date_created_gmt": "2023-11-07T07:29:13",
+      "date_modified": "2023-11-07T14:29:24",
+      "date_modified_gmt": "2023-11-07T07:29:24",
+      "src": "https://mfparis.vn/wp-content/uploads/2023/11/lan-khu-mui-etiaxil-deodorant-douceur-48h-3.jpg",
+      "name": "Lăn Khử Mùi Etiaxil Deodorant Douceur 48h",
+      "alt": "Lăn Khử Mùi Etiaxil Deodorant Douceur 48h"
+    },
+    "menu_order": 0,
+    "count": 15,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7767",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8112,
+    "name": "Mặt nạ dưỡng tóc",
+    "slug": "mat-na-duong-toc",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8112",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 24,
+    "name": "Mẹ Và Bé",
+    "slug": "me-va-be",
+    "parent": 0,
+    "description": "Các sản phẩm mẹ và bé luôn là trợ thủ đắc lực của các chị em trên hành trình làm mẹ. Chúng ra đời như một sự san sẻ tuyệt vời giúp chị em hoàn thành thiên chức làm mẹ của mình, giúp chị em chăm sóc, nuôi dạy con tốt hơn đồng thời tạo điều kiện thuận lợi nhất cho sự phát triển của bé ngay từ những năm tháng đầu đời và theo suốt những ngày tháng phát triển của con.\r\n\r\n<img class=\"size-medium wp-image-15914\" src=\"https://mfparis.vn/wp-content/uploads/2022/01/an-gi-tot-cho-me-va-be-1-600x400.jpg\" alt=\"Ăn gì tốt cho mẹ và bé?\" width=\"600\" height=\"400\" />\r\n\r\nSức khỏe cho mẹ và dinh dưỡng cho trẻ sơ sinh và trẻ nhỏ luôn được quan tâm nhất hiện tại. Một đứa bé được sinh ra đời là một quá trình dài chăm sóc bà bầu từ khi mang thai đến khi sinh ra em bé. Trong quá trình này, dinh dưỡng và các dụng cụ cần thiết cho mẹ và bé được mỗi gia đình có một kế hoạch chăm sóc khác nhau.\r\n\r\nHãy luôn đặt cao tinh thần trách nhiệm và mang lại cuộc sống khỏe mạnh cho đứa bé sắp chào đời. Hãy cùng chúng tôi MF Paris tìm hiểu những sản phẩm tốt chất lượng cho mẹ và bé nhé.\r\n<h2><strong>1.Vitamin cho mẹ và bé:</strong></h2>\r\nVitamin cho mẹ và bé bao gồm các sản phẩm hỗ trợ bổ sung vitamin, dưỡng chất cần thiết cho mẹ và bé, đảm bảo nguồn dinh dưỡng cần thiết cho bé ngay từ khi còn trong bụng mẹ cho đến khi chào đời, trong những năm tháng phát triển đầu tiên đồng thời đảm bảo sức khỏe cho mẹ suốt thời gian mang thai và sau sinh.\r\n\r\n<img class=\"size-medium wp-image-26273 aligncenter\" src=\"https://mfparis.vn/wp-content/uploads/2023/07/danh-muc-me-va-be-400x400.jpg\" alt=\"\" width=\"400\" height=\"400\" />\r\n\r\nBên cạnh việc ăn uống đầy đủ dưỡng chất thông qua các bữa ăn hằng ngày. Thì việc lựa chọn những sản phẩm bổ sung Vitamin phù hợp mà cơ thể chưa thể tự hấp thu được là một việc vô cùng quan trọng. Dưới đây là các sản phẩm dành riêng cho mẹ và bé trong việc cung cấp dinh dưỡng thiết yếu.\r\n<h3><strong> Các sản phẩm vitamin cho mẹ và bé bao gồm:</strong></h3>\r\nDinh dưỡng cho bé, Dinh dưỡng cho bà bầu\r\n<h4><strong>- Dinh dưỡng cho bé:</strong></h4>\r\n<strong>Tính năng sản phẩm</strong>: Các sản phẩm dinh dưỡng cho bé được chia thành từng giai đoạn, đáp ứng nhu cầu dinh dưỡng qua từng thời kỳ phát triển của bé như giai đoạn sơ sinh, giai đoạn bé ăn dặm, giai đoạn phát triển chiều cao,...\r\n\r\n<img class=\"alignnone size-medium wp-image-15521\" src=\"https://mfparis.vn/wp-content/uploads/2021/12/vitamin-va-khoang-chat-599x400.jpg\" alt=\"\" width=\"599\" height=\"400\" />\r\n\r\nNgoài ra còn có các sản phẩm dinh dưỡng chuyên dụng cho tình trạng cụ thể cho bé như bé sinh non, bé chậm lớn, bé kén ăn, bé mới ốm dậy,... Tùy theo nhu cầu sử dụng mà bố mẹ có thể lựa chọn sản phẩm dinh dưỡng cho bé phù hợp.\r\n\r\n<strong>Sản phẩm nổi bật:</strong> Sữa A2 nguyên kem dạng bột, Sữa bột Ensure Original Nutrition Powder Add Water, Sữa non Healthy Care,\r\n<h4><strong>Vitamin cho bé :</strong></h4>\r\n<strong>Tính năng sản phẩm:</strong> Các sản phẩm vitamin cho bé giúp hỗ trợ bổ sung các vitamin và khoáng chất cần thiết cho cơ thể, giúp tăng cường sức đề kháng, hỗ trợ quá trình phát triển của bé, đặc biệt hỗ trợ tốt cho các bé có chế độ ăn uống thiếu chất, kén ăn, không thể bổ sung đầy đủ dưỡng chất cho cơ thể qua nguồn thực phẩm hàng ngày.\r\n\r\n<strong>Sản phẩm nổi bật</strong>: Kẹo Vitamin Cho Bé <a href=\"https://mfparis.vn/healthy-care-gummy-omega-3-250-vien/\">Healthy Care Gummy Omega 3 250 Viên;  </a><a href=\"https://mfparis.vn/healthy-care-milk-calcium-60-vien/\">Viên Uống Healthy Care Milk Calcium 60 Viên</a>,<a href=\"https://mfparis.vn/ostelin-kids-calcium-vitamin-d3-90-vien-nhai/\">Ostelin Kids Calcium Vitamin D3 90 Viên Nhai, </a><a href=\"https://mfparis.vn/bio-island-dha-for-kids-60-vien/\">Bio Island DHA For Kids 60 Viên</a>\r\n<h4><strong>Dinh dưỡng cho bà bầu:</strong></h4>\r\n<strong>Tinh năng sản phẩm:</strong> Các sản phẩm dinh dưỡng cho bà bầu tập trung vào việc bổ sung các loại sữa bầu, vitamin, khoáng chất và các dưỡng chất cần thiết đảm bảo sức khỏe cho mẹ bầu và sự phát triển toàn diện của thai nhi trong suốt thai kỳ.\r\n\r\n<strong>Sản phẩm nổi bật:</strong> <a href=\"https://mfparis.vn/vien-uong-bo-sung-dha-bio-island-cho-ba-bau-60-vien/\">Viên Uống Bổ Sung DHA Bio Island Cho Bà Bầu 60 Viên</a> (bổ sung DHA), <a href=\"https://mfparis.vn/blackmores-conceive-well-gold-28-tabs-28-caps/\">Blackmores Conceive Well Gold 28 Tabs 28 Caps</a>, , <a href=\"https://mfparis.vn/vien-bo-sung-vitamin-cho-ba-bau-elevit-pregnancy-multivitamin-100-vien/\">vitamin tổng hợp cho bà bầu Elevit</a> và một số loại vitamin tổng hợp khác,...\r\n<h2>2. Sản phẩm cho mẹ:</h2>\r\nTrong quá trình mang thai và sinh nở , người mẹ đã tiêu hào rất nhiều dinh dưỡng và sức khỏe để nuôi con. Vì vậy, sau khi sinh nỡ thì việc làm đẹp lại nhan sắc cũng như ăn uống bổ sung thêm nhiều dinh dưỡng cho mẹ nhầm phục hồi thể trạng sau khi sinh.\r\n\r\nDưới đây là những sản phẩm giúp bà bầu và phự nữ sau có thể lấy lại vẽ đẹp thanh xuân của mình.\r\n<h3>Vệ sinh cá nhân cho bà bầu:</h3>\r\nSau khi sinh nỡ thì cơ quan sinh dục của bà bầu bị tốn thương rất lớn. Nên vệ sinh chăm sóc vùng kín của phụ nữ là vô cùng quan trọng. Bên cạnh đó, bình thường thì cơ quan sinh dục của nữ là rất nhạy cảm và dễ dàng bị vi khuẩn xâm nhập nếu không có cách vệ sinh sạch sẽ.\r\n\r\n<img class=\"size-medium wp-image-24810\" src=\"https://mfparis.vn/wp-content/uploads/2023/04/thuoc-dat-phu-khoa-phap-800x376.jpg\" alt=\"Thuốc đặt phụ khoa pháp\" width=\"800\" height=\"376\" />\r\n\r\nSau đây là những sản phẩm giúp bà bầu và phụ nữ có thể tự vệ sinh và bảo vệ nơi vùng kín của bản thân trảnh khỏi những tác nhân gây hại nghi hiểm ảnh hưởng đến sức khỏe:\r\n\r\nViên Đặt Phụ Khoa Medigyne Saforelle 10 viên\r\n\r\nPuressentiel Hygiene Intime – Dung dịch vệ sinh hữu cơ dành cho da nhạy cảm và dùng được cho mẹ bầu\r\n\r\nDung dịch vệ sinh nội địa Roge Cavailles\r\n\r\nDung dịch vệ sinh phụ nữ Femfresh\r\n\r\nKhử mùi cho bà bầu:\r\n<h3>Làm đẹp cho bà bầu:</h3>\r\nVấn đề là rất quan trọng cho sắc đẹp của bản thân người phụ nữ đã có gia đình. Hãy luôn luôn chăm sóc bản thân để xây dựng tình cảm gia đình bên vững.\r\n\r\nĐầu tiên đừng vội buồn khi bạn da hơi nhăn và sần sùi đi sau khi sinh. Hãy chăm sóc lại bạn thể để bạn được như một người con gái đôi mươi.\r\n<h4>Những sản phẩm làm đẹp cho bà bầu:</h4>\r\nChăm sóc tóc cho bà bầu:\r\n\r\n<a href=\"https://mfparis.vn/vien-uong-dep-toc-arkopharma-forcapil-fortifiant/\"><strong>Viên Uống Đẹp Tóc Arkopharma Forcapil Fortifiant</strong></a> - dành cho bà bầu\r\n\r\nChăm sóc da cho bà bầu:\r\n\r\n<a href=\"https://mfparis.vn/khong-con-lo-ran-da-voi-kem-tri-ran-da-cua-phap/\">Top các sản phẩm dầu rạn cho an toàn mẹ bầu</a>\r\n<h2>3: Sản phẩm cho bé:</h2>\r\nSau khi bé chào đời thì sẽ tiếp xúc trực tiếp với môi trường bên ngoài. Việc này sẽ khiến bé phải tiếp cận với nhiều tác nhân gây hại từ môi trường thiên nhiên.\r\n\r\nNgoài việc, chúng ta tự chăm sóc con trẻ bảo vệ con trẻ, thì những sản phẩm bảo vệ trẻ em khoỉ những tác nhân gây hại là rất cần thiết.",
+    "display": "products",
+    "image": null,
+    "menu_order": 0,
+    "count": 35,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/24",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8511,
+    "name": "Mũi",
+    "slug": "mui",
+    "parent": 50,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8511",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+        }
+      ]
+    }
+  },
+  {
+    "id": 20,
+    "name": "Mỹ Phẩm",
+    "slug": "my-pham",
+    "parent": 0,
+    "description": "Mỹ phẩm (tiếng anh: Cosmetics) là những chất hoặc sản phẩm được dùng để trang điểm hoặc thay đổi diện mạo hoặc mùi hương cơ thể người.",
+    "display": "products",
+    "image": {
+      "id": 26266,
+      "date_created": "2023-07-07T11:32:02",
+      "date_created_gmt": "2023-07-07T04:32:02",
+      "date_modified": "2023-07-07T11:32:02",
+      "date_modified_gmt": "2023-07-07T04:32:02",
+      "src": "https://mfparis.vn/wp-content/uploads/2023/07/danh-muc-my-pham.jpg",
+      "name": "danh-muc-my-pham",
+      "alt": ""
+    },
+    "menu_order": 0,
+    "count": 494,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8115,
+    "name": "Nến Thơm",
+    "slug": "nen-thom",
+    "parent": 0,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 41501,
+      "date_created": "2025-02-09T10:24:48",
+      "date_created_gmt": "2025-02-09T03:24:48",
+      "date_modified": "2025-02-09T10:25:08",
+      "date_modified_gmt": "2025-02-09T03:25:08",
+      "src": "https://mfparis.vn/wp-content/uploads/2025/01/nen-thom-nuxe-huile-prodigieuse-70g-6.jpg",
+      "name": "Nến Thơm Nuxe Huile Prodigieuse 70g",
+      "alt": "Nến Thơm Nuxe Huile Prodigieuse 70g"
+    },
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8115",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8578,
+    "name": "Nhuộm tóc",
+    "slug": "nhuom-toc",
+    "parent": 20,
+    "description": "[html_block id=\"49551\"]",
+    "display": "default",
+    "image": {
+      "id": 23085,
+      "date_created": "2023-02-21T16:55:19",
+      "date_created_gmt": "2023-02-21T09:55:19",
+      "date_modified": "2023-04-10T15:08:26",
+      "date_modified_gmt": "2023-04-10T08:08:26",
+      "src": "https://mfparis.vn/wp-content/uploads/2023/02/nhuom-toc-phyto-color-hair-thao-duoc-mau-3-e1677211863230.jpg",
+      "name": "Nhuộm Tóc Phyto Color Hair Thảo Dược 3",
+      "alt": "Nhuộm Tóc Phyto Color Hair Thảo Dược 3"
+    },
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8578",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 5928,
+    "name": "Nước Hoa",
+    "slug": "nuoc-hoa",
+    "parent": 0,
+    "description": "Nước hoa không chỉ là một phụ kiện làm đẹp mà còn là cách thể hiện cá tính, tâm trạng và gu thẩm mỹ của mỗi người. Một mùi hương phù hợp có thể lưu giữ những kỷ niệm đẹp, tạo ấn tượng khó quên và khơi gợi cảm xúc sâu sắc. Trong thế giới đa dạng của nước hoa, mỗi chai đều mang trong mình một câu chuyện riêng, từ thiết kế độc đáo đến những tầng hương tinh tế.\r\n\r\nHãy cùng MF Paris những điều đặc biệt ẩn chứa trong từng giọt hương thơm qua bài viết này!\r\n<h2><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">1. Nước hoa là gì ?</span></span></h2>\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\"><a href=\"https://mfparis.vn/nuoc-hoa/\">Nước hoa</a> hay còn gọi là perfume hay fragrance là chất lỏng có mùi thơm được sử dụng để làm thơm cơ thể. Nước hoa được làm từ các loại tinh dầu như hoa, trái cây và thảo mộc. Tinh dầu được chiết xuất từ ​​nguyên liệu thô bằng các phương pháp như chưng cất và ép lạnh. Làm nước hoa bằng cách hòa tan tinh dầu trong rượu.</span></span>\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2022/03/xit-nuoc-hoa-o-dau.jpg\"><img class=\"aligncenter wp-image-16570 size-full\" src=\"https://mfparis.vn/wp-content/uploads/2022/03/xit-nuoc-hoa-o-dau.jpg\" alt=\"xịt nuoc hoa ơ đau\" width=\"600\" height=\"400\" /></a>\r\n\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Nước hoa có lịch sử lâu đời và được sử dụng bởi các nền văn hóa khác nhau trên thế giới. Nước hoa được sử dụng để thể hiện sự sang trọng, quyến rũ và cá tính của người dùng. Nước hoa cũng được sử dụng để tạo bầu không khí thư thái và thoải mái.</span></span>\r\n\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Ngày nay, nước hoa được cả nam và nữ sử dụng rộng rãi. Nước hoa là phụ kiện thời trang giúp bạn thể hiện phong cách cá nhân. Nước hoa cũng là một phương tiện để tạo ấn tượng tốt với người khác.</span></span>\r\n\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Khi chọn nước hoa, bạn nên cân nhắc sở thích, tính cách và dịp sử dụng nước hoa. Nếu bạn không chắc chắn nên chọn loại nước hoa nào, hãy tham khảo ý kiến ​​của chuyên gia tư vấn cửa hàng nước hoa.</span></span>\r\n<h2>II. Nước Hoa Có Mấy Loại ?</h2>\r\nNước hoa không chỉ là một phần của nghệ thuật làm đẹp, mà còn là biểu tượng của phong cách và cá nhân hóa. Trong bài viết này, chúng ta sẽ tìm hiểu về cách phân loại nước hoa thông qua các tiêu chí quan trọng như giới tính, nồng độ tinh dầu, phong cách và mùa, giúp bạn lựa chọn sản phẩm phù hợp với sở thích và cá tính riêng của mình.\r\n<h3>1. Theo giới tính</h3>\r\nNước hoa được chia thành ba loại chính dựa trên giới tính: Nam, Nữ, và Unisex. Nước hoa nam thường có hương thơm mạnh mẽ, trong khi nước hoa nữ thường có sự nhẹ nhàng và quyến rũ. Nước hoa unisex thường mang đến sự cân bằng giữa hai giới.\r\n<h4><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">a. Nước hoa nam</span></span></h4>\r\nNước hoa nam là một loại nước hoa được thiết kế dành riêng cho nam giới. <a href=\"https://mfparis.vn/nuoc-hoa-nam/\">Nước hoa nam</a> thường có mùi hương mạnh mẽ, nam tính và quyến rũ. Nước hoa nam được sử dụng để tạo ấn tượng tốt với người khác, thể hiện phong cách cá nhân và bản lĩnh của người đàn ông.\r\n\r\n<img class=\"aligncenter wp-image-15344 size-full\" src=\"https://mfparis.vn/wp-content/uploads/2021/12/nuoc-hoa-danh-cho-nam-phong-do.jpg\" alt=\"\" width=\"600\" height=\"600\" />\r\n\r\nNước hoa nam có nhiều loại khác nhau, mỗi loại có một mùi hương đặc trưng.\r\n\r\nMột số loại nước hoa nam phổ biến nhất bao gồm:\r\n\r\nNước hoa nhóm hương gỗ: có mùi hương mạnh mẽ, nam tính và sang trọng, được sử dụng trong những dịp trang trọng hoặc những buổi tiệc đêm.\r\n\r\nNước hoa hương biển:  có mùi hương tươi mát, sảng khoái và trẻ trung, được sử dụng trong những ngày hè nóng bức hoặc những chuyến đi biển.\r\n\r\nNước hoa hương hoa: có mùi hương ngọt ngào, dịu dàng và lãng mạn, được sử dụng trong những dịp hẹn hò hoặc những buổi tiệc tối.\r\n\r\nKhi chọn nước hoa nam, bạn cần lưu ý đến sở thích cá nhân, tính cách và dịp sử dụng. Nếu bạn không chắc chắn nên chọn loại nước hoa nào, bạn có thể nhờ nhân viên tư vấn tại cửa hàng nước hoa giúp bạn.\r\n<h5>Top Nước Hoa Nam Bán Chạy Mọi Thời Đại</h5>\r\n<ol>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nam-chanel-bleu-de-chanel-edt/\"><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Bleu de Chanel EDT</span></span></a></li>\r\n \t<li><a href=\"https://mfparis.vn/dior-sauvage-eau-de-toilette/\"><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Nước hoa Dior Sauvage EDT</span></span></a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nam-yves-saint-laurent-y-eau-de-parfum/\"><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">YSL Y Eau de Parfum</span></span></a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nam-dolce-gabbana-the-one-for-men-chinh-hang/\"><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Dolce &amp; Gabbana The One dành cho nam giới</span></span></a></li>\r\n \t<li><a href=\"https://mfparis.vn/giorgio-armani-acqua-di-gio-pour-homme/\"><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Giorgio Armani Acqua di Gio Pour Homme</span></span></a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nam-versace-eros-eau-de-toilette/\"><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Nước hoa Versace Eros</span></span></a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nam-calvin-klein-eternity-for-men/\"><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Calvin Klein Eternity for Men Eau de Toilette</span></span></a></li>\r\n \t<li><a href=\"https://mfparis.vn/paco-rabanne-1-million-edt-100ml/\"><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Paco Rabanne 1 Million Eau de Toilette</span></span></a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nam-bvlgari-man-in-black-eau-de-parfum/\"><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Bvlgari Man in Black Eau de Parfum</span></span></a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nam-gucci-guilty-pour-homme-edt/\">Gucci Guilty Eau de Toilette</a></li>\r\n</ol>\r\n<h4>b. Nước hoa nữ</h4>\r\nNước hoa nữ là loại nước hoa được thiết kế dành riêng cho phụ nữ, thường có mùi hương ngọt ngào, nhẹ nhàng và quyến rũ giúp thể hiện phong cách và vẻ đẹp cá nhân của người phụ nữ.\r\n\r\n<img class=\"aligncenter wp-image-15345 size-full\" src=\"https://mfparis.vn/wp-content/uploads/2021/12/nuoc-hoa-danh-cho-quy-ba.jpg\" alt=\"\" width=\"600\" height=\"400\" />\r\n\r\nCó các loại nhóm huong thương được dành cho phụ nữ như:\r\n\r\nNhóm hương Hương hoa ngọt ngào, nhẹ nhàng và lãng mạn, thường được sử dụng trong những buổi hẹn hò, tiệc đêm.\r\n\r\nNước hoa hương trái cây có mùi hương tươi mát, trẻ trung và năng động được sử dụng vào những ngày hè nóng bức hoặc khi đi du lịch.\r\n\r\nNước hoa hương hoa cỏ có mùi hương thơm mát, thư thái và dễ chịu được sử dụng vào những ngày hè nóng bức và khi tập thể dục.\r\n\r\nTop nước hoa nữ bán chạy mọi thời đại\r\n<ol>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nu-chanel-no5-eau-de-parfum-chinh-hang/\">Chanel No. 5 Eau de Parfum</a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nu-narciso-rodriguez-for-her-eau-de-toillette/\">Narciso Rodriguez For Her Eau de Toilette</a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nu-dior-jadore-eau-de-parfum/\">Dior J'adore Eau de Parfum</a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nu-gucci-bloom-eau-de-parfum-chinh-hang/\">Gucci Bloom Eau de Parfum</a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nu-marc-jacobs-daisy-eau-de-toilette/\">Marc Jacobs Daisy Eau de Toilette</a></li>\r\n \t<li><a href=\"https://mfparis.vn/yves-saint-laurent-black-opium-le-parfum/\">Yves Saint Laurent Black Opium Eau de Parfum</a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nu-versace-bright-crystal-eau-de-toillette/\">Versace Bright Crystal Eau de Toilette</a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nu-prada-candy-eau-de-parfum/\">Prada Candy Eau de Parfum.</a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nu-chloe-nomade-eau-de-parfum-chinh-hang/\">Chloe Nomade Eau de Parfum</a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nu-bvlgari-omnia-crystalline/\">Bvlgari Omnia Crystalline Eau de Toilette</a></li>\r\n</ol>\r\n<h4>c. Nước hoa unisex</h4>\r\nNước hoa unisex là một loại nước hoa vô cùng phức tạp. Bởi vì mùi hương của nó nếu xịt lên cơ thể nam giới sẽ cho ra một mùi hương mạnh mẽ nam tính. Còn ngược lại, nếu xịt trên cơ thể nữ thì sẽ tạo ra mùi hương ngọt ngào đầy nữ tính.\r\n\r\n<img class=\"size-medium wp-image-16067 aligncenter\" src=\"https://mfparis.vn/wp-content/uploads/2022/01/la-co-cong-dong-lgpt-604x400.jpg\" alt=\"la cờ cộng đồng lgpt\" width=\"604\" height=\"400\" />\r\n\r\nTop nước hoa unisex đáng thử nhất hiện nay\r\n<ol>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-unisex-tom-ford-oud-wood-eau-de-parfum/\">Tom Ford Oud Wood Eau de Parfum</a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-nam-molecule-01-eau-de-parfum/\">Escentric Molecules Molecule 01 Eau de Toilette</a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-unisex-le-labo-santal-33-eau-de-parfum/\">Le Labo Santal 33 Eau de Parfum</a></li>\r\n \t<li><a href=\"https://mfparis.vn/maison-margiela-replica-jazz-club/\">Maison Margiela Replica Jazz Club Eau de Toilette</a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-unisex-juliette-has-a-gun-not-a-perfume/\">Juliette Has a Gun Not a Perfume Eau de Parfum</a></li>\r\n \t<li><a href=\"https://mfparis.vn/barakkat-rouge-540-eau-de-parfum/\">Maison Francis Kurkdjian Baccarat Rouge 540 Eau de Parfum</a></li>\r\n \t<li>Kilian Straight to Heaven Eau de Parfum</li>\r\n \t<li>Byredo Bal d'Afrique Eau de Parfum</li>\r\n \t<li>Diptyque Philosykos Eau de Toilette</li>\r\n \t<li>Jo Malone Wood Sage &amp; Sea Salt Cologne</li>\r\n</ol>\r\n<h3>2. Nồng độ nước hoa</h3>\r\nNồng độ nước hoa là một trong những yếu tố quan trọng quyết định độ tỏa hương và độ lưu hương của nước hoa. Nồng độ nước hoa được đo bằng tỷ lệ phần trăm dầu thơm có trong nước hoa. Nồng độ tinh dầu càng cao thì mùi hương càng mạnh và lưu lại càng lâu.\r\n\r\n<img class=\"size-medium wp-image-16804 aligncenter\" src=\"https://mfparis.vn/wp-content/uploads/2022/03/nong-do-tinh-dau-nuoc-hoa-ma-ban-chua-biet-747x400.jpg\" alt=\"nồng độ tinh dầu nước hoa\" width=\"747\" height=\"400\" />\r\n<p data-sourcepos=\"3:1-3:42\">Dưới đây là các nồng độ nước hoa phổ biến:</p>\r\n\r\n<ul>\r\n \t<li data-sourcepos=\"3:1-3:42\">Eau Fraiche: có chứa 1-2 % tinh dầu nước hoa, lưu hương dưới 2 tiếng.</li>\r\n \t<li data-sourcepos=\"5:1-5:79\">Eau de Cologne (EDC): có chứa 2-5% tinh dầu nước hoa, lưu hương từ 2-3 tiếng.</li>\r\n \t<li data-sourcepos=\"6:1-6:81\">Eau de Toilette (EDT): có chứa 4-10% tinh dầu nước hoa, lưu hương từ 4-6 tiếng.</li>\r\n \t<li data-sourcepos=\"7:1-7:80\">Eau de Parfum (EDP): có chứa 12-20% tinh dầu nước hoa, lưu hương từ 6-8 tiếng.</li>\r\n \t<li data-sourcepos=\"8:1-9:0\">Parfum Extrait (Parfum): có chứa 20-30% tinh dầu nước hoa, lưu hương từ 8-12 tiếng.</li>\r\n</ul>\r\nNồng độ nước hoa nào phù hợp với bạn phụ thuộc vào nhiều yếu tố, bao gồm thời tiết, sở thích cá nhân và lý do sử dụng. Nếu bạn muốn hương thơm nồng và lâu, hãy chọn loại nước hoa đậm đặc như Eau de Parfum hoặc Parfum Extrat. Nếu muốn mùi hương nhẹ nhàng, tươi mát, bạn nên chọn nước hoa có nồng độ thấp như cologne hoặc eau de toilette.\r\n\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Ngoài nồng độ nước hoa, thời gian thoa nước hoa cũng ảnh hưởng đến độ bền của nước hoa. Nên dùng nước hoa sau khi tắm và sau khi thoa kem dưỡng ẩm. Điều này cho phép nước hoa lưu lại trên da lâu hơn. Ngoài ra, không nên sử dụng quá nhiều nước hoa vì mùi hương có thể quá nồng và gây khó chịu cho những người xung quanh.</span></span>\r\n<h3>3. Theo Phong Cách:</h3>\r\nNước hoa được phân loại theo nhiều phong cách như cuốn hút ,thể thao, tiểu thư, Quý bà, Lịch lãm, độc đáo, quyến rũ, cá tính, doanh nhân, Tinh tế v.v. Mỗi phong cách đều thể hiện sự đa dạng và đặc trưng riêng biệt.\r\n<h3>4. Theo Mùa:</h3>\r\n<ul>\r\n \t<li><em>Xuân:</em> Hương tươi mới, hoa quả, thích hợp cho những ngày nắng ấm.</li>\r\n \t<li><em>Hạ:</em> Hương mát mẻ, hoa nồng, thích hợp cho thời tiết ấm áp.</li>\r\n \t<li><em>Thu:</em> Hương ấm áp, gỗ, phù hợp cho không khí mát mẻ của mùa thu.</li>\r\n \t<li><em>Đông:</em> Hương trầm, ấm áp, thích hợp cho những ngày lạnh giá.</li>\r\n</ul>\r\n<h3><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">5. Nhóm hương nước hoa</span></span></h3>\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Có 9 nhóm hương nước hoa cơ bản, bao gồm:</span></span>\r\n\r\n<img class=\"size-medium wp-image-24653 aligncenter\" src=\"https://mfparis.vn/wp-content/uploads/2023/04/Ho-huong-nhom-huong-nuoc-ho-396x400.png\" alt=\"\" width=\"396\" height=\"400\" />\r\n<h4><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Hương hoa cỏ:</span></span></h4>\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Đây là nhóm hương phổ biến nhất, bao gồm các loại hoa như hoa hồng, hoa nhài, hoa huệ, hoa lan, hoa violet, hoa oải hương,... Hương hoa cỏ thường mang đến cảm giác tươi mát, dịu dàng và nữ tính.</span></span>\r\n\r\nXem ngay:\r\n<ul>\r\n \t<li><a href=\"https://mfparis.vn/bi-mat-13-chai-nuoc-hoa-huong-hoa-nhai-quyen-ru/\">Nước Hoa Hương Nhài </a></li>\r\n</ul>\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Hương cam chanh:</span></span>\r\n\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Nhóm hương này mang đến cảm giác tươi mát, sảng khoái và tràn đầy năng lượng. Các loại hương phổ biến trong nhóm hương này bao gồm cam, chanh, bưởi, cam bergamot,...</span></span>\r\n\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Hương trái cây:</span></span>\r\n\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Nhóm hương này mang đến cảm giác ngọt ngào, tươi mát và trẻ trung. Các loại hương phổ biến trong nhóm hương này bao gồm táo, lê, đào, dâu tây, kiwi,...</span></span>\r\n\r\nXem thêm:\r\n<ul>\r\n \t<li><a href=\"https://mfparis.vn/top-13-chai-nuoc-hoa-huong-trai-cay-kho-cuong/\">Nước hoa hương trái cây</a></li>\r\n</ul>\r\n<h4><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Hương gỗ:</span></span></h4>\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Nhóm hương này mang đến cảm giác ấm áp, sang trọng và nam tính. Các loại hương phổ biến trong nhóm hương này bao gồm gỗ đàn hương, gỗ tuyết tùng, gỗ gụ, gỗ hồng mộc,...</span></span>\r\n\r\nXem thêm:\r\n<ul>\r\n \t<li><a href=\"https://mfparis.vn/kham-pha-suc-hut-day-quyen-ru-cua-nuoc-hoa-mui-go/\">Nước hoa mùi gỗ</a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-mui-go-dan-huong-top-10-lua-chon-tot-nhat/\">Nước hoa mùi gỗ đàn hương</a></li>\r\n</ul>\r\n<h4><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Hương phương Đông:</span></span></h4>\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Nhóm hương này mang đến cảm giác ấm áp, quyến rũ và bí ẩn. Các loại hương phổ biến trong nhóm hương này bao gồm xạ hương, hổ phách, vani, gỗ đàn hương,...</span></span>\r\n\r\nXem thêm:\r\n<ul>\r\n \t<li><a href=\"https://mfparis.vn/bo-tui-10-chai-nuoc-hoa-xa-huong-cho-nam-goi-cam/\">Nước hoa mùi xạ hương cho nam</a></li>\r\n \t<li><a href=\"https://mfparis.vn/9-chai-nuoc-hoa-mui-vani-nam-cuc-chat-cuon-hut/\">Nước hoa mùi vani</a></li>\r\n</ul>\r\n<h4><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Hương biển:</span></span></h4>\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Nhóm hương này mang đến cảm giác tươi mát, sảng khoái và mát mẻ. Các loại hương phổ biến trong nhóm hương này bao gồm muối biển, rong biển, cam bergamot,...</span></span>\r\n<h4><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Hương cỏ thảo mộc:</span></span></h4>\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Nhóm hương này mang đến cảm giác tươi mát, thư giãn và sảng khoái. Các loại hương phổ biến trong nhóm hương này bao gồm hương thảo, bạc hà, oải hương, húng quế,...</span></span>\r\n<h4><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Hương gia vị:</span></span></h4>\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Nhóm hương này mang đến cảm giác ấm áp, mạnh mẽ và cá tính. Các loại hương phổ biến trong nhóm hương này bao gồm quế, hồi, đinh hương, tiêu,...</span></span>\r\n\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Khi chọn nước hoa, bạn cần lưu ý đến sở thích cá nhân, tính cách, thời tiết và dịp sử dụng.</span></span>\r\n<h3>6. Phân loại nước hoa theo xuất xứ</h3>\r\nXuất xứ của nước hoa là câu hỏi mà các bạn luôn luôn đạt ra để đảm bảo mình có mua được chai nước hoa chính hãng như ý muốn không. Có 1 vấn đề bạn cần hiểu rõ đề không bị nhầm lẫn như sau.\r\n\r\nNước hoa được sản xuất tại đâu thì xuất xứ ở đó:\r\n\r\nQuan điểm này không đúng hoàn toàn. Vì hiện nay các sản phẩm nước hoa và thương hiệu của họ đã lang tỏa đi khắp thể giới. Nên việc đặt thêm nhiều nhà máy ở các nước khác nhau để tạo lợi thế cạnh tranh về khoảng cách giữa các thương hiệu với nhau.\r\n\r\nVí dụ cụ thể: Thương hiệu Gucci là một thương hiệu đến từ nước ý, nhiều người lầm tưởng là Gucci là thương hiệu nước hoa ý. Nhưng việc gucci có nhà máy sản xuất tại nước hoa pháp thì xuất xứ của chai nước hoa đó là nước pháp.\r\n\r\nBên cạnh đó, tại mỗi đất nước hoa sẽ có tiêu chuẩn sản xuất khác nhau. Nên bạn không thể nào đem so sánh nước hoa pháp và nước hoa mỹ hay nước hoa ý. Đơn giản một điều là nó vẫn có sự khác biệt giữa chất lượng nước hoa với nhau. Chỉ là ở góc độ của một người tiêu dùng thường bạn sẽ không thể nhận biết được.\r\n\r\nMặc khác, việc bạn đi sang nước pháp để mua một chai nước hoa gucci nó sẽ có chất lượng khác với việc bạn đi sang mỹ tại các trung tâm uy tín để mua nước hoa gucci.\r\n\r\nTóm lại, <em>Việc bạn mua nước hoa ở đau nó quan trọng hơn là xuất xứ nước hoa ở đau</em>. Vì thương hiệu gucci muốn đưa ra của mình sang thị trường pháp để kinh doanh thì phải đạt các tiêu chí của nước pháp.\r\n\r\nDưới đây một số nước trên thế giới có ngành công nghiệp nước hoa phát triển bật nhất thế giới mà bạn có thể trải nghiệm:\r\n<ol>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-phap/\">Nước Hoa Pháp</a></li>\r\n \t<li><a href=\"https://mfparis.vn/nuoc-hoa-my/\">Nước Hoa Mỹ</a></li>\r\n \t<li><a href=\"https://mfparis.vn/top-8-thuong-hieu-nuoc-hoa-y-gan-lien-voi-nguoi-viet-nam/\">Nước Hoa Ý</a></li>\r\n \t<li>Nước Hoa Anh</li>\r\n \t<li>Nước Hoa Tây Ban Nha</li>\r\n \t<li><a href=\"https://mfparis.vn/thuong-hieu-nuoc-hoa-dubai-duoc-ua-chuong-nhat-viet-nam/\">Nước Hoa Dubai</a></li>\r\n</ol>\r\n<h3>7. Phân loại nước hoa theo thương hiệu</h3>\r\nĐể mua một chai nước hoa vừa ý thì đầu tiên chắc có lẽ bạn cũng đang chọn được mà thương hiệu nước hoa quen thuộc trước khi tính đến việc mùi hương đó có phù hợp với bạn hay không.\r\n\r\nMỗi thương hiệu nước hoa sẽ một phong cách và sáng chế riêng mùi hương cho mình. Từ bình dị đến sang trọng đăng cấp thì phân khúc nào cũng có giá trị mà hương thơm mang lại cho bạn.\r\n\r\nDưới đây có thể là những cái tên quen thuộc trong làng nước hoa thế giới mà ít nhất bạn cũng đã nghe một lần.\r\n<ol>\r\n \t<li><a href=\"http://mfparis.vn/thuong-hieu/chanel/\">Chanel</a></li>\r\n \t<li><a href=\"https://mfparis.vn/thuong-hieu/dior/\">Dior</a></li>\r\n \t<li><a href=\"https://mfparis.vn/thuong-hieu/gucci/\">Gucci</a></li>\r\n \t<li><a href=\"https://mfparis.vn/thuong-hieu/yves-saint-laurent/\">Yves Saint Laurent</a></li>\r\n \t<li><a href=\"https://mfparis.vn/thuong-hieu/tom-ford/\">Tom Ford</a></li>\r\n \t<li><a href=\"https://mfparis.vn/thuong-hieu/versace/\">Versace</a></li>\r\n \t<li><a href=\"https://mfparis.vn/thuong-hieu/prada/\">Prada</a></li>\r\n \t<li><a href=\"https://mfparis.vn/thuong-hieu/calvin-klein/\">Calvin Klein</a></li>\r\n \t<li><a href=\"https://mfparis.vn/thuong-hieu/marc-jacobs/\">Marc Jacobs</a></li>\r\n \t<li><a href=\"https://mfparis.vn/thuong-hieu/giorgio-armani/\">Giorgio Armani</a></li>\r\n</ol>\r\n<h3>8. Phân loại nước hoa niche và nước hoa thiết kế</h3>\r\nKhi bạn đã đọc đến đây thì khả năng phân loại nước hoa của bạn đang ở một tầm cao hơn một số tín đồ khác. Vì ở phân loại này có thể giúp bạn lựa chọn và tìm kiếm cho mình một bộ sưu tập nước hoa kì bí riệng biệt chứ không còn đại trà và phổ thông nữa.\r\n<h3>Nước hoa niche là:</h3>\r\nĐịnh nghĩa nước hoa niche hay còn gọi là nước hoa ngành lách, là những thương hiệu và công ty chỉ sản xuất nước hoa hoặc kèm theo nên thơm với những nguyên liệu quý hiếm và rất rất hạn chế về số lượng sản phẩm sản xuất ra trên thế giới.\r\n\r\nBên cạnh đó với những công thức và nguyên liệu quý hiếm nên nước hoa niche cũng rất kén chọn khách hàng. Không phải ai cũng thích những loại nước hoa niche vì mùi hương và thiết kế rất khác biệt. Bạn có thể tham khảo thêm ở link bên dưới để hiểu hơn về nó.\r\n\r\nXem thêm:\r\n<ul>\r\n \t<li><a href=\"https://mfparis.vn/25-dieu-ban-co-the-chua-biet-ve-nuoc-hoa-niche/\">Nước hoa niche là gì ?</a></li>\r\n \t<li><a href=\"https://mfparis.vn/dung-mua-10-chai-nuoc-hoa-niche-ban-chay-neu-chua-doc/\">Top 10 Chai Nước Hoa Niche Bán Chạy</a></li>\r\n</ul>\r\n<h3>Nước hoa thiết kế ?</h3>\r\nNước hoa thiết kế hay còn gọi là nước hoa designer được chế tạo ra để miêu tả bộ sưu tập thời trang hoặc túi xách của những công ty thời trang đình.\r\n\r\nNhững mùi hương nước hoa thiết kế hướng đến sự đại trà và dễ dàng lấy lòng khách hàng của mình. Nên nếu lựa chọn nước hoa cho người mới sử dụng thì nước hoa thiết kế đáng để bạn trải nghiệm.\r\n\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Xem thêm:</span></span></span></span>\r\n<ul>\r\n \t<li><a href=\"https://mfparis.vn/25-dieu-ban-co-the-chua-biet-ve-nuoc-hoa-niche/\">Nước hoa thiết kế</a></li>\r\n</ul>\r\n<h2>10. Cách sử dụng nước hoa.</h2>\r\n<ul data-sourcepos=\"13:1-16:0\">\r\n \t<li data-sourcepos=\"13:1-13:74\">Vị trí: Xịt vào những điểm có mạch đập như cổ tay, cổ, gáy, sau tai.</li>\r\n \t<li data-sourcepos=\"14:1-14:51\">Khoảng cách: Xịt cách cơ thể khoảng 10-15 cm.</li>\r\n \t<li data-sourcepos=\"15:1-16:0\">Lượng nước hoa: Xịt 1-2 lần cho mỗi vị trí.</li>\r\n</ul>\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Xem thêm:</span></span></span></span>\r\n<ul>\r\n \t<li><a href=\"https://mfparis.vn/13-cach-su-dung-nuoc-hoa-dung-cach/\">13 mẹo xịt nước hoa giúp lưu hương lâu hơn</a></li>\r\n</ul>\r\n<h2><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">11. Cách chọn nước hoa:</span></span></h2>\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Nước hoa là một phần thiết yếu trong thói quen chải chuốt của một người đàn ông và có thể tác động đáng kể đến sự tự tin và sức hấp dẫn tổng thể của một người. Với rất nhiều tùy chọn có sẵn trên</span></span>\r\n\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Chọn đúng loại nước hoa có thể nâng cao phong cách cá nhân của một người đàn ông và để lại ấn tượng lâu dài với những người xung quanh. Mùi hương của nước hoa cũng có thể gợi lên những cảm xúc và ký ức nhất định, khiến nó trở thành một công cụ đắc lực trong cuộc sống cá nhân và nghề nghiệp của một người.</span></span>\r\n\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Cho dù bạn đang tìm kiếm một mùi hương tươi mát, sắc nét cho một ngày đi chơi bình thường hay một mùi hương tinh tế hơn cho một sự kiện trang trọng, thì luôn có một loại nước hoa hoàn hảo dành cho bạn.</span></span>\r\n\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Trong blog này, chúng tôi sẽ hướng dẫn bạn từng bước của quy trình </span></span><em><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">cách chọn nước hoa phù hợp</span></span></em><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">, từ việc hiểu các loại nước hoa khác nhau đến xác định sở thích về mùi hương của bạn, để giúp bạn tìm ra loại nước hoa hoàn hảo cho mình. Bắt đầu nào!</span></span>\r\n\r\n<span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Xem thêm: </span></span><a href=\"https://mfparis.vn/huong-dan-cach-chon-nuoc-hoa-phu-hop-tu-a-den-z/\"><span style=\"vertical-align: inherit\"><span style=\"vertical-align: inherit\">Hướng dẫn cách chọn nước hoa từ A-Z</span></span></a>\r\n<h2>12: Địa điểm bán nước hoa chính hãng:</h2>\r\nNếu bạn chưa tìm được địa điểm bán nước hoa chính hãng an tâm mua sắm, bạn có thể ghé thắm cửa hàng của MF Paris - chúng tôi chuyên cung cấp nước hoa chính hãng từ Pháp với mẫu mã đa dạng và chính sách bảo hành mùi hương đến giọt cuối cùng. Với kinh nghiệm hơn 6 trong ngành nước hoa, chúng tôi sẽ mang đến bạn những trải nghiệm hương thơm hữu ích và xứng đáng từng xu.\r\n\r\nThông tin mua hàng:\r\n<ul>\r\n \t<li>Địa chỉ: 220/24 Nguyễn Oanh, Phường 17, Quận Gò Vấp, Hồ Chí Minh</li>\r\n \t<li>Số điện thoại: 0792979299</li>\r\n \t<li>Fanpage: <a href=\"https://facebook.com/www.mfparis.vn\">Nước hoa và mỹ phẩm MF Paris</a></li>\r\n</ul>\r\n\r\n<hr />\r\n\r\nNước hoa không chỉ đơn thuần là một sản phẩm làm đẹp, mà còn là người bạn đồng hành giúp bạn tỏa sáng và để lại dấu ấn trong từng khoảnh khắc. Mỗi mùi hương đều mang theo sức mạnh đặc biệt, khơi dậy cảm xúc và kể những câu chuyện riêng biệt.\r\n\r\nHãy để nước hoa trở thành tiếng nói thầm lặng, thể hiện phong cách và bản sắc của bạn. Và đừng ngần ngại khám phá, trải nghiệm để tìm ra hương thơm khiến bạn cảm thấy tự tin và quyến rũ nhất!",
+    "display": "products",
+    "image": {
+      "id": 26267,
+      "date_created": "2023-07-07T11:33:17",
+      "date_created_gmt": "2023-07-07T04:33:17",
+      "date_modified": "2023-07-07T11:33:17",
+      "date_modified_gmt": "2023-07-07T04:33:17",
+      "src": "https://mfparis.vn/wp-content/uploads/2023/07/danh-muc-nuoc-hoa.jpg",
+      "name": "danh-muc-nuoc-hoa",
+      "alt": ""
+    },
+    "menu_order": 0,
+    "count": 1263,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 620,
+    "name": "Nước Hoa Chiết",
+    "slug": "nuoc-hoa-chiet",
+    "parent": 5928,
+    "description": "[html_block id=\"48051\"]",
+    "display": "products",
+    "image": {
+      "id": 29904,
+      "date_created": "2023-11-14T15:02:59",
+      "date_created_gmt": "2023-11-14T08:02:59",
+      "date_modified": "2023-11-14T15:02:59",
+      "date_modified_gmt": "2023-11-14T08:02:59",
+      "src": "https://mfparis.vn/wp-content/uploads/2023/11/6337ba3b6c585-nuoc-hoa-mini-nu-yves-saint-laurent-mon-paris-couture-edp-chiet-10ml-boshop.jpg",
+      "name": "6337ba3b6c585-nuoc-hoa-mini-nu-yves-saint-laurent-mon-paris-couture-edp-chiet-10ml-boshop",
+      "alt": ""
+    },
+    "menu_order": 0,
+    "count": 30,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/620",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+        }
+      ]
+    }
+  },
+  {
+    "id": 562,
+    "name": "Nước Hoa Designer",
+    "slug": "nuoc-hoa-designer",
+    "parent": 5928,
+    "description": "[html_block id=\"48037\"]",
+    "display": "products",
+    "image": {
+      "id": 18039,
+      "date_created": "2022-04-13T16:59:01",
+      "date_created_gmt": "2022-04-13T09:59:01",
+      "date_modified": "2023-04-11T16:21:09",
+      "date_modified_gmt": "2023-04-11T09:21:09",
+      "src": "https://mfparis.vn/wp-content/uploads/2022/04/so-sanh-nuoc-hoa-chanel-coco-mademoiselle-va-no5-2YuAPqlRQHUx4M8i-mfparis.jpg",
+      "name": "Chanel Coco Mademoiselle Vs No5",
+      "alt": "Chanel Coco Mademoiselle Vs No5"
+    },
+    "menu_order": 0,
+    "count": 149,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/562",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7777,
+    "name": "Nước hoa hồng",
+    "slug": "nuoc-hoa-hong",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 21014,
+      "date_created": "2022-10-29T16:54:10",
+      "date_created_gmt": "2022-10-29T09:54:10",
+      "date_modified": "2023-04-10T19:03:35",
+      "date_modified_gmt": "2023-04-10T12:03:35",
+      "src": "https://mfparis.vn/wp-content/uploads/2022/10/nuoc-hoa-hong-sanoflore-aqua-magnifica-toner.jpg",
+      "name": "Nước Hoa Hồng Sanoflore Aqua Magnifica Toner",
+      "alt": "Nước Hoa Hồng Sanoflore Aqua Magnifica Toner"
+    },
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7777",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 4577,
+    "name": "Nước Hoa Mini",
+    "slug": "nuoc-hoa-mini",
+    "parent": 5928,
+    "description": "[html_block id=\"48053\"]",
+    "display": "products",
+    "image": {
+      "id": 23375,
+      "date_created": "2023-03-01T17:39:15",
+      "date_created_gmt": "2023-03-01T10:39:15",
+      "date_modified": "2023-03-01T17:39:33",
+      "date_modified_gmt": "2023-03-01T10:39:33",
+      "src": "https://mfparis.vn/wp-content/uploads/2023/03/2011211580-nuoc-hoa-mini-replica-jazz-club-chinh-hang.jpg",
+      "name": "Nước Hoa Mini Replica Jazz Club 7ml",
+      "alt": "Nước Hoa Mini Replica Jazz Club 7ml"
+    },
+    "menu_order": 0,
+    "count": 83,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/4577",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7112,
+    "name": "Nước Hoa Mỹ",
+    "slug": "nuoc-hoa-my",
+    "parent": 0,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 26,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7112",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8025,
+    "name": "Nước hoa nam",
+    "slug": "nuoc-hoa-nam",
+    "parent": 5928,
+    "description": "Trong thế giới hiện đại, nước hoa đã không còn là đặc quyền của riêng phái đẹp. Đối với nam giới, nước hoa không chỉ đơn thuần là một phụ kiện làm đẹp, mà còn là một công cụ đắc lực giúp thể hiện cá tính, tăng cường sự tự tin và gây ấn tượng mạnh mẽ.\r\n\r\nMột mùi hương tinh tế, phù hợp sẽ giúp bạn ghi dấu ấn trong lòng người đối diện, tạo nên sự cuốn hút khó cưỡng và nâng tầm phong cách sống. Việc lựa chọn <a href=\"https://mfparis.vn/nuoc-hoa-nam/\">nước hoa nam</a> không chỉ là sự lựa chọn về mùi hương, mà còn là sự thể hiện gu thẩm mỹ, cá tính và thậm chí là cả câu chuyện riêng của bạn.\r\n\r\nHôm nay hãy cùng chúng tôi, review nước hoa nam đang thịnh hành và chọn cho mình một mùi hương phù hợp nhé.\r\n<h2>1. Xu hướng nước hoa nam</h2>\r\n<strong>Xu hướng nước hoa nam hiện nay đang rất đa dạng và phong phú</strong>. Bên cạnh những mùi hương cổ điển, sang trọng, thể hiện sự lịch lãm và chín chắn, xu hướng hiện đại đang hướng đến sự kết hợp tinh tế giữa các tầng hương, tạo nên những mùi hương độc đáo, cá tính và phù hợp với nhiều phong cách sống khác nhau.\r\n\r\nSự pha trộn giữa các nốt hương phương Đông bí ẩn, hương gỗ ấm áp, hương biển tươi mát, hay hương trái cây ngọt ngào… đang tạo nên một \"vũ trụ\" mùi hương phong phú, đáp ứng mọi sở thích và gu thẩm mỹ. Không chỉ vậy, việc lựa chọn nước hoa nam thơm lâu cũng đang được rất nhiều quý ông quan tâm, để tự tin tỏa sáng suốt cả ngày dài.\r\n\r\nTừ những chai nước hoa nam cao cấp đến những dòng nước hoa có mức giá phải chăng, thị trường nước hoa nam hiện nay vô cùng sôi động và đa dạng, đáp ứng mọi nhu cầu của người dùng.\r\n\r\n<em>Dưới đây là gợi ý top nước hoa nam mà bạn phải sở hữu 1 chai cho riêng mình.</em>\r\n<h2>2. Top 17 nước hoa nam bạn phải sở hữu ít nhất 1 chai</h2>\r\n<h3>1. Armani Acqua Di Gio Eau De Parfum</h3>\r\nVào năm 2022, <a href=\"https://mfparis.vn/giorgio-armani-acqua-di-gio-eau-de-parfum/\">Acqua Di Gio Eau De Parfum</a> của <a href=\"https://mfparis.vn/thuong-hieu/giorgio-armani/\">Giorgio Armani</a> đã bán cực chạy dạo gần đây.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2024/10/acqua-di-gio-edp.jpg\"><img class=\"aligncenter size-full wp-image-38606\" src=\"https://mfparis.vn/wp-content/uploads/2024/10/acqua-di-gio-edp.jpg\" alt=\"Acqua di Gio EDP\" width=\"1069\" height=\"1069\" /></a>\r\n\r\n&nbsp;\r\n\r\nVượt qua các bản flanker trước đó với khuynh hướng hiện đại, phiên bản này không chỉ tái tạo mùi hương cổ điển mà còn làm phong phú thêm hương thơm sâu hơn, tinh chất thảo dược hơn.\r\n\r\nKhả năng tỏa hương mạnh mẽ và độ bền lâu dài của nó vượt trội so với những phiên bản khác của nó, lưu hương đến tám giờ và trở thành lựa chọn ưa thích cho sự ấm áp nhẹ nhàng của mùa xuân.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Mùa xuân</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Tươi &amp; Thảo Dược</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>8 giờ/ 2m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>2. Narciso Rodriguez For Him Bleu Noir Parfum</h3>\r\n<a href=\"https://mfparis.vn/narciso-rodriguez-for-him-bleu-noir-parfum/\">Bleu Noir Parfum</a> của <a href=\"https://mfparis.vn/thuong-hieu/narciso-rodriguez/\">Narciso Rodriguez</a> là dòng nước hoa nam narciso nổi bật trong hạng mục mùi hương phấn với sự pha trộn tinh tế giữa hương cam quýt và hoa diên vĩ, dẫn đến sự kết hợp sang trọng giữa da lộn và sô cô la đen, được hỗ trợ bởi gỗ xạ hương, đất.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2023/06/narciso-rodriguez-for-him-bleu-noir-parfum-20220709193057_IMG_1974-01_1024x1024_2x.jpg\"><img class=\"aligncenter wp-image-25936 size-full\" src=\"https://mfparis.vn/wp-content/uploads/2023/06/narciso-rodriguez-for-him-bleu-noir-parfum-20220709193057_IMG_1974-01_1024x1024_2x.jpg\" alt=\"Narciso Rodriguez For Him Bleu Noir Parfum 100ml\" width=\"1200\" height=\"1200\" /></a>\r\n\r\nHương thơm nam tính, mạnh mẽ này là sự lựa chọn phù hợp cho những buổi tối mong muốn có ấn tượng lâu dài.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Buổi tối/Đêm mùa đông</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Phấn, thân gỗ, hướng mống mắt</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>8 giờ/2m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>3. Jean Paul Gaultier Le Beau Le Parfum</h3>\r\nNước hoa nam JPG Le Beau Le Parfum, gây bất ngờ với mùi hương hổ phách và gỗ, khác hẳn với những loại nước hoa mùa xuân đặc trưng. Nó có sự pha trộn độc đáo của Dứa, Dừa và Đậu Tonka, phù hợp cho những ngày ấm áp đầu năm.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2022/08/nuoc-hoa-nam-jpg-le-beau-le-parfum-125ml-mfparis.jpg\"><img class=\"aligncenter wp-image-20074 size-full\" src=\"https://mfparis.vn/wp-content/uploads/2022/08/nuoc-hoa-nam-jpg-le-beau-le-parfum-125ml-mfparis.jpg\" alt=\"Jean Paul Gaultier Le Beau Le Parfum\" width=\"739\" height=\"739\" /></a>\r\n\r\nNó là dòng nước hoa nam phù hợp với buổi hẹn hò ban đêm và trang phục hàng ngày,một sự lựa chọn thú vị từ dòng nước hoa Le Beau của <a href=\"https://mfparis.vn/thuong-hieu/jean-paul-gaultier/\">Jean Paul Gaultier</a>.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Mùa xuân, đầu mùa hè</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Phấn, thân gỗ, hướng mống mắt</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>8 giờ/2m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>4. Givenchy Gentleman Eau De Parfum Reserve Privee</h3>\r\n<a href=\"https://mfparis.vn/nuoc-hoa-nam-givenchy-gentleman-reserve-privee/\">Givenchy Gentleman Eau De Parfum Reserve Privee</a> nổi bật là một trong những sản phẩm mới ra mắt tốt nhất năm nay. Lấy cảm hứng từ rượu whisky, nó mang lại trải nghiệm khứu giác phong phú.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2023/07/nuoc-hoa-nam-givenchy-gentleman-reserve-privee-EfzbvYFPCbLmtIsv.jpg\"><img class=\"aligncenter size-full wp-image-26713\" src=\"https://mfparis.vn/wp-content/uploads/2023/07/nuoc-hoa-nam-givenchy-gentleman-reserve-privee-EfzbvYFPCbLmtIsv.jpg\" alt=\"Givenchy Gentleman Réserve Privée\" width=\"1015\" height=\"1015\" /></a>\r\n\r\nPhần mở đầu cho thấy hương hạt dẻ pha chút rượu whisky và cam bergamot tươi mát. Khi phát triển, vị hạt dẻ hòa quyện tuyệt đẹp với hoa diên vĩ, tạo ra một mùi thơm hấp dẫn. Rượu whisky đọng lại nhưng không quá mạnh.\r\n\r\nỞ nốt hương khô, hương gỗ nổi lên cùng với sự kết hợp giữa hạt dẻ/hoa diên vĩ, tạo nên một bố cục cân bằng. Đó là một hương thơm kéo dài và lan tỏa, phù hợp cho những đêm mùa thu và mùa đông, tạo ấn tượng mạnh mẽ đầu tiên.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Đêm thu, đêm đông</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Gỗ, Da &amp; Rượu</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>9 tiếng/2m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>5. Prada Luna Rossa Ocean Eau de Parfum</h3>\r\n<a href=\"https://mfparis.vn/prada-luna-rossa-ocean-eau-de-toilette/\">Prada Luna Rossa Ocean Eau de Parfum</a>, sản phẩm mới nhất của dòng nước hoa nam Luna Rossa, đang thu hút sự chú ý nhờ đặc tính độc đáo của nó.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2022/11/nuoc-hoa-nam-prada-luna-rossa-ocean-eau-de-toilette.jpg\"><img class=\"size-full wp-image-21472\" src=\"https://mfparis.vn/wp-content/uploads/2022/11/nuoc-hoa-nam-prada-luna-rossa-ocean-eau-de-toilette.jpg\" alt=\"Prada Luna Rossa Ocean Eau de toillette\" width=\"741\" height=\"741\" /></a>\r\n\r\nMùi hương hướng đến thành phần thủy sinh và mang đến mùi hương đậm hơn, màu hổ phách và gợi cảm. Nó dường như được thiết kế để sử dụng vào buổi tối và buổi hẹn hò ban đêm.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Buổi tối, Hẹn hò</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Hổ phách, gợi cảm</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>5-6 giờ/1m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>6. Amouage Overture Man</h3>\r\nAmouage Overture Man là một hương thơm quyết đoán và dễ chịu nhất, đáng chú ý. Thiết kế sang trọng của dòng <a href=\"https://mfparis.vn/nuoc-hoa-niche/\">nước hoa niche</a>, mang đến mùi hương quyến rũ.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2023/07/amouage-overture-man-eau-de-parfum-dQu91j4AtMRLahRJ.jpg\"><img class=\"aligncenter size-full wp-image-25951\" src=\"https://mfparis.vn/wp-content/uploads/2023/07/amouage-overture-man-eau-de-parfum-dQu91j4AtMRLahRJ.jpg\" alt=\"Amouage Overture Man Eau de Parfum\" width=\"1200\" height=\"900\" /></a>\r\n\r\n<a href=\"https://mfparis.vn/amouage-overture-man-eau-de-parfum/\">Overture Man</a> có mùi nghệ tây, bạch đậu khấu và thì là góp phần tạo nên vị cam quýt và độ tươi cay, trong khi rượu cognac tạo thêm sự ấm áp, vị khói và hương gỗ sâu lắng.\r\n\r\nPhù hợp cho những người đàn ông trưởng thành, và những đêm mùa đông lạnh giá, với khả năng lưu hương và tỏa hương khủng khiếp.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Đêm mùa đông</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Da thuộc &amp; cay</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>10 giờ/3m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>7. Roja Elysium</h3>\r\n<a href=\"https://mfparis.vn/nuoc-hoa-nam-roja-parfums-elysium-eau-de-parfum/\">Roja Elysium</a> được Roja Dove ra mắt vào năm 2017, là một loại nước hoa nam đỉnh cao thời thượng. Bằng sự pha trộn tươi mát, giòn của chanh, bưởi và hạt tiêu hồng, nổi bật với hương xạ hương độc đáo đóng vai trò như lớp hương đầu.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2022/09/nuoc-hoa-nam-roja-parfums-elysium-eyirZqeCPt6w5S1x-mfparis.jpg\"><img class=\"size-full wp-image-20251\" src=\"https://mfparis.vn/wp-content/uploads/2022/09/nuoc-hoa-nam-roja-parfums-elysium-eyirZqeCPt6w5S1x-mfparis.jpg\" alt=\"Nước hoa nam Roja Parfums Elysium\" width=\"1200\" height=\"1200\" /></a>\r\n\r\nỞ giữa hương hoa và trái cây, dẫn đến hương cuối nam tính , da thuộc của cỏ vetiver, gỗ tuyết tùng và long diên hương.\r\n\r\nElysium là mùi hương nước hoa nam mùa xuân, mang lại độ lưu hương 6-8 giờ với 3-4 giờ tỏa hương liên tục. Sử dụng vào ban ngày, mùi hương sang trọng đẳng cấp và khác biệt.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Mùa xuân, Ban ngày</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Thơm, cam quýt, Fougere</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>7 giờ/ 2m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>8. Creed Royal Water</h3>\r\nCreed Royal Water là dòng nước hoa nam mùa hè, một viên ngọc ẩn trong loạt nước hoa mùa hè của Creed.\r\n\r\nMở đầu với sự pha trộn sôi động của cam quýt và bạc hà, tạo ra một hương thơm xanh, tươi mát và nồng nàn. Tiếp đó là hương cây bách xù và húng quế, thêm hương thảo mộc, vị cay tươi bổ sung cho hương cam quýt còn sót lại.\r\n\r\nCuối cùng, xạ hương và long diên hương đặc trưng của Creed. Mùi hương trưởng thành, lịch lãm hơn dành cho những ai thích mùi hương cay nồng, tươi mát, bất kể tuổi tác.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Mùa hè, Mọi lứa tuổi</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Xanh &amp; Ozon</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>6 giờ/1m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>9. Dior Sauvage Elixir</h3>\r\n<a href=\"https://mfparis.vn/nuoc-hoa-nam-dior-sauvage-elixir-eau-de-parfum/\">Dior Sauvage Elixir</a>, phiên bản thứ tư và sang trọng nhất trong dòng Sauvage, tạo nên sự khác biệt như một loại nước hoa nam độc đáo như nước hoa niche.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2021/12/nuoc-hoa-chinh-hang-phap-dior-sauvage-elixir-edp-60ml.jpg\"><img class=\"aligncenter size-full wp-image-15574\" src=\"https://mfparis.vn/wp-content/uploads/2021/12/nuoc-hoa-chinh-hang-phap-dior-sauvage-elixir-edp-60ml.jpg\" alt=\"Dior Sauvage Elixir Eau de Parfum 60ml\" width=\"1000\" height=\"1000\" /></a>\r\n\r\nMở đầu bằng hương bưởi thú vị, được bổ sung bởi hạt nhục đậu khấu cay và quế. Hoa oải hương là điểm nổi bật của hương thơm. Hương cuối mang đến hương thơm phong phú, ấm áp, hương gỗ và vị cay, hòa quyện giữa cam thảo, gỗ đàn hương, hổ phách và hoắc hương.\r\n\r\nDior Sauvage Elixir gợi lên nỗi hoài niệm hiện đại hóa về nước hoa của thập niên 80 và 90. Về mặt hiệu suất, nó mạnh mẽ với độ lưu hương lâu dài và tỏa hương xa hương nhiều. Elixir phù hợp cho mùa đông và phù hợp hơn với trang phục buổi tối.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Trang phục mùa đông, buổi tối</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Cay &amp; Tươi</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>12 giờ/2m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>9. Mancera Cedrat Boise</h3>\r\nPierre Montale, người sáng tạo ra Montale và Mancera, đã tạo ra <a href=\"https://mfparis.vn/nuoc-hoa-unisex-mancera-cedrat-boise-eau-de-parfum/\">Cedrat Boise</a>, một loại nước hoa nam mùa xuân ra mắt vào năm 2011.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2022/03/nuoc-hoa-mancera-cedrat-boise-luu-huong-bao-lau-ARNiYQPjhZUDg41M-mfparis-e1725356557666.jpg\"><img class=\"aligncenter size-full wp-image-16747\" src=\"https://mfparis.vn/wp-content/uploads/2022/03/nuoc-hoa-mancera-cedrat-boise-luu-huong-bao-lau-ARNiYQPjhZUDg41M-mfparis-e1725356557666.jpg\" alt=\"nước hoa nam pháp chính hãng Mancera Cedrat Boise luu hương bao lau\" width=\"898\" height=\"898\" /></a>\r\n\r\nNó đầu với hương chanh Sicilia và hương trái cây, gỗ tuyết tùng và da thuộc, tạo nên hương vị kem, trái cây, gỗ và hơi khói.\r\n\r\nHương thơm phù hợp cho ban ngày và ban đêm. Nó tự hào về độ lưu hương và độ tỏa hơn cả Creed Aventus.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Ban ngày mùa xuân, linh hoạt cho ban đêm</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Hương gỗ, Hương khói, Hương trái cây</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>8 tiếng/2m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>10. Armaf Club De Nuit Intense Man (CDNIM)</h3>\r\nMột bản sao của creed aventus nhưng độ bám tỏa kinh khủng lên đến trên 8 tiếng. <a href=\"https://mfparis.vn/nuoc-hoa-nam-armaf-club-de-nuit-intense-chinh-hang/\">Club De Nuit Intense Man</a> là một <a href=\"https://mfparis.vn/top-13-chai-nuoc-hoa-nam-chinh-hang-gia-re/\">nước hoa nam giá rẻ</a> dành cho mùa xuân xứng đáng được trải nghiệm và hiện tại nó đang đứng đầu danh sách nước hoa dubai bán chạy nhất tại việt Nam.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2022/02/nuoc-hoa-nam-armaf-club-de-nuit-intense-man-chinh-hang-phap-255973336_1256794441450163_6731649083160651334_mfparis.jpg\"><img class=\"aligncenter size-full wp-image-16486\" src=\"https://mfparis.vn/wp-content/uploads/2022/02/nuoc-hoa-nam-armaf-club-de-nuit-intense-man-chinh-hang-phap-255973336_1256794441450163_6731649083160651334_mfparis.jpg\" alt=\"nước hoa nam armaf club de nuit intense man\" width=\"1080\" height=\"1078\" /></a>\r\n\r\nHương đầu là quả dứa nhưng không có hương khói, hương giữa là bạch dương và hương cuối là xạ hương.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Mùa xuân, những dịp linh hoạt</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Cam quýt, gỗ, trái cây</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>9 tiếng/2m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>11. Jean Paul Gaultier Le Male Le Parfum</h3>\r\n<a href=\"https://mfparis.vn/jean-paul-gaultier-le-male-le-parfum/\">Le Male Le Parfum</a> là dòng <a href=\"https://mfparis.vn/nuoc-hoa-phap/\">nước hoa Pháp</a>, toát lên vẻ ngoài nam tính mạnh mẽ phù hợp cho mùa đông hoặc mùa thu do tính chất ngọt ngào và khá linh hoạt.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2022/12/nuoc-hoa-le-male-le-parfum-eM6Z9NddqEwi0PhJ.jpg\"><img class=\"aligncenter size-full wp-image-22184\" src=\"https://mfparis.vn/wp-content/uploads/2022/12/nuoc-hoa-le-male-le-parfum-eM6Z9NddqEwi0PhJ.jpg\" alt=\"Nước Hoa Le Male Le Parfum\" width=\"801\" height=\"1200\" /></a>\r\n\r\nMở đầu bằng sự kết hợp ngọt ngào, đậm đà và bột của vani và hoa oải hương, tạo nên vị ngọt ban đầu đầy lôi cuốn. Khi phát triển, nó bộc lộ đặc tính ấm áp, cay nồng, cuối cùng chuyển sang hương gỗ và hổ phách ổn định, thú vị, với hương vani dai dẳng trong suốt vòng đời của nó.\r\n\r\nMùi hương phù hợp cho đi làm văn phòng hoặc đi câu lạc bộ. Về độ lưu hương trên 7 giờ và tỏa hơn 1m quá ok.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Mùa đông, mùa thu, giản dị và hẹn hò</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Vị cay &amp; hổ phách</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>7 giờ/2m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>12. Dior Homme Sport</h3>\r\n<a href=\"https://mfparis.vn/nuoc-hoa-nam-dior-homme-sport-eau-de-toillette/\">Dior Homme Sport</a>, thuộc dòng nước hoa nam Dior Homme ra mắt năm 2021. Một mùi hương sạch sẽ dành cho mùa hè.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2022/05/nuoc-hoa-nam-dior-homme-sport-edt-75ml-1-mfparis.jpg\"><img class=\"aligncenter size-full wp-image-18510\" src=\"https://mfparis.vn/wp-content/uploads/2022/05/nuoc-hoa-nam-dior-homme-sport-edt-75ml-1-mfparis.jpg\" alt=\"Dior Homme Sport Eau de Toilette\" width=\"740\" height=\"740\" /></a>\r\n\r\nHương chanh là hương chủ đạo, sau đó phát triển thành hương gỗ được nhấn mạnh bởi hương hạt tiêu và hương elemi.\r\n\r\nDior Homme Sport phù hợp cho người đàn ông trưởng thành, ăn sử dụng lịch sự và bạn có thể mua mà không cần thử.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Sự kiện mùa hè, xã hội và trang trọng</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Vị cay tươi và hương gỗ</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>6 giờ/1m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>13. Yves Saint Laurent Y</h3>\r\n<a href=\"https://mfparis.vn/nuoc-hoa-nam-yves-saint-laurent-y-eau-de-parfum/\">Yves Saint Laurent Y</a> dòng <a href=\"https://mfparis.vn/huong-dan-chon-mua-nuoc-hoa-ysl-nam-phu-hop/\">nước hoa nam YSL bán chạy</a> nhất ra mắt vào năm 2018. Sự tươi mát và dễ chịu, phù hợp cho những ngày tươi sáng, không căng thẳng.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2021/08/z2581773336850_d4767a072ee3c1350632e671e0e984fd.jpg\"><img class=\"aligncenter size-full wp-image-13959\" src=\"https://mfparis.vn/wp-content/uploads/2021/08/z2581773336850_d4767a072ee3c1350632e671e0e984fd.jpg\" alt=\"Yves Saint Laurent Y EDP 100ml\" width=\"900\" height=\"900\" /></a>\r\n\r\nPhần mở đầu chủ yếu là táo , dần dần chuyển sang sự pha trộn của cây xô thơm và gừng, được hỗ trợ bởi gỗ hổ phách ở lớp hương cuối.\r\n\r\nYSL Y là dòng nước hoa nam mùa xuân, mang đến sự cân bằng tuyệt vời về giá cả, hiệu suất và mùi hương.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Mùa xuân, hàng ngày</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Sắc nét, sạch sẽ, tươi mới</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>6 tiếng/2m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>14. Nautica Voyage</h3>\r\n<a href=\"https://mfparis.vn/nuoc-hoa-nam-nautica-voyage-eau-de-toilette/\">Nautica Voyage</a> là chai nước hoa nam bán chạy nhất trên Amazon, được ưa chuộng vì sức hấp dẫn lớn và tính linh hoạt trong nhiều dịp khác nhau.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2022/04/nuoc-hoa-nam-nautica-voyage-eau-de-toilette-100m-ab007e60c41a0a44530b4-mfparis.jpg\"><img class=\"aligncenter size-full wp-image-17796\" src=\"https://mfparis.vn/wp-content/uploads/2022/04/nuoc-hoa-nam-nautica-voyage-eau-de-toilette-100m-ab007e60c41a0a44530b4-mfparis.jpg\" alt=\"Nước hoa nam Nautica Voyage Eau de Toilette\" width=\"1284\" height=\"1284\" /></a>\r\n\r\nNó mở ra với hương thơm xanh gắt của táo và lá xanh, gợi nhớ đến mùi hương sạch sẽ, sảng khoái sau khi tắm. Sau đó, một hỗn hợp hoa trái cây, với hương phấn nhẹ và hương nước từ hoa sen và mimosa trong hương giữa.\r\n\r\nMột mùi hương giá rẻ mà ngon cho mùa hè đáng thử. Xem thêm: <a href=\"https://mfparis.vn/review-nuoc-hoa-nautica-voyage/\">review nautica voyage</a> để biết thêm chi tiết tại sao lại hot đến như vậy nhé.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Mùa hè, giản dị</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Xanh &amp; Tươi</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>4 tiếng/ 1m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>15. Prada Luna Rossa Black</h3>\r\n<a href=\"https://mfparis.vn/nuoc-hoa-nam-prada-luna-rossa-black-eau-de-parfum/\">Prada Luna Rossa Black</a> mùi hương nước hoa nam kinh điển cho mùa đông lạnh lẽo.\r\n\r\nHương đầu là cam bergamot đầy tinh tế, tiếp theo là bạch chỉ và hoắc hương ở giữa. Sự hòa quyện của coumarin, hổ phách và xạ hương tạo nên mùi hương hổ phách kem ấm áp, gợi cảm. Sự đơn giản mà quyến rũ của nó, lôi kéo bạn quay lại với nó nhiều lần.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2022/11/prada-luna-rossa-black-HC3VtEhyuvTmlDJf.jpg\"><img class=\"aligncenter size-full wp-image-21478\" src=\"https://mfparis.vn/wp-content/uploads/2022/11/prada-luna-rossa-black-HC3VtEhyuvTmlDJf.jpg\" alt=\"Prada Luna Rossa Black\" width=\"802\" height=\"802\" /></a>\r\n\r\nPhù hợp cho một buổi hẹn hò hoặc ăn tối trong thời tiết lạnh, tạo cảm giác thư giãn và thoải mái. Mùi hương sẽ giúp bạn tạo nên sự chú ý giữa đám đông rất đáng trải nghiệm.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Mùa đông, buổi tối</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Hổ phách &amp; Xạ hương</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>8 giờ/ 2m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>16. Azzaro Wanted By Night</h3>\r\n<a href=\"https://mfparis.vn/azzaro-wanted-by-night-eau-de-parfum/\">Azzaro Wanted By Night</a> là dòng nước hoa nam mùa đông tốt nhất với mùi hương quyến rũ sử dụng.\r\n\r\nHương mở đầu của quế và quýt và sau đó hương trầm, thuốc lá và tinh chất khói nhanh chóng làm chủ không gian. Nó phù hợp cho bất kỳ dịp mùa đông và những buổi hẹn hò quan trọng.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2024/10/doi-tuong-su-dung-azzaro-wanted-by-night.jpg\"><img class=\"aligncenter size-full wp-image-38434\" src=\"https://mfparis.vn/wp-content/uploads/2024/10/doi-tuong-su-dung-azzaro-wanted-by-night.jpg\" alt=\"Đối tượng sử dụng Azzaro Wanted by Night EDP\" width=\"1080\" height=\"1080\" /></a>\r\n\r\nWanted By Night thực sự là chai nước hoa nam giá rẻ mà chất lượng cực tốt. Đáng trải nghiệm!!\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Sự kiện mùa đông, buổi tối</td>\r\n</tr>\r\n<tr>\r\n<td>Hương thơm</td>\r\n<td>Rượu &amp; cay</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>6 tiếng/2m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h3>17. Montblanc Explorer</h3>\r\nMột bản sao khác của Creed Aventus, <a href=\"https://mfparis.vn/montblanc-explorer/\">Montblanc Explorer</a>, ra mắt vào năm 2019 với mức giá quá hời và mùi hương sang trọng và không có chút hóa học nào.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2022/03/nuoc-hoa-nam-chinh-hang-mont-blanc-explore-edp-100ml-IlYjj9xIabnFGbEj-mfparis.jpg\"><img class=\"aligncenter size-full wp-image-16774\" src=\"https://mfparis.vn/wp-content/uploads/2022/03/nuoc-hoa-nam-chinh-hang-mont-blanc-explore-edp-100ml-IlYjj9xIabnFGbEj-mfparis.jpg\" alt=\"Nước hoa Montblanc Explorer \" width=\"1200\" height=\"800\" /></a>\r\n\r\nHương thơm mở ra với một mùi hương tươi mát, cay nồng và chào đón nồng nhiệt, chuyển sang hương da thuộc và gỗ . Vị cay và ấm, bắt nguồn từ hạt tiêu hồng và cây xô thơm, tạo nên sự khác biệt và thú vị cho phần mở đầu hương trái cây.\r\n\r\nMontblanc Explorer một mùi hương đa dụng dễ dùng cho nhiều mùa khác nhau với mức giá quá rẻ đáng để trải nghiệm.\r\n<table>\r\n<tbody>\r\n<tr>\r\n<td>Thời điểm sử dụng</td>\r\n<td>Mùa hè, xuân, văn phòng, dạo phố</td>\r\n</tr>\r\n<tr>\r\n<td>Mùi hương</td>\r\n<td>Hương trái cây, tươi &amp; hương gỗ</td>\r\n</tr>\r\n<tr>\r\n<td>Độ bám tỏa</td>\r\n<td>6 tiếng/1m</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n<h2>3. Bí Quyết Chọn Nước Hoa Nam Thơm Lâu: Tìm Kiếm Mùi Hương \"Signature\"</h2>\r\nChọn nước hoa nam phù hợp không chỉ đơn thuần là lựa chọn mùi hương yêu thích mà còn là cách thể hiện cá tính, phong cách và gu thẩm mỹ. Để tìm được mùi hương \"signature\" hoàn hảo, hãy tham khảo những bí quyết sau:\r\n<h3>Các nhóm hương chính:</h3>\r\nThế giới nước hoa nam cao cấp vô cùng đa dạng với nhiều nhóm hương khác nhau. Việc hiểu rõ các nhóm hương sẽ giúp bạn dễ dàng lựa chọn mùi hương phù hợp với cá tính và sở thích.\r\n\r\n<strong>Woody (Hương gỗ):</strong> Gỗ đàn hương, gỗ tuyết tùng, gỗ guaiac… tạo nên mùi hương nam tính, trưởng thành và lịch lãm. Phù hợp với những quý ông thành đạt, yêu thích sự sang trọng và tinh tế. (Ví dụ: <a href=\"https://mfparis.vn/dior-sauvage-eau-de-toilette/\">Dior Sauvage</a>, <a href=\"https://mfparis.vn/nuoc-hoa-nam-chanel-bleu-de-chanel-edt/\">Bleu de Chanel</a>)\r\n<blockquote>Xem thêm: <a href=\"https://mfparis.vn/kham-pha-suc-hut-day-quyen-ru-cua-nuoc-hoa-mui-go/\">nước hoa mùi gỗ cho nam</a></blockquote>\r\n<strong>Fougère (Hương fougère):</strong> Sự kết hợp giữa hương lavender, coumarin và xạ hương tạo nên mùi hương tươi mát, nam tính và có chút cổ điển. Phù hợp với những người đàn ông năng động, yêu thích sự cổ điển pha lẫn hiện đại. (Ví dụ: <a href=\"https://mfparis.vn/yves-saint-laurent-la-nuit-de-l-homme-eau-de-toilette/\">YSL La Nuit de L'Homme</a>)\r\n\r\n<strong>Oriental (Hương phương Đông):</strong> Gỗ trầm hương, hổ phách, gia vị… tạo nên mùi hương ấm áp, bí ẩn và quyến rũ. Phù hợp với những người đàn ông bí ẩn, quyến rũ và muốn thể hiện sự mạnh mẽ của mình. (Ví dụ: <a href=\"https://mfparis.vn/nuoc-hoa-unisex-tom-ford-oud-wood-eau-de-parfum/\">Tom Ford Oud Wood</a>)\r\n\r\n<strong>Citrus (Hương cam chanh):</strong> Chanh, cam bergamot, bưởi… tạo nên mùi hương tươi mát, sảng khoái và năng động. Phù hợp với những người đàn ông năng động, yêu thích sự tươi trẻ và thoải mái. (Ví dụ: <a href=\"https://mfparis.vn/hermes-terre-d-hermes-eau-de-toilette/\">Hermès Terre d’hermes</a>)\r\n\r\n<strong>Leather (Hương da thuộc):</strong> Da thuộc, gỗ, gia vị… tạo nên mùi hương mạnh mẽ, gợi cảm và đầy nam tính. Phù hợp với những người đàn ông mạnh mẽ, quyến rũ và muốn thể hiện sự cá tính của mình. (Ví dụ: <a href=\"https://mfparis.vn/nuoc-hoa-nam-tom-ford-tuscan-leather-eau-de-parfum/\">Tom Ford Tuscan Leather</a>, <a href=\"https://mfparis.vn/nuoc-hoa-unisex-mancera-red-tobacco-eau-de-parfum/\">Mancera Red Tobacco</a>)\r\n\r\n<strong>Amber (Hương hổ phách):</strong> Hổ phách, vani, gỗ… tạo nên mùi hương ấm áp, sâu lắng và quyến rũ. Phù hợp với những người đàn ông bí ẩn, quyến rũ và muốn thể hiện sự trưởng thành của mình. (Ví dụ: <a href=\"https://mfparis.vn/nuoc-hoa-jean-paul-gaultier-le-male-elixir-chinh-hang/\">Jean Paul Gaultier Le Male Elixir</a>)\r\n<h3>Phong cách cá nhân:</h3>\r\nMùi hương cũng là một cách để thể hiện phong cách cá nhân.\r\n\r\n<strong>Lịch lãm và sang trọng:</strong> Chọn những mùi hương thuộc nhóm Woody, Oriental, với độ lưu hương lâu và tỏa hương tốt.\r\n\r\n<strong>Trẻ trung và năng động:</strong> Chọn những mùi hương thuộc nhóm Citrus, Fougère, với độ lưu hương vừa phải và tỏa hương nhẹ nhàng.\r\n\r\n<strong>Mạnh mẽ và nam tính:</strong> Chọn những mùi hương thuộc nhóm Leather, Woody, Oriental, với độ lưu hương lâu và tỏa hương mạnh mẽ.\r\n\r\n<strong>Cá tính và nổi bật:</strong> Chọn những mùi hương độc đáo, không quá phổ biến, thể hiện sự khác biệt.\r\n<h3>Dịp sử dụng:</h3>\r\nMùi hương cũng nên được lựa chọn sao cho phù hợp với từng dịp.\r\n\r\n<strong>Hàng ngày:</strong> Chọn những mùi hương nhẹ nhàng, tươi mát, không quá nồng.\r\n\r\n<strong>Dự tiệc:</strong> Chọn những mùi hương đậm đà, quyến rũ, với độ lưu hương lâu.\r\n\r\n<strong>Hẹn hò:</strong> Chọn những mùi hương ngọt ngào, gợi cảm, để tạo ấn tượng tốt với người đối diện.\r\n<blockquote>Xem thêm: <a href=\"https://mfparis.vn/bi-mat-chon-nuoc-hoa-cho-nam-huong-dan-chi-tiet/\">Cách chọn nước hoa cho nam</a></blockquote>\r\n<h2>4. Mua Nước Hoa Nam Chính Hãng: Đảm Bảo Chất Lượng Và Tránh Hàng Giả</h2>\r\nĐể đảm bảo mua được nước hoa nam chính hãng, chất lượng và tránh mua phải hàng giả, bạn nên lưu ý những điểm sau:\r\n\r\n<strong>Địa điểm mua hàng uy tín:</strong> Lựa chọn những cửa hàng chính hãng, website chính thức của thương hiệu, hoặc các sàn thương mại điện tử uy tín, có chính sách đổi trả rõ ràng. Tránh mua hàng ở những nơi không rõ nguồn gốc xuất xứ.\r\n\r\n<strong>Cách nhận biết hàng chính hãng:</strong> Kiểm tra kỹ bao bì, tem nhãn, mã vạch, tem chống hàng giả… So sánh với hình ảnh sản phẩm chính hãng trên website của thương hiệu. Quan sát chất lượng in ấn, mùi hương (nếu có thể thử trước khi mua), và kiểm tra số seri sản phẩm (nếu có).\r\n\r\n<hr />\r\n\r\nTop 17 nước hoa nam thơm lâu được giới thiệu trong bài viết này là những gợi ý hoàn hảo giúp bạn tìm được mùi hương \"signature\" của riêng mình. Hãy lựa chọn mùi hương phù hợp với cá tính, phong cách và dịp sử dụng để tự tin tỏa sáng.\r\n\r\n<em>Khám phá ngay nhiều loại nước hoa nam khác tại MF Paris nhé.</em>\r\n\r\n&nbsp;",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 258,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8025",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+        }
+      ]
+    }
+  },
+  {
+    "id": 561,
+    "name": "Nước Hoa Niche",
+    "slug": "nuoc-hoa-niche",
+    "parent": 5928,
+    "description": "[html_block id=\"48030\"]",
+    "display": "default",
+    "image": {
+      "id": 13490,
+      "date_created": "2021-08-12T18:34:40",
+      "date_created_gmt": "2021-08-12T11:34:40",
+      "date_modified": "2023-05-06T21:27:53",
+      "date_modified_gmt": "2023-05-06T14:27:53",
+      "src": "https://mfparis.vn/wp-content/uploads/2021/08/aventus-100ml-1500x1500new-1_1_1.png",
+      "name": "Creed Aventus For Him 100ml",
+      "alt": "Creed Aventus For Him 100ml"
+    },
+    "menu_order": 0,
+    "count": 141,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/561",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+        }
+      ]
+    }
+  },
+  {
+    "id": 63,
+    "name": "Nước Hoa Nữ",
+    "slug": "nuoc-hoa-nu",
+    "parent": 5928,
+    "description": "Nước hoa không chỉ là một sản phẩm làm đẹp mà còn là một phần quan trọng trong việc tạo nên phong cách và bản sắc cá nhân của mỗi người. Với hơn 600+ mã <a href=\"https://mfparis.vn/nuoc-hoa-nu/\"><strong>nước hoa nữ</strong></a> cao cấp.\r\n\r\n<strong>Marais de France (MF Paris)</strong> tự hào là điểm đến lý tưởng cho các quý bà muốn tìm kiếm một mùi hương đặc biệt, từ các thương hiệu nổi tiếng thế giới như <a href=\"https://mfparis.vn/thuong-hieu/dior/\">Dior</a>, <a href=\"https://mfparis.vn/thuong-hieu/gucci/\">Gucci</a>, <a href=\"https://mfparis.vn/thuong-hieu/hermes/\">Hermes</a>, <a href=\"https://mfparis.vn/thuong-hieu/versace/\">Versace</a>,<a href=\"https://mfparis.vn/thuong-hieu/creed/\"> Creed</a>, Roja và nhiều hơn nữa.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2024/04/nuoc-hoa-nu-480899.jpg\"><img class=\"aligncenter wp-image-33056 size-full\" title=\"Nước Hoa Nữ Chính Hãng Cao Cấp Hồ Chí Minh\" src=\"https://mfparis.vn/wp-content/uploads/2024/04/nuoc-hoa-nu-480899.jpg\" alt=\"Nước Hoa Nữ Chính Hãng Cao Cấp Hồ Chí Minh\" width=\"1200\" height=\"672\" /></a>\r\n\r\nMỗi mùi hương đều mang một câu chuyện riêng, một phong cách riêng biệt, giúp người dùng không chỉ nâng cao vẻ nữ tính, sang trọng mà còn rất tự tin trong mọi cuộc giao tiếp.\r\n\r\nSự đa dạng trong lựa chọn nước hoa tại <strong><a href=\"https://mfparis.vn/\">Marais de France</a> ( MF Paris)</strong> giúp mỗi quý bà có thể tìm thấy mùi hương phản ánh chính xác nhất cá tính và phong cách sống của mình.\r\n\r\nDù bạn theo đuổi một phong cách sang trọng, quyến rũ hay cá tính, năng động, chắc chắn sẽ có một loại nước hoa nữ phù hợp.\r\n\r\nĐội ngũ nhân viên nhiệt tình và am hiểu sẽ giúp bạn tìm kiếm và lựa chọn được mùi hương ưng ý nhất, đồng thời cung cấp những lời khuyên hữu ích về cách sử dụng và bảo quản nước hoa để mùi hương luôn tươi mới, lâu phai.\r\n<h2><strong>Sử dụng nước hoa nữ có cần thiết không?</strong></h2>\r\nCâu trả lời tất nhiên là có. Nhắc đến phái nữ thì nước hoa làm sao có thể bỏ quên được chứ. Nó là một phần quan trọng của sự quyến rũ và hấp dẫn của người phụ nữ.\r\n\r\nTrong thế giới hiện đại này, nước hoa nữ cao cấp đã trở thành biểu tượng không thể thiếu trong tủ đồ của mỗi người phụ nữ, như một lời nhắc nhở về sự quyến rũ và sức hấp dẫn của họ.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2024/04/nuoc-hoa-danh-cho-nu.jpeg\"><img class=\"aligncenter wp-image-33054 size-medium\" title=\"Top nước hoa nữ bán chạy\" src=\"https://mfparis.vn/wp-content/uploads/2024/04/nuoc-hoa-danh-cho-nu-600x400.jpeg\" alt=\"Những Chai nước hoa dành cho nữ\" width=\"600\" height=\"400\" /></a>\r\n\r\nNước hoa không chỉ là một phụ kiện thời trang, mà còn là một cách để phụ nữ tự tin khẳng định vẻ đẹp và phong cách của mình, như một bức tranh tinh tế vẽ lên bởi những giọt nước hoa nhẹ nhàng.\r\n\r\nKhi bạn mặc một bộ trang phục đẹp kết hợp cùng với một chút hương thơm dịu dàng, bạn sẽ không chỉ thu hút ánh nhìn của mọi người mà còn để lại trong họ những ấn tượng lãng mạn khó phai.\r\n\r\nMột vài giây đi qua, và họ sẽ nhớ mãi về vẻ đẹp và mùi hương tinh tế mà bạn mang lại - như một câu chuyện tình yêu dễ thương đượm hương sắc màu của nước hoa.\r\n<h2>Lợi ích khi sử dụng nước hoa nữ cao cấp</h2>\r\nNước hoa không chỉ đơn thuần là một sản phẩm làm đẹp mà còn là một phần quan trọng trong cuộc sống hàng ngày của phụ nữ, mang lại những lợi ích tuyệt vời không chỉ về mặt thẩm mỹ mà còn về mặt tinh thần.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2024/04/loi-ich-cua-viec-su-dung-nuoc-hoa-nu.jpg\"><img class=\"aligncenter wp-image-33052 size-full\" src=\"https://mfparis.vn/wp-content/uploads/2024/04/loi-ich-cua-viec-su-dung-nuoc-hoa-nu.jpg\" alt=\"Lợi ích của việc sử dụng nước hoa cho nữ\" width=\"1024\" height=\"736\" /></a>\r\n\r\nViệc lựa chọn và sử dụng nước hoa không chỉ giúp phụ nữ tăng cường sự tự tin trong mọi tình huống, mà còn giúp họ tạo ra những ấn tượng đầu tiên đáng nhớ. Một mùi hương ấn tượng không chỉ khiến người khác nhớ về bạn mà còn thể hiện sự tinh tế và phong cách của bản thân.\r\n\r\nThêm vào đó, nước hoa còn có khả năng nâng cao tâm trạng và giảm bớt căng thẳng trong cuộc sống hàng ngày. Những hương thơm nhẹ nhàng, dễ chịu có thể giúp tâm hồn thư giãn, mang lại cảm giác yên bình và hạnh phúc.\r\n\r\nĐiều này không chỉ giúp cải thiện tâm trạng mà còn có lợi cho sức khỏe tinh thần, giúp phụ nữ luôn giữ được thái độ tích cực và lạc quan.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2024/04/nuoc-hoa-nu-perfume-womens.jpg\"><img class=\"size-full wp-image-33057 aligncenter\" src=\"https://mfparis.vn/wp-content/uploads/2024/04/nuoc-hoa-nu-perfume-womens.jpg\" alt=\"Nước Hoa nữ perfume for women\" width=\"500\" height=\"400\" /></a>\r\n\r\nCuối cùng, việc chọn lựa nước hoa phù hợp còn giúp phản ánh cá tính và phong cách riêng biệt của mỗi người. Nước hoa không chỉ là điểm nhấn cho phong cách thời trang mà còn là cách để mỗi người phụ nữ thể hiện bản thân mình, qua đó tôn vinh vẻ đẹp và sự duyên dáng riêng có.\r\n\r\nNhững lợi ích mà nước hoa mang lại chính là lý do khiến nó trở thành một phần không thể thiếu trong cuộc sống hàng ngày của phụ nữ, giúp họ tỏa sáng và quyến rũ mỗi ngày.\r\n<h2><strong>Cách chọn nước hoa nữ phù hợp</strong></h2>\r\nDưới đây là một hướng dẫn chi tiết và dài dòng hơn về cách chọn nước hoa nữ phù hợp:\r\n<h3>1. Xác định loại hương thơm bạn thích:</h3>\r\nHãy bắt đầu bằng việc xác định loại hương thơm bạn thích trong nước hoa nữ:\r\n<ul>\r\n \t<li>Hương Hoa Cỏ: Tươi mát, nữ tính, dịu dàng (Ví dụ: hoa hồng, hoa nhài).</li>\r\n \t<li>Hương Trái Cây: Sôi động, tươi mới (Ví dụ: cam, quýt, dâu).</li>\r\n \t<li>Hương Gỗ: Ấm áp, gợi cảm, mạnh mẽ (Ví dụ: gỗ đàn hương, gỗ sồi).</li>\r\n \t<li>Hương Gourmand: Ngọt ngào, ấm áp, thân thuộc (Ví dụ: cacao, vani, sô cô la).</li>\r\n \t<li>Hương Oriental: Bí ẩn, gợi cảm, phong cách (Ví dụ: vani, hoắc hương).</li>\r\n</ul>\r\nMỗi loại hương thơm sẽ mang lại một cảm giác và trải nghiệm riêng, và sự kết hợp của chúng trong một loại nước hoa cụ thể sẽ tạo ra một mùi hương độc đáo và đặc biệt.\r\n\r\n- Hãy suy nghĩ về những mùi hương bạn thường thích hoặc những kỷ niệm đặc biệt liên quan đến mùi hương để tìm ra hướng đi cho sở thích của bạn.\r\n<h3>2. Thử nghiệm mùi hương:</h3>\r\n- Đến cửa hàng nước hoa và thử nghiệm các mẫu nước hoa khác nhau trên da của bạn.\r\n\r\n- Hãy lưu ý rằng không nên thử quá nhiều loại cùng một lúc để tránh gây nhầm lẫn và mất khả năng phân biệt hương thơm.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2024/04/top-nuoc-hoa-nu-ban-chay.jpg\"><img class=\"aligncenter wp-image-33055 size-large\" title=\"Lợi ích của việc sử dụng nước hoa\" src=\"https://mfparis.vn/wp-content/uploads/2024/04/top-nuoc-hoa-nu-ban-chay-800x800.jpg\" alt=\"Lợi ích của việc sử dụng nước hoa\" width=\"800\" height=\"800\" /></a>\r\n\r\n- Để hương thơm phát huy tối đa, cần ủ nước hoa trên da từ 15-30 phút để hương thơm phát triển. Nhiệt độ cơ thể ảnh hưởng đến các tầng hương của nước hoa.\r\n\r\n- Bảo quản nước hoa ở nơi khô ráo, tránh ánh sáng và nhiệt độ cao. Xịt nước hoa ở những vùng da có mạch đập để hương thơm tồn tại lâu hơn và phát triển mạnh mẽ.\r\n<h3>3. Đánh giá hương phù hợp với da và tâm trạng của bạn:</h3>\r\n- Đánh giá xem liệu hương thơm có phù hợp với da của bạn không. Đôi khi một mùi hương có thể trở nên khác biệt trên mỗi người do tương tác với hóa chất tự nhiên trên da.\r\n\r\n- Hãy chọn một mùi hương phù hợp với tâm trạng của bạn và hoàn cảnh sử dụng. Ví dụ, có thể bạn muốn một hương thơm nhẹ nhàng và tươi mới cho ngày làm việc, và một hương thơm ấm áp và gợi cảm hơn cho dịp đặc biệt.\r\n<h3>4. Tìm hiểu về thành phần và xuất xứ:</h3>\r\n- Nếu bạn quan tâm đến các thành phần tự nhiên hoặc đang tìm kiếm một thương hiệu cụ thể, hãy tìm hiểu về thành phần và xuất xứ của sản phẩm trước khi mua.\r\n<h3>5. Tùy chỉnh theo mùa và hoàn cảnh:</h3>\r\n- Chọn nước hoa phù hợp với mùa trong năm và hoàn cảnh sử dụng.\r\n\r\n- Nước hoa tươi mát thích hợp cho mùa hè, trong khi các loại nước hoa ấm áp và gợi cảm hơn có thể phù hợp cho mùa đông hoặc các dịp đặc biệt.\r\n<h3>6. Kiểm tra phản hồi và đánh giá từ người dùng khác:</h3>\r\n- Trước khi mua, hãy tham khảo phản hồi và đánh giá từ người dùng khác về sản phẩm bạn quan tâm để có cái nhìn tổng quan và đánh giá khách quan hơn.\r\n\r\nViệc chọn nước hoa không chỉ là việc tìm kiếm một mùi hương ưa thích, mà còn là hành trình khám phá bản thân và thể hiện cá tính riêng biệt.\r\n\r\nMỗi loại nước hoa đều mang trong mình một câu chuyện, một không gian cảm xúc riêng biệt, từ sự tinh tế, ngọt ngào cho đến sự mạnh mẽ, quyến rũ.\r\n\r\nĐể tìm ra sự kết hợp hoàn hảo cho bản thân, bạn cần dành thời gian thử nghiệm, cảm nhận và lắng nghe những gì mà mỗi loại nước hoa muốn gửi gắm.\r\n<h2><strong>Mẹo giúp nước hoa lưu hương thơm lâu</strong></h2>\r\nĐể nước hoa nữ của bạn thơm lâu, hãy nhớ chuẩn bị da sạch và khô trước khi xịt. Sau đó, xịt nhẹ nhàng ở các điểm nóng trên cơ thể như cổ tay và cổ. Tránh xịt trực tiếp lên quần áo để không gây vết ố.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2024/04/meo-giup-nuoc-hoa-nu-luu-huong-lau-26114368843170ea40c494866b4d39b4.jpg\"><img class=\"aligncenter wp-image-33053 size-medium\" src=\"https://mfparis.vn/wp-content/uploads/2024/04/meo-giup-nuoc-hoa-nu-luu-huong-lau-26114368843170ea40c494866b4d39b4-669x400.jpg\" alt=\"Mẹo giúp nước hoa lưu hương lâu hơn cho nữ\" width=\"669\" height=\"400\" /></a>\r\n\r\nĐợi đến khi da khô hoàn toàn trước khi xịt nước hoa. Sử dụng cùng dòng nước hoa từ lớp cơ bản đến lớp hoàn thiện để hương thơm kéo dài lâu hơn. Nhớ làm nhẹ nhàng và tập trung ở những điểm chiến lược.\r\n\r\nVới những bước đơn giản này, bạn sẽ giữ được hương thơm quyến rũ và tự tin suốt cả ngày.\r\n<h2><strong>Top chai nước hoa nữ được ưa thích</strong></h2>\r\nTrong thế giới mênh mông của mùi hương, sự kết hợp giữa người nổi tiếng và các loại nước hoa luôn là một điều hấp dẫn. Trong một không gian văn hóa đa dạng và phong phú, mỗi loại nước hoa trở thành biểu tượng của sự cá nhân và bí ẩn.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2024/04/cach-chon-nuoc-hoa-nu-cc832cd57176e170142ec1c5cd69d16c.jpg\"><img class=\"aligncenter wp-image-33050 size-medium\" title=\"Cách chọn nước hoa nữ phù hợp\" src=\"https://mfparis.vn/wp-content/uploads/2024/04/cach-chon-nuoc-hoa-nu-cc832cd57176e170142ec1c5cd69d16c-600x400.jpg\" alt=\"Cách chọn nước hoa nữ phù hợp\" width=\"600\" height=\"400\" /></a>\r\n\r\nNhiều người chia sẻ niềm đam mê đặc biệt với những loại nước hoa, không chỉ để thể hiện phong cách mà còn để biểu lộ bản tính và sở thích cá nhân.\r\n\r\nDưới đây chúng tôi sẽ cho bạn thấy một số dòng nước hoa tốt nhất trên thị trường cũng như được sự ưa thích đặc biệt:\r\n<h3>Dior Hypnotic Poison Eau de Parfum</h3>\r\nNước hoa nữ Dior Hypnotic Poison Eau de Parfum là một sự kết hợp tinh tế giữa hương thơm ngọt ngào và gợi cảm. Với sự pha trộn độc đáo của hương vani, hương cam đắng và hương hoa lan Nam Phi, nước hoa này tạo ra một dấu ấn đặc biệt và quyến rũ.\r\n\r\nMùi hương của Hypnotic Poison là sự kết hợp hoàn hảo giữa sự quyến rũ và sức mạnh, tạo nên một cảm giác huyền bí và cuốn hút. Đây là lựa chọn hoàn hảo cho những người muốn thể hiện sự cá tính và quyến rũ một cách độc đáo.\r\n<h2>Tại sao nên chọn Marais de France ( MF Paris) làm nơi mua sắm tốt nhất?</h2>\r\nKhám Phá Sự Sang Trọng và Chất Lượng - MF Paris - Điểm Đến Lý Tưởng Cho Nước Hoa Chính Hãng\r\n\r\nChào mừng đến với MF Paris, nơi bạn có thể khám phá thế giới của sự sang trọng và chất lượng trong nước hoa. Chúng tôi tự hào là địa chỉ đáng tin cậy cho những người đam mê nước hoa, với cam kết mang đến cho bạn những trải nghiệm mua sắm đẳng cấp nhất.\r\n\r\nTại MF Paris, chúng tôi coi trọng việc cung cấp những sản phẩm chính hãng và chất lượng nhất đến tay khách hàng. Mỗi chai nước hoa được chọn lọc cẩn thận từ những thương hiệu danh tiếng, đảm bảo sự đáng tin cậy và chất lượng vượt trội.\r\n\r\nVới một bộ sưu tập đa dạng từ những thương hiệu nổi tiếng trên thế giới, MF Paris mang đến cho bạn sự lựa chọn không giới hạn. Từ những hương thơm tinh tế và thanh lịch đến những sắc màu mạnh mẽ và cá tính, bạn sẽ dễ dàng tìm ra một mùi hương phản ánh phong cách và cá tính của riêng mình.\r\n\r\nChúng tôi cam kết mang đến dịch vụ khách hàng tận tâm và chuyên nghiệp nhất. Đội ngũ nhân viên giàu kinh nghiệm của chúng tôi luôn sẵn lòng tư vấn và hỗ trợ bạn trong việc chọn lựa sản phẩm phù hợp nhất với nhu cầu và mong muốn của bạn.\r\n\r\nNgoài ra, chúng tôi hiểu rằng sự hài lòng của khách hàng là ưu tiên hàng đầu. Vì vậy, chúng tôi cung cấp chính sách đổi trả linh hoạt, giúp bạn yên tâm khi mua sắm và trải nghiệm sản phẩm mà không lo lắng về bất kỳ rủi ro nào.\r\n\r\nHãy đến với MF Paris và khám phá sự sang trọng và chất lượng trong mỗi chai nước hoa. Chúng tôi cam kết mang đến cho bạn trải nghiệm mua sắm đẳng cấp và không gian tuyệt vời nhất. Hãy để chúng tôi là người bạn đồng hành đáng tin cậy trên hành trình của bạn trong thế giới nước hoa!",
+    "display": "both",
+    "image": {
+      "id": 14434,
+      "date_created": "2021-09-13T19:18:26",
+      "date_created_gmt": "2021-09-13T12:18:26",
+      "date_modified": "2024-09-03T10:30:32",
+      "date_modified_gmt": "2024-09-03T03:30:32",
+      "src": "https://mfparis.vn/wp-content/uploads/2021/09/good-girl-gone-bad-ky-kilian-100ml-e1651070796682.jpg",
+      "name": "Good Girl Gone Bad By Kilian EDP 50ml",
+      "alt": "Good Girl Gone Bad By Kilian EDP 50ml"
+    },
+    "menu_order": 0,
+    "count": 574,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/63",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+        }
+      ]
+    }
+  },
+  {
+    "id": 736,
+    "name": "Nước Hoa Pháp",
+    "slug": "nuoc-hoa-phap",
+    "parent": 5928,
+    "description": "[html_block id=\"48058\"]",
+    "display": "default",
+    "image": {
+      "id": 20283,
+      "date_created": "2022-09-04T15:13:21",
+      "date_created_gmt": "2022-09-04T08:13:21",
+      "date_modified": "2023-04-11T13:10:34",
+      "date_modified_gmt": "2023-04-11T06:10:34",
+      "src": "https://mfparis.vn/wp-content/uploads/2022/09/top-10-chai-nuoc-hoa-cua-phap-ban-chay-moi-thoi-dai.jpg",
+      "name": "nước hoa của pháp bán chạy nhất",
+      "alt": "nước hoa của pháp bán chạy nhất"
+    },
+    "menu_order": 0,
+    "count": 176,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/736",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+        }
+      ]
+    }
+  },
+  {
+    "id": 208,
+    "name": "Nước Hoa Unisex",
+    "slug": "nuoc-hoa-unisex",
+    "parent": 5928,
+    "description": "<a href=\"http://mfparis.vn/nuoc-hoa-unisex/\">Nước hoa unisex</a> không chỉ là một sản phẩm mùi hương, mà còn là biểu tượng của sự tự do và sáng tạo. Nó là một lời kêu gọi cho sự đa dạng và không giới hạn, một cuộc phiêu lưu trong thế giới của mùi hương mà không bị ràng buộc bởi các quy chuẩn giới tính truyền thống.<a href=\"https://mfparis.vn/wp-content/uploads/2024/04/nuoc-hoa-unisex.jpg\"><img class=\"size-medium wp-image-33074 aligncenter\" src=\"https://mfparis.vn/wp-content/uploads/2024/04/nuoc-hoa-unisex-540x400.jpg\" alt=\"Nước Hoa Unisex \" width=\"540\" height=\"400\" /></a>\r\n\r\nĐược tạo ra từ sự pha trộn tinh tế của các hương thơm từ hoa cỏ, hương gỗ, hương trái cây và hương oriental, nước hoa unisex không chỉ là một cảm giác mà còn là một trải nghiệm đa chiều. Mỗi hơi thở của nó là một chuyến hành trình qua thế giới của sự tự do và sự độc đáo.\r\n\r\nVới mỗi giọt nước hoa unisex, bạn không chỉ đang thể hiện phong cách cá nhân của mình mà còn làm chứng cho sự mở cửa trái tim và tinh thần. Đó là cuộc phiêu lưu của sự tự do và sự sáng tạo, nơi mà mọi giới hạn biến mất và bạn tự do thể hiện bản thân mình theo cách duy nhất của mình.\r\n<h2>Có nên sử dụng nước hoa unisex ?</h2>\r\nTrong thế giới hiện đại, sự lựa chọn nước hoa không còn bị giới hạn bởi ranh giới giới tính. Nước hoa unisex, với sự linh hoạt và đa dạng của mình, đã trở thành lựa chọn ưa thích của nhiều người, mang lại những lợi ích thực tế và tinh tế.\r\n\r\nViệc sử dụng nước hoa unisex không chỉ giúp tiết kiệm thời gian và tiền bạc mà còn thể hiện sự thông minh trong việc chọn lựa mùi hương, giảm bớt sự phức tạp khi phải lựa chọn giữa các loại nước hoa nam và nữ.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2024/04/loi-ich-viec-su-dung-nuoc-hoa-unisex.jpg\"><img class=\"aligncenter wp-image-33072 size-medium\" src=\"https://mfparis.vn/wp-content/uploads/2024/04/loi-ich-viec-su-dung-nuoc-hoa-unisex-533x400.jpg\" alt=\"Lợi Ích Của Việc Sử Dụng Nước Hoa Unisex\" width=\"533\" height=\"400\" /></a>\r\n\r\nHơn nữa, nước hoa unisex cung cấp sự linh hoạt đáng kinh ngạc trong việc sử dụng, phù hợp với mọi hoàn cảnh từ công việc hàng ngày đến các sự kiện quan trọng.\r\n\r\nViệc sử dụng nước hoa unisex còn là một cách thể hiện sự độc đáo và cá nhân của bạn. Một mùi hương không bị giới hạn bởi ranh giới giới tính có thể trở thành phần không thể thiếu trong việc xây dựng phong cách cá nhân, phản ánh rõ nét tính cách và sự tự tin của bạn.\r\n\r\nVới sự tiện lợi và đa dạng mà nước hoa unisex mang lại, không có lý do gì để không chọn loại nước hoa này làm người bạn đồng hành trong cuộc sống hàng ngày của bạn.\r\n<h2>Lợi ích có được khi sử dụng nước hoa unisex cao cấp</h2>\r\nViệc chọn lựa nước hoa unisex cao cấp là một quyết định thông minh cho những ai yêu thích sự mới mẻ và muốn tạo nên một dấu ấn cá nhân không lẫn vào đâu được. Dưới đây là những lợi ích cụ thể bạn sẽ có được khi sử dụng nước hoa unisex cao cấp:\r\n<ul>\r\n \t<li>Sự sang trọng và đẳng cấp:</li>\r\n</ul>\r\nNước hoa unisex cao cấp thường mang lại một cảm giác sang trọng và đẳng cấp. Với các thành phần chất lượng và mùi hương phức tạp, chúng tạo ra một ấn tượng lâu dài và đặc biệt cho người sử dụng.\r\n<ul>\r\n \t<li>Phù hợp với mọi đối tượng:</li>\r\n</ul>\r\nKhông chỉ mang lại cảm giác sang trọng và đẳng cấp, nước hoa unisex còn phá vỡ mọi rào cản giới tính, mở ra một không gian tự do cho bất kỳ ai muốn thể hiện mình. Chính sự đa dạng và phong phú trong hương thơm cũng như tính chất không phân biệt giới tính của nước hoa unisex cao cấp giúp chúng trở nên độc đáo và được yêu thích.\r\n<ul>\r\n \t<li>Sự tích cực trong tâm trạng:</li>\r\n</ul>\r\nNước hoa unisex cao cấp còn có khả năng làm tăng cảm giác tự tin và tạo ra sự thoải mái cho người dùng.\r\n<ul>\r\n \t<li>Trải nghiệm mùi hương phong phú:</li>\r\n</ul>\r\nSự kết hợp giữa các thành phần chất lượng và công thức mùi hương độc đáo tạo nên một trải nghiệm thực sự khác biệt, không chỉ là một loại nước hoa mà còn là một phần của cá tính và bản sắc của bạn.\r\n\r\nViệc sử dụng nước hoa unisex cao cấp không chỉ là một lựa chọn thời trang mà còn là một phong cách sống. Nó phản ánh quan điểm của bạn về sự tự do, sự đa dạng và khao khát thể hiện cá nhân.\r\n\r\nMỗi khi sử dụng, bạn không chỉ là người mang một mùi hương đẹp mà còn đang truyền bá một thông điệp về sự tôn trọng và đánh giá cao giá trị cá nhân. Nước hoa unisex cao cấp không chỉ là một lựa chọn về mùi hương mà còn là một biểu tượng của sự tự do và cá tính.\r\n<h2>Cách chọn nước hoa unisex phù hợp</h2>\r\nĐể chọn được một chai nước hoa unisex phù hợp, bạn có thể tuân thủ một số bước sau đây:\r\n<h3>Xác Định Sở Thích Mùi Hương:</h3>\r\nĐầu tiên, hãy xác định loại hương thơm mà bạn thích. Bạn có thể thích mùi hoa cỏ, hương gỗ, hương trái cây, hoặc một pha trộn của chúng. Sự hiểu biết về loại hương thơm bạn ưa thích sẽ giúp bạn dễ dàng tìm được mùi hương thật sự hợp với bạn.+\r\n<h3>Thử Nghiệm Trước Khi Mua:</h3>\r\nĐừng ngần ngại thử nghiệm nước hoa trực tiếp trên da của bạn trước khi quyết định mua. Mỗi loại nước hoa sẽ có mùi hương khác nhau trên da mỗi người, do đó việc thử nghiệm trực tiếp sẽ giúp bạn đánh giá mùi hương chính xác hơn.\r\n<h3>Tìm Hiểu Về Thương Hiệu:</h3>\r\nNắm vững thông tin về các thương hiệu nước hoa unisex có uy tín và chất lượng cao. Một số thương hiệu nổi tiếng trong lĩnh vực nước hoa unisex bao gồm Maison Francis Kurkdjian, Byredo, Le Labo, và Tom Ford.\r\n<h3>Xem Xét Mùi Hương Chính:</h3>\r\nKiểm tra thành phần mùi hương chính của nước hoa để đảm bảo rằng nó phản ánh phong cách và sở thích cá nhân của bạn. Hãy chọn một chai nước hoa có hương thơm mà bạn thích và phản ánh được cá tính của bạn.\r\n<h3>Tìm Xem Về Feedback Hoặc review:</h3>\r\nTìm hiểu về ý kiến và phản hồi từ người sử dụng khác về nước hoa mà bạn quan tâm. Điều này có thể giúp bạn có cái nhìn tổng quan về chất lượng và mùi hương của sản phẩm.\r\n<h3>Xem Xét Thời Điểm Sử Dụng:</h3>\r\nXem xét dịp và môi trường bạn dự định sử dụng nước hoa để chọn một mùi hương phù hợp. Một số mùi hương có thể thích hợp hơn cho môi trường làm việc hàng ngày, trong khi những mùi hương mạnh mẽ hơn có thể phù hợp cho các dịp đặc biệt.\r\n\r\nTóm lại, việc chọn nước hoa unisex phù hợp đòi hỏi sự hiểu biết về sở thích cá nhân của bạn cũng như việc thử nghiệm và nghiên cứu về sản phẩm trước khi mua. Hãy tận dụng các bước trên để chọn lựa được một mùi hương unisex mà bạn yêu thích và phản ánh được cá nhân của mình.\r\n<h3>Cách sử dụng nước hoa hiệu quả</h3>\r\nĐể nước hoa nữ của bạn thơm lâu, hãy nhớ chuẩn bị da sạch và khô trước khi xịt. Sau đó, xịt nhẹ nhàng ở các điểm nóng trên cơ thể như cổ tay và cổ. Tránh xịt trực tiếp lên quần áo để không gây vết ố.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2024/04/nhung-chai-nuoc-hoa-unisex-ban-chay.jpg\"><img class=\"aligncenter wp-image-33073 size-large\" src=\"https://mfparis.vn/wp-content/uploads/2024/04/nhung-chai-nuoc-hoa-unisex-ban-chay-800x800.jpg\" alt=\"Những Chai Nước Hoa Unisex Bán Chạy\" width=\"800\" height=\"800\" /></a>\r\n\r\nĐợi đến khi da khô hoàn toàn trước khi xịt nước hoa. Sử dụng cùng dòng nước hoa từ lớp cơ bản đến lớp hoàn thiện để hương thơm kéo dài lâu hơn. Nhớ làm nhẹ nhàng và tập trung ở những điểm chiến lược. Với những bước đơn giản này, bạn sẽ giữ được hương thơm quyến rũ và tự tin suốt cả ngày.\r\n<h2>Top 6 nước hoa unisex tốt nhất có mặt tại Mf Paris</h2>\r\n<h3>1. Tom Ford Tobacco Vanille:</h3>\r\nTom Ford Tobacco Vanille là một biểu tượng của sự sang trọng và quyến rũ. Với hương thơm mê hoặc của vani và thuốc lá, nước hoa unisex này mang đến một trải nghiệm đầy gợi cảm và lôi cuốn.\r\n<img class=\"aligncenter wp-image-16158 size-large\" title=\"Nước Hoa Unisex Tom Ford Tobacco Vanille EDP 50ml\" src=\"https://mfparis.vn/wp-content/uploads/2022/01/nuoc-hoa-unisex-chinh-hang-tom-ford-tobacco-vanille-edp-50ml-248006491_4900278973334553_7939691440329822668_mfparis-800x800.jpg\" alt=\"Nước Hoa Unisex Tom Ford Tobacco Vanille EDP 50ml\" width=\"800\" height=\"800\" />\r\n\r\nHương đầu của <a href=\"https://mfparis.vn/tom-ford-tobacco-vanille/\">Tobacco Vanille</a> khởi đầu với sự pha trộn hấp dẫn giữa lá thuốc lá và hoa hồng, tạo ra một sự kết hợp độc đáo giữa gợi cảm và tinh tế. Hương giữa của nó là một sự kết hợp tinh tế giữa gỗ đàn hương, cacao và hoa nhài, tạo nên một sự cân bằng hoàn hảo giữa ấm áp và gợi cảm.\r\n\r\nCuối cùng, hương cuối của Tobacco Vanille là sự hòa quyện hoàn hảo giữa vani, hổ phách và cây hổ phách, tạo nên một lớp mùi hương ấm áp và gợi cảm, với độ lưu hương lâu dài.\r\n\r\nĐây là một lựa chọn hoàn hảo cho những người muốn tỏa sáng và gây ấn tượng trong mọi dịp.\r\n<h3>2. Maison Francis Kurkdjian Baccarat Rouge 540</h3>\r\nMaison Francis Kurkdjian Baccarat Rouge 540 là một tác phẩm nghệ thuật đầy bí ẩn và gợi cảm, đem lại cảm giác của sự xa hoa và hiện đại.\r\n\r\nHương thơm của nó là một hòa quyện tinh tế giữa gỗ đàn hương, hoa nhài và hổ phách, tạo nên một trải nghiệm khó quên và độc đáo.\r\n\r\n<img class=\"aligncenter wp-image-21164 size-large\" src=\"https://mfparis.vn/wp-content/uploads/2022/11/Maison-Francis-Kurkdjian-Baccarat-Rouge-540-800x800.jpg\" alt=\"Maison Francis Kurkdjian Baccarat Rouge 540\" width=\"800\" height=\"800\" />\r\n\r\nHương đầu của Baccarat Rouge 540 khởi đầu với một cơn sóng hoa nhài mê đắm, kết hợp với nốt hương hổ phách ấm áp. Hương giữa của nó là sự kết hợp độc đáo giữa gỗ đàn hương và hổ phách, tạo ra một sự cân bằng hài hòa giữa sức mạnh và tinh tế.\r\n\r\nCuối cùng, hương cuối của nước hoa unisex Baccarat Rouge 540 là sự kết hợp độc đáo của hổ phách và gỗ đàn hương, tạo ra một lớp mùi hương lôi cuốn và ấm áp.\r\n\r\nVới độ lưu hương lâu dài và sự sang trọng không gì sánh kịp, đây là một lựa chọn không thể phủ nhận cho những ai muốn tỏa sáng và thu hút mọi ánh nhìn.\r\n<h3>3. Diptyque Philosykos</h3>\r\nNước hoa unisex Diptyque Philosykos là một tác phẩm nghệ thuật với hương thơm tinh tế, mang đậm hơi thở của cây vả và hoa lan, tạo nên một trải nghiệm tự nhiên và thanh khiết.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2024/10/nuoc-hoa-diptyque-philosykos-eau-de-parfum.jpg\"><img class=\"aligncenter size-full wp-image-38181\" src=\"https://mfparis.vn/wp-content/uploads/2024/10/nuoc-hoa-diptyque-philosykos-eau-de-parfum.jpg\" alt=\"Diptyque Philosykos Eau de Parfum\" width=\"1440\" height=\"1440\" /></a>\r\n\r\nVới sự kết hợp độc đáo của hương trái cây tươi mát và hương hoa dịu dàng, Philosykos mở ra một cảm giác gần gũi với tự nhiên, như một buổi sáng dễ chịu dạo bước trong vườn cây xanh mướt. Đây là sự kết hợp hoàn hảo giữa sự tươi mới và sự ấm áp của thiên nhiên, mang lại cho bạn cảm giác thanh khiết và sảng khoái suốt cả ngày.\r\n<h3>4. Escentric Molecules Molecule 01</h3>\r\nEscentric Molecules Molecule 01 là một loại nước hoa unisex với hương thơm độc đáo và quyến rũ.\r\n\r\n<a href=\"https://mfparis.vn/nuoc-hoa-nam-molecule-01-eau-de-parfum/\">Escentric Molecules Molecule 01</a> là sự kết hợp tinh tế của hương cỏ hoắc và hương Ambroxan, tạo nên một hương thơm đơn giản nhưng đầy cuốn hút.\r\n\r\n<a href=\"https://mfparis.vn/wp-content/uploads/2023/07/escentric-molecules-molecule-01.jpg\"><img class=\"size-medium wp-image-26332 aligncenter\" src=\"https://mfparis.vn/wp-content/uploads/2023/07/escentric-molecules-molecule-01-544x400.jpg\" alt=\"Escentric Molecules Molecule 01\" width=\"544\" height=\"400\" /></a>\r\n\r\nVới chất lượng độc đáo của hương cỏ hoắc, nước hoa này mang lại một mùi hương cá nhân và hiện đại, phản ánh sự độc đáo và phong cách của người sử dụng. Molecule 01 không chỉ là một loại nước hoa, mà còn làm tôn lên một sự tự tin của mỗi người, làm nổi bật phong cách độc đáo của bạn một cách đặc biệt và không thể nhầm lẫn.\r\n<h3>5. Nước hoa unisex Le Labo Santal 33</h3>\r\nNếu bạn từng tò mò về hương thơm của thành phố New York, thì Santal 33 của Le Labo sẽ là câu trả lời cho điều đó! Hương thơm này không giống bất kỳ loại nước hoa unisex nào bạn từng gặp.\r\n\r\nNó không chỉ đơn giản là một mùi hương, mà là một trải nghiệm, một tác phẩm nghệ thuật được chế tạo với sự cẩn trọng và đam mê.\r\n\r\n<img class=\"aligncenter wp-image-20476 size-large\" src=\"https://mfparis.vn/wp-content/uploads/2022/09/nuoc-hoa-unisex-le-labo-santal-33-100ml-chinh-hang-QKo8PeV7SjeLNzit-1-800x800.jpg\" alt=\"Nước Hoa Le Labo santal 33\" width=\"800\" height=\"800\" />\r\n\r\nSantal 33 Một hương thơm gỗ ấm áp với hỗn hợp của gỗ đàn hương, tiêu đen và hoa cam, phù hợp cho cả nam và nữ. Kết quả là một hương thơm ấm áp, cuốn hút và phong cách, đặc biệt và đầy bí ẩn.\r\n\r\nNếu bạn là người đánh giá cao sự sang trọng và muốn tự biểu hiện cá tính của mình thông qua hương thơm, thì <a href=\"https://mfparis.vn/nuoc-hoa-unisex-le-labo-santal-33-eau-de-parfum/\">Santal 33</a> là sự lựa chọn không thể bỏ qua. Đắm chìm trong hương thơm của Santal 33, bạn sẽ cảm nhận được tinh thần của thành phố New York, với tất cả sự sôi động và tính đa dạng của nó.\r\n<h3>6. Nước hoa unisex Juliette Has a Gun Not a Perfume</h3>\r\nJuliette Has a Gun Not a Perfume là một hiện tượng đặc biệt trong thế giới nước hoa unisex, bởi vì nó phá vỡ quy chuẩn về cách mà một chai nước hoa thường được tạo ra.\r\n\r\n<img class=\"aligncenter wp-image-38137\" src=\"https://mfparis.vn/wp-content/uploads/2023/05/nuoc-hoa-unisex-juliette-has-a-gun-not-a-perfume-mfparis.jpg\" alt=\"Juliette Has A Gun Not A Perfume \" width=\"800\" height=\"800\" />\r\n\r\nThay vì sử dụng một danh sách dài các thành phần, \"Not A Perfume\" tập trung vào một thành phần duy nhất: Cetalux hay còn được biết đến với tên gọi khác là Ambroxan. Đây là một hợp chất hóa học được tạo ra từ long diên hương, mang lại một mùi hương đặc trưng không lẫn vào đâu được.\r\n\r\nĐặc biệt, do tính chất gần như không mùi của chính nó, \"Not A Perfume\" có khả năng tương tác với mùi cơ thể tự nhiên của mỗi người, tạo nên một hương thơm duy nhất và cá nhân hóa.\r\n\r\n\"Not A Perfume\" chính là minh chứng cho việc đôi khi, sự đơn giản lại là chìa khóa để tạo nên điều phi thường.\r\n<h2>Tại sao nên chọn Marais de France ( MF Paris) làm nơi mua sắm tốt nhất?</h2>\r\nKhám Phá Sự Sang Trọng và Chất Lượng - MF Paris - Điểm Đến Lý Tưởng Cho Nước Hoa Chính Hãng\r\n\r\nChào mừng đến với MF Paris, nơi bạn có thể khám phá thế giới của sự sang trọng và chất lượng trong nước hoa. Chúng tôi tự hào là địa chỉ đáng tin cậy cho những người đam mê nước hoa, với cam kết mang đến cho bạn những trải nghiệm mua sắm đẳng cấp nhất.\r\n\r\nTại MF Paris, chúng tôi coi trọng việc cung cấp những sản phẩm chính hãng và chất lượng nhất đến tay khách hàng. Mỗi chai nước hoa được chọn lọc cẩn thận từ những thương hiệu danh tiếng, đảm bảo sự đáng tin cậy và chất lượng vượt trội.\r\n\r\nVới một bộ sưu tập đa dạng từ những thương hiệu nổi tiếng trên thế giới, MF Paris mang đến cho bạn sự lựa chọn không giới hạn. Từ những hương thơm tinh tế và thanh lịch đến những sắc màu mạnh mẽ và cá tính, bạn sẽ dễ dàng tìm ra một mùi hương phản ánh phong cách và cá tính của riêng mình.\r\n\r\nChúng tôi cam kết mang đến dịch vụ khách hàng tận tâm và chuyên nghiệp nhất. Đội ngũ nhân viên giàu kinh nghiệm của chúng tôi luôn sẵn lòng tư vấn và hỗ trợ bạn trong việc chọn lựa sản phẩm phù hợp nhất với nhu cầu và mong muốn của bạn.\r\n\r\nNgoài ra, chúng tôi hiểu rằng sự hài lòng của khách hàng là ưu tiên hàng đầu. Vì vậy, chúng tôi cung cấp chính sách đổi trả linh hoạt, giúp bạn yên tâm khi mua sắm và trải nghiệm sản phẩm mà không lo lắng về bất kỳ rủi ro nào.\r\n\r\nHãy đến với MF Paris và khám phá sự sang trọng và chất lượng trong mỗi chai nước hoa. Chúng tôi cam kết mang đến cho bạn trải nghiệm mua sắm đẳng cấp và không gian tuyệt vời nhất. Hãy để chúng tôi là người bạn đồng hành đáng tin cậy trên hành trình của bạn trong thế giới nước hoa!",
+    "display": "default",
+    "image": {
+      "id": 14678,
+      "date_created": "2021-09-29T11:52:12",
+      "date_created_gmt": "2021-09-29T04:52:12",
+      "date_modified": "2021-09-29T12:06:24",
+      "date_modified_gmt": "2021-09-29T05:06:24",
+      "src": "https://mfparis.vn/wp-content/uploads/2021/09/nuoc-hoa-cao-cap-le-labo-another-13-100ml.jpg",
+      "name": "nuoc-hoa-cao-cap-le-labo-another-13-100ml",
+      "alt": "Le Labo Another 13 100ml"
+    },
+    "menu_order": 0,
+    "count": 247,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/208",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8565,
+    "name": "Omega 3",
+    "slug": "omega-3",
+    "parent": 8563,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 44731,
+      "date_created": "2025-09-18T20:39:59",
+      "date_created_gmt": "2025-09-18T13:39:59",
+      "date_modified": "2025-09-18T20:40:27",
+      "date_modified_gmt": "2025-09-18T13:40:27",
+      "src": "https://mfparis.vn/wp-content/uploads/2025/09/arkopharma-arkogelules-omega-3-1.jpg",
+      "name": "Arkopharma Arkogélules® Omega 3",
+      "alt": "Arkopharma Arkogélules® Omega 3"
+    },
+    "menu_order": 0,
+    "count": 5,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8565",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8660,
+    "name": "Phổi",
+    "slug": "phoi",
+    "parent": 8536,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8660",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8645,
+    "name": "Phụ Khoa",
+    "slug": "phu-khoa",
+    "parent": 0,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8645",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8605,
+    "name": "Sản phẩm giảm đau dùng ngoài da",
+    "slug": "san-pham-giam-dau-dung-ngoai-da",
+    "parent": 8604,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 4,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8605",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8604"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7764,
+    "name": "Serum",
+    "slug": "serum",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 43621,
+      "date_created": "2025-08-06T15:01:14",
+      "date_created_gmt": "2025-08-06T08:01:14",
+      "date_modified": "2025-08-06T15:01:40",
+      "date_modified_gmt": "2025-08-06T08:01:40",
+      "src": "https://mfparis.vn/wp-content/uploads/2025/08/avene-hydrance-boost-concentrated-hydrating-serum.jpg",
+      "name": "Avène Hydrance Boost Concentrated Hydrating Serum",
+      "alt": "Avène Hydrance Boost Concentrated Hydrating Serum"
+    },
+    "menu_order": 0,
+    "count": 47,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7764",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8520,
+    "name": "Sinh lý - Nội tiết tố",
+    "slug": "sinh-ly-noi-tiet-to",
+    "parent": 50,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 32130,
+      "date_created": null,
+      "date_created_gmt": null,
+      "date_modified": null,
+      "date_modified_gmt": null,
+      "src": false,
+      "name": "",
+      "alt": ""
+    },
+    "menu_order": 0,
+    "count": 8,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8520",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7763,
+    "name": "Son Môi",
+    "slug": "son-moi",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 44131,
+      "date_created": "2025-08-21T20:41:08",
+      "date_created_gmt": "2025-08-21T13:41:08",
+      "date_modified": "2025-08-21T20:46:43",
+      "date_modified_gmt": "2025-08-21T13:46:43",
+      "src": "https://mfparis.vn/wp-content/uploads/2025/08/son-li-ysl-rouge-pur-couture-the-slim-416.jpg",
+      "name": "Son  Lì YSL Rouge Pur Couture The Slim 416",
+      "alt": "Son Lì YSL Rouge Pur Couture The Slim 416"
+    },
+    "menu_order": 0,
+    "count": 93,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7763",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8606,
+    "name": "Sữa dưỡng tóc",
+    "slug": "sua-duong-toc",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8606",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7770,
+    "name": "Sữa Rửa Mặt",
+    "slug": "sua-rua-mat",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 15755,
+      "date_created": "2021-12-31T10:59:22",
+      "date_created_gmt": "2021-12-31T03:59:22",
+      "date_modified": "2025-10-04T10:30:02",
+      "date_modified_gmt": "2025-10-04T03:30:02",
+      "src": "https://mfparis.vn/wp-content/uploads/2021/12/sua-rua-mat-tao-bot-cerave-foaming-cleanser-236ml.jpg",
+      "name": "Sửa Rửa Mặt Tạo Bọt Cerave Foaming Cleanser 236ml",
+      "alt": "Sửa Rửa Mặt Tạo Bọt Cerave Foaming Cleanser 236ml"
+    },
+    "menu_order": 0,
+    "count": 6,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7770",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7775,
+    "name": "Sữa tắm",
+    "slug": "sua-tam",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 41407,
+      "date_created": "2025-01-22T10:04:43",
+      "date_created_gmt": "2025-01-22T03:04:43",
+      "date_modified": "2025-01-22T10:05:03",
+      "date_modified_gmt": "2025-01-22T03:05:03",
+      "src": "https://mfparis.vn/wp-content/uploads/2025/01/sua-tam-ngoc-trai-vang-nuxe.jpg",
+      "name": "Sữa Tắm Ngọc Trai Vàng Nuxe",
+      "alt": "Sữa Tắm Ngọc Trai Vàng Nuxe"
+    },
+    "menu_order": 0,
+    "count": 13,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7775",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7774,
+    "name": "Tẩy tế bào chết",
+    "slug": "tay-te-bao-chet",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 40039,
+      "date_created": "2024-12-11T14:56:10",
+      "date_created_gmt": "2024-12-11T07:56:10",
+      "date_modified": "2024-12-11T14:56:40",
+      "date_modified_gmt": "2024-12-11T07:56:40",
+      "src": "https://mfparis.vn/wp-content/uploads/2024/12/mat-na-tay-te-bao-chet-avene-cleanance-mask-50ml.jpg",
+      "name": "Mặt Nạ Tẩy Tế Bào Chết Avene Cleanance Mask 50ml",
+      "alt": "Mặt Nạ Tẩy Tế Bào Chết Avene Cleanance Mask 50ml"
+    },
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7774",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7769,
+    "name": "Tẩy Trang",
+    "slug": "tay-trang",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 33252,
+      "date_created": "2024-04-09T14:39:25",
+      "date_created_gmt": "2024-04-09T07:39:25",
+      "date_modified": "2024-04-09T14:39:35",
+      "date_modified_gmt": "2024-04-09T07:39:35",
+      "src": "https://mfparis.vn/wp-content/uploads/2024/04/nuoc-tay-trang-da-dau-mun-bioderma-crealine-h2o.jpg",
+      "name": "Nước Tẩy Trang Da Dầu Mụn Bioderma Créaline H2O",
+      "alt": "Nước Tẩy Trang Da Dầu Mụn Bioderma Créaline H2O"
+    },
+    "menu_order": 0,
+    "count": 7,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7769",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8659,
+    "name": "Thận",
+    "slug": "than",
+    "parent": 8536,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8659",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8612,
+    "name": "Thân hình",
+    "slug": "than-hinh",
+    "parent": 8560,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8612",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8560"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8625,
+    "name": "Thần kinh não",
+    "slug": "than-kinh-nao",
+    "parent": 50,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 5,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8625",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+        }
+      ]
+    }
+  },
+  {
+    "id": 50,
+    "name": "Thực Phẩm Chức Năng",
+    "slug": "thuc-pham-chuc-nang",
+    "parent": 0,
+    "description": "Vitamin và thực phẩm chức năng mang lại lợi ích rất nhiều trong quá trình hỗ trợ sức khỏe cho bạn và gia đình bạn.",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 183,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8665,
+    "name": "Tim",
+    "slug": "tim",
+    "parent": 50,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8665",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8554,
+    "name": "Tĩnh Mạch",
+    "slug": "tinh-mach",
+    "parent": 50,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8554",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7834,
+    "name": "Tóc",
+    "slug": "toc",
+    "parent": 8523,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 44552,
+      "date_created": "2025-09-07T15:05:38",
+      "date_created_gmt": "2025-09-07T08:05:38",
+      "date_modified": "2025-09-07T15:05:55",
+      "date_modified_gmt": "2025-09-07T08:05:55",
+      "src": "https://mfparis.vn/wp-content/uploads/2025/09/vien-uong-moc-toc-duong-mong-phyto-phanere-120-vien.jpg",
+      "name": "Viên Uống Mọc Tóc, Dưỡng Móng Phyto Phanere 120 Viên",
+      "alt": "Viên Uống Mọc Tóc, Dưỡng Móng Phyto Phanere 120 Viên"
+    },
+    "menu_order": 0,
+    "count": 10,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7834",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7847,
+    "name": "Trị gàu",
+    "slug": "tri-gau",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 0,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7847",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8649,
+    "name": "Trị Mụn",
+    "slug": "tri-mun",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8649",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8604,
+    "name": "Vật tư y tế",
+    "slug": "vat-tu-y-te",
+    "parent": 0,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 7,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8604",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8579,
+    "name": "Vệ sinh cá nhân",
+    "slug": "ve-sinh-ca-nhan",
+    "parent": 8560,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 17,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8579",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8560"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8676,
+    "name": "Viên Đặt Âm Đạo",
+    "slug": "vien-dat-am-dao",
+    "parent": 8520,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 1,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8676",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8520"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8510,
+    "name": "Viên Ngậm",
+    "slug": "vien-ngam",
+    "parent": 50,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 2,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8510",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8563,
+    "name": "Vitamin &amp; Khoáng chất",
+    "slug": "vitamin-khoang-chat",
+    "parent": 50,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 25915,
+      "date_created": "2023-06-29T15:09:47",
+      "date_created_gmt": "2023-06-29T08:09:47",
+      "date_modified": "2023-06-29T15:10:06",
+      "date_modified_gmt": "2023-06-29T08:10:06",
+      "src": "https://mfparis.vn/wp-content/uploads/2023/06/vien-uong-bo-sung-vitamin-d-zinc-bion3-defense-90-vien-2.jpg",
+      "name": "Viên Uống Bổ Sung Vitamin D Zinc Bion3 Defense 90 Viên",
+      "alt": "Viên Uống Bổ Sung Vitamin D Zinc Bion3 Defense 90 Viên"
+    },
+    "menu_order": 0,
+    "count": 13,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8080,
+    "name": "Vitamin Tổng Hợp",
+    "slug": "vitamin-tong-hop",
+    "parent": 50,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 25915,
+      "date_created": "2023-06-29T15:09:47",
+      "date_created_gmt": "2023-06-29T08:09:47",
+      "date_modified": "2023-06-29T15:10:06",
+      "date_modified_gmt": "2023-06-29T08:10:06",
+      "src": "https://mfparis.vn/wp-content/uploads/2023/06/vien-uong-bo-sung-vitamin-d-zinc-bion3-defense-90-vien-2.jpg",
+      "name": "Viên Uống Bổ Sung Vitamin D Zinc Bion3 Defense 90 Viên",
+      "alt": "Viên Uống Bổ Sung Vitamin D Zinc Bion3 Defense 90 Viên"
+    },
+    "menu_order": 0,
+    "count": 22,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8080",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+        }
+      ]
+    }
+  },
+  {
+    "id": 7776,
+    "name": "Xịt khoáng",
+    "slug": "xit-khoang",
+    "parent": 20,
+    "description": "",
+    "display": "default",
+    "image": {
+      "id": 44687,
+      "date_created": "2025-09-18T14:17:23",
+      "date_created_gmt": "2025-09-18T07:17:23",
+      "date_modified": "2025-09-18T14:18:33",
+      "date_modified_gmt": "2025-09-18T07:18:33",
+      "src": "https://mfparis.vn/wp-content/uploads/2025/09/xit-khoang-puressentiel-oai-huong.jpg",
+      "name": "Xịt khoáng Puressentiel oải hương",
+      "alt": "Xịt khoáng Puressentiel oải hương"
+    },
+    "menu_order": 0,
+    "count": 7,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7776",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8539,
+    "name": "xoang",
+    "slug": "xoang",
+    "parent": 8536,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 0,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8539",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536"
+        }
+      ]
+    }
+  },
+  {
+    "id": 8615,
+    "name": "Xương",
+    "slug": "xuong",
+    "parent": 8536,
+    "description": "",
+    "display": "default",
+    "image": null,
+    "menu_order": 0,
+    "count": 3,
+    "_links": {
+      "self": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8615",
+          "targetHints": {
+            "allow": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        }
+      ],
+      "collection": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+        }
+      ],
+      "up": [
+        {
+          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536"
+        }
+      ]
+    }
+  }
+]

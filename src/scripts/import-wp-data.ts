@@ -62,7 +62,10 @@ const ITEM_OFFSET = Math.max(0, Number(getArg('--offset', '0')) || 0)
 const mediaLimit = pLimit(MEDIA_CONCURRENCY)
 
 const WP_BASE_URL = getArg('--wp-base-url', process.env.WP_BASE_URL || 'https://mfparis.vn')
-const DATA_DIR = path.resolve(getArg('--data-dir', process.env.WP_IMPORT_DATA_DIR || 'D:\\new\\export'))
+const DEFAULT_DATA_DIR = path.resolve(__dirname, 'export')
+const DATA_DIR = path.resolve(
+  getArg('--data-dir', process.env.WP_IMPORT_DATA_DIR || DEFAULT_DATA_DIR),
+)
 
 const DATA_FILES = {
   brands: 'brands.merged.json',
