@@ -66,7 +66,7 @@ export async function POST(req: Request) {
                 const productRepresentativeImage =
                     getProductRepresentativeImage(product) ||
                     item.image ||
-                    '/api/media/file/placeholder.jpg'
+                    '/api/media/file/placeholder.webp'
 
                 const latestVariants = Array.isArray(product?.variants)
                     ? product.variants

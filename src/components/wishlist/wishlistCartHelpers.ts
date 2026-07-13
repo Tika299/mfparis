@@ -122,7 +122,7 @@ export function productToCartItem(
     const fallbackImage =
         getImageUrl(
             product.images?.[0]?.image,
-        ) || '/placeholder.jpg'
+        ) || '/placeholder.webp'
 
     const activeVariants =
         getActiveVariants(product)

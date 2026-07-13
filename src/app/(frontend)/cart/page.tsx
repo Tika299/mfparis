@@ -192,7 +192,7 @@ export default function CartPage() {
               >
                 <div className="relative h-28 w-24 shrink-0 overflow-hidden rounded-xl bg-gray-100 md:h-32 md:w-28">
                   <Image
-                    src={item.image || '/api/media/file/placeholder.jpg'}
+                    src={item.image || '/api/media/file/placeholder.webp'}
                     alt={item.title}
                     fill
                     sizes="112px"

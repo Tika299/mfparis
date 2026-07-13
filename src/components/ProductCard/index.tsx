@@ -293,7 +293,7 @@ export const ProductCard = ({
 
   const productImage =
     getUploadUrl(displayMedia) ||
-    '/api/media/file/placeholder.jpg'
+    '/api/media/file/placeholder.webp'
 
   const brandName =
     product.brand &&
