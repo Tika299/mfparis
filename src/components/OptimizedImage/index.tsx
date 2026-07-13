@@ -56,7 +56,7 @@ export const OptimizedImage = ({
         )}
       >
         <Image
-          src="/api/media/file/placeholder.jpg"
+          src="/api/media/file/placeholder.webp"
           alt="Placeholder"
           fill
           sizes={sizes ?? '100vw'}
@@ -70,7 +70,7 @@ export const OptimizedImage = ({
   const src =
     sizedMedia?.url ||
     media.url ||
-    '/api/media/file/placeholder.jpg'
+    '/api/media/file/placeholder.webp'
 
   const imageAlt =
     alt || media.alt || 'MF Paris Product'
