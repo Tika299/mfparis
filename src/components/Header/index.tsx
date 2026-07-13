@@ -329,7 +329,7 @@ export const Header = async () => {
                 return (
                   <Link
                     key={item.id}
-                    href={item.link}
+                    href={process.env.NEXT_PUBLIC_BASE_URL + item.link}
                     className={
                       isOffer
                         ? 'group flex items-center gap-2 whitespace-nowrap text-[12.5px] font-semibold text-[#c31920] transition-opacity hover:opacity-70'
