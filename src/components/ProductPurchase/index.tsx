@@ -35,13 +35,12 @@ const getUploadUrl = (upload: any) => {
 }
 
 const getProductImage = (product: any, selectedVariant?: any) => {
-  const variantImage = getUploadUrl(selectedVariant?.image)
-
-  if (variantImage) return variantImage
-
   const firstProductImage = product?.images?.[0]?.image
+  const productImage = getUploadUrl(firstProductImage)
 
-  return getUploadUrl(firstProductImage)
+  if (productImage) return productImage
+
+  return getUploadUrl(selectedVariant?.image)
 }
 
 export function ProductPurchase({ product }: ProductPurchaseProps) {
@@ -139,7 +138,6 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
       stock,
 
       variants: variants.map((variant: any) => {
-        const variantImage = getUploadUrl(variant?.image)
         const variantBasePrice = Number(variant?.basePrice || 0)
         const variantSalePrice = Number(variant?.salePrice || 0)
 
@@ -151,7 +149,7 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
           salePrice: variantSalePrice,
           price: variantSalePrice > 0 ? variantSalePrice : variantBasePrice,
           stock: Number(variant?.stock || 0),
-          image: variantImage || image,
+          image,
         }
       }),
     } as any)

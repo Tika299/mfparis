@@ -288,12 +288,12 @@ export const ProductCard = ({
 
   const displayMedia:
     MediaRelationship =
-    defaultVariant?.image ??
-    firstProductImage
+    firstProductImage ??
+    defaultVariant?.image
 
   const productImage =
     getUploadUrl(displayMedia) ||
-    '/placeholder.jpg'
+    '/api/media/file/placeholder.jpg'
 
   const brandName =
     product.brand &&

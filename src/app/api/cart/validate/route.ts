@@ -5,6 +5,26 @@ import configPromise from '@payload-config'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+function getMediaUrl(media: any): string {
+    if (!media || typeof media !== 'object') {
+        return ''
+    }
+
+    return (
+        media.sizes?.card?.url ||
+        media.url ||
+        media.sizes?.thumbnail?.url ||
+        ''
+    )
+}
+
+function getProductRepresentativeImage(product: any): string {
+    const firstProductImage =
+        product?.images?.[0]?.image
+
+    return getMediaUrl(firstProductImage)
+}
+
 export async function POST(req: Request) {
     try {
         const { items } = await req.json()
@@ -43,6 +63,11 @@ export async function POST(req: Request) {
                     continue
                 }
 
+                const productRepresentativeImage =
+                    getProductRepresentativeImage(product) ||
+                    item.image ||
+                    '/api/media/file/placeholder.jpg'
+
                 const latestVariants = Array.isArray(product?.variants)
                     ? product.variants
                         .filter((variant: any) => variant?.isActive !== false)
@@ -58,7 +83,7 @@ export async function POST(req: Request) {
                                 salePrice,
                                 price: salePrice > 0 ? salePrice : basePrice,
                                 stock: Number(variant?.stock || 0),
-                                image: variant?.image?.url || '',
+                                image: productRepresentativeImage,
                             }
                         })
                     : []
@@ -66,7 +91,7 @@ export async function POST(req: Request) {
                 let latestStock = 0
                 let latestPrice = 0
                 let latestTitle = product.title
-                let latestImage = item.image
+                let latestImage = productRepresentativeImage
                 let latestSku = product.sku || item.sku
 
                 if (variantId) {
@@ -92,10 +117,6 @@ export async function POST(req: Request) {
                     latestPrice = salePrice > 0 ? salePrice : basePrice
                     latestTitle = `${product.title} - ${variant.name}`
                     latestSku = variant.sku || product.sku || item.sku
-
-                    if (variant?.image?.url) {
-                        latestImage = variant.image.url
-                    }
                 } else {
                     const basePrice = Number(product?.price?.basePrice || 0)
                     const salePrice = Number(product?.price?.salePrice || 0)
@@ -103,9 +124,7 @@ export async function POST(req: Request) {
                     latestStock = Number(product?.price?.stock || 0)
                     latestPrice = salePrice > 0 ? salePrice : basePrice
 
-                    if (product?.images?.[0]?.image?.url) {
-                        latestImage = product.images[0].image.url
-                    }
+                    latestImage = productRepresentativeImage
                 }
 
                 const isOutOfStock = latestStock <= 0

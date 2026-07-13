@@ -184,9 +184,7 @@ export function productToCartItem(
             'Phân loại mặc định'
 
         const image =
-            getImageUrl(
-                selectedVariant.image,
-            ) || fallbackImage
+            fallbackImage
 
         const cartVariants:
             CartVariant[] =
@@ -233,9 +231,6 @@ export function productToCartItem(
                         ),
 
                         image:
-                            getImageUrl(
-                                variant.image,
-                            ) ||
                             fallbackImage,
                     }
                 },

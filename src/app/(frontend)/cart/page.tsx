@@ -138,7 +138,7 @@ export default function CartPage() {
       title: `${baseTitle} - ${variant.name}`,
 
       price,
-      image: variant.image || item.image,
+      image: item.image,
       slug: item.slug,
       sku: variant.sku || item.sku,
       stock,
