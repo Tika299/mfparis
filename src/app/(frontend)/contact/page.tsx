@@ -1,6 +1,10 @@
-import type { Metadata } from 'next'
+import type { Metadata } from 'next'
+
 import { JsonLd } from '@/components/JsonLd'
-import { buildStaticPageSchemaGraph } from '@/lib/structured-data'
+import {
+    buildStaticPageSchemaGraph,
+    getMfParisLocalBusinessInput,
+} from '@/lib/structured-data'
 
 export const metadata: Metadata = {
     title: 'Liên hệ | MF Paris',
@@ -11,20 +15,21 @@ export default function ContactPage() {
     const schemaGraph = buildStaticPageSchemaGraph({
         page: {
             url: '/contact',
-            name: 'Lien he MF Paris',
-            description: 'Thong tin lien he, hotline, email va dia chi ho tro khach hang cua MF Paris.',
+            name: 'Liên hệ MF Paris',
+            description: 'Thông tin liên hệ, hotline, email và địa chỉ hỗ trợ khách hàng của MF Paris.',
             type: 'ContactPage',
         },
         breadcrumb: [
             {
-                name: 'Trang chu',
+                name: 'Trang chủ',
                 url: '/',
             },
             {
-                name: 'Lien he MF Paris',
+                name: 'Liên hệ MF Paris',
                 url: '/contact',
             },
         ],
+        localBusiness: getMfParisLocalBusinessInput(),
     })
 
     return (
@@ -44,7 +49,7 @@ export default function ContactPage() {
                         Hotline: <strong>0792979299</strong>
                     </p>
                     <p>
-                        Email: <strong>cskh@maraisdefrance.vn</strong>
+                        Email: <strong>mfparisvn@gmail.com</strong>
                     </p>
                     <p>
                         Địa chỉ: <strong>220/24 Nguyễn Oanh, Gò Vấp, Thành phố Hồ Chí Minh</strong>

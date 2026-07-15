@@ -428,7 +428,7 @@ export const Footer = async () => {
 
   const email =
     contact?.email?.trim() ||
-    'cskh@maraisdefrance.vn'
+    'mfparisvn@gmail.com'
 
   const address =
     contact?.address?.trim() ||

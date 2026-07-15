@@ -65,7 +65,7 @@ function insertTable() {
   document.execCommand(
     'insertHTML',
     false,
-    '<table><tbody><tr><th>Tieu de</th><th>Tieu de</th></tr><tr><td>Noi dung</td><td>Noi dung</td></tr></tbody></table>',
+    '<table><tbody><tr><th>Tiêu đề</th><th>Tiêu đề</th></tr><tr><td>Nội dung</td><td>Nội dung</td></tr></tbody></table>',
   )
 }
 
@@ -219,7 +219,7 @@ export function WordPressHtmlEditor({
               onClick={() => switchMode(item)}
               className={mode === item ? 'is-active' : ''}
             >
-              {item === 'visual' ? 'Soan thao' : item === 'source' ? 'HTML' : 'Xem truoc'}
+              {item === 'visual' ? 'Soạn thảo' : item === 'source' ? 'HTML' : 'Xem trước'}
             </button>
           ))}
         </div>

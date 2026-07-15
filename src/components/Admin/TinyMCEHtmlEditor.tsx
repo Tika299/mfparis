@@ -211,10 +211,10 @@ export function TinyMCEHtmlEditor({ path, field }: TinyMCEHtmlEditorProps) {
               className={mode === item ? 'is-active' : ''}
             >
               {item === 'visual'
-                ? 'Soan thao'
+                ? 'Soạn thảo'
                 : item === 'source'
                   ? 'HTML'
-                  : 'Xem truoc'}
+                  : 'Xem trước'}
             </button>
           ))}
         </div>

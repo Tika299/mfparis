@@ -4,14 +4,12 @@ export const revalidate = 300
 
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
-import { JsonLd } from '@/components/JsonLd'
 import '../globals.css'
 import '@/styles/floating-contact.css'
 import { Be_Vietnam_Pro, Playfair_Display } from 'next/font/google'
 import { FloatingContact } from '@/components/FloatingContact'
 import { Toaster } from 'sonner'
 import { SITE_ORIGIN } from '@/utilities/seo'
-import { buildSiteIdentitySchemaGraph } from '@/lib/structured-data'
 import { ClientEnhancements } from '@/components/ClientEnhancements'
 
 const siteUrl =
@@ -59,13 +57,10 @@ const beVietnam = Be_Vietnam_Pro({
   display: 'swap',
 })
 
-const siteIdentitySchemaGraph = buildSiteIdentitySchemaGraph()
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi" suppressHydrationWarning className={`${beVietnam.variable} ${playfair.variable}`}>
       <body className="flex min-h-screen flex-col font-sans text-[#1a1a1a] antialiased">
-        <JsonLd data={siteIdentitySchemaGraph} />
         <ClientEnhancements />
         <Header />
         <main className="flex-grow">{children}</main>

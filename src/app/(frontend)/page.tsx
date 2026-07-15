@@ -17,9 +17,11 @@ import { HeroSlider } from '@/components/HeroSlider'
 import { FlashSaleSection } from '@/components/FlashSaleSection'
 import { StoreIntro } from '@/components/home/StoreIntro'
 import { GoogleReviews } from '@/components/home/GoogleReviews'
-import { JsonLd } from '@/components/JsonLd'
 import { SITE_ORIGIN } from '@/utilities/seo'
-import { buildHomeSchemaGraph } from '@/lib/structured-data'
+import {
+  buildHomeSchemaGraph,
+  getMfParisLocalBusinessInput,
+} from '@/lib/structured-data'
 import { FeaturedCategoriesSectionClient } from '@/components/FeaturedCategoriesSectionClient'
 import { BrandPartnersSectionClient } from '@/components/BrandPartnersSectionClient'
 import { HomeProductTabsSectionClient } from '@/components/HomeProductTabsSectionClient'
@@ -217,11 +219,18 @@ export default async function HomePage() {
   const schemaGraph = buildHomeSchemaGraph({
     title: homeTitle,
     description: homeDescription,
+    localBusiness: getMfParisLocalBusinessInput(),
   })
 
   return (
     <main className="min-h-screen pb-16 antialiased">
-      <JsonLd data={schemaGraph} />
+      <script
+        type="application/ld+json"
+        className="rank-math-schema-pro"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(schemaGraph).replace(/</gu, '\\u003c'),
+        }}
+      />
       <h1 className="sr-only">
         Nước hoa, mỹ phẩm và sản phẩm làm đẹp chính hãng từ Pháp tại MF Paris
       </h1>

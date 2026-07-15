@@ -6,14 +6,14 @@ export const Posts: CollectionConfig = {
   slug: 'posts',
   admin: {
     useAsTitle: 'title',
-    group: 'Noi dung',
+    group: 'Nội dung',
   },
   fields: [
     {
       name: 'title',
       type: 'text',
       required: true,
-      label: 'Tieu de bai viet',
+      label: 'Tiêu đề bài viết',
     },
     {
       name: 'slug',
@@ -26,7 +26,7 @@ export const Posts: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description:
-          'Tu dong tao tu ten, co the chinh sua thu cong de toi uu SEO',
+          'Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO',
       },
     },
     {
@@ -34,33 +34,33 @@ export const Posts: CollectionConfig = {
       type: 'upload',
       relationTo: 'media',
       required: true,
-      label: 'Anh dai dien bai viet',
+      label: 'Ảnh đại diện bài viết',
     },
     {
       name: 'categories',
       type: 'relationship',
       relationTo: 'post-categories',
       hasMany: true,
-      label: 'Danh muc bai viet',
+      label: 'Danh mục bài viết',
       admin: {
         position: 'sidebar',
       },
     },
     htmlEditorField({
       name: 'content',
-      label: 'Noi dung bai viet',
+      label: 'Nội dung bài viết',
       description:
-        'Noi dung bai viet luu dang HTML, co the soan truc quan hoac chinh ma HTML.',
+        'Nội dung bài viết luu dang HTML, co the soan truc quan hoac chinh ma HTML.',
     }),
     {
       name: 'excerpt',
       type: 'textarea',
-      label: 'Mo ta ngan',
+      label: 'Mô tả ngắn',
     },
     {
       name: 'seo',
       type: 'group',
-      label: 'Cau hinh SEO',
+      label: 'Cấu hình SEO',
       fields: [
         { name: 'metaTitle', type: 'text' },
         { name: 'metaDescription', type: 'textarea' },
@@ -80,7 +80,7 @@ export const Posts: CollectionConfig = {
     {
       name: 'sourceUrl',
       type: 'text',
-      label: 'URL goc',
+      label: 'URL gốc',
       admin: {
         position: 'sidebar',
         readOnly: true,
@@ -89,7 +89,7 @@ export const Posts: CollectionConfig = {
     {
       name: 'importNotes',
       type: 'textarea',
-      label: 'Ghi chu import post',
+      label: 'Ghi chú import post',
       admin: {
         position: 'sidebar',
         rows: 3,

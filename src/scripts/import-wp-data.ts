@@ -1158,7 +1158,7 @@ async function normalizeVariants(payload: any, rawProduct: AnyRecord, payloadMap
 
         return withoutUndefined({
           name,
-          sku: variation.sku || '',
+          sku: variation.id ? String(variation.id) : variation.sku || '',
           wpVariationId: Number(variation.id) || undefined,
           isDefault: index === 0,
           optionValues: getVariationOptionValues(variation, payloadMaps),
@@ -1288,7 +1288,7 @@ async function importProducts(payload: any, maps: ImportMaps) {
 
       const productData = withoutUndefined({
         title: preparedProduct?.title || name,
-        sku: preparedProduct?.sku || rawProduct.sku || '',
+        sku: rawProduct.id ? String(rawProduct.id) : preparedProduct?.sku || rawProduct.sku || '',
         gtin: preparedProduct?.gtin || rawProduct.gtin || undefined,
         mpn: preparedProduct?.mpn || rawProduct.mpn || undefined,
         slug,

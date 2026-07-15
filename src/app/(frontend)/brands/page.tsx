@@ -80,10 +80,10 @@ export default async function AllBrandsPage({
       url: currentPage > 1 ? `/brands?page=${currentPage}` : '/brands',
       name: 'Thuong hieu',
       description:
-        'Kham pha cac thuong hieu nuoc hoa, my pham va thuc pham chuc nang chinh hang tai MF Paris.',
+        'Khám phá các thương hiệu nước hoa, mỹ phẩm và thực phẩm chức năng chính hãng tại MF Paris.',
       breadcrumb: [
         {
-          name: 'Trang chu',
+          name: 'Trang chủ',
           url: '/',
         },
         {

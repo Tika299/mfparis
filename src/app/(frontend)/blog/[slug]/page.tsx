@@ -412,7 +412,7 @@ export default async function BlogPostPage({
     },
     breadcrumb: [
       {
-        name: 'Trang chu',
+        name: 'Trang chủ',
         url: '/',
       },
       {

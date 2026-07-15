@@ -39,7 +39,7 @@ export default function PaymentMethodsPage() {
         },
         breadcrumb: [
             {
-                name: 'Trang chu',
+                name: 'Trang chủ',
                 url: '/',
             },
             {

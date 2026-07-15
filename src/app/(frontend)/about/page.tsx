@@ -3,7 +3,10 @@ export const revalidate = 0
 export const fetchCache = 'force-no-store'
 import { getPayload } from 'payload'
 import { JsonLd } from '@/components/JsonLd'
-import { buildStaticPageSchemaGraph } from '@/lib/structured-data'
+import {
+  buildStaticPageSchemaGraph,
+  getMfParisLocalBusinessInput,
+} from '@/lib/structured-data'
 import configPromise from '@payload-config'
 import { OptimizedImage } from '@/components/OptimizedImage'
 import { SafeHtmlContent } from '@/components/SafeHtmlContent'
@@ -24,20 +27,21 @@ export default async function AboutPage() {
     const schemaGraph = buildStaticPageSchemaGraph({
         page: {
             url: '/about',
-            name: 'Gioi thieu ve MF Paris',
-            description: 'Cau chuyen thuong hieu va cam ket cua MF Paris.',
+            name: 'Giới thiệu về MF Paris',
+            description: 'Câu chuyện thương hiệu và cam kết của MF Paris.',
             type: 'AboutPage',
         },
         breadcrumb: [
             {
-                name: 'Trang chu',
+                name: 'Trang chủ',
                 url: '/',
             },
             {
-                name: 'Gioi thieu ve MF Paris',
+                name: 'Giới thiệu về MF Paris',
                 url: '/about',
             },
         ],
+        localBusiness: getMfParisLocalBusinessInput(),
     })
 
 

@@ -821,11 +821,11 @@ export default async function AllProductsPage({
       description: seoContent.description,
       breadcrumb: [
         {
-          name: 'Trang chu',
+          name: 'Trang chủ',
           url: '/',
         },
         {
-          name: 'San pham',
+          name: 'Sản phẩm',
           url: createPageUrl(currentPage),
         },
       ],

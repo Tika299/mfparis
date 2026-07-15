@@ -17,7 +17,7 @@ export default function ReturnPolicyPage() {
         },
         breadcrumb: [
             {
-                name: 'Trang chu',
+                name: 'Trang chủ',
                 url: '/',
             },
             {

@@ -266,7 +266,7 @@ const MF_PARIS_CONTACT_POINTS: SchemaObject[] = [
     '@type': 'ContactPoint',
     telephone: '+84792979299',
     contactType: 'customer service',
-    email: 'cskh@maraisdefrance.vn',
+    email: 'mfparisvn@gmail.com',
     areaServed: 'VN',
     availableLanguage: ['vi', 'en'],
   },
@@ -905,13 +905,87 @@ export function buildVideoObjectSchema(input: VideoInput, url?: string): SchemaO
   })
 }
 
+function buildDefaultOrganizationInput(input?: {
+  logo?: ImageInput | string | null
+  organization?: OrganizationInput
+}): OrganizationInput {
+  return {
+    name: 'Marais de France',
+    alternateName: [
+      'MF Paris',
+      'MFParis',
+      'MARAIS DE FRANCE - MF PARIS',
+      'mfparis.vn',
+    ],
+    legalName: 'HỘ KINH DOANH MARAIS DE FRANCE',
+    url: SITE_ORIGIN,
+    logo: input?.organization?.logo || input?.logo || MF_PARIS_LOGO_URL,
+    telephone: '+84792979299',
+    email: 'mfparisvn@gmail.com',
+    address: MF_PARIS_POSTAL_ADDRESS,
+    taxID: '058095006998',
+    vatID: '058095006998',
+    foundingDate: '2018',
+    identifier: MF_PARIS_BUSINESS_IDENTIFIER,
+    contactPoint: MF_PARIS_CONTACT_POINTS,
+    sameAs: MF_PARIS_SAME_AS,
+    returnPolicy: {
+      applicableCountry: 'VN',
+      merchantReturnDays: 7,
+      returnPolicyCategory:
+        'https://schema.org/MerchantReturnFiniteReturnWindow',
+      returnFees:
+        'https://schema.org/ReturnFeesCustomerResponsibility',
+    },
+    shippingService: {
+      name: 'Giao hàng toàn quốc MF Paris',
+      areaServed: 'VN',
+      description:
+        'Giao hàng toàn quốc qua đối tác vận chuyển. Nội thành TP.HCM 1-2 ngày làm việc, tỉnh thành khác 2-5 ngày làm việc.',
+    },
+    ...(input?.organization || {}),
+  }
+}
+
+export function getMfParisLocalBusinessInput(): LocalBusinessInput {
+  return {
+    name: 'Marais de France',
+    url: SITE_ORIGIN,
+    logo: MF_PARIS_LOGO_URL,
+    image: MF_PARIS_DEFAULT_OG_IMAGE,
+    telephone: '+84792979299',
+    email: 'mfparisvn@gmail.com',
+    address: MF_PARIS_POSTAL_ADDRESS,
+    geo: {
+      latitude: 10.8240504,
+      longitude: 106.6789258,
+    },
+    openingHours: ['Mo-Su 08:00-22:00'],
+    priceRange: '$$',
+    sameAs: MF_PARIS_SAME_AS,
+  }
+}
+
+function buildSiteIdentitySchemaNodes(input?: {
+  logo?: ImageInput | string | null
+  organization?: OrganizationInput
+}): SchemaObject[] {
+  return [
+    buildOrganizationSchema(buildDefaultOrganizationInput(input)),
+    buildWebSiteSchema('Marais de France'),
+  ]
+}
+
 export function buildHomeSchemaGraph(input?: {
   title?: string
   description?: string
   logo?: ImageInput | string | null
   organization?: OrganizationInput
+  localBusiness?: LocalBusinessInput | null
 }): SchemaObject {
   return buildSchemaGraph([
+    ...buildSiteIdentitySchemaNodes(input),
+    input?.localBusiness ? buildLocalBusinessSchema(input.localBusiness) : null,
     buildWebPageSchema({
       url: '/',
       name: input?.title || DEFAULT_SITE_NAME,
@@ -931,6 +1005,9 @@ export function buildProductPageSchemaGraph(input: {
   const breadcrumb = buildBreadcrumbListSchema(input.page.url, input.breadcrumb)
 
   return buildSchemaGraph([
+    ...buildSiteIdentitySchemaNodes({
+      organization: input.organization,
+    }),
     buildWebPageSchema({
       ...input.page,
       breadcrumbId: breadcrumb ? schemaId(input.page.url, 'breadcrumb') : undefined,
@@ -952,6 +1029,9 @@ export function buildCollectionPageSchemaGraph(input: {
     : null
 
   return buildSchemaGraph([
+    ...buildSiteIdentitySchemaNodes({
+      organization: input.organization,
+    }),
     buildCollectionSubjectSchema(input.page),
     buildCollectionPageSchema(input.page),
     buildCollectionItemListSchema(input.page),
@@ -968,6 +1048,9 @@ export function buildBlogPostingSchemaGraph(input: {
   const breadcrumb = buildBreadcrumbListSchema(input.page.url, input.breadcrumb)
 
   return buildSchemaGraph([
+    ...buildSiteIdentitySchemaNodes({
+      organization: input.organization,
+    }),
     buildWebPageSchema({
       ...input.page,
       breadcrumbId: breadcrumb ? schemaId(input.page.url, 'breadcrumb') : undefined,
@@ -993,11 +1076,15 @@ export function buildStaticPageSchemaGraph(input: {
     : null
 
   return buildSchemaGraph([
+    ...buildSiteIdentitySchemaNodes({
+      organization: input.organization,
+    }),
     buildWebPageSchema({
       ...input.page,
       breadcrumbId: breadcrumb ? schemaId(input.page.url, 'breadcrumb') : undefined,
     }),
     breadcrumb,
+    input.localBusiness ? buildLocalBusinessSchema(input.localBusiness) : null,
     input.faq ? buildFAQPageSchema(input.faq, input.page.url) : null,
     input.video ? buildVideoObjectSchema(input.video, input.page.url) : null,
   ])
@@ -1007,61 +1094,6 @@ export function buildSiteIdentitySchemaGraph(input?: {
   logo?: ImageInput | string | null
   organization?: OrganizationInput
 }): SchemaObject {
-  const organization: OrganizationInput = {
-    name: 'Marais de France',
-    alternateName: [
-      'MF Paris',
-      'MFParis',
-      'MARAIS DE FRANCE - MF PARIS',
-      'mfparis.vn',
-    ],
-    legalName: 'HỘ KINH DOANH MARAIS DE FRANCE',
-    url: SITE_ORIGIN,
-    logo: input?.organization?.logo || input?.logo || MF_PARIS_LOGO_URL,
-    telephone: '+84792979299',
-    email: 'cskh@maraisdefrance.vn',
-    address: MF_PARIS_POSTAL_ADDRESS,
-    taxID: '058095006998',
-    vatID: '058095006998',
-    foundingDate: '2018',
-    identifier: MF_PARIS_BUSINESS_IDENTIFIER,
-    contactPoint: MF_PARIS_CONTACT_POINTS,
-    sameAs: MF_PARIS_SAME_AS,
-    returnPolicy: {
-      applicableCountry: 'VN',
-      merchantReturnDays: 7,
-      returnPolicyCategory:
-        'https://schema.org/MerchantReturnFiniteReturnWindow',
-      returnFees:
-        'https://schema.org/ReturnFeesCustomerResponsibility',
-    },
-    shippingService: {
-      name: 'Giao hàng toàn quốc MF Paris',
-      areaServed: 'VN',
-      description:
-        'Giao hàng toàn quốc qua đối tác vận chuyển. Nội thành TP.HCM 1-2 ngày làm việc, tỉnh thành khác 2-5 ngày làm việc.',
-    },
-    ...(input?.organization || {}),
-  }
-
-  return buildSchemaGraph([
-    buildOrganizationSchema(organization),
-    buildWebSiteSchema('Marais de France'),
-    buildLocalBusinessSchema({
-      name: 'Marais de France',
-      url: SITE_ORIGIN,
-      logo: MF_PARIS_LOGO_URL,
-      image: MF_PARIS_DEFAULT_OG_IMAGE,
-      telephone: '+84792979299',
-      email: 'cskh@maraisdefrance.vn',
-      address: MF_PARIS_POSTAL_ADDRESS,
-      geo: {
-        latitude: 10.8240504,
-        longitude: 106.6789258,
-      },
-      openingHours: ['Mo-Su 08:00-22:00'],
-      priceRange: '$$',
-      sameAs: MF_PARIS_SAME_AS,
-    }),
-  ])
+  return buildSchemaGraph(buildSiteIdentitySchemaNodes(input))
 }
+

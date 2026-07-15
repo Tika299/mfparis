@@ -161,10 +161,10 @@ export default async function AllCategoriesPage({
             url: currentPage > 1 ? `/categories?page=${currentPage}` : '/categories',
             name: 'Danh muc san pham',
             description:
-                'Kham pha cac dong san pham nuoc hoa, my pham va thuc pham chuc nang cao cap tu Phap tai MF Paris.',
+                'Khám phá các dòng sản phẩm nước hoa, mỹ phẩm và thực phẩm chức năng cao cấp từ Pháp tại MF Paris.',
             breadcrumb: [
                 {
-                    name: 'Trang chu',
+                    name: 'Trang chủ',
                     url: '/',
                 },
                 {

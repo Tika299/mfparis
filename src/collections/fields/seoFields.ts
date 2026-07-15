@@ -349,7 +349,7 @@ export const productStructuredSeoFields: Field[] = [
     name: 'canonicalProduct',
     type: 'relationship',
     relationTo: 'products',
-    label: 'San pham canonical',
+    label: 'Sản phẩm canonical',
     admin: {
       description:
         'Dung khi san pham/variant trung lap nen canonical ve mot san pham chinh.',
@@ -359,7 +359,7 @@ export const productStructuredSeoFields: Field[] = [
     name: 'discontinuedRedirectTarget',
     type: 'relationship',
     relationTo: 'products',
-    label: 'San pham thay the khi ngung ban',
+    label: 'Sản phẩm thay the khi ngung ban',
     admin: {
       description:
         'Truong ro nghia hon cho redirect SEO. Co the dong bo voi san pham thay the hien co.',
@@ -487,7 +487,7 @@ export const productStructuredSeoFields: Field[] = [
         name: 'text',
         type: 'text',
         required: true,
-        label: 'Noi dung',
+        label: 'Nội dung',
       },
     ],
   },
@@ -500,7 +500,7 @@ export const productStructuredSeoFields: Field[] = [
         name: 'text',
         type: 'text',
         required: true,
-        label: 'Noi dung',
+        label: 'Nội dung',
       },
     ],
   },
@@ -517,7 +517,7 @@ export const productStructuredSeoFields: Field[] = [
         name: 'question',
         type: 'text',
         required: true,
-        label: 'Cau hoi',
+        label: 'Câu hỏi',
       },
       {
         name: 'answer',
@@ -538,21 +538,21 @@ export const landingSeoContentFields: Field[] = [
   {
     name: 'introHtml',
     type: 'textarea',
-    label: 'Noi dung mo dau HTML',
+    label: 'Nội dung mo dau HTML',
     admin: {
       rows: 8,
       description:
-        'Noi dung hien thi phia tren danh sach san pham.',
+        'Nội dung hien thi phia tren danh sach san pham.',
     },
   },
   {
     name: 'bottomContentHtml',
     type: 'textarea',
-    label: 'Noi dung cuoi trang HTML',
+    label: 'Nội dung cuoi trang HTML',
     admin: {
       rows: 10,
       description:
-        'Noi dung SEO hien thi phia duoi danh sach san pham.',
+        'Nội dung SEO hien thi phia duoi danh sach san pham.',
     },
   },
   {
@@ -564,7 +564,7 @@ export const landingSeoContentFields: Field[] = [
         name: 'question',
         type: 'text',
         required: true,
-        label: 'Cau hoi',
+        label: 'Câu hỏi',
       },
       {
         name: 'answer',
@@ -579,7 +579,7 @@ export const landingSeoContentFields: Field[] = [
     type: 'relationship',
     relationTo: 'products',
     hasMany: true,
-    label: 'San pham noi bat',
+    label: 'Sản phẩm noi bat',
   },
   {
     name: 'indexableFacets',

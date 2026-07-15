@@ -95,12 +95,12 @@ export default async function BlogPage({ searchParams }: PageProps) {
   const schemaGraph = buildCollectionPageSchemaGraph({
     page: {
       url: blogUrl,
-      name: q ? `Ket qua tim kiem blog: ${q}` : 'Blog MF Paris',
+      name: q ? `Kết quả tìm kiếm blog: ${q}` : 'Blog MF Paris',
       description:
-        'Cap nhat kien thuc nuoc hoa, my pham, cham soc da va suc khoe tu MF Paris.',
+        'Cập nhật kiến thức nước hoa, mỹ phẩm, chăm sóc da và sức khỏe từ MF Paris.',
       breadcrumb: [
         {
-          name: 'Trang chu',
+          name: 'Trang chủ',
           url: '/',
         },
         {

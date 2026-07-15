@@ -87,6 +87,11 @@ type OpenGraphImageData = Readonly<{
   height?: number
 }>
 
+type ProductFaqItem = Readonly<{
+  question: string
+  answer: string
+}>
+
 function isRecord(
   value: unknown,
 ): value is Record<string, unknown> {
@@ -1606,6 +1611,71 @@ export default async function ProductPage({
     return jsonLd
   }
 
+  const getProductFaqItems = (
+    currentProduct: Product,
+  ): ProductFaqItem[] => {
+    const rawFaq =
+      (currentProduct as any)?.seo?.faq ||
+      (currentProduct as any)?.faq ||
+      []
+
+    if (!Array.isArray(rawFaq)) {
+      return []
+    }
+
+    return rawFaq
+      .map((item: any) => {
+        const question =
+          typeof item?.question === 'string'
+            ? item.question.trim()
+            : ''
+        const answer =
+          typeof item?.answer === 'string'
+            ? item.answer.trim()
+            : ''
+
+        if (!question || !answer) {
+          return null
+        }
+
+        return {
+          question,
+          answer,
+        }
+      })
+      .filter(
+        (item): item is ProductFaqItem =>
+          item !== null,
+      )
+  }
+
+  const buildProductFaqJsonLd = (
+    currentProduct: Product,
+  ) => {
+    const faqItems =
+      getProductFaqItems(currentProduct)
+
+    const mainEntity = faqItems.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    }))
+
+    if (mainEntity.length === 0) {
+      return null
+    }
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      '@id': `${getProductCanonicalUrl(currentProduct.slug)}#faq`,
+      mainEntity,
+    }
+  }
+
   const buildProductBreadcrumbJsonLd = (
     currentProduct: Product,
   ) => {
@@ -1655,32 +1725,570 @@ export default async function ProductPage({
     }
   }
 
-  const productJsonLd =
-    buildProductJsonLd(
-      product,
-      approvedReviews,
+  const cleanJsonLdObject = (
+    value: Record<string, unknown>,
+  ): Record<string, unknown> =>
+    Object.fromEntries(
+      Object.entries(value).filter(([, item]) => {
+        if (
+          item === undefined ||
+          item === null ||
+          item === ''
+        ) {
+          return false
+        }
+
+        return !Array.isArray(item) || item.length > 0
+      }),
     )
-  const breadcrumbJsonLd =
-    buildProductBreadcrumbJsonLd(product)
-  const productWebPageJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    '@id': `${getProductCanonicalUrl(product.slug)}#webpage`,
-    url: getProductCanonicalUrl(product.slug),
-    name: metadataContent.title,
-    description: metadataContent.description,
-    isPartOf: {
-      '@id': `${SITE_ORIGIN}/#website`,
-    },
-    breadcrumb: {
-      '@id': `${getProductCanonicalUrl(product.slug)}#breadcrumb`,
-    },
-    mainEntity: {
-      '@id': `${getProductCanonicalUrl(product.slug)}#product`,
-    },
-    inLanguage: 'vi-VN',
+
+  const getMediaImageObject = (
+    media: Media,
+    fallbackCaption: string,
+  ): Record<string, unknown> | null => {
+    const url = getMediaUrl(media)
+
+    if (!url) {
+      return null
+    }
+
+    return cleanJsonLdObject({
+      '@type': 'ImageObject',
+      '@id': url,
+      url,
+      width:
+        media.width !== undefined && media.width !== null
+          ? String(media.width)
+          : undefined,
+      height:
+        media.height !== undefined && media.height !== null
+          ? String(media.height)
+          : undefined,
+      caption:
+        media.alt ||
+        media.title ||
+        fallbackCaption,
+      inLanguage: 'vi',
+    })
   }
 
+  const getRankMathProductImageObject = (
+    media: Media,
+  ): Record<string, unknown> | null => {
+    const url = getMediaUrl(media)
+
+    if (!url) {
+      return null
+    }
+
+    return cleanJsonLdObject({
+      '@type': 'ImageObject',
+      url,
+      height:
+        media.height !== undefined && media.height !== null
+          ? String(media.height)
+          : undefined,
+      width:
+        media.width !== undefined && media.width !== null
+          ? String(media.width)
+          : undefined,
+    })
+  }
+
+  const getProductImageMedia = (
+    currentProduct: Product,
+  ): Media[] => {
+    if (!Array.isArray(currentProduct.images)) {
+      return []
+    }
+
+    return currentProduct.images
+      .map((item) => item.image)
+      .filter(isPopulatedMedia)
+  }
+
+  const getProductImageObjects = (
+    currentProduct: Product,
+  ): Record<string, unknown>[] =>
+    getProductImageMedia(currentProduct)
+      .map((media) => getRankMathProductImageObject(media))
+      .filter(
+        (
+          item,
+        ): item is Record<string, unknown> =>
+          item !== null,
+      )
+
+  const getPrimaryProductImageObject = (
+    currentProduct: Product,
+  ): Record<string, unknown> | null => {
+    const primaryMedia =
+      getProductImageMedia(currentProduct)[0]
+
+    return primaryMedia
+      ? getMediaImageObject(
+        primaryMedia,
+        currentProduct.title,
+      )
+      : null
+  }
+
+  const getPrimaryProductImageUrl = (
+    currentProduct: Product,
+  ): string | undefined => {
+    const primaryMedia =
+      getProductImageMedia(currentProduct)[0]
+
+    return primaryMedia
+      ? getMediaUrl(primaryMedia) || undefined
+      : undefined
+  }
+
+  const getProductCategoryTrail = (
+    currentProduct: Product,
+  ): string | undefined => {
+    const currentCategories =
+      getProductCategories(currentProduct)
+
+    if (!currentCategories.length) {
+      return undefined
+    }
+
+    return currentCategories
+      .map((category) => category.name)
+      .join(' > ')
+  }
+
+  const getProductAdditionalProperties = (
+    currentProduct: Product,
+  ): Record<string, unknown>[] | undefined => {
+    const specifications =
+      currentProduct.specifications || []
+
+    const properties = specifications
+      .map((item) =>
+        item.label && item.value
+          ? cleanJsonLdObject({
+            '@type': 'PropertyValue',
+            name: item.label,
+            value: item.value,
+          })
+          : null,
+      )
+      .filter(
+        (
+          item,
+        ): item is Record<string, unknown> =>
+          item !== null,
+      )
+
+    return properties.length ? properties : undefined
+  }
+
+  const buildRankMathBreadcrumbJsonLd = (
+    currentProduct: Product,
+  ) => {
+    const canonicalUrl =
+      getProductCanonicalUrl(currentProduct.slug)
+    const currentCategories =
+      getProductCategories(currentProduct)
+
+    const items = [
+      {
+        name: 'Trang chủ',
+        url: SITE_ORIGIN,
+      },
+      ...currentCategories.map((category) => ({
+        name: category.name,
+        url:
+          SITE_ORIGIN +
+          '/categories/' +
+          category.slug,
+      })),
+      {
+        name: currentProduct.title,
+        url: canonicalUrl,
+      },
+    ]
+
+    return {
+      '@type': 'BreadcrumbList',
+      '@id': canonicalUrl + '#breadcrumb',
+      itemListElement: items.map((item, index) => ({
+        '@type': 'ListItem',
+        position: String(index + 1),
+        item: {
+          '@id': item.url,
+          name: item.name,
+        },
+      })),
+    }
+  }
+
+  const getRankMathVariantUrl = (
+    currentProduct: Product,
+    variant: NonNullable<Product['variants']>[number],
+  ): string => {
+    const canonicalUrl =
+      getProductCanonicalUrl(currentProduct.slug)
+
+    if (!Array.isArray(variant.optionValues)) {
+      return canonicalUrl
+    }
+
+    const params = new URLSearchParams()
+
+    variant.optionValues.forEach((optionValue) => {
+      if (!isRecord(optionValue)) {
+        return
+      }
+
+      const attribute = optionValue.attribute
+      const attributeSlug = isRecord(attribute)
+        ? typeof attribute.wooTaxonomySlug === 'string' && attribute.wooTaxonomySlug.trim()
+          ? attribute.wooTaxonomySlug.trim()
+          : typeof attribute.slug === 'string' && attribute.slug.trim()
+            ? attribute.slug.trim()
+            : ''
+        : ''
+      const valueSlug =
+        typeof optionValue.slug === 'string'
+          ? optionValue.slug.trim()
+          : ''
+
+      if (!attributeSlug || !valueSlug) {
+        return
+      }
+
+      const queryKey = attributeSlug.startsWith('attribute_')
+        ? attributeSlug
+        : 'attribute_' + attributeSlug
+
+      params.set(queryKey, valueSlug)
+    })
+
+    const query = params.toString()
+
+    return query ? canonicalUrl + '?' + query : canonicalUrl
+  }
+
+  const getRankMathPriceValidUntil = (): string => {
+    const currentYear = new Date().getFullYear()
+
+    return String(currentYear + 1) + '-12-31'
+  }
+
+  const buildRankMathOfferJsonLd = (
+    url: string,
+    price: number,
+    availability: string,
+    description?: string,
+  ): Record<string, unknown> =>
+    cleanJsonLdObject({
+      '@type': 'Offer',
+      description,
+      price: String(price),
+      priceCurrency: 'VND',
+      availability,
+      itemCondition: 'NewCondition',
+      priceValidUntil: getRankMathPriceValidUntil(),
+      url,
+    })
+
+  const buildRankMathVariantJsonLd = (
+    currentProduct: Product,
+    variant: NonNullable<Product['variants']>[number],
+  ): Record<string, unknown> | null => {
+    const productDescription =
+      getProductDescription(currentProduct)
+    const price = getEffectivePrice(
+      variant.basePrice,
+      variant.salePrice,
+    )
+
+    if (!price) {
+      return null
+    }
+
+    const variantImageUrl =
+      isPopulatedMedia(variant.image)
+        ? getMediaUrl(variant.image)
+        : getPrimaryProductImageUrl(currentProduct)
+    const variantUrl = getRankMathVariantUrl(
+      currentProduct,
+      variant,
+    )
+
+    return cleanJsonLdObject({
+      '@type': 'Product',
+      sku:
+        variant.sku ||
+        currentProduct.sku ||
+        undefined,
+      name: variant.name
+        ? currentProduct.title + ' - ' + variant.name
+        : currentProduct.title,
+      description: productDescription,
+      image: variantImageUrl,
+      offers: buildRankMathOfferJsonLd(
+        variantUrl,
+        price,
+        getOfferAvailability(
+          getProductSeoStatus(currentProduct),
+          variant.stock,
+        ),
+        productDescription,
+      ),
+    })
+  }
+
+  const buildRankMathProductSchemaGraph = (
+    currentProduct: Product,
+    reviews: ProductReviewItem[],
+    faqItems: ProductFaqItem[],
+    currentMetadataContent: ProductMetadataContent,
+  ) => {
+    const canonicalUrl =
+      getProductCanonicalUrl(currentProduct.slug)
+    const currentBrand =
+      getProductBrand(currentProduct)
+    const imageObjects =
+      getProductImageObjects(currentProduct)
+    const primaryImage =
+      getPrimaryProductImageObject(currentProduct)
+    const breadcrumb =
+      buildRankMathBreadcrumbJsonLd(currentProduct)
+    const productJsonLd =
+      buildProductJsonLd(currentProduct, reviews)
+    const productDescription =
+      getProductDescription(currentProduct)
+    const currentSeoStatus =
+      getProductSeoStatus(currentProduct)
+    const isVariableProduct =
+      currentProduct.productType === 'variable' &&
+      Array.isArray(currentProduct.variants) &&
+      currentProduct.variants.some(
+        (variant) => variant?.isActive !== false,
+      )
+
+    const reviewJsonLd = Array.isArray(
+      productJsonLd.review,
+    )
+      ? productJsonLd.review.map((review) => {
+        const {
+          reviewBody,
+          dateModified,
+          ...rest
+        } = review as Record<string, unknown>
+
+        return cleanJsonLdObject({
+          ...rest,
+          description: reviewBody,
+        })
+      })
+      : undefined
+
+    const aggregateRating = isRecord(
+      productJsonLd.aggregateRating,
+    )
+      ? cleanJsonLdObject({
+        '@type': 'AggregateRating',
+        ratingValue:
+          productJsonLd.aggregateRating.ratingValue !== undefined
+            ? String(productJsonLd.aggregateRating.ratingValue)
+            : undefined,
+        bestRating:
+          productJsonLd.aggregateRating.bestRating !== undefined
+            ? String(productJsonLd.aggregateRating.bestRating)
+            : '5',
+        ratingCount:
+          productJsonLd.aggregateRating.ratingCount !== undefined
+            ? String(productJsonLd.aggregateRating.ratingCount)
+            : productJsonLd.aggregateRating.reviewCount !== undefined
+              ? String(productJsonLd.aggregateRating.reviewCount)
+              : undefined,
+        reviewCount:
+          productJsonLd.aggregateRating.reviewCount !== undefined
+            ? String(productJsonLd.aggregateRating.reviewCount)
+            : productJsonLd.aggregateRating.ratingCount !== undefined
+              ? String(productJsonLd.aggregateRating.ratingCount)
+              : undefined,
+      })
+      : undefined
+
+    const simplePrice = getEffectivePrice(
+      currentProduct.price?.basePrice,
+      currentProduct.price?.salePrice,
+    )
+
+    const productNode = cleanJsonLdObject({
+      '@type': isVariableProduct
+        ? 'ProductGroup'
+        : 'Product',
+      brand: currentBrand
+        ? {
+          '@type': 'Brand',
+          name: currentBrand.name,
+        }
+        : undefined,
+      name: currentProduct.title,
+      description: productDescription,
+      sku: currentProduct.sku || undefined,
+      category:
+        getProductCategoryTrail(currentProduct),
+      mainEntityOfPage: {
+        '@id': canonicalUrl + '#webpage',
+      },
+      image: imageObjects.length
+        ? imageObjects
+        : productJsonLd.image,
+      aggregateRating,
+      review: reviewJsonLd,
+      additionalProperty:
+        getProductAdditionalProperties(
+          currentProduct,
+        ),
+      url: canonicalUrl,
+      productGroupID: isVariableProduct
+        ? String(
+          currentProduct.sku ||
+          currentProduct.id,
+        )
+        : undefined,
+      hasVariant: isVariableProduct
+        ? currentProduct.variants
+          ?.filter(
+            (variant) =>
+              variant?.isActive !== false,
+          )
+          .map((variant) =>
+            buildRankMathVariantJsonLd(
+              currentProduct,
+              variant,
+            ),
+          )
+          .filter(
+            (
+              item,
+            ): item is Record<string, unknown> =>
+              item !== null,
+          )
+        : undefined,
+      offers:
+        !isVariableProduct && simplePrice
+          ? buildRankMathOfferJsonLd(
+            canonicalUrl,
+            simplePrice,
+            getOfferAvailability(
+              currentSeoStatus,
+              currentProduct.price?.stock,
+            ),
+            productDescription,
+          )
+          : undefined,
+      '@id': canonicalUrl + '#richSnippet',
+    })
+
+    const faqNode = faqItems.length
+      ? {
+        '@type': 'FAQPage',
+        '@id': canonicalUrl + '#faq',
+        mainEntity: faqItems.map((item) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.answer,
+          },
+        })),
+      }
+      : null
+
+    return {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': [
+            'Organization',
+            'Person',
+          ],
+          '@id': SITE_ORIGIN + '/#person',
+          name: 'MF Paris',
+          url: SITE_ORIGIN,
+          email: 'mfparisvn@gmail.com',
+          address: {
+            '@type': 'PostalAddress',
+            streetAddress: '220/24 Nguyễn Oanh, Phường Gò Vấp',
+            addressLocality: 'Gò Vấp',
+            addressRegion: 'Hồ Chí Minh',
+            postalCode: '700000',
+          },
+          logo: {
+            '@type': 'ImageObject',
+            '@id': SITE_ORIGIN + '/#logo',
+            url: 'https://mfparis.vn/wp-content/uploads/2024/08/logo-mfparis-512x512-2.png',
+            contentUrl:
+              'https://mfparis.vn/wp-content/uploads/2024/08/logo-mfparis-512x512-2.png',
+            caption: 'MF Paris',
+            inLanguage: 'vi',
+            width: '512',
+            height: '512',
+          },
+          telephone: '0792979299',
+          image: {
+            '@id': SITE_ORIGIN + '/#logo',
+          },
+        },
+        {
+          '@type': 'WebSite',
+          '@id': SITE_ORIGIN + '/#website',
+          url: SITE_ORIGIN,
+          name: 'MF Paris',
+          publisher: {
+            '@id': SITE_ORIGIN + '/#person',
+          },
+          inLanguage: 'vi',
+        },
+        primaryImage,
+        breadcrumb,
+        cleanJsonLdObject({
+          '@type': 'WebPage',
+          '@id': canonicalUrl + '#webpage',
+          url: canonicalUrl,
+          name: currentMetadataContent.title,
+          datePublished:
+            currentProduct.createdAt,
+          dateModified:
+            currentProduct.updatedAt,
+          isPartOf: {
+            '@id': SITE_ORIGIN + '/#website',
+          },
+          primaryImageOfPage: primaryImage
+            ? {
+              '@id': primaryImage['@id'],
+            }
+            : undefined,
+          inLanguage: 'vi',
+          breadcrumb: {
+            '@id': canonicalUrl + '#breadcrumb',
+          },
+        }),
+        productNode,
+        faqNode,
+      ].filter(Boolean),
+    }
+  }
+
+
+  const productFaqItems =
+    getProductFaqItems(product)
+  const productSchemaGraph =
+    buildRankMathProductSchemaGraph(
+      product,
+      approvedReviews,
+      productFaqItems,
+      metadataContent,
+    )
   return (
     <div
       className="min-h-screen bg-[#F0F2F5] pb-20 lg:pb-12"
@@ -1691,26 +2299,11 @@ export default async function ProductPage({
     >
       <script
         type="application/ld+json"
+        className="rank-math-schema-pro"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(
-            productWebPageJsonLd,
-          ),
-        }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(
-            productJsonLd,
-          ),
-        }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(
-            breadcrumbJsonLd,
-          ),
+            productSchemaGraph,
+          ).replace(/</gu, '\\u003c'),
         }}
       />
 
@@ -1967,6 +2560,44 @@ export default async function ProductPage({
             <ProductRichTextContent
               description={product.description}
             />
+
+
+            {productFaqItems.length > 0 ? (
+              <section
+                aria-labelledby="product-faq-heading"
+                className="rounded-[2rem] bg-white p-6 shadow-sm md:p-8"
+              >
+                <div className="mb-5">
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-[#B72828]">
+                    FAQ
+                  </p>
+
+                  <h2
+                    id="product-faq-heading"
+                    className="mt-2 text-2xl font-black text-gray-950"
+                  >
+                    Câu hỏi thường gặp
+                  </h2>
+                </div>
+
+                <div className="divide-y divide-gray-100">
+                  {productFaqItems.map((item, index) => (
+                    <details
+                      key={`${item.question}-${index}`}
+                      className="group py-4"
+                    >
+                      <summary className="cursor-pointer list-none text-base font-bold text-gray-950 marker:hidden">
+                        {item.question}
+                      </summary>
+
+                      <p className="mt-3 whitespace-pre-line text-sm leading-7 text-gray-600">
+                        {item.answer}
+                      </p>
+                    </details>
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
             <ProductReviews
               productId={product.id}

@@ -3,21 +3,21 @@ import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 
 export const AboutPage: GlobalConfig = {
   slug: 'about-page',
-  label: 'Trang Gioi thieu',
+  label: 'Trang Giới thiệu',
   admin: {
-    group: 'Noi dung',
+    group: 'Nội dung',
   },
   fields: [
     {
       name: 'hero',
       type: 'group',
       fields: [
-        { name: 'title', type: 'text', label: 'Tieu de lon' },
+        { name: 'title', type: 'text', label: 'Tiêu đề lớn' },
         {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
-          label: 'Anh Hero (16:9)',
+          label: 'Ảnh Hero (16:9)',
         },
       ],
     },
@@ -25,35 +25,35 @@ export const AboutPage: GlobalConfig = {
       name: 'story',
       type: 'group',
       fields: [
-        { name: 'heading', type: 'text', label: 'Tieu de cau chuyen' },
+        { name: 'heading', type: 'text', label: 'Tiêu đề câu chuyện' },
         htmlEditorField({
           name: 'content',
-          label: 'Noi dung ke chuyen',
+          label: 'Nội dung ke chuyen',
           rows: 20,
         }),
         {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
-          label: 'Anh minh hoa cau chuyen',
+          label: 'Ảnh minh họa câu chuyện',
         },
         {
           name: 'videoUrl',
           type: 'text',
-          label: 'Link video gioi thieu',
+          label: 'Link video giới thiệu',
           admin: {
             description:
-              'Dan link YouTube, YouTube Shorts, youtu.be hoac Vimeo.',
+              'Dán link YouTube, YouTube Shorts, youtu.be hoặc Vimeo.',
           },
         },
         {
           name: 'videoTitle',
           type: 'text',
-          label: 'Tieu de mo ta video',
-          defaultValue: 'Video gioi thieu Marais de France',
+          label: 'Tiêu đề mô tả video',
+          defaultValue: 'Video giới thiệu Marais de France',
           admin: {
             description:
-              'Noi dung nay duoc dung lam title cho iframe va ho tro kha nang truy cap.',
+              'Nội dung nay duoc dung lam title cho iframe va ho tro kha nang truy cap.',
           },
         },
       ],
@@ -61,7 +61,7 @@ export const AboutPage: GlobalConfig = {
     {
       name: 'values',
       type: 'array',
-      label: 'Gia tri cot loi',
+      label: 'Giá trị cốt lõi',
       fields: [
         { name: 'title', type: 'text' },
         { name: 'description', type: 'textarea' },

@@ -99,7 +99,7 @@ export default async function VouchersPage() {
         },
         breadcrumb: [
             {
-                name: 'Trang chu',
+                name: 'Trang chủ',
                 url: '/',
             },
             {

@@ -205,7 +205,7 @@ export interface Media {
   id: number;
   alt: string;
   /**
-   * Ten de quan tri tim kiem media. Doi ten nay se cap nhat o cac noi dung dung relationship media.
+   * Tên để quản trị tìm kiếm media. Đổi tên này sẽ cập nhật ở các nội dung dùng relationship media.
    */
   title?: string | null;
   caption?: string | null;
@@ -408,13 +408,23 @@ export interface Product {
       }[]
     | null;
   /**
-   * Noi dung chi tiet san pham luu dang HTML. Co the soan truc quan, dan noi dung tu WordPress hoac chinh ma HTML.
+   * Nội dung chi tiet san pham luu dang HTML. Co the soan truc quan, dan noi dung tu WordPress hoac chinh ma HTML.
    */
   description?: string | null;
   isCombo?: boolean | null;
   comboItems?: (number | Product)[] | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
+  /**
+   * Chi nhap cau hoi/cau tra loi that su hien thi tren trang san pham.
+   */
+  faq?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Tự động tạo từ tên sản phẩm, có thể chỉnh tay để tối ưu SEO.
    */
@@ -672,13 +682,13 @@ export interface Post {
   id: number;
   title: string;
   /**
-   * Tu dong tao tu ten, co the chinh sua thu cong de toi uu SEO
+   * Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO
    */
   slug: string;
   thumbnail: number | Media;
   categories?: (number | PostCategory)[] | null;
   /**
-   * Noi dung bai viet luu dang HTML, co the soan truc quan hoac chinh ma HTML.
+   * Nội dung bài viết luu dang HTML, co the soan truc quan hoac chinh ma HTML.
    */
   content?: string | null;
   excerpt?: string | null;
@@ -1205,6 +1215,13 @@ export interface ProductsSelect<T extends boolean = true> {
   comboItems?: T;
   seoTitle?: T;
   seoDescription?: T;
+  faq?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
   slug?: T;
   averageRating?: T;
   reviewCount?: T;
@@ -1653,16 +1670,16 @@ export interface AboutPage {
   story?: {
     heading?: string | null;
     /**
-     * Noi dung HTML. Co the soan truc quan hoac chinh truc tiep ma HTML.
+     * Nội dung HTML. Co the soan truc quan hoac chinh truc tiep ma HTML.
      */
     content?: string | null;
     image?: (number | null) | Media;
     /**
-     * Dan link YouTube, YouTube Shorts, youtu.be hoac Vimeo.
+     * Dán link YouTube, YouTube Shorts, youtu.be hoặc Vimeo.
      */
     videoUrl?: string | null;
     /**
-     * Noi dung nay duoc dung lam title cho iframe va ho tro kha nang truy cap.
+     * Nội dung nay duoc dung lam title cho iframe va ho tro kha nang truy cap.
      */
     videoTitle?: string | null;
   };

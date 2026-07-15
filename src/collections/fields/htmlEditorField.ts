@@ -24,7 +24,7 @@ export function htmlEditorField({
       rows,
       description:
         description ||
-        'Noi dung HTML. Co the soan truc quan hoac chinh truc tiep ma HTML.',
+        'Nội dung HTML. Co the soan truc quan hoac chinh truc tiep ma HTML.',
       components: {
         Field: {
           path: '@/components/Admin/TinyMCEHtmlEditor#TinyMCEHtmlEditor',

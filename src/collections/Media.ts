@@ -81,7 +81,7 @@ export const Media: CollectionConfig = {
       label: 'Ten hien thi',
       admin: {
         description:
-          'Ten de quan tri tim kiem media. Doi ten nay se cap nhat o cac noi dung dung relationship media.',
+          'Tên để quản trị tìm kiếm media. Đổi tên này sẽ cập nhật ở các nội dung dùng relationship media.',
       },
     },
     {

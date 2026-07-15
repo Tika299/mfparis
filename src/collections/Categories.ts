@@ -80,7 +80,7 @@ export const Categories: CollectionConfig = {
     {
       name: 'sourceUrl',
       type: 'text',
-      label: 'URL goc',
+      label: 'URL gốc',
       admin: {
         position: 'sidebar',
         readOnly: true,

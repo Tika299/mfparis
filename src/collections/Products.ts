@@ -670,7 +670,7 @@ export const Products: CollectionConfig = {
               name: 'description',
               label: 'Mo ta san pham',
               description:
-                'Noi dung chi tiet san pham luu dang HTML. Co the soan truc quan, dan noi dung tu WordPress hoac chinh ma HTML.',
+                'Nội dung chi tiet san pham luu dang HTML. Co the soan truc quan, dan noi dung tu WordPress hoac chinh ma HTML.',
             }),
           ],
         },
@@ -712,6 +712,29 @@ export const Products: CollectionConfig = {
               admin: {
                 rows: 4,
               },
+            },
+            {
+              name: 'faq',
+              type: 'array',
+              label: 'FAQ san pham',
+              admin: {
+                description:
+                  'Chi nhap cau hoi/cau tra loi that su hien thi tren trang san pham.',
+              },
+              fields: [
+                {
+                  name: 'question',
+                  type: 'text',
+                  required: true,
+                  label: 'Câu hỏi',
+                },
+                {
+                  name: 'answer',
+                  type: 'textarea',
+                  required: true,
+                  label: 'Cau tra loi',
+                },
+              ],
             },
           ],
         },
