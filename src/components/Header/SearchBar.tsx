@@ -28,9 +28,9 @@ export const SearchBar = ({
       return
     }
 
-    router.push(
-      `/search?q=${encodeURIComponent(keyword)}`,
-    )
+    const searchUrl = `/tim-kiem/${encodeURIComponent(keyword)}`
+
+    router.push(searchUrl)
 
     setSearchTerm('')
   }

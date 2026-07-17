@@ -30,6 +30,7 @@ import {
   ProductRichTextContent,
 } from '@/components/ProductQuickNav'
 import { RelatedProducts } from '@/components/RelatedProducts'
+import { buildRelatedItemListSchema } from '@/lib/structured-data'
 import type {
   Brand,
   Category,
@@ -654,6 +655,54 @@ function buildRelatedProductsWhere(
   }
 }
 
+function getComparableTimestamp(
+  value: string | null | undefined,
+): number {
+  if (!value) {
+    return 0
+  }
+
+  const timestamp = Date.parse(value)
+
+  return Number.isFinite(timestamp) ? timestamp : 0
+}
+
+function getRelatedProductScore(
+  candidate: Product,
+  brandID: RelationshipID | null,
+  categoryIDSet: Set<string>,
+): number {
+  let score = 0
+  const candidateBrandID = getRelationshipID(
+    candidate.brand,
+  )
+
+  if (
+    brandID !== null &&
+    candidateBrandID !== null &&
+    String(candidateBrandID) === String(brandID)
+  ) {
+    score += 100
+  }
+
+  const categoryOverlap = getProductCategoryIDs(
+    candidate,
+  ).filter((categoryID) =>
+    categoryIDSet.has(String(categoryID)),
+  ).length
+
+  score += categoryOverlap * 35
+
+  if (
+    typeof candidate.averageRating === 'number' &&
+    Number.isFinite(candidate.averageRating)
+  ) {
+    score += Math.min(5, candidate.averageRating)
+  }
+
+  return score
+}
+
 const getRelatedProducts = unstable_cache(
   async (
     productID: RelationshipID,
@@ -668,7 +717,7 @@ const getRelatedProducts = unstable_cache(
     const result = await payload.find({
       collection: 'products',
       depth: 1,
-      limit,
+      limit: Math.max(limit * 4, 24),
       overrideAccess: true,
       sort: '-createdAt',
       where: buildRelatedProductsWhere(
@@ -689,6 +738,9 @@ const getRelatedProducts = unstable_cache(
         averageRating: true,
         reviewCount: true,
         status: true,
+        categories: true,
+        createdAt: true,
+        updatedAt: true,
         productType: true,
         variants: {
           id: true,
@@ -704,9 +756,42 @@ const getRelatedProducts = unstable_cache(
       },
     })
 
+    const categoryIDSet = new Set(
+      categoryIDsCsv
+        .split(',')
+        .map((categoryID) => categoryID.trim())
+        .filter(Boolean),
+    )
+
     return result.docs
+      .map((candidate) => ({
+        candidate,
+        score: getRelatedProductScore(
+          candidate,
+          brandID,
+          categoryIDSet,
+        ),
+      }))
+      .sort((left, right) => {
+        if (right.score !== left.score) {
+          return right.score - left.score
+        }
+
+        return (
+          getComparableTimestamp(
+            right.candidate.updatedAt ||
+              right.candidate.createdAt,
+          ) -
+          getComparableTimestamp(
+            left.candidate.updatedAt ||
+              left.candidate.createdAt,
+          )
+        )
+      })
+      .slice(0, limit)
+      .map(({ candidate }) => candidate)
   },
-  ['mfparis-related-products-v3'],
+  ['mfparis-related-products-v4'],
   {
     revalidate: PRODUCT_REVALIDATE_SECONDS,
     tags: [
@@ -2047,6 +2132,7 @@ export default async function ProductPage({
     reviews: ProductReviewItem[],
     faqItems: ProductFaqItem[],
     currentMetadataContent: ProductMetadataContent,
+    relatedProductsForSchema: Product[],
   ) => {
     const canonicalUrl =
       getProductCanonicalUrl(currentProduct.slug)
@@ -2120,6 +2206,26 @@ export default async function ProductPage({
       currentProduct.price?.basePrice,
       currentProduct.price?.salePrice,
     )
+    const relatedProductsItemList =
+      buildRelatedItemListSchema({
+        url: canonicalUrl,
+        id: 'related-products',
+        name: 'Sản phẩm liên quan',
+        itemType: 'Product',
+        items: relatedProductsForSchema.map(
+          (relatedProduct) => ({
+            url: getProductPath(relatedProduct.slug),
+            name: relatedProduct.title,
+            description:
+              getProductDescription(relatedProduct),
+            image:
+              getPrimaryProductImageUrl(relatedProduct),
+            type: 'Product',
+            datePublished: relatedProduct.createdAt,
+            dateModified: relatedProduct.updatedAt,
+          }),
+        ),
+      })
 
     const productNode = cleanJsonLdObject({
       '@type': isVariableProduct
@@ -2275,6 +2381,7 @@ export default async function ProductPage({
         }),
         productNode,
         faqNode,
+        relatedProductsItemList,
       ].filter(Boolean),
     }
   }
@@ -2288,6 +2395,7 @@ export default async function ProductPage({
       approvedReviews,
       productFaqItems,
       metadataContent,
+      relatedProducts,
     )
   return (
     <div
@@ -2629,41 +2737,29 @@ export default async function ProductPage({
           </div>
 
           {relatedProducts.length > 0 ? (
-            <section
-              aria-labelledby="related-products-heading"
+            <RelatedProducts
+              products={relatedProducts}
+              eyebrow={
+                seoStatus === 'discontinued_keep_page'
+                  ? 'Gợi ý thay thế'
+                  : 'Gợi ý thêm'
+              }
+              title={
+                seoStatus === 'discontinued_keep_page'
+                  ? 'Sản phẩm bạn có thể quan tâm'
+                  : 'Sản phẩm liên quan'
+              }
+              description={
+                seoStatus === 'discontinued_keep_page'
+                  ? 'Các sản phẩm cùng thương hiệu hoặc cùng danh mục đang được MF PARIS phân phối.'
+                  : undefined
+              }
               className={
-                seoStatus ===
-                  'discontinued_keep_page'
+                seoStatus === 'discontinued_keep_page'
                   ? 'rounded-3xl border border-red-100 bg-white p-5 shadow-sm md:p-8'
                   : undefined
               }
-            >
-              {seoStatus ===
-                'discontinued_keep_page' ? (
-                <header className="mb-7">
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-[#B72828]">
-                    Gợi ý thay thế
-                  </p>
-
-                  <h2
-                    id="related-products-heading"
-                    className="mt-2 text-2xl font-black text-gray-950 md:text-3xl"
-                  >
-                    Sản phẩm bạn có thể quan tâm
-                  </h2>
-
-                  <p className="mt-2 text-sm leading-6 text-gray-600">
-                    Các sản phẩm cùng thương hiệu
-                    hoặc cùng danh mục đang được
-                    MF PARIS phân phối.
-                  </p>
-                </header>
-              ) : null}
-
-              <RelatedProducts
-                products={relatedProducts}
-              />
-            </section>
+            />
           ) : null}
         </div>
       </div>

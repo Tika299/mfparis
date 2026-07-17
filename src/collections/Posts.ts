@@ -46,12 +46,167 @@ export const Posts: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'author',
+      type: 'group',
+      label: 'Tác giả',
+      fields: [
+        {
+          name: 'name',
+          type: 'text',
+          label: 'Tên tác giả',
+          defaultValue: 'Marais de France',
+        },
+        {
+          name: 'title',
+          type: 'text',
+          label: 'Chức danh',
+          defaultValue: 'MF Paris Editorial',
+        },
+        {
+          name: 'avatar',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Ảnh tác giả',
+        },
+        {
+          name: 'url',
+          type: 'text',
+          label: 'URL tác giả',
+          defaultValue: '/author/mfparis/',
+        },
+        {
+          name: 'bio',
+          type: 'textarea',
+          label: 'Mô tả ngắn',
+          defaultValue:
+            'Marais de France là đội ngũ yêu thích hương thơm, chia sẻ kinh nghiệm đánh giá nước hoa và mỹ phẩm nhằm giúp khách hàng lựa chọn sản phẩm phù hợp.',
+        },
+      ],
+    },
+    {
+      name: 'reviewer',
+      type: 'group',
+      label: 'Kiểm duyệt nội dung',
+      fields: [
+        {
+          name: 'name',
+          type: 'text',
+          label: 'Người kiểm duyệt',
+          defaultValue: 'Marais de France',
+        },
+        {
+          name: 'title',
+          type: 'text',
+          label: 'Vai trò',
+          defaultValue: 'Content Reviewer',
+        },
+        {
+          name: 'url',
+          type: 'text',
+          label: 'URL người kiểm duyệt',
+          defaultValue: '/about',
+        },
+        {
+          name: 'reviewedAt',
+          type: 'date',
+          label: 'Ngày kiểm duyệt',
+          admin: {
+            date: {
+              pickerAppearance: 'dayAndTime',
+            },
+          },
+        },
+      ],
+    },
+    {
+      name: 'viewCount',
+      type: 'number',
+      label: 'Lượt xem',
+      defaultValue: 0,
+      min: 0,
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'rating',
+      type: 'group',
+      label: 'Đánh giá bài viết',
+      admin: {
+        description:
+          'Điểm trung bình được cập nhật tự động từ phần đánh giá sao ngoài frontend.',
+      },
+      fields: [
+        {
+          name: 'average',
+          type: 'number',
+          label: 'Điểm trung bình',
+          defaultValue: 0,
+          min: 0,
+          max: 5,
+          admin: {
+            readOnly: true,
+            step: 0.1,
+          },
+        },
+        {
+          name: 'count',
+          type: 'number',
+          label: 'Số lượt đánh giá',
+          defaultValue: 0,
+          min: 0,
+          admin: {
+            readOnly: true,
+          },
+        },
+        {
+          name: 'total',
+          type: 'number',
+          label: 'Tổng điểm',
+          defaultValue: 0,
+          min: 0,
+          admin: {
+            readOnly: true,
+            hidden: true,
+          },
+        },
+      ],
+    },
     htmlEditorField({
       name: 'content',
       label: 'Nội dung bài viết',
       description:
         'Nội dung bài viết luu dang HTML, co the soan truc quan hoac chinh ma HTML.',
     }),
+    {
+      name: 'faq',
+      type: 'array',
+      label: 'FAQ bài viết',
+      labels: {
+        singular: 'Câu hỏi',
+        plural: 'Câu hỏi',
+      },
+      fields: [
+        {
+          name: 'question',
+          type: 'text',
+          required: true,
+          label: 'Câu hỏi',
+        },
+        {
+          name: 'answer',
+          type: 'textarea',
+          required: true,
+          label: 'Câu trả lời',
+        },
+      ],
+      admin: {
+        description:
+          'Các câu hỏi này sẽ hiển thị ở frontend và được xuất vào FAQPage schema.',
+      },
+    },
     {
       name: 'excerpt',
       type: 'textarea',
@@ -64,6 +219,19 @@ export const Posts: CollectionConfig = {
       fields: [
         { name: 'metaTitle', type: 'text' },
         { name: 'metaDescription', type: 'textarea' },
+        {
+          name: 'keywords',
+          type: 'array',
+          label: 'Từ khóa SEO',
+          fields: [
+            {
+              name: 'keyword',
+              type: 'text',
+              required: true,
+              label: 'Từ khóa',
+            },
+          ],
+        },
       ],
     },
     {

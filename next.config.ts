@@ -8,6 +8,83 @@ const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  async rewrites() {
+    return [
+      /*
+       * Pretty URLs for filter/search pages.
+       * These are internal rewrites, not 301 redirects:
+       * users keep the clean URL while Next.js renders the existing route.
+       */
+      {
+        source: '/tim-kiem',
+        destination: '/search',
+      },
+      {
+        source: '/tim-kiem/:query',
+        destination: '/search?q=:query',
+      },
+      {
+        source: '/san-pham-moi',
+        destination: '/products?sort=-createdAt',
+      },
+      {
+        source: '/san-pham-ban-chay',
+        destination: '/products?sort=-reviewCount',
+      },
+      {
+        source: '/san-pham-giam-gia',
+        destination: '/products?sale=yes',
+      },
+      {
+        source: '/san-pham-con-hang',
+        destination: '/products?availability=in-stock',
+      },
+      {
+        source: '/nuoc-hoa/:brand',
+        destination: '/products?category=nuoc-hoa&brand=:brand',
+      },
+      {
+        source: '/thuong-hieu/:brand/san-pham',
+        destination: '/brands/:brand',
+      },
+      {
+        source: '/danh-muc/:category',
+        destination: '/categories/:category',
+      },
+      {
+        source: '/loc/danh-muc/:category/thuong-hieu/:brand',
+        destination: '/products?category=:category&brand=:brand',
+      },
+      {
+        source: '/loc/thuong-hieu/:brand/danh-muc/:category',
+        destination: '/products?brand=:brand&category=:category',
+      },
+      {
+        source: '/loc/thuong-hieu/:brand',
+        destination: '/products?brand=:brand',
+      },
+      {
+        source: '/loc/danh-muc/:category',
+        destination: '/products?category=:category',
+      },
+      {
+        source: '/loc/huong/:note',
+        destination: '/products?note=:note',
+      },
+      {
+        source: '/loc/gioi-tinh/:gender',
+        destination: '/products?gender=:gender',
+      },
+      {
+        source: '/loc/dung-tich/:volume',
+        destination: '/products?volume=:volume',
+      },
+      {
+        source: '/loc/thuoc-tinh/:attribute/:value',
+        destination: '/products?attribute=:attribute&value=:value',
+      },
+    ]
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [378, 414, 640, 768, 1024, 1280, 1600, 1920],

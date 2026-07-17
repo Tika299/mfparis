@@ -18,6 +18,11 @@ import {
 } from '@/utilities/seo'
 import { getProductFilterOptions } from '@/data/getProductFilterOptions'
 import { buildCollectionPageSchemaGraph } from '@/lib/structured-data'
+import {
+  appendAdvancedProductWhereConditions,
+  appendAdvancedSearchParams,
+  hasAdvancedProductFilters,
+} from '@/lib/productSearchFilters'
 
 const PRODUCTS_PATHNAME = '/products'
 const PRODUCTS_PER_PAGE = 12
@@ -38,6 +43,8 @@ const ALLOWED_SORTS = [
   '-price.basePrice',
   'title',
   '-title',
+  '-averageRating',
+  '-reviewCount',
 ] as const
 
 type ProductSort = (typeof ALLOWED_SORTS)[number]
@@ -334,6 +341,7 @@ function buildProductsWhere({
   minPrice,
   scentValues,
   volumeValues,
+  searchParams,
 }: Readonly<{
   brandValues: readonly string[]
   categoryValues: readonly string[]
@@ -342,6 +350,7 @@ function buildProductsWhere({
   minPrice: number | null
   scentValues: readonly string[]
   volumeValues: readonly string[]
+  searchParams: ProductsSearchParams
 }>): Where {
   const conditions: Where[] = [
     {
@@ -403,6 +412,11 @@ function buildProductsWhere({
       },
     })
   }
+
+  appendAdvancedProductWhereConditions(
+    conditions,
+    searchParams,
+  )
 
   return {
     and: conditions,
@@ -619,7 +633,7 @@ export async function generateMetadata({
 
   const shouldIndex = containsOnlyIndexableFacetParams(
     resolvedSearchParams,
-  )
+  ) && !hasAdvancedProductFilters(resolvedSearchParams)
 
   return {
     title: seoContent.title,
@@ -712,6 +726,7 @@ export default async function AllProductsPage({
     genderValues,
     minPrice,
     maxPrice,
+    searchParams: resolvedSearchParams,
   })
 
   const [productsRes, filterOptions] =
@@ -802,6 +817,11 @@ export default async function AllProductsPage({
       pageSearchParams.set('sort', sort)
     }
 
+    appendAdvancedSearchParams(
+      pageSearchParams,
+      resolvedSearchParams,
+    )
+
     if (pageNumber > 1) {
       pageSearchParams.set('page', String(pageNumber))
     }
@@ -863,10 +883,11 @@ export default async function AllProductsPage({
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
           <aside className="hidden lg:block lg:w-[250px] lg:shrink-0">
             <div className="lc-card rounded-2xl bg-white shadow-sm">
-              <SearchFilters
-                brands={filterOptions.brands}
-                categories={filterOptions.categories}
-                variant="sidebar"
+                <SearchFilters
+                  brands={filterOptions.brands}
+                  categories={filterOptions.categories}
+                  facets={filterOptions.facets}
+                  variant="sidebar"
                 sticky={false}
                 routeContext={{
                   type: 'listing',
@@ -881,6 +902,7 @@ export default async function AllProductsPage({
                 <SearchFilters
                   brands={filterOptions.brands}
                   categories={filterOptions.categories}
+                  facets={filterOptions.facets}
                   variant="horizontal"
                   sticky={false}
                   routeContext={{
@@ -1023,6 +1045,7 @@ export default async function AllProductsPage({
         <SearchFilters
           brands={filterOptions.brands}
           categories={filterOptions.categories}
+          facets={filterOptions.facets}
           variant="mobile-fab"
           routeContext={{
             type: 'listing',

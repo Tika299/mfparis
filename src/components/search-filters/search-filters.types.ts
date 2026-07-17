@@ -5,6 +5,16 @@ export type FilterItem = {
     count?: number
 }
 
+export type FilterFacetGroup = {
+    key: string
+    title: string
+    placeholder: string
+    items: FilterItem[]
+    emptyMessage?: string
+    multiple?: boolean
+    description?: string
+}
+
 export type PriceRange = [number, number]
 
 export type SearchFiltersVariant =
@@ -27,24 +37,16 @@ export type FilterRouteContext =
         slug: string
         clearPath: string
     }
+    | {
+        type: 'search'
+    }
 
-export type FilterKey =
-    | 'brand'
-    | 'category'
-    | 'volume'
-    | 'scent'
-    | 'gender'
-    | 'min'
-    | 'max'
-    | 'sort'
-
-export type FilterUpdates = Partial<
-    Record<FilterKey, string | null>
->
+export type FilterUpdates = Record<string, string | null>
 
 export type SearchFiltersProps = {
     brands: FilterItem[]
     categories?: FilterItem[]
+    facets?: FilterFacetGroup[]
     resultCount?: number
     variant?: SearchFiltersVariant
     sticky?: boolean

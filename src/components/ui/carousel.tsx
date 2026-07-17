@@ -132,8 +132,37 @@ function Carousel({
   )
 }
 
-function CarouselContent({ className, ...props }: React.ComponentProps<"div">) {
+type CarouselContentProps = React.HTMLAttributes<HTMLDivElement> & {
+  as?: "div" | "ul"
+}
+
+function CarouselContent({
+  as: ContentTag = "div",
+  className,
+  ...props
+}: CarouselContentProps) {
   const { carouselRef, orientation } = useCarousel()
+  const contentClassName = cn(
+    "flex",
+    orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
+    ContentTag === "ul" && "m-0 list-none p-0",
+    className
+  )
+
+  if (ContentTag === "ul") {
+    return (
+      <div
+        ref={carouselRef}
+        className="overflow-hidden"
+        data-slot="carousel-content"
+      >
+        <ul
+          className={contentClassName}
+          {...(props as React.HTMLAttributes<HTMLUListElement>)}
+        />
+      </div>
+    )
+  }
 
   return (
     <div
@@ -142,30 +171,50 @@ function CarouselContent({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="carousel-content"
     >
       <div
-        className={cn(
-          "flex",
-          orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
-          className
-        )}
+        className={contentClassName}
         {...props}
       />
     </div>
   )
 }
 
-function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
+type CarouselItemProps = React.HTMLAttributes<HTMLDivElement> & {
+  as?: "div" | "li"
+}
+
+function CarouselItem({
+  as: ItemTag = "div",
+  className,
+  ...props
+}: CarouselItemProps) {
   const { orientation } = useCarousel()
+  const itemClassName = cn(
+    "min-w-0 shrink-0 grow-0 basis-full",
+    orientation === "horizontal" ? "pl-4" : "pt-4",
+    className
+  )
+
+  if (ItemTag === "li") {
+    return (
+      <li
+        data-slot="carousel-item"
+        className={itemClassName}
+        {...(props as React.HTMLAttributes<HTMLLIElement>)}
+      />
+    )
+  }
+
+  const slideProps =
+    {
+      role: "group",
+      "aria-roledescription": "slide",
+    }
 
   return (
     <div
-      role="group"
-      aria-roledescription="slide"
+      {...slideProps}
       data-slot="carousel-item"
-      className={cn(
-        "min-w-0 shrink-0 grow-0 basis-full",
-        orientation === "horizontal" ? "pl-4" : "pt-4",
-        className
-      )}
+      className={itemClassName}
       {...props}
     />
   )

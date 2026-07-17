@@ -16,6 +16,10 @@ import { ExpandableContent } from '@/components/ExpandableContent'
 import { SafeHtmlContent } from '@/components/SafeHtmlContent'
 import { htmlToPlainText, normalizeContentHtml } from '@/lib/html/contentHtml'
 import { buildCollectionPageSchemaGraph } from '@/lib/structured-data'
+import {
+  appendAdvancedProductWhereConditions,
+  appendAdvancedSearchParams,
+} from '@/lib/productSearchFilters'
 
 const PRODUCTS_PER_PAGE = 20
 const DEFAULT_SORT = '-createdAt'
@@ -25,6 +29,8 @@ const ALLOWED_SORT_VALUES = new Set([
   'price.basePrice',
   '-price.basePrice',
   'title',
+  '-averageRating',
+  '-reviewCount',
 ])
 
 type CategoryPageProps = {
@@ -311,13 +317,14 @@ export default async function CategoryPage({
 }: CategoryPageProps) {
   const { slug } = await params
 
+  const resolvedSearchParams = await searchParams
   const {
     page,
     brand,
     min,
     max,
     sort: requestedSort,
-  } = await searchParams
+  } = resolvedSearchParams
 
   const currentPage = normalizePage(page)
   const minimumPrice = normalizePrice(min)
@@ -388,6 +395,11 @@ export default async function CategoryPage({
       },
     })
   }
+
+  appendAdvancedProductWhereConditions(
+    andConditions,
+    resolvedSearchParams,
+  )
 
   const whereQueries: Where = {
     and: andConditions,
@@ -496,6 +508,11 @@ export default async function CategoryPage({
       query.set('sort', sort)
     }
 
+    appendAdvancedSearchParams(
+      query,
+      resolvedSearchParams,
+    )
+
     if (pageNumber > 1) {
       query.set(
         'page',
@@ -563,6 +580,7 @@ export default async function CategoryPage({
           <SearchFilters
             brands={filterOptions.brands}
             categories={filterOptions.categories}
+            facets={filterOptions.facets}
             variant="horizontal"
             sticky={false}
             routeContext={
@@ -578,6 +596,7 @@ export default async function CategoryPage({
               <SearchFilters
                 brands={filterOptions.brands}
                 categories={filterOptions.categories}
+                facets={filterOptions.facets}
                 variant="sidebar"
                 sticky={false}
                 routeContext={
@@ -722,6 +741,7 @@ export default async function CategoryPage({
         <SearchFilters
           brands={filterOptions.brands}
           categories={filterOptions.categories}
+          facets={filterOptions.facets}
           variant="mobile-fab"
           routeContext={
             filterRouteContext

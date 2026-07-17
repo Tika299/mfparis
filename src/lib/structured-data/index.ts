@@ -137,14 +137,31 @@ export type BlogPostingInput = {
   url: string
   headline: string
   description?: string | null
+  name?: string | null
   image?: ImageInput | string | null
   datePublished?: string | null
   dateModified?: string | null
   authorName?: string | null
   authorUrl?: string | null
+  authorImage?: ImageInput | string | null
+  authorSameAs?: string[] | null
+  reviewerName?: string | null
+  reviewerUrl?: string | null
+  dateReviewed?: string | null
   articleSection?: string | null
   keywords?: string[] | string | null
   wordCount?: number | null
+  faq?: FAQInput | null
+}
+
+export type RelatedItemInput = {
+  url: string
+  name?: string | null
+  description?: string | null
+  image?: ImageInput | string | null
+  type?: 'Product' | 'BlogPosting' | 'Article' | 'WebPage' | 'Thing'
+  datePublished?: string | null
+  dateModified?: string | null
 }
 
 export type PersonInput = {
@@ -419,7 +436,7 @@ export function buildWebSiteSchema(siteName = DEFAULT_SITE_NAME): SchemaObject {
     inLanguage: DEFAULT_LANGUAGE,
     potentialAction: {
       '@type': 'SearchAction',
-      target: `${SITE_ORIGIN}/search?q={search_term_string}`,
+      target: `${SITE_ORIGIN}/tim-kiem/{search_term_string}`,
       'query-input': 'required name=search_term_string',
     },
   }
@@ -681,6 +698,63 @@ function buildCollectionItemListSchema(input: CollectionPageInput): SchemaObject
   }
 }
 
+export function buildRelatedItemListSchema(input: {
+  url: string
+  id?: string
+  name?: string
+  itemType?: RelatedItemInput['type']
+  items?: RelatedItemInput[] | null
+}): SchemaObject | null {
+  const items = input.items?.filter((item) => absoluteUrl(item.url)) || []
+
+  if (!items.length) {
+    return null
+  }
+
+  const url = absoluteUrl(input.url) || SITE_ORIGIN
+  const itemType = input.itemType || 'Thing'
+
+  return stripEmpty({
+    '@type': 'ItemList',
+    '@id': schemaId(url, input.id || 'related-itemlist'),
+    name: cleanString(input.name),
+    numberOfItems: items.length,
+    itemListElement: items.map((item, index) => {
+      const type = item.type || itemType
+      const itemUrl = absoluteUrl(item.url) || SITE_ORIGIN
+      const itemIdSuffix =
+        type === 'Product'
+          ? 'richSnippet'
+          : type === 'BlogPosting' || type === 'Article'
+            ? 'richSnippet'
+            : 'webpage'
+
+      return stripEmpty({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: itemUrl,
+        item: stripEmpty({
+          '@type': type,
+          '@id': schemaId(itemUrl, itemIdSuffix),
+          name: cleanString(item.name),
+          headline:
+            type === 'BlogPosting' || type === 'Article'
+              ? cleanString(item.name)
+              : undefined,
+          description: cleanString(item.description),
+          url: itemUrl,
+          image:
+            typeof item.image === 'string'
+              ? absoluteUrl(item.image)
+              : absoluteUrl(item.image?.url || undefined),
+          datePublished: cleanString(item.datePublished),
+          dateModified: cleanString(item.dateModified),
+        }),
+      })
+    }),
+  })
+}
+
 export function buildCollectionPageSchema(input: CollectionPageInput): SchemaObject {
   const url = absoluteUrl(input.url) || SITE_ORIGIN
   const itemList = buildCollectionItemListSchema(input)
@@ -714,34 +788,206 @@ export function buildCollectionPageSchema(input: CollectionPageInput): SchemaObj
   })
 }
 
+function getArticleSchemaLanguage(): string {
+  return 'vi'
+}
+
+function getDefaultArticleAuthorUrl(): string {
+  return absoluteUrl('/author/mfparis/') || SITE_ORIGIN
+}
+
+function getArticleAuthorName(input: BlogPostingInput): string {
+  return cleanString(input.authorName) || 'Marais de France'
+}
+
+function getArticleAuthorUrl(input: BlogPostingInput): string {
+  return absoluteUrl(input.authorUrl || getDefaultArticleAuthorUrl()) || getDefaultArticleAuthorUrl()
+}
+
+function getArticleImageId(input: BlogPostingInput): string | undefined {
+  if (!input.image) {
+    return undefined
+  }
+
+  const imageUrl =
+    typeof input.image === 'string'
+      ? absoluteUrl(input.image)
+      : absoluteUrl(input.image.url)
+
+  return imageUrl || undefined
+}
+
+function buildRankMathArticleImageObject(input: BlogPostingInput): SchemaObject | undefined {
+  const image = buildImageObject(input.image, getArticleImageId(input))
+
+  if (!image) {
+    return undefined
+  }
+
+  return stripEmpty({
+    ...image,
+    contentUrl: typeof image.url === 'string' ? image.url : undefined,
+    inLanguage: getArticleSchemaLanguage(),
+  })
+}
+
+function buildRankMathArticleAuthorSchema(input: BlogPostingInput): SchemaObject {
+  const authorUrl = getArticleAuthorUrl(input)
+
+  return stripEmpty({
+    '@type': 'Person',
+    '@id': authorUrl,
+    name: getArticleAuthorName(input),
+    url: authorUrl,
+    image: buildImageObject(input.authorImage || MF_PARIS_LOGO_URL, schemaId(authorUrl, 'author-image')),
+    description:
+      'Marais de France là đội ngũ yêu thích hương thơm, chia sẻ kinh nghiệm đánh giá nước hoa và mỹ phẩm nhằm giúp khách hàng lựa chọn sản phẩm phù hợp.',
+    sameAs: input.authorSameAs?.length ? input.authorSameAs.map(absoluteUrl).filter(isString) : MF_PARIS_SAME_AS,
+  })
+}
+
+function buildRankMathPublisherSchema(input?: OrganizationInput): SchemaObject {
+  const organization = buildDefaultOrganizationInput({
+    organization: input,
+  })
+  const logo = buildImageObject(organization.logo || MF_PARIS_LOGO_URL, schemaId(SITE_ORIGIN, 'logo'))
+
+  return stripEmpty({
+    '@type': ['Organization', 'Person'],
+    '@id': schemaId(SITE_ORIGIN, 'person'),
+    name: organization.name || 'Marais de France',
+    alternateName: organization.alternateName,
+    legalName: organization.legalName,
+    url: SITE_ORIGIN,
+    email: organization.email,
+    address: typeof organization.address === 'string' ? organization.address : organization.address || undefined,
+    logo,
+    telephone: organization.telephone,
+    image: logo
+      ? {
+        '@id': logo['@id'] as string,
+      }
+      : undefined,
+  })
+}
+
+function buildRankMathWebSiteSchema(): SchemaObject {
+  return {
+    '@type': 'WebSite',
+    '@id': schemaId(SITE_ORIGIN, 'website'),
+    url: SITE_ORIGIN,
+    name: 'Marais de France',
+    publisher: {
+      '@id': schemaId(SITE_ORIGIN, 'person'),
+    },
+    inLanguage: getArticleSchemaLanguage(),
+  }
+}
+
+function buildRankMathBreadcrumbListSchema(url: string, items: BreadcrumbItem[]): SchemaObject | null {
+  const normalizedItems = items
+    .filter((item) => cleanString(item.name))
+    .map((item, index) =>
+      stripEmpty({
+        '@type': 'ListItem',
+        position: String(index + 1),
+        item: stripEmpty({
+          '@id': absoluteUrl(item.url || undefined),
+          name: item.name,
+        }),
+      }),
+    )
+
+  if (normalizedItems.length < 2) {
+    return null
+  }
+
+  return {
+    '@type': 'BreadcrumbList',
+    '@id': schemaId(url, 'breadcrumb'),
+    itemListElement: normalizedItems,
+  }
+}
+
+function buildRankMathArticleWebPageSchema(
+  page: WebPageInput,
+  article: BlogPostingInput,
+  breadcrumb: SchemaObject | null,
+): SchemaObject {
+  const url = absoluteUrl(page.url) || SITE_ORIGIN
+  const imageId = getArticleImageId(article)
+
+  return stripEmpty({
+    '@type': 'WebPage',
+    '@id': schemaId(url, 'webpage'),
+    url,
+    name: page.name,
+    description: cleanString(page.description),
+    datePublished: cleanString(page.datePublished || article.datePublished),
+    dateModified: cleanString(page.dateModified || article.dateModified),
+    isPartOf: {
+      '@id': schemaId(SITE_ORIGIN, 'website'),
+    },
+    primaryImageOfPage: imageId
+      ? {
+        '@id': imageId,
+      }
+      : undefined,
+    inLanguage: getArticleSchemaLanguage(),
+    breadcrumb: breadcrumb
+      ? {
+        '@id': breadcrumb['@id'] as string,
+      }
+      : undefined,
+  })
+}
+
 export function buildBlogPostingSchema(input: BlogPostingInput): SchemaObject {
   const url = absoluteUrl(input.url) || SITE_ORIGIN
+  const imageId = getArticleImageId(input)
+  const authorUrl = getArticleAuthorUrl(input)
 
   return stripEmpty({
     '@type': 'BlogPosting',
-    '@id': schemaId(url, 'article'),
     headline: input.headline,
-    description: cleanString(input.description),
-    image: buildImageObject(input.image, schemaId(url, 'primaryimage')),
+    keywords: Array.isArray(input.keywords)
+      ? input.keywords.filter(Boolean).join(',')
+      : cleanString(input.keywords),
     datePublished: cleanString(input.datePublished),
     dateModified: cleanString(input.dateModified),
+    articleSection: cleanString(input.articleSection),
     author: {
-      '@type': 'Person',
-      name: cleanString(input.authorName) || 'MF Paris Editorial',
-      url: absoluteUrl(input.authorUrl || '/about'),
+      '@id': authorUrl,
+      name: getArticleAuthorName(input),
     },
     publisher: {
-      '@id': schemaId(SITE_ORIGIN, 'organization'),
+      '@id': schemaId(SITE_ORIGIN, 'person'),
     },
+    reviewedBy: input.reviewerName
+      ? stripEmpty({
+        '@type': 'Person',
+        name: cleanString(input.reviewerName),
+        url: absoluteUrl(input.reviewerUrl || undefined),
+      })
+      : undefined,
+    dateReviewed: cleanString(input.dateReviewed),
+    description: cleanString(input.description),
+    name: cleanString(input.name) || input.headline,
+    subjectOf: input.faq ? [buildFAQPageSchema(input.faq, url)] : undefined,
+    '@id': schemaId(url, 'richSnippet'),
+    isPartOf: {
+      '@id': schemaId(url, 'webpage'),
+    },
+    image: imageId
+      ? {
+        '@id': imageId,
+      }
+      : undefined,
+    wordCount: input.wordCount || undefined,
+    inLanguage: getArticleSchemaLanguage(),
     mainEntityOfPage: {
       '@id': schemaId(url, 'webpage'),
     },
-    articleSection: cleanString(input.articleSection),
-    keywords: Array.isArray(input.keywords)
-      ? input.keywords.filter(Boolean).join(', ')
-      : cleanString(input.keywords),
-    wordCount: input.wordCount || undefined,
-    inLanguage: DEFAULT_LANGUAGE,
   })
 }
 
@@ -794,9 +1040,15 @@ export function buildMerchantReturnPolicySchema(input: MerchantReturnPolicyInput
 export function buildShippingServiceSchema(input: ShippingServiceInput = {}): SchemaObject {
   return stripEmpty({
     '@type': 'ShippingService',
-    name: cleanString(input.name) || 'Giao hang MF Paris',
-    areaServed: cleanString(input.areaServed) || 'VN',
-    description: cleanString(input.description),
+    name: 'Giao hàng toàn quốc MF Paris',
+    description: 'Giao hàng toàn quốc qua đối tác vận chuyển.',
+    shippingConditions: {
+      '@type': 'ShippingConditions',
+      shippingDestination: {
+        '@type': 'DefinedRegion',
+        addressCountry: 'VN',
+      },
+    },
   })
 }
 
@@ -1044,22 +1296,25 @@ export function buildBlogPostingSchemaGraph(input: {
   article: BlogPostingInput
   breadcrumb: BreadcrumbItem[]
   organization?: OrganizationInput
+  relatedItems?: RelatedItemInput[] | null
 }): SchemaObject {
-  const breadcrumb = buildBreadcrumbListSchema(input.page.url, input.breadcrumb)
+  const breadcrumb = buildRankMathBreadcrumbListSchema(input.page.url, input.breadcrumb)
 
   return buildSchemaGraph([
-    ...buildSiteIdentitySchemaNodes({
-      organization: input.organization,
-    }),
-    buildWebPageSchema({
-      ...input.page,
-      breadcrumbId: breadcrumb ? schemaId(input.page.url, 'breadcrumb') : undefined,
-      mainEntity: {
-        '@id': schemaId(input.page.url, 'article'),
-      },
-    }),
+    buildRankMathPublisherSchema(input.organization),
+    buildRankMathWebSiteSchema(),
+    buildRankMathArticleImageObject(input.article),
     breadcrumb,
+    buildRankMathArticleWebPageSchema(input.page, input.article, breadcrumb),
+    buildRankMathArticleAuthorSchema(input.article),
     buildBlogPostingSchema(input.article),
+    buildRelatedItemListSchema({
+      url: input.page.url,
+      id: 'related-posts',
+      name: 'Bài viết liên quan',
+      itemType: 'BlogPosting',
+      items: input.relatedItems,
+    }),
   ])
 }
 

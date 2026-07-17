@@ -687,14 +687,52 @@ export interface Post {
   slug: string;
   thumbnail: number | Media;
   categories?: (number | PostCategory)[] | null;
+  author?: {
+    name?: string | null;
+    title?: string | null;
+    avatar?: (number | null) | Media;
+    url?: string | null;
+    bio?: string | null;
+  };
+  reviewer?: {
+    name?: string | null;
+    title?: string | null;
+    url?: string | null;
+    reviewedAt?: string | null;
+  };
+  viewCount?: number | null;
+  /**
+   * Điểm trung bình được cập nhật tự động từ phần đánh giá sao ngoài frontend.
+   */
+  rating?: {
+    average?: number | null;
+    count?: number | null;
+    total?: number | null;
+  };
   /**
    * Nội dung bài viết luu dang HTML, co the soan truc quan hoac chinh ma HTML.
    */
   content?: string | null;
+  /**
+   * Các câu hỏi này sẽ hiển thị ở frontend và được xuất vào FAQPage schema.
+   */
+  faq?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
   excerpt?: string | null;
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
+    keywords?:
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
   };
   wpId?: number | null;
   sourceUrl?: string | null;
@@ -1307,13 +1345,51 @@ export interface PostsSelect<T extends boolean = true> {
   slug?: T;
   thumbnail?: T;
   categories?: T;
+  author?:
+    | T
+    | {
+        name?: T;
+        title?: T;
+        avatar?: T;
+        url?: T;
+        bio?: T;
+      };
+  reviewer?:
+    | T
+    | {
+        name?: T;
+        title?: T;
+        url?: T;
+        reviewedAt?: T;
+      };
+  viewCount?: T;
+  rating?:
+    | T
+    | {
+        average?: T;
+        count?: T;
+        total?: T;
+      };
   content?: T;
+  faq?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
   excerpt?: T;
   seo?:
     | T
     | {
         metaTitle?: T;
         metaDescription?: T;
+        keywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
       };
   wpId?: T;
   sourceUrl?: T;

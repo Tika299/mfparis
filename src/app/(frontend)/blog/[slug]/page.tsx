@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
+import type { Where } from 'payload'
 
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { notFound } from 'next/navigation'
 import { OptimizedImage } from '@/components/OptimizedImage'
-import { JsonLd } from '@/components/JsonLd'
 import Link from 'next/link'
 import {
   Calendar,
@@ -21,6 +21,7 @@ import {
   BlogTocNav,
 } from '@/components/Blog/BlogRichTextContent'
 import RelatedPostsCarousel from '@/components/Blog/RelatedPostsCarousel'
+import { BlogPostEngagement } from '@/components/Blog/BlogPostEngagement'
 import { SITE_ORIGIN } from '@/utilities/seo'
 import { extractHtmlHeadings, htmlToPlainText } from '@/lib/html/contentHtml'
 import { buildBlogPostingSchemaGraph } from '@/lib/structured-data'
@@ -43,6 +44,19 @@ type RelationshipMedia =
   | undefined
 
 type LexicalNode = Record<string, any>
+
+type BlogFaqItem = {
+  question: string
+  answer: string
+}
+
+type BlogPersonInfo = {
+  name: string
+  title?: string | null
+  url?: string | null
+  avatarUrl?: string | null
+  reviewedAt?: string | null
+}
 
 function getSiteUrl(): string {
   return (
@@ -254,6 +268,99 @@ function getBlogHeadingClassName(tag?: string) {
   return 'mt-8 mb-4 text-lg font-bold leading-snug text-gray-900'
 }
 
+function getPostFaqItems(post: any): BlogFaqItem[] {
+  if (!Array.isArray(post?.faq)) {
+    return []
+  }
+
+  return post.faq
+    .map((item: any) => ({
+      question:
+        typeof item?.question === 'string'
+          ? item.question.trim()
+          : '',
+      answer:
+        typeof item?.answer === 'string'
+          ? item.answer.trim()
+          : '',
+    }))
+    .filter(
+      (item: BlogFaqItem) =>
+        item.question.length > 0 &&
+        item.answer.length > 0,
+    )
+}
+
+function getPostSeoKeywords(post: any): string[] {
+  const keywords = post?.seo?.keywords
+
+  if (!Array.isArray(keywords)) {
+    return []
+  }
+
+  return keywords
+    .map((item: any) => {
+      if (typeof item === 'string') {
+        return item
+      }
+
+      if (typeof item?.keyword === 'string') {
+        return item.keyword
+      }
+
+      return ''
+    })
+    .map((item: string) => item.trim())
+    .filter(Boolean)
+}
+
+function getReadingMinutes(wordCount: number): number {
+  return Math.max(1, Math.ceil(wordCount / 220))
+}
+
+function getOptionalText(value: unknown): string | null {
+  return typeof value === 'string' && value.trim()
+    ? value.trim()
+    : null
+}
+
+function getBlogPersonInfo(
+  value: unknown,
+  fallback: BlogPersonInfo,
+): BlogPersonInfo {
+  if (!value || typeof value !== 'object') {
+    return fallback
+  }
+
+  const record = value as Record<string, unknown>
+
+  return {
+    name: getOptionalText(record.name) || fallback.name,
+    title: getOptionalText(record.title) || fallback.title,
+    url: getOptionalText(record.url) || fallback.url,
+    avatarUrl: getMediaUrl(record.avatar as RelationshipMedia) || fallback.avatarUrl,
+    reviewedAt: getOptionalText(record.reviewedAt) || fallback.reviewedAt,
+  }
+}
+
+function getPostRatingStats(post: any) {
+  const rating = post?.rating || {}
+  const average = Math.min(
+    5,
+    Math.max(0, Number(rating.average) || 0),
+  )
+  const count = Math.max(0, Number(rating.count) || 0)
+
+  return {
+    average,
+    count,
+  }
+}
+
+function getPostViewCount(post: any): number {
+  return Math.max(0, Number(post?.viewCount) || 0)
+}
+
 export async function generateMetadata({
   params,
 }: BlogPostPageProps): Promise<Metadata> {
@@ -336,9 +443,11 @@ export default async function BlogPostPage({
   if (!post) notFound()
 
   const categoryIds =
-    post.categories?.map(
-      (cat: any) => cat.id,
-    ) || []
+    Array.isArray(post.categories)
+      ? post.categories
+        .map((cat: any) => cat?.id)
+        .filter(Boolean)
+      : []
 
   const tocItems = extractHtmlHeadings(post.content)
 
@@ -386,18 +495,78 @@ export default async function BlogPostPage({
   const canonicalUrl = `/blog/${encodeURIComponent(slug)}`
   const description = getPostDescription(post)
   const imageUrl = getMediaUrl(post.thumbnail)
+  const postPlainText = htmlToPlainText(post.content)
+  const wordCount = postPlainText.split(/\s+/u).filter(Boolean).length
+  const readingMinutes = getReadingMinutes(wordCount)
+  const faqItems = getPostFaqItems(post)
+  const authorInfo = getBlogPersonInfo(post.author, {
+    name: 'Marais de France',
+    title: 'MF Paris Editorial',
+    url: '/author/mfparis/',
+    avatarUrl: '/api/media/file/logo-thuong-hieu-marais-de-france-1200x1200-1-edited-e1768551529162.png',
+  })
+  const reviewerInfo = getBlogPersonInfo(post.reviewer, {
+    name: 'Marais de France',
+    title: 'Content Reviewer',
+    url: '/about',
+  })
+  const ratingStats = getPostRatingStats(post)
+  const viewCount = getPostViewCount(post)
   const articleSection = Array.isArray(post.categories)
     ? post.categories
       .map((category: any) => category?.title || category?.name)
       .filter(Boolean)
       .join(', ')
     : undefined
+  let relatedPostsWhere: Where = {
+    slug: {
+      not_equals: slug,
+    },
+  }
+
+  if (categoryIds.length > 0) {
+    relatedPostsWhere = {
+      and: [
+        {
+          slug: {
+            not_equals: slug,
+          },
+        },
+        {
+          categories: {
+            in: categoryIds,
+          },
+        },
+      ],
+    }
+  }
+  const [featuredPosts, relatedPosts] =
+    await Promise.all([
+      payload.find({
+        collection: 'posts',
+        limit: 5,
+        sort: '-createdAt',
+        where: {
+          slug: { not_equals: slug },
+        },
+      }),
+      payload.find({
+        collection: 'posts',
+        limit: categoryIds.length > 0 ? 16 : 8,
+        depth: 1,
+        sort: '-createdAt',
+        where: relatedPostsWhere,
+      }),
+    ])
+  const relatedPostDocs = relatedPosts.docs.slice(0, 8)
   const schemaGraph = buildBlogPostingSchemaGraph({
     page: {
       url: canonicalUrl,
       name: post.title,
       description,
       type: 'WebPage',
+      datePublished: post.createdAt,
+      dateModified: post.updatedAt,
     },
     article: {
       url: canonicalUrl,
@@ -406,9 +575,25 @@ export default async function BlogPostPage({
       image: imageUrl,
       datePublished: post.createdAt,
       dateModified: post.updatedAt,
-      authorName: 'MF Paris Editorial',
+      authorName: authorInfo.name,
+      authorUrl: authorInfo.url,
+      authorImage: authorInfo.avatarUrl,
+      reviewerName: reviewerInfo.name,
+      reviewerUrl: reviewerInfo.url,
+      dateReviewed: reviewerInfo.reviewedAt,
       articleSection,
-      wordCount: htmlToPlainText(post.content).split(/\s+/u).filter(Boolean).length,
+      keywords: [
+        ...getPostSeoKeywords(post),
+        ...(Array.isArray(post.categories)
+          ? post.categories.map((category: any) => category?.title || category?.name).filter(Boolean)
+          : []),
+      ],
+      wordCount,
+      faq: faqItems.length > 0
+        ? {
+          questions: faqItems,
+        }
+        : undefined,
     },
     breadcrumb: [
       {
@@ -424,43 +609,26 @@ export default async function BlogPostPage({
         url: canonicalUrl,
       },
     ],
+    relatedItems: relatedPostDocs.map((relatedPost: any) => ({
+      url: `/blog/${relatedPost.slug}`,
+      name: relatedPost.title,
+      description: getPostDescription(relatedPost),
+      image: getMediaUrl(relatedPost.thumbnail),
+      type: 'BlogPosting',
+      datePublished: relatedPost.createdAt,
+      dateModified: relatedPost.updatedAt,
+    })),
   })
-
-  const [featuredPosts, relatedPosts] =
-    await Promise.all([
-      payload.find({
-        collection: 'posts',
-        limit: 5,
-        sort: '-createdAt',
-        where: {
-          slug: { not_equals: slug },
-        },
-      }),
-      payload.find({
-        collection: 'posts',
-        limit: 8,
-        depth: 1,
-        sort: '-createdAt',
-        where: {
-          and: [
-            {
-              slug: {
-                not_equals: slug,
-              },
-            },
-            {
-              categories: {
-                in: categoryIds,
-              },
-            },
-          ],
-        },
-      }),
-    ])
 
   return (
     <div className="min-h-screen bg-[#FDFBF9] pb-20 font-sans">
-      <JsonLd data={schemaGraph} />
+      <script
+        type="application/ld+json"
+        className="rank-math-schema-pro"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(schemaGraph).replace(/</gu, '\\u003c'),
+        }}
+      />
       <div className="mx-auto max-w-[1240px] px-4 py-6">
         <nav className="mb-10 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
           <Link
@@ -512,7 +680,7 @@ export default async function BlogPostPage({
                     <div className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-100">
                       <User size={16} />
                     </div>
-                    <span>MF Paris Editorial</span>
+                    <span>{authorInfo.name}</span>
                   </div>
 
                   <div className="flex items-center gap-1.5">
@@ -525,9 +693,20 @@ export default async function BlogPostPage({
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <Clock size={14} /> 4 phút đọc
+                    <Clock size={14} /> {readingMinutes} phút đọc
                   </div>
                 </div>
+                <BlogPostEngagement
+                  authorName={authorInfo.name}
+                  authorTitle={authorInfo.title}
+                  initialRatingAverage={ratingStats.average}
+                  initialRatingCount={ratingStats.count}
+                  initialViewCount={viewCount}
+                  postId={post.id}
+                  reviewedAt={reviewerInfo.reviewedAt}
+                  reviewerName={reviewerInfo.name}
+                  reviewerTitle={reviewerInfo.title}
+                />
               </header>
 
               <div className="relative mb-12 aspect-video w-full overflow-hidden rounded-[2rem] bg-[#f4f0ed] shadow-xl">
@@ -545,6 +724,41 @@ export default async function BlogPostPage({
                 tocItems={tocItems}
                 maxHeight={500}
               />
+
+              {faqItems.length > 0 ? (
+                <section
+                  className="mt-14 rounded-[2rem] border border-orange-100 bg-orange-50/40 p-6 md:p-8"
+                  aria-labelledby="post-faq-heading"
+                >
+                  <p className="text-xs font-black uppercase tracking-[0.22em] text-[#E54D2E]">
+                    FAQ
+                  </p>
+
+                  <h2
+                    id="post-faq-heading"
+                    className="mt-2 text-2xl font-black tracking-tight text-gray-950 md:text-3xl"
+                  >
+                    Câu hỏi thường gặp
+                  </h2>
+
+                  <div className="mt-6 divide-y divide-orange-100">
+                    {faqItems.map((item, index) => (
+                      <details
+                        key={`${item.question}-${index}`}
+                        className="group py-4"
+                      >
+                        <summary className="cursor-pointer list-none text-base font-bold text-gray-950 marker:hidden">
+                          {item.question}
+                        </summary>
+
+                        <p className="mt-3 whitespace-pre-line text-sm leading-7 text-gray-600">
+                          {item.answer}
+                        </p>
+                      </details>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
 
               <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-gray-100 pt-10 md:flex-row">
                 <div
@@ -587,9 +801,9 @@ export default async function BlogPostPage({
               </div>
             </article>
 
-            {relatedPosts.docs.length > 0 && (
+            {relatedPostDocs.length > 0 && (
               <RelatedPostsCarousel
-                posts={relatedPosts.docs}
+                posts={relatedPostDocs}
               />
             )}
           </div>

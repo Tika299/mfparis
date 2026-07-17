@@ -547,9 +547,6 @@ export const ProductCard = ({
         <div
           className={cn(
             'mt-auto',
-            isFlashMode
-              ? 'pt-2.5 sm:pt-3'
-              : 'pt-4',
           )}
         >
           {mode === 'flash' && isSale ? (
