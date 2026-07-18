@@ -9,6 +9,7 @@ import * as migration_20260630_075143_add_site_settings_payment_fields from './2
 import * as migration_20260705_090000 from './20260705_090000';
 import * as migration_20260712_081600_add_media_import_fields from './20260712_081600_add_media_import_fields';
 import * as migration_20260717_043357_add_col_new from './20260717_043357_add_col_new';
+import * as migration_20260718_142438 from './20260718_142438';
 
 export const migrations = [
   {
@@ -64,6 +65,11 @@ export const migrations = [
   {
     up: migration_20260717_043357_add_col_new.up,
     down: migration_20260717_043357_add_col_new.down,
-    name: '20260717_043357_add_col_new'
+    name: '20260717_043357_add_col_new',
+  },
+  {
+    up: migration_20260718_142438.up,
+    down: migration_20260718_142438.down,
+    name: '20260718_142438'
   },
 ];

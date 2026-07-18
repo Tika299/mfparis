@@ -1567,6 +1567,26 @@ export default async function ProductPage({
     getApprovedReviews(product.id),
   ])
 
+  const sameBrandRelatedProducts = relatedProducts.filter(
+    (relatedProduct) => {
+      const relatedBrandID = getRelationshipID(relatedProduct.brand)
+      const currentBrandID = getRelationshipID(product.brand)
+
+      return (
+        relatedBrandID !== null &&
+        currentBrandID !== null &&
+        String(relatedBrandID) === String(currentBrandID)
+      )
+    },
+  )
+
+  const otherRelatedProducts = relatedProducts.filter(
+    (relatedProduct) =>
+      !sameBrandRelatedProducts.some(
+        (sameBrandProduct) => sameBrandProduct.id === relatedProduct.id,
+      ),
+  )
+
   const averageRating =
     typeof product.averageRating ===
       'number' &&
@@ -2736,9 +2756,20 @@ export default async function ProductPage({
             </div>
           </div>
 
-          {relatedProducts.length > 0 ? (
+          {sameBrandRelatedProducts.length > 0 ? (
             <RelatedProducts
-              products={relatedProducts}
+              products={sameBrandRelatedProducts}
+              headingId="same-brand-products-heading"
+              eyebrow="Cùng thương hiệu"
+              title="Sản phẩm cùng thương hiệu"
+              description="Các sản phẩm cùng thương hiệu đang được MF PARIS phân phối."
+            />
+          ) : null}
+
+          {otherRelatedProducts.length > 0 ? (
+            <RelatedProducts
+              products={otherRelatedProducts}
+              headingId="related-products-heading"
               eyebrow={
                 seoStatus === 'discontinued_keep_page'
                   ? 'Gợi ý thay thế'
@@ -2751,7 +2782,7 @@ export default async function ProductPage({
               }
               description={
                 seoStatus === 'discontinued_keep_page'
-                  ? 'Các sản phẩm cùng thương hiệu hoặc cùng danh mục đang được MF PARIS phân phối.'
+                  ? 'Các sản phẩm cùng danh mục hoặc có nhu cầu sử dụng tương tự.'
                   : undefined
               }
               className={

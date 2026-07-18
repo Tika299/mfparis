@@ -22,6 +22,7 @@ import {
 } from '@/components/Blog/BlogRichTextContent'
 import RelatedPostsCarousel from '@/components/Blog/RelatedPostsCarousel'
 import { BlogPostEngagement } from '@/components/Blog/BlogPostEngagement'
+import { BlogComments } from '@/components/Blog/BlogComments'
 import { SITE_ORIGIN } from '@/utilities/seo'
 import { extractHtmlHeadings, htmlToPlainText } from '@/lib/html/contentHtml'
 import { buildBlogPostingSchemaGraph } from '@/lib/structured-data'
@@ -55,6 +56,7 @@ type BlogPersonInfo = {
   title?: string | null
   url?: string | null
   avatarUrl?: string | null
+  bio?: string | null
   reviewedAt?: string | null
 }
 
@@ -339,6 +341,7 @@ function getBlogPersonInfo(
     title: getOptionalText(record.title) || fallback.title,
     url: getOptionalText(record.url) || fallback.url,
     avatarUrl: getMediaUrl(record.avatar as RelationshipMedia) || fallback.avatarUrl,
+    bio: getOptionalText(record.bio) || fallback.bio,
     reviewedAt: getOptionalText(record.reviewedAt) || fallback.reviewedAt,
   }
 }
@@ -359,6 +362,14 @@ function getPostRatingStats(post: any) {
 
 function getPostViewCount(post: any): number {
   return Math.max(0, Number(post?.viewCount) || 0)
+}
+
+function formatPostDate(value: string | null | undefined): string {
+  if (!value) {
+    return ''
+  }
+
+  return new Date(value).toLocaleDateString('vi-VN')
 }
 
 export async function generateMetadata({
@@ -504,6 +515,7 @@ export default async function BlogPostPage({
     title: 'MF Paris Editorial',
     url: '/author/mfparis/',
     avatarUrl: '/api/media/file/logo-thuong-hieu-marais-de-france-1200x1200-1-edited-e1768551529162.png',
+    bio: 'Marais de France là đội ngũ yêu thích hương thơm, chia sẻ kinh nghiệm đánh giá nước hoa và mỹ phẩm nhằm giúp khách hàng lựa chọn sản phẩm phù hợp.',
   })
   const reviewerInfo = getBlogPersonInfo(post.reviewer, {
     name: 'Marais de France',
@@ -540,7 +552,7 @@ export default async function BlogPostPage({
       ],
     }
   }
-  const [featuredPosts, relatedPosts] =
+  const [featuredPosts, relatedPosts, blogComments] =
     await Promise.all([
       payload.find({
         collection: 'posts',
@@ -557,8 +569,29 @@ export default async function BlogPostPage({
         sort: '-createdAt',
         where: relatedPostsWhere,
       }),
+      payload.find({
+        collection: 'blog-comments' as any,
+        depth: 0,
+        limit: 30,
+        sort: '-createdAt',
+        where: {
+          and: [
+            {
+              post: {
+                equals: post.id,
+              },
+            },
+            {
+              status: {
+                equals: 'approved',
+              },
+            },
+          ],
+        },
+      }),
     ])
-  const relatedPostDocs = relatedPosts.docs.slice(0, 8)
+  const relatedPostDocs = relatedPosts.docs.slice(0, 4)
+  const approvedBlogComments = blogComments.docs
   const schemaGraph = buildBlogPostingSchemaGraph({
     page: {
       url: canonicalUrl,
@@ -684,12 +717,13 @@ export default async function BlogPostPage({
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <Calendar size={14} />{' '}
-                    {new Date(
-                      post.createdAt,
-                    ).toLocaleDateString(
-                      'vi-VN',
-                    )}
+                    <Calendar size={14} />
+                    Ngày đăng: {formatPostDate(post.createdAt)}
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <Calendar size={14} />
+                    Cập nhật: {formatPostDate(post.updatedAt || post.createdAt)}
                   </div>
 
                   <div className="flex items-center gap-1.5">
@@ -724,6 +758,48 @@ export default async function BlogPostPage({
                 tocItems={tocItems}
                 maxHeight={500}
               />
+
+
+              <section
+                className="mt-14 rounded-[2rem] border border-gray-100 bg-[#fffaf7] p-6 md:p-8"
+                aria-labelledby="blog-author-heading"
+              >
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white text-[#E54D2E] shadow-sm">
+                    {authorInfo.avatarUrl ? (
+                      <img
+                        src={authorInfo.avatarUrl}
+                        alt={authorInfo.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <User size={26} />
+                    )}
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#E54D2E]">
+                      Tác giả
+                    </p>
+                    <h2
+                      id="blog-author-heading"
+                      className="mt-1 text-xl font-black text-gray-950"
+                    >
+                      {authorInfo.name}
+                    </h2>
+                    {authorInfo.title ? (
+                      <p className="mt-1 text-sm font-semibold text-gray-500">
+                        {authorInfo.title}
+                      </p>
+                    ) : null}
+                    {authorInfo.bio ? (
+                      <p className="mt-3 max-w-2xl text-sm leading-7 text-gray-600">
+                        {authorInfo.bio}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+              </section>
 
               {faqItems.length > 0 ? (
                 <section
@@ -806,6 +882,12 @@ export default async function BlogPostPage({
                 posts={relatedPostDocs}
               />
             )}
+
+            <BlogComments
+              comments={approvedBlogComments}
+              postId={post.id}
+            />
+
           </div>
 
           <aside className="lg:col-span-4 space-y-10">

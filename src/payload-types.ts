@@ -85,6 +85,7 @@ export interface Config {
     carts: Cart;
     'fragrance-notes': FragranceNote;
     reviews: Review;
+    'blog-comments': BlogComment;
     'voucher-redemptions': VoucherRedemption;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -110,6 +111,7 @@ export interface Config {
     carts: CartsSelect<false> | CartsSelect<true>;
     'fragrance-notes': FragranceNotesSelect<false> | FragranceNotesSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
+    'blog-comments': BlogCommentsSelect<false> | BlogCommentsSelect<true>;
     'voucher-redemptions': VoucherRedemptionsSelect<false> | VoucherRedemptionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -890,6 +892,30 @@ export interface Review {
   createdAt: string;
 }
 /**
+ * Duyệt bình luận bài viết trước khi hiển thị công khai trên frontend.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-comments".
+ */
+export interface BlogComment {
+  id: number;
+  post: number | Post;
+  name: string;
+  /**
+   * Email dùng để kiểm tra nội bộ, không hiển thị công khai.
+   */
+  email: string;
+  comment: string;
+  /**
+   * Chỉ bình luận đã duyệt mới được hiển thị trên frontend.
+   */
+  status: 'pending' | 'approved' | 'rejected';
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Sổ lịch sử giữ lượt, hoàn tất và hủy voucher. Không chỉnh sửa thủ công.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1006,6 +1032,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'reviews';
         value: number | Review;
+      } | null)
+    | ({
+        relationTo: 'blog-comments';
+        value: number | BlogComment;
       } | null)
     | ({
         relationTo: 'voucher-redemptions';
@@ -1601,6 +1631,21 @@ export interface ReviewsSelect<T extends boolean = true> {
   rating?: T;
   comment?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-comments_select".
+ */
+export interface BlogCommentsSelect<T extends boolean = true> {
+  post?: T;
+  name?: T;
+  email?: T;
+  comment?: T;
+  status?: T;
+  ipAddress?: T;
+  userAgent?: T;
   updatedAt?: T;
   createdAt?: T;
 }

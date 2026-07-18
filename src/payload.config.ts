@@ -24,6 +24,7 @@ import { Carts } from '@/collections/Carts'
 import { FragranceNotes } from './collections/FragranceNotes'
 import { Reviews } from '@/collections/Reviews'
 import { VoucherRedemptions } from '@/collections/VoucherRedemptions'
+import { BlogComments } from '@/collections/BlogComments'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -63,6 +64,7 @@ export default buildConfig({
     Carts,
     FragranceNotes,
     Reviews,
+    BlogComments,
     VoucherRedemptions,
   ],
   globals: [SiteSettings, AboutPage],

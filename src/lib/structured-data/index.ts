@@ -673,26 +673,8 @@ function buildCollectionItemListSchema(input: CollectionPageInput): SchemaObject
       stripEmpty({
         '@type': 'ListItem',
         position: index + 1,
-        item: stripEmpty({
-          '@type': 'Product',
-          '@id': schemaId(item.url, 'product'),
-          name: cleanString(item.name),
-          url: absoluteUrl(item.url),
-          image:
-            typeof item.image === 'string'
-              ? absoluteUrl(item.image)
-              : absoluteUrl(item.image?.url || undefined),
-          brand: input.subject?.type === 'Brand'
-            ? {
-              '@id': schemaId(input.subject.url || input.url, 'brand'),
-            }
-            : item.brandName
-              ? {
-                '@type': 'Brand',
-                name: item.brandName,
-              }
-              : undefined,
-        }),
+        name: cleanString(item.name),
+        url: absoluteUrl(item.url),
       }),
     ),
   }
@@ -712,44 +694,19 @@ export function buildRelatedItemListSchema(input: {
   }
 
   const url = absoluteUrl(input.url) || SITE_ORIGIN
-  const itemType = input.itemType || 'Thing'
-
   return stripEmpty({
     '@type': 'ItemList',
     '@id': schemaId(url, input.id || 'related-itemlist'),
     name: cleanString(input.name),
     numberOfItems: items.length,
     itemListElement: items.map((item, index) => {
-      const type = item.type || itemType
       const itemUrl = absoluteUrl(item.url) || SITE_ORIGIN
-      const itemIdSuffix =
-        type === 'Product'
-          ? 'richSnippet'
-          : type === 'BlogPosting' || type === 'Article'
-            ? 'richSnippet'
-            : 'webpage'
 
       return stripEmpty({
         '@type': 'ListItem',
         position: index + 1,
+        name: cleanString(item.name),
         url: itemUrl,
-        item: stripEmpty({
-          '@type': type,
-          '@id': schemaId(itemUrl, itemIdSuffix),
-          name: cleanString(item.name),
-          headline:
-            type === 'BlogPosting' || type === 'Article'
-              ? cleanString(item.name)
-              : undefined,
-          description: cleanString(item.description),
-          url: itemUrl,
-          image:
-            typeof item.image === 'string'
-              ? absoluteUrl(item.image)
-              : absoluteUrl(item.image?.url || undefined),
-          datePublished: cleanString(item.datePublished),
-          dateModified: cleanString(item.dateModified),
-        }),
       })
     }),
   })
