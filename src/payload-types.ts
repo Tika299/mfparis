@@ -75,6 +75,7 @@ export interface Config {
     categories: Category;
     orders: Order;
     posts: Post;
+    'blog-authors': BlogAuthor;
     'post-categories': PostCategory;
     messages: Message;
     'chat-profiles': ChatProfile;
@@ -101,6 +102,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    'blog-authors': BlogAuthorsSelect<false> | BlogAuthorsSelect<true>;
     'post-categories': PostCategoriesSelect<false> | PostCategoriesSelect<true>;
     messages: MessagesSelect<false> | MessagesSelect<true>;
     'chat-profiles': ChatProfilesSelect<false> | ChatProfilesSelect<true>;
@@ -689,6 +691,10 @@ export interface Post {
   slug: string;
   thumbnail: number | Media;
   categories?: (number | PostCategory)[] | null;
+  /**
+   * Chọn tác giả từ Blog Authors. Nếu bỏ trống, frontend sẽ dùng thông tin tác giả cũ trong bài hoặc tác giả mặc định.
+   */
+  authorProfile?: (number | null) | BlogAuthor;
   author?: {
     name?: string | null;
     title?: string | null;
@@ -757,6 +763,39 @@ export interface PostCategory {
   wpId?: number | null;
   sourceUrl?: string | null;
   importNotes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Quản lý hồ sơ tác giả để chọn trong từng bài blog và xuất schema tác giả.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-authors".
+ */
+export interface BlogAuthor {
+  id: number;
+  name: string;
+  /**
+   * Dùng cho URL tác giả và @id schema.
+   */
+  slug: string;
+  title?: string | null;
+  avatar?: (number | null) | Media;
+  bio?: string | null;
+  /**
+   * Có thể nhập /author/slug/ hoặc URL đầy đủ.
+   */
+  url?: string | null;
+  sameAs?:
+    | {
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Dùng khi bài viết chưa chọn tác giả riêng.
+   */
+  isDefault?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -900,6 +939,10 @@ export interface Review {
 export interface BlogComment {
   id: number;
   post: number | Post;
+  /**
+   * Dùng khi đây là phản hồi cho một bình luận khác.
+   */
+  parent?: (number | null) | BlogComment;
   name: string;
   /**
    * Email dùng để kiểm tra nội bộ, không hiển thị công khai.
@@ -992,6 +1035,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'posts';
         value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'blog-authors';
+        value: number | BlogAuthor;
       } | null)
     | ({
         relationTo: 'post-categories';
@@ -1375,6 +1422,7 @@ export interface PostsSelect<T extends boolean = true> {
   slug?: T;
   thumbnail?: T;
   categories?: T;
+  authorProfile?: T;
   author?:
     | T
     | {
@@ -1424,6 +1472,27 @@ export interface PostsSelect<T extends boolean = true> {
   wpId?: T;
   sourceUrl?: T;
   importNotes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-authors_select".
+ */
+export interface BlogAuthorsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  title?: T;
+  avatar?: T;
+  bio?: T;
+  url?: T;
+  sameAs?:
+    | T
+    | {
+        url?: T;
+        id?: T;
+      };
+  isDefault?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1640,6 +1709,7 @@ export interface ReviewsSelect<T extends boolean = true> {
  */
 export interface BlogCommentsSelect<T extends boolean = true> {
   post?: T;
+  parent?: T;
   name?: T;
   email?: T;
   comment?: T;

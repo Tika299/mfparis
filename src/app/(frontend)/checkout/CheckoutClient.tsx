@@ -28,6 +28,8 @@ import {
     type DeliveryMethod,
 } from '@/lib/shipping'
 
+type PaymentMethod = 'bank_transfer' | 'cod' | 'fundiin'
+
 type ValidatedCheckoutItem = Readonly<{
     id: string | number
     productId?: string | number | null
@@ -63,13 +65,16 @@ export type BankTransferSettings = Readonly<{
 
 export default function CheckoutPage({
     bankTransfer,
+    initialPaymentMethod = 'bank_transfer',
 }: Readonly<{
     bankTransfer: BankTransferSettings
+    initialPaymentMethod?: PaymentMethod
 }>) {
     const router = useRouter()
     const [isClient, setIsClient] = useState(false)
     const [loading, setLoading] = useState(false)
-    const [paymentMethod, setPaymentMethod] = useState('bank_transfer')
+    const [paymentMethod, setPaymentMethod] =
+        useState<PaymentMethod>(initialPaymentMethod)
     const [deliveryMethod, setDeliveryMethod] =
         useState<DeliveryMethod>('home_delivery')
 
@@ -588,7 +593,7 @@ export default function CheckoutPage({
 
                         <section className="bg-white rounded-[2rem] p-8 md:p-10 shadow-sm border border-gray-50">
                             <h2 className="text-xl font-bold text-gray-900 mb-8">Phương thức thanh toán</h2>
-                            <RadioGroup defaultValue="bank_transfer" onValueChange={setPaymentMethod} className="space-y-4">
+                            <RadioGroup value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as PaymentMethod)} className="space-y-4">
                                 <div
                                     className={`rounded-2xl border-2 transition-all ${paymentMethod === 'bank_transfer'
                                         ? 'border-[#b72828] bg-red-50/30'

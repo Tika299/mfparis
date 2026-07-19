@@ -9,6 +9,7 @@ type BlogCommentStatus = 'pending' | 'approved' | 'rejected'
 type BlogCommentDocument = {
   id: string | number
   post?: string | number | { id: string | number } | null
+  parent?: string | number | { id: string | number } | null
   name?: string | null
   email?: string | null
   comment?: string | null
@@ -97,6 +98,19 @@ export const BlogComments: CollectionConfig = {
       index: true,
       admin: {
         allowCreate: false,
+      },
+    },
+    {
+      name: 'parent',
+      label: 'B\u00ecnh lu\u1eadn cha',
+      type: 'relationship',
+      relationTo: 'blog-comments',
+      index: true,
+      admin: {
+        position: 'sidebar',
+        allowCreate: false,
+        description:
+          'D\u00f9ng khi \u0111\u00e2y l\u00e0 ph\u1ea3n h\u1ed3i cho m\u1ed9t b\u00ecnh lu\u1eadn kh\u00e1c.',
       },
     },
     {

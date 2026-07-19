@@ -47,6 +47,17 @@ export const Posts: CollectionConfig = {
       },
     },
     {
+      name: 'authorProfile',
+      type: 'relationship',
+      relationTo: 'blog-authors',
+      label: 'T\u00e1c gi\u1ea3',
+      admin: {
+        position: 'sidebar',
+        description:
+          'Ch\u1ecdn t\u00e1c gi\u1ea3 t\u1eeb Blog Authors. N\u1ebfu b\u1ecf tr\u1ed1ng, frontend s\u1ebd d\u00f9ng th\u00f4ng tin t\u00e1c gi\u1ea3 c\u0169 trong b\u00e0i ho\u1eb7c t\u00e1c gi\u1ea3 m\u1eb7c \u0111\u1ecbnh.',
+      },
+    },
+    {
       name: 'author',
       type: 'group',
       label: 'Tác giả',

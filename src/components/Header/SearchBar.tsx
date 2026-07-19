@@ -5,11 +5,63 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search } from 'lucide-react'
 
+import type { HeaderSearchBrand } from '@/data/getHeaderSearchBrands'
+
 type SearchBarProps = {
+  brandTargets?: HeaderSearchBrand[]
   mobile?: boolean
 }
 
+function normalizeSearchKey(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[đĐ]/g, 'd')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    .replace(/\s+/g, ' ')
+}
+
+function compactSearchKey(value: string): string {
+  return normalizeSearchKey(value).replace(/\s+/g, '')
+}
+
+function getBrandSearchUrl(
+  keyword: string,
+  brandTargets: readonly HeaderSearchBrand[],
+): string | null {
+  const keywordKey = normalizeSearchKey(keyword)
+  const compactKeywordKey = compactSearchKey(keyword)
+
+  if (!keywordKey) {
+    return null
+  }
+
+  for (const brand of brandTargets) {
+    const candidates = [
+      brand.name,
+      brand.slug,
+      brand.slug.replace(/-/g, ' '),
+    ]
+
+    const isMatch = candidates.some((candidate) => {
+      return (
+        normalizeSearchKey(candidate) === keywordKey ||
+        compactSearchKey(candidate) === compactKeywordKey
+      )
+    })
+
+    if (isMatch) {
+      return `/thuong-hieu/${encodeURIComponent(brand.slug)}/san-pham`
+    }
+  }
+
+  return null
+}
+
 export const SearchBar = ({
+  brandTargets = [],
   mobile = false,
 }: SearchBarProps) => {
   const [searchTerm, setSearchTerm] =
@@ -28,9 +80,17 @@ export const SearchBar = ({
       return
     }
 
-    const searchUrl = `/tim-kiem/${encodeURIComponent(keyword)}`
+    const brandUrl = getBrandSearchUrl(keyword, brandTargets)
 
-    router.push(searchUrl)
+    if (brandUrl) {
+      router.push(brandUrl)
+      setSearchTerm('')
+      return
+    }
+
+    router.push(
+      `/search?q=${encodeURIComponent(keyword)}`,
+    )
 
     setSearchTerm('')
   }

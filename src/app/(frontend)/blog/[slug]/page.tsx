@@ -23,6 +23,7 @@ import {
 import RelatedPostsCarousel from '@/components/Blog/RelatedPostsCarousel'
 import { BlogPostEngagement } from '@/components/Blog/BlogPostEngagement'
 import { BlogComments } from '@/components/Blog/BlogComments'
+import { JsonLd } from '@/components/JsonLd'
 import { SITE_ORIGIN } from '@/utilities/seo'
 import { extractHtmlHeadings, htmlToPlainText } from '@/lib/html/contentHtml'
 import { buildBlogPostingSchemaGraph } from '@/lib/structured-data'
@@ -58,6 +59,12 @@ type BlogPersonInfo = {
   avatarUrl?: string | null
   bio?: string | null
   reviewedAt?: string | null
+  sameAs?: string[] | null
+}
+
+type BlogBreadcrumbItem = {
+  name: string
+  url: string
 }
 
 function getSiteUrl(): string {
@@ -189,6 +196,144 @@ function getMediaUrl(
   } catch {
     return undefined
   }
+}
+
+function getPostCategoryName(
+  category: any,
+): string {
+  if (!category || typeof category !== 'object') {
+    return ''
+  }
+
+  return String(
+    category.title || category.name || '',
+  ).trim()
+}
+
+function getPostCategoryUrl(
+  category: any,
+): string {
+  const slug =
+    typeof category?.slug === 'string'
+      ? category.slug.trim()
+      : ''
+
+  return slug
+    ? `/blog?category=${encodeURIComponent(slug)}`
+    : '/blog'
+}
+
+function getPostCategoryParent(
+  category: any,
+): any | null {
+  return category?.parent &&
+    typeof category.parent === 'object'
+    ? category.parent
+    : null
+}
+
+function getPostCategoryDepth(
+  category: any,
+): number {
+  let depth = 0
+  let currentCategory = getPostCategoryParent(category)
+  const visitedIDs = new Set<unknown>([
+    category?.id,
+  ])
+
+  while (
+    currentCategory &&
+    !visitedIDs.has(currentCategory.id)
+  ) {
+    depth += 1
+    visitedIDs.add(currentCategory.id)
+    currentCategory =
+      getPostCategoryParent(currentCategory)
+  }
+
+  return depth
+}
+
+function getPostCategoryTrail(
+  category: any,
+): any[] {
+  const trail: any[] = []
+  let currentCategory = category
+  const visitedIDs = new Set<unknown>()
+
+  while (
+    currentCategory &&
+    typeof currentCategory === 'object' &&
+    !visitedIDs.has(currentCategory.id)
+  ) {
+    if (getPostCategoryName(currentCategory)) {
+      trail.unshift(currentCategory)
+    }
+
+    visitedIDs.add(currentCategory.id)
+    currentCategory =
+      getPostCategoryParent(currentCategory)
+  }
+
+  return trail
+}
+
+function getPostBreadcrumbItems(
+  post: any,
+): BlogBreadcrumbItem[] {
+  const categories = Array.isArray(post?.categories)
+    ? post.categories.filter((category: any) =>
+      getPostCategoryName(category),
+    )
+    : []
+
+  if (!categories.length) {
+    return []
+  }
+
+  const primaryCategory = [...categories].sort(
+    (leftCategory: any, rightCategory: any) => {
+      const depthDelta =
+        getPostCategoryDepth(rightCategory) -
+        getPostCategoryDepth(leftCategory)
+
+      if (depthDelta !== 0) {
+        return depthDelta
+      }
+
+      return getPostCategoryName(
+        leftCategory,
+      ).localeCompare(
+        getPostCategoryName(rightCategory),
+        'vi',
+      )
+    },
+  )[0]
+
+  return getPostCategoryTrail(primaryCategory).map(
+    (category) => ({
+      name: getPostCategoryName(category),
+      url: getPostCategoryUrl(category),
+    }),
+  )
+}
+
+function getBlogSchemaBreadcrumbItems(
+  post: any,
+  canonicalUrl: string,
+  categoryBreadcrumbItems: BlogBreadcrumbItem[],
+): BlogBreadcrumbItem[] {
+  return [
+    {
+      name: 'Trang chủ',
+      url: '/',
+    },
+    ...categoryBreadcrumbItems,
+    {
+      name: post.title,
+      url: canonicalUrl,
+    },
+  ]
 }
 
 function getTextFromNode(node: LexicalNode): string {
@@ -326,6 +471,33 @@ function getOptionalText(value: unknown): string | null {
     : null
 }
 
+function getStringArrayFromUnknown(value: unknown): string[] | null {
+  if (!Array.isArray(value)) {
+    return null
+  }
+
+  const items = value
+    .map((item) => {
+      if (typeof item === 'string') {
+        return item
+      }
+
+      if (
+        item &&
+        typeof item === 'object' &&
+        typeof (item as Record<string, unknown>).url === 'string'
+      ) {
+        return (item as Record<string, string>).url
+      }
+
+      return ''
+    })
+    .map((item) => item.trim())
+    .filter(Boolean)
+
+  return items.length > 0 ? items : null
+}
+
 function getBlogPersonInfo(
   value: unknown,
   fallback: BlogPersonInfo,
@@ -343,6 +515,32 @@ function getBlogPersonInfo(
     avatarUrl: getMediaUrl(record.avatar as RelationshipMedia) || fallback.avatarUrl,
     bio: getOptionalText(record.bio) || fallback.bio,
     reviewedAt: getOptionalText(record.reviewedAt) || fallback.reviewedAt,
+    sameAs: getStringArrayFromUnknown(record.sameAs) || fallback.sameAs,
+  }
+}
+
+function getBlogAuthorProfileInfo(
+  value: unknown,
+  fallback: BlogPersonInfo,
+): BlogPersonInfo {
+  if (!value || typeof value !== 'object') {
+    return fallback
+  }
+
+  const record = value as Record<string, unknown>
+  const slug = getOptionalText(record.slug)
+  const url =
+    getOptionalText(record.url) ||
+    (slug ? `/author/${slug}/` : fallback.url)
+
+  return {
+    name: getOptionalText(record.name) || fallback.name,
+    title: getOptionalText(record.title) || fallback.title,
+    url,
+    avatarUrl: getMediaUrl(record.avatar as RelationshipMedia) || fallback.avatarUrl,
+    bio: getOptionalText(record.bio) || fallback.bio,
+    reviewedAt: fallback.reviewedAt,
+    sameAs: getStringArrayFromUnknown(record.sameAs) || fallback.sameAs,
   }
 }
 
@@ -510,13 +708,36 @@ export default async function BlogPostPage({
   const wordCount = postPlainText.split(/\s+/u).filter(Boolean).length
   const readingMinutes = getReadingMinutes(wordCount)
   const faqItems = getPostFaqItems(post)
-  const authorInfo = getBlogPersonInfo(post.author, {
+  const defaultAuthorResult = await payload.find({
+    collection: 'blog-authors' as any,
+    depth: 2,
+    limit: 1,
+    sort: '-updatedAt',
+    where: {
+      isDefault: {
+        equals: true,
+      },
+    },
+  })
+  const siteFallbackAuthor: BlogPersonInfo = {
     name: 'Marais de France',
     title: 'MF Paris Editorial',
     url: '/author/mfparis/',
     avatarUrl: '/api/media/file/logo-thuong-hieu-marais-de-france-1200x1200-1-edited-e1768551529162.png',
     bio: 'Marais de France là đội ngũ yêu thích hương thơm, chia sẻ kinh nghiệm đánh giá nước hoa và mỹ phẩm nhằm giúp khách hàng lựa chọn sản phẩm phù hợp.',
-  })
+  }
+  const defaultAuthorInfo = getBlogAuthorProfileInfo(
+    defaultAuthorResult.docs[0],
+    siteFallbackAuthor,
+  )
+  const legacyAuthorInfo = getBlogPersonInfo(
+    post.author,
+    defaultAuthorInfo,
+  )
+  const authorInfo = getBlogAuthorProfileInfo(
+    post.authorProfile,
+    legacyAuthorInfo,
+  )
   const reviewerInfo = getBlogPersonInfo(post.reviewer, {
     name: 'Marais de France',
     title: 'Content Reviewer',
@@ -530,6 +751,7 @@ export default async function BlogPostPage({
       .filter(Boolean)
       .join(', ')
     : undefined
+  const blogBreadcrumbItems = getPostBreadcrumbItems(post)
   let relatedPostsWhere: Where = {
     slug: {
       not_equals: slug,
@@ -611,6 +833,7 @@ export default async function BlogPostPage({
       authorName: authorInfo.name,
       authorUrl: authorInfo.url,
       authorImage: authorInfo.avatarUrl,
+      authorSameAs: authorInfo.sameAs,
       reviewerName: reviewerInfo.name,
       reviewerUrl: reviewerInfo.url,
       dateReviewed: reviewerInfo.reviewedAt,
@@ -628,20 +851,11 @@ export default async function BlogPostPage({
         }
         : undefined,
     },
-    breadcrumb: [
-      {
-        name: 'Trang chủ',
-        url: '/',
-      },
-      {
-        name: 'Blog',
-        url: '/blog',
-      },
-      {
-        name: post.title,
-        url: canonicalUrl,
-      },
-    ],
+    breadcrumb: getBlogSchemaBreadcrumbItems(
+      post,
+      canonicalUrl,
+      blogBreadcrumbItems,
+    ),
     relatedItems: relatedPostDocs.map((relatedPost: any) => ({
       url: `/blog/${relatedPost.slug}`,
       name: relatedPost.title,
@@ -655,15 +869,12 @@ export default async function BlogPostPage({
 
   return (
     <div className="min-h-screen bg-[#FDFBF9] pb-20 font-sans">
-      <script
-        type="application/ld+json"
-        className="rank-math-schema-pro"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(schemaGraph).replace(/</gu, '\\u003c'),
-        }}
-      />
+      <JsonLd data={schemaGraph} />
       <div className="mx-auto max-w-[1240px] px-4 py-6">
-        <nav className="mb-10 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
+        <nav
+          aria-label="Breadcrumb"
+          className="mb-10 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-gray-400"
+        >
           <Link
             href="/"
             className="hover:text-black"
@@ -671,14 +882,21 @@ export default async function BlogPostPage({
             Trang chủ
           </Link>
 
-          <ChevronRight size={10} />
+          {blogBreadcrumbItems.map((item) => (
+            <span
+              key={item.url}
+              className="contents"
+            >
+              <ChevronRight size={10} />
 
-          <Link
-            href="/blog"
-            className="hover:text-black"
-          >
-            Blog
-          </Link>
+              <Link
+                href={item.url}
+                className="hover:text-black"
+              >
+                {item.name}
+              </Link>
+            </span>
+          ))}
 
           <ChevronRight size={10} />
 
@@ -877,12 +1095,6 @@ export default async function BlogPostPage({
               </div>
             </article>
 
-            {relatedPostDocs.length > 0 && (
-              <RelatedPostsCarousel
-                posts={relatedPostDocs}
-              />
-            )}
-
             <BlogComments
               comments={approvedBlogComments}
               postId={post.id}
@@ -911,22 +1123,27 @@ export default async function BlogPostPage({
               </button>
             </form>
 
-            {tocItems.length > 0 && (
-              <div className="lg:sticky lg:top-[190px]">
+            <div className="space-y-10 lg:sticky lg:top-[190px]">
+              {tocItems.length > 0 && (
                 <div className="rounded-[2.5rem] border border-gray-100 bg-white p-8 shadow-sm">
-                  <h3 className="mb-6 flex items-center gap-3 text-[13px] font-black uppercase tracking-[0.2em] text-gray-900">
+                  <h3 className="mb-2 flex items-center gap-3 text-[13px] font-black uppercase tracking-[0.2em] text-gray-900">
                     <span className="h-5 w-1 bg-primary"></span>
                     Mục lục
                   </h3>
 
                   <BlogTocNav tocItems={tocItems} />
                 </div>
-              </div>
-            )}
+              )}
+
+              {relatedPostDocs.length > 0 && (
+                <RelatedPostsCarousel
+                  posts={relatedPostDocs}
+                />
+              )}
+            </div>
           </aside>
         </div>
       </div>
     </div>
   )
 }
-

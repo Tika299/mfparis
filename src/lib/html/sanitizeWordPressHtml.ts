@@ -200,6 +200,25 @@ function isWordPressLazyPlaceholder(value: string): boolean {
   return /\/themes\/woodmart\/images\/lazy\.svg(?:$|[?#])/i.test(value)
 }
 
+function unwrapImageOnlyLinks(html: string): string {
+  let nextHtml = html
+
+  for (let index = 0; index < 5; index += 1) {
+    const unwrapped = nextHtml.replace(
+      /<a\b[^>]*>\s*((?:<img\b[^>]*>\s*)+)<\/a>/gi,
+      '$1',
+    )
+
+    if (unwrapped === nextHtml) {
+      break
+    }
+
+    nextHtml = unwrapped
+  }
+
+  return nextHtml
+}
+
 function sanitizeAttributes(tagName: string, attrs = ''): string {
   const sanitized: string[] = []
   const attrValues = new Map<string, string>()
@@ -308,7 +327,7 @@ export function sanitizeWordPressHtml(html: unknown): string {
     return ''
   }
 
-  return html
+  return unwrapImageOnlyLinks(html)
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(
       /<\s*(script|style|iframe|object|embed|form|input|button|textarea|select|option|meta|link|base)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi,

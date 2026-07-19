@@ -15,6 +15,7 @@ import {
 
 import { SearchBar } from './Header/SearchBar'
 import { CartCount } from './Header/CartCount'
+import type { HeaderSearchBrand } from '@/data/getHeaderSearchBrands'
 import { useWishlistStore } from '@/lib/store'
 
 type MobileMenuProps = {
@@ -25,12 +26,14 @@ type MobileMenuProps = {
     }[]
     logoUrl?: string | null
     logoAlt?: string
+    searchBrandTargets?: HeaderSearchBrand[]
 }
 
 export const MobileMenu = ({
     navItems,
     logoUrl,
     logoAlt = 'Marais de France',
+    searchBrandTargets = [],
 }: MobileMenuProps) => {
     const [open, setOpen] =
         useState(false)
@@ -145,7 +148,10 @@ export const MobileMenu = ({
 
                     {/* SEARCH */}
                     <div className="border-b border-[#eeeeee] px-5 py-4">
-                        <SearchBar mobile />
+                        <SearchBar
+                            brandTargets={searchBrandTargets}
+                            mobile
+                        />
                     </div>
 
                     {/* NAVIGATION */}

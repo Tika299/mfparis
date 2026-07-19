@@ -17,6 +17,7 @@ type RelatedProductsProps = {
   eyebrow?: string
   title?: string
   description?: string
+  emptyMessage?: string
   className?: string
 }
 
@@ -26,9 +27,15 @@ export const RelatedProducts = ({
   eyebrow = 'Gợi ý thêm',
   title = 'Sản phẩm liên quan',
   description,
+  emptyMessage,
   className,
 }: RelatedProductsProps) => {
-  if (!products || products.length === 0) return null
+  const normalizedProducts = Array.isArray(products)
+    ? products
+    : []
+  const hasProducts = normalizedProducts.length > 0
+
+  if (!hasProducts && !emptyMessage) return null
 
   const sectionClassName = [
     'mt-16 md:mt-24',
@@ -62,31 +69,37 @@ export const RelatedProducts = ({
         </div>
       </div>
 
-      <Carousel
-        opts={{ align: 'start', loop: products.length > 4 }}
-        plugins={[Autoplay({ delay: 4000 })]}
-        className="relative w-full"
-      >
-        <CarouselContent
-          as="ul"
-          className="-ml-4"
+      {hasProducts ? (
+        <Carousel
+          opts={{ align: 'start', loop: normalizedProducts.length > 4 }}
+          plugins={[Autoplay({ delay: 4000 })]}
+          className="relative w-full"
         >
-          {products.map((product) => (
-            <CarouselItem
-              as="li"
-              key={product.id}
-              className="basis-1/2 pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5"
-            >
-              <ProductCard product={product} />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
+          <CarouselContent
+            as="ul"
+            className="-ml-4"
+          >
+            {normalizedProducts.map((product) => (
+              <CarouselItem
+                as="li"
+                key={product.id}
+                className="basis-1/2 pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5"
+              >
+                <ProductCard product={product} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
 
-        <div className="hidden lg:block">
-          <CarouselPrevious className="-left-5 bg-white shadow-md xl:-left-6" />
-          <CarouselNext className="-right-5 bg-white shadow-md xl:-right-6" />
+          <div className="hidden lg:block">
+            <CarouselPrevious className="-left-5 bg-white shadow-md xl:-left-6" />
+            <CarouselNext className="-right-5 bg-white shadow-md xl:-right-6" />
+          </div>
+        </Carousel>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-gray-200 bg-white/70 px-5 py-6 text-sm font-semibold text-gray-500">
+          {emptyMessage}
         </div>
-      </Carousel>
+      )}
     </section>
   )
 }

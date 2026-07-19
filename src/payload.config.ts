@@ -25,6 +25,7 @@ import { FragranceNotes } from './collections/FragranceNotes'
 import { Reviews } from '@/collections/Reviews'
 import { VoucherRedemptions } from '@/collections/VoucherRedemptions'
 import { BlogComments } from '@/collections/BlogComments'
+import { BlogAuthors } from '@/collections/BlogAuthors'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -54,6 +55,7 @@ export default buildConfig({
     Categories,
     Orders,
     Posts,
+    BlogAuthors,
     PostCategories,
     Messages,
     ChatProfiles,

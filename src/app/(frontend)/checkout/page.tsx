@@ -7,6 +7,12 @@ import CheckoutClient, {
   type BankTransferSettings,
 } from './CheckoutClient'
 
+type CheckoutPageProps = Readonly<{
+  searchParams?: Promise<{
+    payment?: string
+  }>
+}>
+
 function getMediaUrl(value: unknown): string | null {
   if (!value || typeof value !== 'object') {
     return null
@@ -21,8 +27,15 @@ function getMediaUrl(value: unknown): string | null {
     : null
 }
 
-export default async function CheckoutPage() {
+export default async function CheckoutPage({
+  searchParams,
+}: CheckoutPageProps) {
   const settings = await getSiteSettings()
+  const resolvedSearchParams = await searchParams
+  const initialPaymentMethod =
+    resolvedSearchParams?.payment === 'fundiin'
+      ? 'fundiin'
+      : 'bank_transfer'
 
   const payment = (settings as unknown as {
     payment?: {
@@ -42,5 +55,10 @@ export default async function CheckoutPage() {
     bankQrImageUrl: getMediaUrl(payment?.bankQrImage),
   }
 
-  return <CheckoutClient bankTransfer={bankTransfer} />
+  return (
+    <CheckoutClient
+      bankTransfer={bankTransfer}
+      initialPaymentMethod={initialPaymentMethod}
+    />
+  )
 }

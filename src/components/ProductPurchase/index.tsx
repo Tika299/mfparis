@@ -8,7 +8,9 @@ import {
   Plus,
   ShoppingBag,
   ShoppingCart,
+  WalletCards,
 } from 'lucide-react'
+import { toast } from 'sonner'
 import { formatPrice } from '@/utilities/formatPrice'
 import { useCartStore } from '@/lib/store'
 
@@ -105,6 +107,45 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
     })
   }
 
+  const buildCartItem = () => ({
+    id: isVariableProduct
+      ? `${product.id}-${selectedVariant?.id}`
+      : product.id,
+
+    productId: product.id,
+    variantId: selectedVariant?.id,
+    variantName: selectedVariant?.name,
+
+    baseTitle: product.title,
+    title: selectedVariant?.name
+      ? `${product.title} - ${selectedVariant.name}`
+      : product.title,
+
+    price: finalPrice,
+    image,
+    slug: product.slug,
+    quantity,
+    sku,
+
+    stock,
+
+    variants: variants.map((variant: any) => {
+      const variantBasePrice = Number(variant?.basePrice || 0)
+      const variantSalePrice = Number(variant?.salePrice || 0)
+
+      return {
+        id: variant.id,
+        name: variant.name,
+        sku: variant.sku,
+        basePrice: variantBasePrice,
+        salePrice: variantSalePrice,
+        price: variantSalePrice > 0 ? variantSalePrice : variantBasePrice,
+        stock: Number(variant?.stock || 0),
+        image,
+      }
+    }),
+  } as any)
+
   const handleAddToCart = () => {
     if (isOutOfStock) return
 
@@ -113,46 +154,12 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
       return
     }
 
-    const cartItemId = isVariableProduct
-      ? `${product.id}-${selectedVariant?.id}`
-      : product.id
+    const cartItem = buildCartItem()
 
-    addItem({
-      id: isVariableProduct ? `${product.id}-${selectedVariant?.id}` : product.id,
-
-      productId: product.id,
-      variantId: selectedVariant?.id,
-      variantName: selectedVariant?.name,
-
-      baseTitle: product.title,
-      title: selectedVariant?.name
-        ? `${product.title} - ${selectedVariant.name}`
-        : product.title,
-
-      price: finalPrice,
-      image,
-      slug: product.slug,
-      quantity,
-      sku,
-
-      stock,
-
-      variants: variants.map((variant: any) => {
-        const variantBasePrice = Number(variant?.basePrice || 0)
-        const variantSalePrice = Number(variant?.salePrice || 0)
-
-        return {
-          id: variant.id,
-          name: variant.name,
-          sku: variant.sku,
-          basePrice: variantBasePrice,
-          salePrice: variantSalePrice,
-          price: variantSalePrice > 0 ? variantSalePrice : variantBasePrice,
-          stock: Number(variant?.stock || 0),
-          image,
-        }
-      }),
-    } as any)
+    addItem(cartItem)
+    toast.success('Đã thêm vào giỏ hàng', {
+      description: cartItem.title,
+    })
   }
 
   const handleBuyNow = () => {
@@ -163,8 +170,22 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
       return
     }
 
-    handleAddToCart()
+    addItem(buildCartItem())
+    toast.success('Đã thêm vào giỏ hàng')
     router.push('/cart')
+  }
+
+  const handleFundiinCheckout = () => {
+    if (isOutOfStock) return
+
+    if (isContactPrice) {
+      window.location.href = 'https://zalo.me/2731577726641619342'
+      return
+    }
+
+    addItem(buildCartItem())
+    toast.success('Đang chuyển đến thanh toán Fundiin')
+    router.push('/checkout?payment=fundiin')
   }
 
   return (
@@ -292,25 +313,37 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
       </div>
 
       {/* Nút mua */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-[56px_56px_minmax(0,1fr)] gap-3">
         <button
           type="button"
           onClick={handleAddToCart}
           disabled={isOutOfStock}
-          className="flex h-14 items-center justify-center gap-2 rounded-full border border-[#b72828] bg-white text-sm font-black uppercase tracking-widest text-[#b72828] transition hover:bg-[#fff5f5] disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-400"
+          aria-label={isContactPrice ? 'Liên hệ tư vấn' : 'Thêm vào giỏ hàng'}
+          title={isContactPrice ? 'Liên hệ tư vấn' : 'Thêm vào giỏ hàng'}
+          className="flex h-14 w-14 items-center justify-center rounded-full border border-[#b72828] bg-white text-[#b72828] transition hover:bg-[#fff5f5] disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-400"
         >
-          <ShoppingCart size={18} />
-          {isContactPrice ? 'Liên hệ' : 'Thêm giỏ'}
+          <ShoppingCart aria-hidden="true" size={20} />
         </button>
 
         <button
           type="button"
           onClick={handleBuyNow}
           disabled={isOutOfStock}
-          className="flex h-14 items-center justify-center gap-2 rounded-full bg-[#b72828] text-sm font-black uppercase tracking-widest text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-gray-300"
+          aria-label={isContactPrice ? 'Liên hệ tư vấn' : 'Mua ngay'}
+          title={isContactPrice ? 'Liên hệ tư vấn' : 'Mua ngay'}
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-[#b72828] text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-gray-300"
         >
-          <ShoppingBag size={18} />
-          {isContactPrice ? 'Liên hệ tư vấn' : 'Mua ngay'}
+          <ShoppingBag aria-hidden="true" size={20} />
+        </button>
+
+        <button
+          type="button"
+          onClick={handleFundiinCheckout}
+          disabled={isOutOfStock || isContactPrice}
+          className="flex h-14 min-w-0 items-center justify-center gap-2 rounded-full bg-[#00AEEF] px-4 text-[11px] font-black uppercase tracking-[0.12em] text-white transition hover:bg-sky-600 disabled:cursor-not-allowed disabled:bg-gray-300 sm:text-xs"
+        >
+          <WalletCards aria-hidden="true" size={19} />
+          <span className="truncate">Trả góp Fundiin</span>
         </button>
       </div>
 

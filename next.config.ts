@@ -16,14 +16,6 @@ const nextConfig: NextConfig = {
        * users keep the clean URL while Next.js renders the existing route.
        */
       {
-        source: '/tim-kiem',
-        destination: '/search',
-      },
-      {
-        source: '/tim-kiem/:query',
-        destination: '/search?q=:query',
-      },
-      {
         source: '/san-pham-moi',
         destination: '/products?sort=-createdAt',
       },

@@ -149,6 +149,49 @@ function withoutUndefined(object: AnyRecord) {
   return Object.fromEntries(Object.entries(object).filter(([, value]) => value !== undefined))
 }
 
+function normalizeImportedTimestamp(value: unknown, isGmt = false): string | undefined {
+  if (typeof value !== 'string') {
+    return undefined
+  }
+
+  const trimmed = value.trim()
+
+  if (!trimmed) {
+    return undefined
+  }
+
+  const normalized = trimmed.includes('T')
+    ? trimmed
+    : trimmed.replace(' ', 'T')
+  const withTimezone =
+    isGmt && !/[zZ]|[+-]\d{2}:?\d{2}$/.test(normalized)
+      ? `${normalized}Z`
+      : normalized
+  const date = new Date(withTimezone)
+
+  return Number.isFinite(date.getTime()) ? date.toISOString() : undefined
+}
+
+function getImportedTimestamps(item: AnyRecord) {
+  const createdAt =
+    normalizeImportedTimestamp(item.date_created_gmt, true) ||
+    normalizeImportedTimestamp(item.date_gmt, true) ||
+    normalizeImportedTimestamp(item.date_created) ||
+    normalizeImportedTimestamp(item.date)
+  const updatedAt =
+    normalizeImportedTimestamp(item.date_modified_gmt, true) ||
+    normalizeImportedTimestamp(item.modified_gmt, true) ||
+    normalizeImportedTimestamp(item.date_modified) ||
+    normalizeImportedTimestamp(item.modified) ||
+    normalizeImportedTimestamp(item.updated_at) ||
+    createdAt
+
+  return withoutUndefined({
+    createdAt,
+    updatedAt,
+  })
+}
+
 function resolveDataFile(filename: string, fallback?: string) {
   const primary = path.resolve(DATA_DIR, filename)
 
@@ -1276,6 +1319,7 @@ async function importProducts(payload: any, maps: ImportMaps) {
       const productImages = await normalizeProductImages(payload, rawProduct)
       const variants = await normalizeVariants(payload, rawProduct, maps)
       const productType = variants.length || rawProduct.type === 'variable' ? 'variable' : 'simple'
+      const importedTimestamps = getImportedTimestamps(rawProduct)
       const description = await normalizeHtmlWithMedia(
         payload,
         rawProduct.description || preparedProduct?.description || '',
@@ -1313,6 +1357,7 @@ async function importProducts(payload: any, maps: ImportMaps) {
         displayLocation: normalizeDisplayLocation(preparedProduct),
         wpId: Number(rawProduct.id) || undefined,
         sourceUrl: rawProduct.permalink || undefined,
+        ...importedTimestamps,
       })
 
       const result = await createOrUpdateBySlug(payload, 'products', slug, productData)
@@ -1358,6 +1403,7 @@ async function importPosts(payload: any, maps: ImportMaps) {
 
     try {
       const slug = makeSafeSlug(item.slug || title, item.id)
+      const importedTimestamps = getImportedTimestamps(item)
       const categories = await resolvePostCategoryIds(payload, item, maps)
       const featuredMedia = await fetchWPFeaturedMedia(item.featured_media)
       const featuredImage =

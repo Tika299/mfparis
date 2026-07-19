@@ -93,6 +93,11 @@ type ProductFaqItem = Readonly<{
   answer: string
 }>
 
+type ProductBreadcrumbItem = Readonly<{
+  name: string
+  url: string
+}>
+
 function isRecord(
   value: unknown,
 ): value is Record<string, unknown> {
@@ -171,6 +176,102 @@ function getProductCategories(
   }
 
   return product.categories.filter(isPopulatedCategory)
+}
+
+function getCategoryParent(
+  category: Category,
+): Category | null {
+  return isPopulatedCategory(category.parent)
+    ? category.parent
+    : null
+}
+
+function getCategoryDepth(
+  category: Category,
+): number {
+  let depth = 0
+  let currentCategory = getCategoryParent(category)
+  const visitedIDs = new Set<RelationshipID>([
+    category.id,
+  ])
+
+  while (
+    currentCategory &&
+    !visitedIDs.has(currentCategory.id)
+  ) {
+    depth += 1
+    visitedIDs.add(currentCategory.id)
+    currentCategory =
+      getCategoryParent(currentCategory)
+  }
+
+  return depth
+}
+
+function getPrimaryBreadcrumbCategory(
+  product: Product,
+): Category | null {
+  const currentCategories =
+    getProductCategories(product)
+
+  if (!currentCategories.length) {
+    return null
+  }
+
+  return [...currentCategories].sort(
+    (leftCategory, rightCategory) => {
+      const depthDelta =
+        getCategoryDepth(rightCategory) -
+        getCategoryDepth(leftCategory)
+
+      if (depthDelta !== 0) {
+        return depthDelta
+      }
+
+      return leftCategory.name.localeCompare(
+        rightCategory.name,
+        'vi',
+      )
+    },
+  )[0]
+}
+
+function getCategoryTrail(
+  category: Category,
+): Category[] {
+  const trail: Category[] = []
+  let currentCategory: Category | null = category
+  const visitedIDs = new Set<RelationshipID>()
+
+  while (
+    currentCategory &&
+    !visitedIDs.has(currentCategory.id)
+  ) {
+    trail.unshift(currentCategory)
+    visitedIDs.add(currentCategory.id)
+    currentCategory =
+      getCategoryParent(currentCategory)
+  }
+
+  return trail
+}
+
+function getProductCategoryBreadcrumbItems(
+  product: Product,
+): ProductBreadcrumbItem[] {
+  const primaryCategory =
+    getPrimaryBreadcrumbCategory(product)
+
+  if (!primaryCategory) {
+    return []
+  }
+
+  return getCategoryTrail(primaryCategory).map(
+    (category) => ({
+      name: category.name,
+      url: `/categories/${category.slug}`,
+    }),
+  )
 }
 
 function getProductCategoryIDs(
@@ -588,12 +689,10 @@ async function enforceProductLifecycleRedirect(
   )
 }
 
-function buildRelatedProductsWhere(
+function buildBaseRelatedProductConditions(
   productID: RelationshipID,
-  brandID: RelationshipID | null,
-  categoryIDsCsv: string,
-): Where {
-  const andConditions: Where[] = [
+): Where[] {
+  return [
     {
       id: {
         not_equals: productID,
@@ -625,34 +724,206 @@ function buildRelatedProductsWhere(
       ],
     },
   ]
+}
 
-  const affinityConditions: Where[] = []
-
-  if (brandID !== null) {
-    affinityConditions.push({
-      brand: {
-        equals: brandID,
+function buildSameBrandProductsWhere(
+  productID: RelationshipID,
+  brandID: RelationshipID,
+): Where {
+  return {
+    and: [
+      ...buildBaseRelatedProductConditions(productID),
+      {
+        brand: {
+          equals: brandID,
+        },
       },
-    })
+    ],
   }
+}
+
+function buildCategoryRelatedProductsWhere(
+  productID: RelationshipID,
+  brandID: RelationshipID | null,
+  categoryIDsCsv: string,
+  excludeSameBrand: boolean,
+): Where {
+  const andConditions =
+    buildBaseRelatedProductConditions(productID)
 
   if (categoryIDsCsv.length > 0) {
-    affinityConditions.push({
+    andConditions.push({
       categories: {
         in: categoryIDsCsv,
       },
     })
   }
 
-  if (affinityConditions.length > 0) {
+  if (excludeSameBrand && brandID !== null) {
     andConditions.push({
-      or: affinityConditions,
+      brand: {
+        not_equals: brandID,
+      },
     })
   }
 
   return {
     and: andConditions,
   }
+}
+
+function getProductAttributeSignatureSet(
+  product: Product,
+): Set<string> {
+  const signatures = new Set<string>()
+
+  if (!Array.isArray(product.productAttributes)) {
+    return signatures
+  }
+
+  for (const item of product.productAttributes) {
+    const attributeID = getRelationshipID(item.attribute)
+
+    if (attributeID !== null) {
+      signatures.add(`attribute:${attributeID}`)
+    }
+
+    if (Array.isArray(item.values)) {
+      for (const value of item.values) {
+        const valueID = getRelationshipID(value)
+
+        if (valueID !== null) {
+          signatures.add(`value:${valueID}`)
+        }
+      }
+    }
+
+    if (
+      attributeID !== null &&
+      typeof item.numericValue === 'number' &&
+      Number.isFinite(item.numericValue)
+    ) {
+      signatures.add(
+        `numeric:${attributeID}:${item.numericValue}`,
+      )
+    }
+
+    if (
+      attributeID !== null &&
+      typeof item.booleanValue === 'boolean'
+    ) {
+      signatures.add(
+        `boolean:${attributeID}:${item.booleanValue}`,
+      )
+    }
+
+    const textValue =
+      typeof item.textValue === 'string'
+        ? item.textValue.trim().toLowerCase()
+        : ''
+
+    if (attributeID !== null && textValue) {
+      signatures.add(`text:${attributeID}:${textValue}`)
+    }
+  }
+
+  return signatures
+}
+
+function getProductAttributeSignaturesCsv(
+  product: Product,
+): string {
+  return Array.from(getProductAttributeSignatureSet(product))
+    .sort((left, right) => left.localeCompare(right))
+    .join(',')
+}
+
+function getProductRelevancePrice(product: Product): number | null {
+  if (
+    product.productType === 'variable' &&
+    Array.isArray(product.variants)
+  ) {
+    const prices = product.variants
+      .filter((variant) => variant?.isActive !== false)
+      .map((variant) =>
+        getEffectivePrice(
+          variant.basePrice,
+          variant.salePrice,
+        ),
+      )
+      .filter(
+        (price): price is number =>
+          typeof price === 'number' &&
+          Number.isFinite(price) &&
+          price > 0,
+      )
+
+    return prices.length > 0 ? Math.min(...prices) : null
+  }
+
+  return getEffectivePrice(
+    product.price?.basePrice,
+    product.price?.salePrice,
+  )
+}
+
+function getProductStockScore(product: Product): number {
+  if (
+    product.productType === 'variable' &&
+    Array.isArray(product.variants)
+  ) {
+    const stock = product.variants
+      .filter((variant) => variant?.isActive !== false)
+      .reduce(
+        (total, variant) =>
+          total + Number(variant?.stock || 0),
+        0,
+      )
+
+    return stock > 0 ? 12 : -12
+  }
+
+  return Number(product.price?.stock || 0) > 0 ? 12 : -12
+}
+
+function getAttributeOverlapScore(
+  candidate: Product,
+  sourceAttributeSignatureSet: Set<string>,
+): number {
+  if (sourceAttributeSignatureSet.size === 0) {
+    return 0
+  }
+
+  let score = 0
+
+  for (const signature of getProductAttributeSignatureSet(candidate)) {
+    if (!sourceAttributeSignatureSet.has(signature)) {
+      continue
+    }
+
+    score += signature.startsWith('value:')
+      ? 28
+      : signature.startsWith('attribute:')
+        ? 8
+        : 16
+  }
+
+  return score
+}
+
+function getPriceProximityScore(
+  candidatePrice: number | null,
+  sourcePrice: number | null,
+): number {
+  if (!candidatePrice || !sourcePrice) {
+    return 0
+  }
+
+  const ratioDistance = Math.abs(
+    Math.log(candidatePrice / sourcePrice),
+  )
+
+  return Math.max(0, 24 - ratioDistance * 24)
 }
 
 function getComparableTimestamp(
@@ -671,6 +942,9 @@ function getRelatedProductScore(
   candidate: Product,
   brandID: RelationshipID | null,
   categoryIDSet: Set<string>,
+  sourceAttributeSignatureSet: Set<string>,
+  sourcePrice: number | null,
+  mode: 'same-brand' | 'category-related',
 ): number {
   let score = 0
   const candidateBrandID = getRelationshipID(
@@ -682,7 +956,7 @@ function getRelatedProductScore(
     candidateBrandID !== null &&
     String(candidateBrandID) === String(brandID)
   ) {
-    score += 100
+    score += mode === 'same-brand' ? 120 : 20
   }
 
   const categoryOverlap = getProductCategoryIDs(
@@ -691,23 +965,120 @@ function getRelatedProductScore(
     categoryIDSet.has(String(categoryID)),
   ).length
 
-  score += categoryOverlap * 35
+  score += categoryOverlap * (mode === 'same-brand' ? 70 : 90)
+  score += getAttributeOverlapScore(
+    candidate,
+    sourceAttributeSignatureSet,
+  )
+  score += getPriceProximityScore(
+    getProductRelevancePrice(candidate),
+    sourcePrice,
+  )
+  score += getProductStockScore(candidate)
 
   if (
     typeof candidate.averageRating === 'number' &&
     Number.isFinite(candidate.averageRating)
   ) {
-    score += Math.min(5, candidate.averageRating)
+    score += Math.min(5, candidate.averageRating) * 2
   }
 
   return score
 }
 
-const getRelatedProducts = unstable_cache(
+const relatedProductSelect = {
+  id: true,
+  title: true,
+  slug: true,
+  sku: true,
+  gtin: true,
+  mpn: true,
+  brand: true,
+  price: true,
+  images: true,
+  averageRating: true,
+  reviewCount: true,
+  status: true,
+  seoStatus: true,
+  categories: true,
+  productAttributes: true,
+  createdAt: true,
+  updatedAt: true,
+  productType: true,
+  variants: {
+    id: true,
+    name: true,
+    sku: true,
+    basePrice: true,
+    salePrice: true,
+    stock: true,
+    isActive: true,
+    isDefault: true,
+    image: true,
+  },
+} as const
+
+const sortRelatedCandidates = (
+  candidates: Product[],
+  brandID: RelationshipID | null,
+  categoryIDsCsv: string,
+  sourceAttributeSignaturesCsv: string,
+  sourcePrice: number | null,
+  mode: 'same-brand' | 'category-related',
+  limit: number,
+): Product[] => {
+  const categoryIDSet = new Set(
+    categoryIDsCsv
+      .split(',')
+      .map((categoryID) => categoryID.trim())
+      .filter(Boolean),
+  )
+  const sourceAttributeSignatureSet = new Set(
+    sourceAttributeSignaturesCsv
+      .split(',')
+      .map((signature) => signature.trim())
+      .filter(Boolean),
+  )
+
+  return candidates
+    .map((candidate) => ({
+      candidate,
+      score: getRelatedProductScore(
+        candidate,
+        brandID,
+        categoryIDSet,
+        sourceAttributeSignatureSet,
+        sourcePrice,
+        mode,
+      ),
+    }))
+    .sort((left, right) => {
+      if (right.score !== left.score) {
+        return right.score - left.score
+      }
+
+      return (
+        getComparableTimestamp(
+          right.candidate.updatedAt ||
+            right.candidate.createdAt,
+        ) -
+        getComparableTimestamp(
+          left.candidate.updatedAt ||
+            left.candidate.createdAt,
+        )
+      )
+    })
+    .slice(0, limit)
+    .map(({ candidate }) => candidate)
+}
+
+const getSameBrandProducts = unstable_cache(
   async (
     productID: RelationshipID,
-    brandID: RelationshipID | null,
+    brandID: RelationshipID,
     categoryIDsCsv: string,
+    sourceAttributeSignaturesCsv: string,
+    sourcePrice: number | null,
     limit: number,
   ): Promise<Product[]> => {
     const payload = await getPayload({
@@ -720,78 +1091,24 @@ const getRelatedProducts = unstable_cache(
       limit: Math.max(limit * 4, 24),
       overrideAccess: true,
       sort: '-createdAt',
-      where: buildRelatedProductsWhere(
+      where: buildSameBrandProductsWhere(
         productID,
         brandID,
-        categoryIDsCsv,
       ),
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        sku: true,
-        gtin: true,
-        mpn: true,
-        brand: true,
-        price: true,
-        images: true,
-        averageRating: true,
-        reviewCount: true,
-        status: true,
-        categories: true,
-        createdAt: true,
-        updatedAt: true,
-        productType: true,
-        variants: {
-          id: true,
-          name: true,
-          sku: true,
-          basePrice: true,
-          salePrice: true,
-          stock: true,
-          isActive: true,
-          isDefault: true,
-          image: true,
-        },
-      },
+      select: relatedProductSelect,
     })
 
-    const categoryIDSet = new Set(
-      categoryIDsCsv
-        .split(',')
-        .map((categoryID) => categoryID.trim())
-        .filter(Boolean),
+    return sortRelatedCandidates(
+      result.docs,
+      brandID,
+      categoryIDsCsv,
+      sourceAttributeSignaturesCsv,
+      sourcePrice,
+      'same-brand',
+      limit,
     )
-
-    return result.docs
-      .map((candidate) => ({
-        candidate,
-        score: getRelatedProductScore(
-          candidate,
-          brandID,
-          categoryIDSet,
-        ),
-      }))
-      .sort((left, right) => {
-        if (right.score !== left.score) {
-          return right.score - left.score
-        }
-
-        return (
-          getComparableTimestamp(
-            right.candidate.updatedAt ||
-              right.candidate.createdAt,
-          ) -
-          getComparableTimestamp(
-            left.candidate.updatedAt ||
-              left.candidate.createdAt,
-          )
-        )
-      })
-      .slice(0, limit)
-      .map(({ candidate }) => candidate)
   },
-  ['mfparis-related-products-v4'],
+  ['mfparis-same-brand-products-v1'],
   {
     revalidate: PRODUCT_REVALIDATE_SECONDS,
     tags: [
@@ -802,13 +1119,77 @@ const getRelatedProducts = unstable_cache(
   },
 )
 
-async function loadRelatedProducts(
+const getCategoryRelatedProducts = unstable_cache(
+  async (
+    productID: RelationshipID,
+    brandID: RelationshipID | null,
+    categoryIDsCsv: string,
+    sourceAttributeSignaturesCsv: string,
+    sourcePrice: number | null,
+    excludedIDsCsv: string,
+    excludeSameBrand: boolean,
+    limit: number,
+  ): Promise<Product[]> => {
+    const payload = await getPayload({
+      config: configPromise,
+    })
+
+    const result = await payload.find({
+      collection: 'products',
+      depth: 1,
+      limit: Math.max(limit * 6, 36),
+      overrideAccess: true,
+      sort: '-createdAt',
+      where: buildCategoryRelatedProductsWhere(
+        productID,
+        brandID,
+        categoryIDsCsv,
+        excludeSameBrand,
+      ),
+      select: relatedProductSelect,
+    })
+
+    const excludedIDSet = new Set(
+      excludedIDsCsv
+        .split(',')
+        .map((id) => id.trim())
+        .filter(Boolean),
+    )
+
+    return sortRelatedCandidates(
+      result.docs.filter(
+        (candidate) => !excludedIDSet.has(String(candidate.id)),
+      ),
+      brandID,
+      categoryIDsCsv,
+      sourceAttributeSignaturesCsv,
+      sourcePrice,
+      'category-related',
+      limit,
+    )
+  },
+  ['mfparis-category-related-products-v1'],
+  {
+    revalidate: PRODUCT_REVALIDATE_SECONDS,
+    tags: [
+      PRODUCTS_CACHE_TAG,
+      BRANDS_CACHE_TAG,
+      CATEGORIES_CACHE_TAG,
+    ],
+  },
+)
+
+async function loadSameBrandRelatedProducts(
   product: Product,
   limit: number,
 ): Promise<Product[]> {
   const brandID = getRelationshipID(
     product.brand,
   )
+
+  if (brandID === null) {
+    return []
+  }
 
   const categoryIDsCsv = getProductCategoryIDs(
     product,
@@ -819,12 +1200,111 @@ async function loadRelatedProducts(
     )
     .join(',')
 
-  return getRelatedProducts(
+  return getSameBrandProducts(
     product.id,
     brandID,
     categoryIDsCsv,
+    getProductAttributeSignaturesCsv(product),
+    getProductRelevancePrice(product),
     limit,
   )
+}
+
+async function loadCategoryRelatedProducts(
+  product: Product,
+  excludedProducts: Product[],
+  limit: number,
+): Promise<Product[]> {
+  const brandID = getRelationshipID(
+    product.brand,
+  )
+  const categoryIDsCsv = getProductCategoryIDs(
+    product,
+  )
+    .map(String)
+    .sort((left, right) =>
+      left.localeCompare(right),
+    )
+    .join(',')
+  const excludedIDsCsv = excludedProducts
+    .map((excludedProduct) => String(excludedProduct.id))
+    .sort((left, right) => left.localeCompare(right))
+    .join(',')
+
+  const relatedWithoutSameBrand =
+    await getCategoryRelatedProducts(
+      product.id,
+      brandID,
+      categoryIDsCsv,
+      getProductAttributeSignaturesCsv(product),
+      getProductRelevancePrice(product),
+      excludedIDsCsv,
+      true,
+      limit,
+    )
+
+  if (
+    relatedWithoutSameBrand.length >= limit ||
+    brandID === null
+  ) {
+    return relatedWithoutSameBrand
+  }
+
+  const fallbackProducts = await getCategoryRelatedProducts(
+    product.id,
+    brandID,
+    categoryIDsCsv,
+    getProductAttributeSignaturesCsv(product),
+    getProductRelevancePrice(product),
+    [
+      ...excludedProducts.map((excludedProduct) =>
+        String(excludedProduct.id),
+      ),
+      ...relatedWithoutSameBrand.map((relatedProduct) =>
+        String(relatedProduct.id),
+      ),
+    ]
+      .sort((left, right) => left.localeCompare(right))
+      .join(','),
+    false,
+    limit - relatedWithoutSameBrand.length,
+  )
+
+  return [
+    ...relatedWithoutSameBrand,
+    ...fallbackProducts,
+  ]
+}
+
+async function loadProductRecommendationGroups(
+  product: Product,
+  limit: number,
+): Promise<{
+  sameBrandProducts: Product[]
+  relatedProducts: Product[]
+  schemaProducts: Product[]
+}> {
+  const sameBrandProducts =
+    await loadSameBrandRelatedProducts(
+      product,
+      limit,
+    )
+
+  const relatedProducts =
+    await loadCategoryRelatedProducts(
+      product,
+      sameBrandProducts,
+      limit,
+    )
+
+  return {
+    sameBrandProducts,
+    relatedProducts,
+    schemaProducts: [
+      ...sameBrandProducts,
+      ...relatedProducts,
+    ].slice(0, limit),
+  }
 }
 
 function normalizeAverageRating(
@@ -1550,6 +2030,8 @@ export default async function ProductPage({
   const brand = getProductBrand(product)
   const categories =
     getProductCategories(product)
+  const productBreadcrumbItems =
+    getProductCategoryBreadcrumbItems(product)
 
   const relatedProductsLimit =
     seoStatus === 'discontinued_keep_page'
@@ -1557,35 +2039,22 @@ export default async function ProductPage({
       : DEFAULT_RELATED_PRODUCTS_LIMIT
 
   const [
-    relatedProducts,
+    recommendationGroups,
     approvedReviews,
   ] = await Promise.all([
-    loadRelatedProducts(
+    loadProductRecommendationGroups(
       product,
       relatedProductsLimit,
     ),
     getApprovedReviews(product.id),
   ])
 
-  const sameBrandRelatedProducts = relatedProducts.filter(
-    (relatedProduct) => {
-      const relatedBrandID = getRelationshipID(relatedProduct.brand)
-      const currentBrandID = getRelationshipID(product.brand)
-
-      return (
-        relatedBrandID !== null &&
-        currentBrandID !== null &&
-        String(relatedBrandID) === String(currentBrandID)
-      )
-    },
-  )
-
-  const otherRelatedProducts = relatedProducts.filter(
-    (relatedProduct) =>
-      !sameBrandRelatedProducts.some(
-        (sameBrandProduct) => sameBrandProduct.id === relatedProduct.id,
-      ),
-  )
+  const sameBrandRelatedProducts =
+    recommendationGroups.sameBrandProducts
+  const otherRelatedProducts =
+    recommendationGroups.relatedProducts
+  const relatedProducts =
+    recommendationGroups.schemaProducts
 
   const averageRating =
     typeof product.averageRating ===
@@ -1784,49 +2253,35 @@ export default async function ProductPage({
   const buildProductBreadcrumbJsonLd = (
     currentProduct: Product,
   ) => {
-    const currentCategories =
-      getProductCategories(
+    const canonicalUrl =
+      getProductCanonicalUrl(currentProduct.slug)
+    const items = [
+      {
+        name: 'Trang chủ',
+        url: SITE_ORIGIN,
+      },
+      ...getProductCategoryBreadcrumbItems(
         currentProduct,
-      )
-    const primaryCategory =
-      currentCategories[0]
+      ).map((item) => ({
+        name: item.name,
+        url: SITE_ORIGIN + item.url,
+      })),
+      {
+        name: currentProduct.title,
+        url: canonicalUrl,
+      },
+    ]
 
     return {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
-      '@id': `${getProductCanonicalUrl(currentProduct.slug)}#breadcrumb`,
-      itemListElement: [
-        {
-          '@type': 'ListItem',
-          position: 1,
-          name: 'Trang chủ',
-          item: SITE_ORIGIN,
-        },
-        {
-          '@type': 'ListItem',
-          position: 2,
-          name: 'Sản phẩm',
-          item: `${SITE_ORIGIN}/products`,
-        },
-        primaryCategory
-          ? {
-            '@type': 'ListItem',
-            position: 3,
-            name: primaryCategory.name,
-            item: `${SITE_ORIGIN}/categories/${primaryCategory.slug}`,
-          }
-          : null,
-        {
-          '@type': 'ListItem',
-          position: primaryCategory
-            ? 4
-            : 3,
-          name: currentProduct.title,
-          item: getProductCanonicalUrl(
-            currentProduct.slug,
-          ),
-        },
-      ].filter(Boolean),
+      '@id': `${canonicalUrl}#breadcrumb`,
+      itemListElement: items.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: item.name,
+        item: item.url,
+      })),
     }
   }
 
@@ -1952,15 +2407,17 @@ export default async function ProductPage({
   const getProductCategoryTrail = (
     currentProduct: Product,
   ): string | undefined => {
-    const currentCategories =
-      getProductCategories(currentProduct)
+    const breadcrumbItems =
+      getProductCategoryBreadcrumbItems(
+        currentProduct,
+      )
 
-    if (!currentCategories.length) {
+    if (!breadcrumbItems.length) {
       return undefined
     }
 
-    return currentCategories
-      .map((category) => category.name)
+    return breadcrumbItems
+      .map((item) => item.name)
       .join(' > ')
   }
 
@@ -1995,20 +2452,16 @@ export default async function ProductPage({
   ) => {
     const canonicalUrl =
       getProductCanonicalUrl(currentProduct.slug)
-    const currentCategories =
-      getProductCategories(currentProduct)
-
     const items = [
       {
         name: 'Trang chủ',
         url: SITE_ORIGIN,
       },
-      ...currentCategories.map((category) => ({
-        name: category.name,
-        url:
-          SITE_ORIGIN +
-          '/categories/' +
-          category.slug,
+      ...getProductCategoryBreadcrumbItems(
+        currentProduct,
+      ).map((item) => ({
+        name: item.name,
+        url: SITE_ORIGIN + item.url,
       })),
       {
         name: currentProduct.title,
@@ -2440,7 +2893,10 @@ export default async function ProductPage({
       />
 
       <div className="border-b border-gray-100 bg-white">
-        <div className="container-ux flex h-11 items-center gap-1.5 text-xs font-medium text-gray-500 md:h-12">
+        <nav
+          aria-label="Breadcrumb"
+          className="container-ux flex h-11 items-center gap-1.5 text-xs font-medium text-gray-500 md:h-12"
+        >
           <Link
             href="/"
             className="line-clamp-1 hover:text-black"
@@ -2448,17 +2904,24 @@ export default async function ProductPage({
             Trang chủ
           </Link>
 
-          <ChevronRight
-            aria-hidden="true"
-            size={14}
-          />
+          {productBreadcrumbItems.map((item) => (
+            <span
+              key={item.url}
+              className="contents"
+            >
+              <ChevronRight
+                aria-hidden="true"
+                size={14}
+              />
 
-          <Link
-            href="/products"
-            className="line-clamp-1 hover:text-black"
-          >
-            Sản phẩm
-          </Link>
+              <Link
+                href={item.url}
+                className="line-clamp-1 hover:text-black"
+              >
+                {item.name}
+              </Link>
+            </span>
+          ))}
 
           <ChevronRight
             aria-hidden="true"
@@ -2471,7 +2934,7 @@ export default async function ProductPage({
           >
             {product.title}
           </span>
-        </div>
+        </nav>
       </div>
 
       <div className="container-ux mt-4 md:mt-6 lg:mt-8">
@@ -2756,45 +3219,42 @@ export default async function ProductPage({
             </div>
           </div>
 
-          {sameBrandRelatedProducts.length > 0 ? (
-            <RelatedProducts
-              products={sameBrandRelatedProducts}
-              headingId="same-brand-products-heading"
-              eyebrow="Cùng thương hiệu"
-              title="Sản phẩm cùng thương hiệu"
-              description="Các sản phẩm cùng thương hiệu đang được MF PARIS phân phối."
-            />
-          ) : null}
+          <RelatedProducts
+            products={sameBrandRelatedProducts}
+            headingId="same-brand-products-heading"
+            eyebrow="Cùng thương hiệu"
+            title="Sản phẩm cùng thương hiệu"
+            description="Các sản phẩm cùng thương hiệu đang được MF PARIS phân phối."
+            emptyMessage="Chưa có sản phẩm cùng thương hiệu khác để hiển thị."
+          />
 
-          {otherRelatedProducts.length > 0 ? (
-            <RelatedProducts
-              products={otherRelatedProducts}
-              headingId="related-products-heading"
-              eyebrow={
-                seoStatus === 'discontinued_keep_page'
-                  ? 'Gợi ý thay thế'
-                  : 'Gợi ý thêm'
-              }
-              title={
-                seoStatus === 'discontinued_keep_page'
-                  ? 'Sản phẩm bạn có thể quan tâm'
-                  : 'Sản phẩm liên quan'
-              }
-              description={
-                seoStatus === 'discontinued_keep_page'
-                  ? 'Các sản phẩm cùng danh mục hoặc có nhu cầu sử dụng tương tự.'
-                  : undefined
-              }
-              className={
-                seoStatus === 'discontinued_keep_page'
-                  ? 'rounded-3xl border border-red-100 bg-white p-5 shadow-sm md:p-8'
-                  : undefined
-              }
-            />
-          ) : null}
+          <RelatedProducts
+            products={otherRelatedProducts}
+            headingId="related-products-heading"
+            eyebrow={
+              seoStatus === 'discontinued_keep_page'
+                ? 'Gợi ý thay thế'
+                : 'Gợi ý thêm'
+            }
+            title={
+              seoStatus === 'discontinued_keep_page'
+                ? 'Sản phẩm bạn có thể quan tâm'
+                : 'Sản phẩm liên quan'
+            }
+            description={
+              seoStatus === 'discontinued_keep_page'
+                ? 'Các sản phẩm cùng danh mục hoặc có nhu cầu sử dụng tương tự.'
+                : 'Các sản phẩm liên quan theo danh mục, thuộc tính, mức giá và nhu cầu sử dụng.'
+            }
+            emptyMessage="Chưa có sản phẩm liên quan phù hợp để hiển thị."
+            className={
+              seoStatus === 'discontinued_keep_page'
+                ? 'rounded-3xl border border-red-100 bg-white p-5 shadow-sm md:p-8'
+                : undefined
+            }
+          />
         </div>
       </div>
     </div>
   )
 }
-

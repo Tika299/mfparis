@@ -14,6 +14,7 @@ import { SearchBar } from './SearchBar'
 import { CartCount } from './CartCount'
 import { WishlistButton } from './WishlistButton'
 import { MobileMenu } from '../MobileMenu'
+import { getHeaderSearchBrands } from '@/data/getHeaderSearchBrands'
 import { getSiteSettings } from '@/data/getSiteSettings'
 import { HeaderHeightSync } from './HeaderHeightSync'
 
@@ -71,7 +72,10 @@ const fallbackNavItems: HeaderNavItem[] = [
 ]
 
 export const Header = async () => {
-  const settings = await getSiteSettings()
+  const [settings, searchBrandTargets] = await Promise.all([
+    getSiteSettings(),
+    getHeaderSearchBrands(),
+  ])
 
   const logo = settings.header?.logo
 
@@ -236,7 +240,7 @@ export const Header = async () => {
 
             {/* SEARCH */}
             <div className="w-full max-w-[340px] justify-self-center">
-              <SearchBar />
+              <SearchBar brandTargets={searchBrandTargets} />
             </div>
 
             {/* ACCOUNT / WISHLIST / CART */}
@@ -365,6 +369,7 @@ export const Header = async () => {
             navItems={navItems}
             logoUrl={logoUrl}
             logoAlt={logoAlt}
+            searchBrandTargets={searchBrandTargets}
           />
 
           {/* LOGO Ở GIỮA */}
@@ -410,7 +415,10 @@ export const Header = async () => {
 
         {/* SEARCH MOBILE */}
         <div className="border-b border-[#eeeeee] bg-white px-4 py-2.5">
-          <SearchBar mobile />
+          <SearchBar
+            brandTargets={searchBrandTargets}
+            mobile
+          />
         </div>
       </div>
     </header>

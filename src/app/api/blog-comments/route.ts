@@ -17,6 +17,20 @@ function normalizeId(value: unknown): string | number | null {
   return null
 }
 
+function getRelationId(
+  value: unknown,
+): string | number | null {
+  if (
+    value &&
+    typeof value === 'object' &&
+    'id' in value
+  ) {
+    return normalizeId((value as { id?: unknown }).id)
+  }
+
+  return normalizeId(value)
+}
+
 function normalizeText(
   value: unknown,
   maxLength: number,
@@ -56,6 +70,7 @@ export async function POST(request: Request) {
   const name = normalizeText(body?.name, 120)
   const email = normalizeText(body?.email, 180).toLowerCase()
   const comment = normalizeText(body?.comment, 2000)
+  const parentId = normalizeId(body?.parentId ?? body?.parent)
 
   if (!postId || !name || !EMAIL_PATTERN.test(email) || comment.length < 5) {
     return NextResponse.json(
@@ -68,17 +83,54 @@ export async function POST(request: Request) {
     config: configPromise,
   })
 
-  await payload.findByID({
-    collection: 'posts',
-    depth: 0,
-    id: postId,
-    overrideAccess: true,
-  })
+  try {
+    await payload.findByID({
+      collection: 'posts',
+      depth: 0,
+      id: postId,
+      overrideAccess: true,
+    })
+  } catch {
+    return NextResponse.json(
+      { error: 'Kh\u00f4ng t\u00ecm th\u1ea5y b\u00e0i vi\u1ebft.' },
+      { status: 404 },
+    )
+  }
+
+  let parentCommentId: string | number | undefined
+
+  if (parentId) {
+    const parentComment = await payload
+      .findByID({
+        collection: 'blog-comments' as any,
+        depth: 0,
+        id: parentId,
+        overrideAccess: true,
+      })
+      .catch(() => null)
+
+    if (
+      !parentComment ||
+      String(getRelationId(parentComment.post)) !== String(postId) ||
+      parentComment.status !== 'approved'
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            'B\u00ecnh lu\u1eadn c\u1ea7n tr\u1ea3 l\u1eddi kh\u00f4ng h\u1ee3p l\u1ec7.',
+        },
+        { status: 400 },
+      )
+    }
+
+    parentCommentId = parentComment.id
+  }
 
   await payload.create({
     collection: 'blog-comments' as any,
     data: {
       post: postId,
+      parent: parentCommentId,
       name,
       email,
       comment,

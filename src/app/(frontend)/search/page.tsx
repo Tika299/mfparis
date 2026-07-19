@@ -33,17 +33,16 @@ type SearchPageProps = {
 type PaginationItem = number | 'ellipsis'
 
 const SEARCH_PATHNAME = '/search'
-const PRETTY_SEARCH_PATHNAME = '/tim-kiem'
 const SEARCH_PER_PAGE = 12
 
-function getPrettySearchPath(query: string): string {
+function getSearchPath(query: string): string {
   const normalizedQuery = query.trim()
 
   if (!normalizedQuery) {
-    return PRETTY_SEARCH_PATHNAME
+    return SEARCH_PATHNAME
   }
 
-  return `${PRETTY_SEARCH_PATHNAME}/${encodeURIComponent(normalizedQuery)}`
+  return `${SEARCH_PATHNAME}?q=${encodeURIComponent(normalizedQuery)}`
 }
 
 function appendSearchParamValues(
@@ -190,7 +189,7 @@ export async function generateMetadata({
       },
     },
     alternates: {
-      canonical: getPrettySearchPath(query),
+      canonical: getSearchPath(query),
     },
     openGraph: {
       type: 'website',
@@ -198,7 +197,7 @@ export async function generateMetadata({
       siteName: 'MF Paris',
       title,
       description,
-      url: getPrettySearchPath(query),
+      url: getSearchPath(query),
     },
     twitter: {
       card: 'summary_large_image',
@@ -282,8 +281,8 @@ export default async function SearchPage({
   const paginationItems = getPaginationItems(currentPage, totalPages)
   const hasPreviousPage = currentPage > 1
   const hasNextPage = currentPage < totalPages
-  const baseSearchPath = getPrettySearchPath(query)
-  const clearFiltersHref = query ? baseSearchPath : SEARCH_PATHNAME
+  const baseSearchPath = SEARCH_PATHNAME
+  const clearFiltersHref = query ? getSearchPath(query) : SEARCH_PATHNAME
   const pageTitle = query
     ? `Kết quả tìm kiếm "${query}"`
     : 'Tìm kiếm sản phẩm'
@@ -293,6 +292,10 @@ export default async function SearchPage({
 
   const createPageUrl = (pageNumber: number): string => {
     const pageSearchParams = new URLSearchParams()
+
+    if (query) {
+      pageSearchParams.set('q', query)
+    }
 
     appendSearchParamValues(pageSearchParams, 'brand', brandValues)
     appendSearchParamValues(pageSearchParams, 'category', categoryValues)

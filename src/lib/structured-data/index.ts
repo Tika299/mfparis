@@ -436,7 +436,7 @@ export function buildWebSiteSchema(siteName = DEFAULT_SITE_NAME): SchemaObject {
     inLanguage: DEFAULT_LANGUAGE,
     potentialAction: {
       '@type': 'SearchAction',
-      target: `${SITE_ORIGIN}/tim-kiem/{search_term_string}`,
+      target: `${SITE_ORIGIN}/search?q={search_term_string}`,
       'query-input': 'required name=search_term_string',
     },
   }

@@ -34,14 +34,6 @@ function safeEncode(value: string): string {
   return encodeURIComponent(value.trim())
 }
 
-function appendParam(params: URLSearchParams, key: string, value: string | null | undefined) {
-  if (!value) {
-    return
-  }
-
-  params.append(key, value)
-}
-
 function getSingle(params: URLSearchParams, key: string): string | null {
   const values = params.getAll(key).filter(Boolean)
   return values.length === 1 ? values[0] : null
@@ -54,31 +46,11 @@ function nonEmptyKeys(params: URLSearchParams): string[] {
     .sort((left, right) => left.localeCompare(right, 'vi'))
 }
 
-function cloneWithout(params: URLSearchParams, keys: string[]): URLSearchParams {
-  const next = new URLSearchParams(params.toString())
-
-  for (const key of keys) {
-    next.delete(key)
-  }
-
-  return next
-}
-
-function queryString(params: URLSearchParams): string {
-  const value = params.toString()
-  return value ? `?${value}` : ''
-}
-
 export function getFilterParamsFromPrettyPathname(pathname: string): URLSearchParams {
   const params = new URLSearchParams()
   const parts = pathname.split('/').filter(Boolean).map(safeDecode)
 
   if (parts.length === 0) {
-    return params
-  }
-
-  if (parts[0] === 'tim-kiem') {
-    appendParam(params, 'q', parts[1])
     return params
   }
 
@@ -204,8 +176,7 @@ export function buildPrettyFilterUrl(
   const q = getSingle(normalized, 'q')
 
   if (q) {
-    const rest = cloneWithout(normalized, ['q'])
-    return `/tim-kiem/${safeEncode(q)}${queryString(rest)}`
+    return null
   }
 
   const keys = nonEmptyKeys(normalized)

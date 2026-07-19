@@ -24,6 +24,7 @@ type ClearCollection =
   | 'orders'
   | 'carts'
   | 'reviews'
+  | 'blog-comments'
   | 'posts'
   | 'products'
   | 'post-categories'
@@ -59,6 +60,11 @@ const dependencyTargets: ClearTarget[] = [
     label: 'don hang',
     reason:
       'orders_items.product_id dang chan viec xoa products trong database',
+  },
+  {
+    collection: 'blog-comments',
+    label: 'binh luan blog',
+    reason: 'tham chieu bai viet',
   },
 ]
 

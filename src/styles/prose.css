@@ -117,7 +117,7 @@
 
 .prose img {
   display: block;
-  max-width: 100%;
+  max-width: min(100%, 800px) !important;
   height: auto;
   border-radius: 10px;
 }
@@ -126,7 +126,7 @@
 .prose .wp-block-image,
 .prose .wp-caption {
   margin: 2rem auto;
-  max-width: 100%;
+  max-width: min(100%, 800px) !important;
 }
 
 .prose figure img,

@@ -15,6 +15,7 @@ export const metadata = {
 
 type PageProps = {
   searchParams?: Promise<{
+    category?: string
     page?: string
     q?: string
   }>
@@ -48,16 +49,59 @@ export default async function BlogPage({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams
   const currentPage = Math.max(Number(resolvedSearchParams?.page) || 1, 1)
   const q = resolvedSearchParams?.q?.trim() || ''
+  const categorySlug =
+    resolvedSearchParams?.category?.trim() || ''
   const limit = 9
 
-  const whereQueries: any = {}
+  const selectedCategoryResult = categorySlug
+    ? await payload.find({
+      collection: 'post-categories',
+      depth: 0,
+      limit: 1,
+      pagination: false,
+      where: {
+        slug: {
+          equals: categorySlug,
+        },
+      },
+    })
+    : null
+  const selectedCategory =
+    selectedCategoryResult?.docs?.[0] ?? null
+  const whereConditions: any[] = []
+
   if (q) {
-    whereQueries.or = [
-      { title: { contains: q } },
-      { excerpt: { contains: q } },
-      { slug: { contains: q } },
-    ]
+    whereConditions.push({
+      or: [
+        { title: { contains: q } },
+        { excerpt: { contains: q } },
+        { slug: { contains: q } },
+      ],
+    })
   }
+
+  if (categorySlug) {
+    whereConditions.push(
+      selectedCategory
+        ? {
+          categories: {
+            in: [selectedCategory.id],
+          },
+        }
+        : {
+          id: {
+            equals: -1,
+          },
+        },
+    )
+  }
+
+  const whereQueries: any =
+    whereConditions.length > 0
+      ? {
+        and: whereConditions,
+      }
+      : {}
 
   const posts = await payload.find({
     collection: 'posts',
@@ -74,6 +118,9 @@ export default async function BlogPage({ searchParams }: PageProps) {
     const params = new URLSearchParams()
 
     if (q) params.set('q', q)
+    if (categorySlug) {
+      params.set('category', categorySlug)
+    }
     if (page > 1) params.set('page', String(page))
 
     const queryString = params.toString()
@@ -92,10 +139,15 @@ export default async function BlogPage({ searchParams }: PageProps) {
     return pages
   }
   const blogUrl = getPageHref(currentPage)
+  const blogPageTitle = selectedCategory
+    ? `Blog: ${selectedCategory.title}`
+    : q
+      ? `Kết quả tìm kiếm blog: ${q}`
+      : 'Blog MF Paris'
   const schemaGraph = buildCollectionPageSchemaGraph({
     page: {
       url: blogUrl,
-      name: q ? `Kết quả tìm kiếm blog: ${q}` : 'Blog MF Paris',
+      name: blogPageTitle,
       description:
         'Cập nhật kiến thức nước hoa, mỹ phẩm, chăm sóc da và sức khỏe từ MF Paris.',
       breadcrumb: [
@@ -146,6 +198,13 @@ export default async function BlogPage({ searchParams }: PageProps) {
           action="/blog"
           className="mx-auto mt-8 flex max-w-xl items-center overflow-hidden rounded-full border border-gray-200 bg-white p-1.5 shadow-sm"
         >
+          {categorySlug ? (
+            <input
+              type="hidden"
+              name="category"
+              value={categorySlug}
+            />
+          ) : null}
           <input
             name="q"
             defaultValue={q}

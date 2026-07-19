@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Newspaper } from 'lucide-react'
 import { OptimizedImage } from '@/components/OptimizedImage'
 
 type RelatedPostsCarouselProps = {
@@ -18,87 +18,78 @@ export default function RelatedPostsCarousel({
   return (
     <section
       aria-labelledby={headingId}
-      className="mt-16"
+      className="rounded-[2.5rem] border border-gray-100 bg-white p-6 shadow-sm"
     >
-      <div className="mb-8 flex items-end justify-between gap-4">
-        <div>
-          <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.28em] text-primary">
-            MF Paris Journal
-          </span>
-          <h2
-            id={headingId}
-            className="font-heading text-2xl font-bold text-gray-900 md:text-3xl"
-          >
-            Bài viết liên quan
-          </h2>
-        </div>
-
-        <Link
-          href="/blog"
-          className="hidden rounded-full border border-gray-200 bg-white px-5 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-gray-600 transition-all hover:border-black hover:bg-black hover:text-white md:inline-flex"
+      <div className="flex items-center justify-between gap-3">
+        <h2
+          id={headingId}
+          className="flex items-center gap-3 text-[13px] font-black uppercase tracking-[0.2em] text-gray-900"
         >
-          Xem thêm
-        </Link>
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-red-50 text-primary">
+            <Newspaper
+              aria-hidden="true"
+              size={16}
+            />
+          </span>
+          Bài viết liên quan
+        </h2>
       </div>
 
-      <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        {posts.slice(0, 4).map((rPost: any) => (
-          <li key={rPost.id}>
+      <ul className="space-y-4">
+        {posts.slice(0, 4).map((relatedPost: any) => (
+          <li key={relatedPost.id}>
             <Link
-              href={`/blog/${rPost.slug}`}
-              className="group block h-full overflow-hidden rounded-[1.75rem] border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-red-100 hover:shadow-xl hover:shadow-red-50/70"
+              href={`/blog/${relatedPost.slug}`}
+              className="group grid grid-cols-[88px_1fr] gap-3 rounded-2xl border border-gray-100 bg-white p-2 transition-colors hover:border-red-100 hover:bg-red-50/30"
             >
-              <div className="relative aspect-video overflow-hidden bg-[#f4f0ed]">
-                {rPost.thumbnail ? (
+              <div className="relative aspect-square overflow-hidden rounded-xl bg-[#f4f0ed]">
+                {relatedPost.thumbnail ? (
                   <OptimizedImage
-                    media={rPost.thumbnail}
+                    media={relatedPost.thumbnail}
                     size="card"
-                    alt={rPost.title}
-                    className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                    alt={relatedPost.title}
+                    className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#f8f1ef] to-white">
-                    <span className="font-heading text-xl font-bold text-primary/80">
+                    <span className="font-heading text-sm font-bold text-primary/80">
                       MF Paris
                     </span>
                   </div>
                 )}
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/0 to-black/0 opacity-80" />
               </div>
 
-              <div className="p-5">
-                <div className="mb-3 flex items-center justify-between gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
-                  <span>MF Journal</span>
-                  {rPost.createdAt && (
-                    <span>
-                      {new Date(rPost.createdAt).toLocaleDateString('vi-VN')}
-                    </span>
-                  )}
-                </div>
-
-                <h3 className="font-heading line-clamp-2 text-lg font-bold leading-tight text-gray-900 transition-colors group-hover:text-primary">
-                  {rPost.title}
+              <div className="min-w-0 py-1 pr-1">
+                <h3 className="line-clamp-2 text-sm font-bold leading-snug text-gray-900 transition-colors group-hover:text-primary">
+                  {relatedPost.title}
                 </h3>
 
-                {rPost.excerpt && (
-                  <p className="mt-3 line-clamp-2 text-sm leading-6 text-gray-500">
-                    {rPost.excerpt}
+                {relatedPost.createdAt ? (
+                  <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400">
+                    {new Date(relatedPost.createdAt).toLocaleDateString('vi-VN')}
                   </p>
-                )}
+                ) : null}
 
-                <div className="mt-5 inline-flex items-center text-[10px] font-black uppercase tracking-[0.22em] text-primary">
+                <span className="mt-3 inline-flex items-center text-[10px] font-black uppercase tracking-[0.18em] text-primary">
                   Đọc tiếp
                   <ChevronRight
-                    size={14}
+                    aria-hidden="true"
+                    size={13}
                     className="ml-1 transition-transform duration-300 group-hover:translate-x-1"
                   />
-                </div>
+                </span>
               </div>
             </Link>
           </li>
         ))}
       </ul>
+
+      <Link
+        href="/blog"
+        className="mt-5 inline-flex w-full items-center justify-center rounded-full border border-gray-200 bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-gray-600 transition-all hover:border-black hover:bg-black hover:text-white"
+      >
+        Xem thêm
+      </Link>
     </section>
   )
 }
