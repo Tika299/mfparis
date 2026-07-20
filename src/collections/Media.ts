@@ -34,6 +34,14 @@ export const Media: CollectionConfig = {
         withoutEnlargement: true,
       },
       {
+        name: 'blogCard',
+        width: 960,
+        height: 540,
+        fit: 'cover',
+        position: 'centre',
+        withoutEnlargement: true,
+      },
+      {
         name: 'heroMobile',
         width: 414,
         height: 552,

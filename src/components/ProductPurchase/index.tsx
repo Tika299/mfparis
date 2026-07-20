@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -170,9 +170,17 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
       return
     }
 
-    addItem(buildCartItem())
-    toast.success('Đã thêm vào giỏ hàng')
-    router.push('/cart')
+    const buyNowItem = buildCartItem()
+
+    window.localStorage.setItem(
+      'mf-paris-checkout-items',
+      JSON.stringify([buyNowItem]),
+    )
+
+    toast.success('Đang chuyển đến thanh toán', {
+      description: buyNowItem.title,
+    })
+    router.push('/checkout?mode=single')
   }
 
   const handleFundiinCheckout = () => {
@@ -183,9 +191,35 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
       return
     }
 
-    addItem(buildCartItem())
-    toast.success('Đang chuyển đến thanh toán Fundiin')
-    router.push('/checkout?payment=fundiin')
+    const fundiinItem = buildCartItem()
+
+    window.localStorage.setItem(
+      'mf-paris-fundiin-checkout-item',
+      JSON.stringify(fundiinItem),
+    )
+
+    window.localStorage.setItem(
+      'mf-paris-checkout-items',
+      JSON.stringify([fundiinItem]),
+    )
+
+    const params = new URLSearchParams({
+      product_id: String(product.id),
+      quantity: String(quantity),
+    })
+
+    if (selectedVariant?.id) {
+      params.set('variant_id', String(selectedVariant.id))
+    }
+
+    if (selectedVariant?.wpVariationId) {
+      params.set('variation_id', String(selectedVariant.wpVariationId))
+    }
+
+    toast.success('Đang mở bảng tính trả góp Fundiin', {
+      description: fundiinItem.title,
+    })
+    router.push(`/tra-gop?${params.toString()}`)
   }
 
   return (
@@ -313,37 +347,41 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
       </div>
 
       {/* Nút mua */}
-      <div className="grid grid-cols-[56px_56px_minmax(0,1fr)] gap-3">
-        <button
-          type="button"
-          onClick={handleAddToCart}
-          disabled={isOutOfStock}
-          aria-label={isContactPrice ? 'Liên hệ tư vấn' : 'Thêm vào giỏ hàng'}
-          title={isContactPrice ? 'Liên hệ tư vấn' : 'Thêm vào giỏ hàng'}
-          className="flex h-14 w-14 items-center justify-center rounded-full border border-[#b72828] bg-white text-[#b72828] transition hover:bg-[#fff5f5] disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-400"
-        >
-          <ShoppingCart aria-hidden="true" size={20} />
-        </button>
+      <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={isOutOfStock}
+            aria-label={isContactPrice ? 'Liên hệ tư vấn' : ''}
+            title={isContactPrice ? 'Liên hệ tư vấn' : ''}
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl border border-[#b72828] bg-white px-5 text-sm font-black uppercase tracking-[0.12em] text-[#b72828] transition hover:bg-[#fff5f5] disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-400"
+          >
+            <ShoppingCart aria-hidden="true" size={24} />
+            <span>{isContactPrice ? 'Liên hệ tư vấn' : ''}</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={handleBuyNow}
-          disabled={isOutOfStock}
-          aria-label={isContactPrice ? 'Liên hệ tư vấn' : 'Mua ngay'}
-          title={isContactPrice ? 'Liên hệ tư vấn' : 'Mua ngay'}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-[#b72828] text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-gray-300"
-        >
-          <ShoppingBag aria-hidden="true" size={20} />
-        </button>
+          <button
+            type="button"
+            onClick={handleBuyNow}
+            disabled={isOutOfStock}
+            aria-label={isContactPrice ? 'Liên hệ tư vấn' : 'Mua ngay'}
+            title={isContactPrice ? 'Liên hệ tư vấn' : 'Mua ngay'}
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-[#b72828] px-5 text-sm font-black uppercase tracking-[0.12em] text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            <ShoppingBag aria-hidden="true" size={19} />
+            <span>{isContactPrice ? 'Liên hệ tư vấn' : 'Mua ngay'}</span>
+          </button>
+        </div>
 
         <button
           type="button"
           onClick={handleFundiinCheckout}
           disabled={isOutOfStock || isContactPrice}
-          className="flex h-14 min-w-0 items-center justify-center gap-2 rounded-full bg-[#00AEEF] px-4 text-[11px] font-black uppercase tracking-[0.12em] text-white transition hover:bg-sky-600 disabled:cursor-not-allowed disabled:bg-gray-300 sm:text-xs"
+          className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#00AEEF] px-5 text-sm font-black uppercase tracking-[0.12em] text-white transition hover:bg-sky-600 disabled:cursor-not-allowed disabled:bg-gray-300"
         >
-          <WalletCards aria-hidden="true" size={19} />
-          <span className="truncate">Trả góp Fundiin</span>
+          <WalletCards aria-hidden="true" size={20} />
+          <span>Trả góp qua Fundiin</span>
         </button>
       </div>
 

@@ -258,12 +258,13 @@ export default async function BlogPage({ searchParams }: PageProps) {
                   >
                     <div className="relative aspect-video overflow-hidden bg-[#f4f0ed]">
                       {post.thumbnail ? (
-                        <OptimizedImage
-                          media={post.thumbnail}
-                          alt={post.title}
-                          size="card"
-                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
+                          <OptimizedImage
+                            media={post.thumbnail}
+                            alt={post.title}
+                            size="blogCard"
+                            className="h-full w-full"
+                            imageClassName="object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                          />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#f8f1ef] to-[#fff] px-6 text-center">
                           <span className="font-heading text-2xl font-bold text-primary/80">

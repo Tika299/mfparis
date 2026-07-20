@@ -1,8 +1,8 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { useCartStore } from '@/lib/store'
+import { useCartStore, type CartItem } from '@/lib/store'
 import { formatPrice } from '@/utilities/formatPrice'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -71,8 +71,16 @@ export default function CheckoutPage({
     initialPaymentMethod?: PaymentMethod
 }>) {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const checkoutMode = searchParams.get('mode')
+    const isSelectedCheckout =
+        checkoutMode === 'single' || checkoutMode === 'selection'
+    const isSingleFundiinCheckout =
+        initialPaymentMethod === 'fundiin' && checkoutMode === 'single'
     const [isClient, setIsClient] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [selectedCheckoutItems, setSelectedCheckoutItems] =
+        useState<CartItem[]>([])
     const [paymentMethod, setPaymentMethod] =
         useState<PaymentMethod>(initialPaymentMethod)
     const [deliveryMethod, setDeliveryMethod] =
@@ -86,8 +94,10 @@ export default function CheckoutPage({
     const syncItems = useCartStore((state: any) => state.syncItems)
 
     // Lấy dữ liệu từ Zustand Store
-    const items = useCartStore((state) => state.items)
+    const cartItems = useCartStore((state) => state.items)
     const clearCart = useCartStore((state) => state.clearCart)
+    const removeItem = useCartStore((state) => state.removeItem)
+    const items = isSelectedCheckout ? selectedCheckoutItems : cartItems
     const totalPrice = items.reduce((acc, item) => acc + item.price * item.quantity, 0)
 
     const subtotalAmount = items.reduce(
@@ -137,11 +147,82 @@ export default function CheckoutPage({
     })
 
     const hasInvalidItems = invalidItems.length > 0
+    const checkoutRecoveryUrl =
+        isSelectedCheckout && items[0]?.slug
+            ? `/products/${items[0].slug}`
+            : '/cart'
+
+    const clearSelectedCheckoutItems = (purchasedItems = items) => {
+        window.localStorage.removeItem('mf-paris-checkout-items')
+        window.localStorage.removeItem('mf-paris-fundiin-checkout-item')
+
+        if (checkoutMode === 'selection') {
+            purchasedItems.forEach((item) => {
+                removeItem(item.id as string)
+            })
+        }
+
+        setSelectedCheckoutItems([])
+    }
 
     // Xử lý lỗi Hydration khi sử dụng LocalStorage
     useEffect(() => {
         setIsClient(true)
     }, [])
+
+    useEffect(() => {
+        if (!isSelectedCheckout) {
+            setSelectedCheckoutItems([])
+            return
+        }
+
+        try {
+            const storedItems = window.localStorage.getItem(
+                'mf-paris-checkout-items',
+            )
+
+            if (storedItems) {
+                const parsedItems = JSON.parse(storedItems)
+                const normalizedItems = Array.isArray(parsedItems)
+                    ? parsedItems
+                    : [parsedItems]
+
+                setSelectedCheckoutItems(
+                    normalizedItems
+                        .filter((item) => item?.id && item?.title)
+                        .map((item) => ({
+                            ...item,
+                            quantity: Math.max(1, Number(item.quantity || 1)),
+                        })),
+                )
+                return
+            }
+
+            if (isSingleFundiinCheckout) {
+                const legacyItem = window.localStorage.getItem(
+                    'mf-paris-fundiin-checkout-item',
+                )
+
+                if (legacyItem) {
+                    const parsedItem = JSON.parse(legacyItem) as CartItem
+
+                    setSelectedCheckoutItems(
+                        parsedItem?.id && parsedItem?.title
+                            ? [{
+                                ...parsedItem,
+                                quantity: Math.max(1, Number(parsedItem.quantity || 1)),
+                            }]
+                            : [],
+                    )
+                    return
+                }
+            }
+
+            setSelectedCheckoutItems([])
+        } catch {
+            setSelectedCheckoutItems([])
+        }
+    }, [isSelectedCheckout, isSingleFundiinCheckout])
 
     const handleSubmit = async (
         event: React.FormEvent<HTMLFormElement>,
@@ -235,7 +316,7 @@ export default function CheckoutPage({
                 toast.error(
                     'Giỏ hàng không hợp lệ',
                 )
-                router.push('/cart')
+                router.push(checkoutRecoveryUrl)
                 return
             }
 
@@ -244,9 +325,18 @@ export default function CheckoutPage({
                     validateData.items,
                 )
             ) {
-                syncItems(
-                    validateData.items,
-                )
+                if (isSelectedCheckout) {
+                    const nextItems = validateData.items as unknown as CartItem[]
+                    setSelectedCheckoutItems(nextItems)
+                    window.localStorage.setItem(
+                        'mf-paris-checkout-items',
+                        JSON.stringify(nextItems),
+                    )
+                } else {
+                    syncItems(
+                        validateData.items,
+                    )
+                }
             }
 
             if (
@@ -259,7 +349,7 @@ export default function CheckoutPage({
                 toast.error(
                     'Một số sản phẩm đã hết hàng, vượt tồn kho hoặc cần liên hệ báo giá',
                 )
-                router.push('/cart')
+                router.push(checkoutRecoveryUrl)
                 return
             }
 
@@ -303,7 +393,7 @@ export default function CheckoutPage({
                 toast.error(
                     'Không có sản phẩm hợp lệ để thanh toán',
                 )
-                router.push('/cart')
+                router.push(checkoutRecoveryUrl)
                 return
             }
 
@@ -412,7 +502,11 @@ export default function CheckoutPage({
                         'Đang chuyển sang cổng thanh toán Fundiin...',
                     )
 
-                    clearCart()
+                    if (isSelectedCheckout) {
+                        clearSelectedCheckoutItems(items)
+                    } else {
+                        clearCart()
+                    }
                     window.location.href =
                         fundiinData.paymentUrl
 
@@ -426,7 +520,11 @@ export default function CheckoutPage({
                 )
             }
 
-            clearCart()
+            if (isSelectedCheckout) {
+                clearSelectedCheckoutItems(items)
+            } else {
+                clearCart()
+            }
             toast.success(
                 'Đặt hàng thành công!',
             )

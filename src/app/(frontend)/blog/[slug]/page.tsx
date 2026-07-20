@@ -10,10 +10,7 @@ import {
   Calendar,
   User,
   Clock,
-  Search,
-  Share2,
-  X,
-  Link as LinkIcon,
+  Search,  ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
 import {
@@ -23,6 +20,7 @@ import {
 import RelatedPostsCarousel from '@/components/Blog/RelatedPostsCarousel'
 import { BlogPostEngagement } from '@/components/Blog/BlogPostEngagement'
 import { BlogComments } from '@/components/Blog/BlogComments'
+import { BlogShareButtons } from '@/components/Blog/BlogShareButtons'
 import { JsonLd } from '@/components/JsonLd'
 import { SITE_ORIGIN } from '@/utilities/seo'
 import { extractHtmlHeadings, htmlToPlainText } from '@/lib/html/contentHtml'
@@ -570,6 +568,83 @@ function formatPostDate(value: string | null | undefined): string {
   return new Date(value).toLocaleDateString('vi-VN')
 }
 
+function BlogPostPager({
+  nextPost,
+  previousPost,
+}: {
+  nextPost?: any
+  previousPost?: any
+}) {
+  if (!previousPost && !nextPost) {
+    return null
+  }
+
+  return (
+    <nav
+      aria-label="Bài viết trước và sau"
+      className="mt-10 grid gap-4 md:grid-cols-2"
+    >
+      {previousPost ? (
+        <Link
+          href={`/blog/${previousPost.slug}`}
+          className="group flex min-h-28 items-center gap-4 rounded-[1.5rem] border border-gray-100 bg-white p-4 shadow-sm transition-colors hover:border-red-100 hover:bg-red-50/30"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-50 text-gray-500 transition-colors group-hover:bg-white group-hover:text-primary">
+            <ChevronLeft
+              aria-hidden="true"
+              size={18}
+            />
+          </span>
+          <span className="min-w-0">
+            <span className="block text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
+              Bài trước
+            </span>
+            <span className="mt-1 line-clamp-2 block text-sm font-bold leading-snug text-gray-950 group-hover:text-primary">
+              {previousPost.title}
+            </span>
+            {previousPost.createdAt ? (
+              <span className="mt-2 block text-[11px] font-semibold text-gray-400">
+                {formatPostDate(previousPost.createdAt)}
+              </span>
+            ) : null}
+          </span>
+        </Link>
+      ) : (
+        <span aria-hidden="true" />
+      )}
+
+      {nextPost ? (
+        <Link
+          href={`/blog/${nextPost.slug}`}
+          className="group flex min-h-28 items-center justify-between gap-4 rounded-[1.5rem] border border-gray-100 bg-white p-4 text-right shadow-sm transition-colors hover:border-red-100 hover:bg-red-50/30"
+        >
+          <span className="min-w-0">
+            <span className="block text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
+              Bài sau
+            </span>
+            <span className="mt-1 line-clamp-2 block text-sm font-bold leading-snug text-gray-950 group-hover:text-primary">
+              {nextPost.title}
+            </span>
+            {nextPost.createdAt ? (
+              <span className="mt-2 block text-[11px] font-semibold text-gray-400">
+                {formatPostDate(nextPost.createdAt)}
+              </span>
+            ) : null}
+          </span>
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-50 text-gray-500 transition-colors group-hover:bg-white group-hover:text-primary">
+            <ChevronRight
+              aria-hidden="true"
+              size={18}
+            />
+          </span>
+        </Link>
+      ) : (
+        <span aria-hidden="true" />
+      )}
+    </nav>
+  )
+}
+
 export async function generateMetadata({
   params,
 }: BlogPostPageProps): Promise<Metadata> {
@@ -774,7 +849,7 @@ export default async function BlogPostPage({
       ],
     }
   }
-  const [featuredPosts, relatedPosts, blogComments] =
+  const [featuredPosts, relatedPosts, blogComments, previousPosts, nextPosts] =
     await Promise.all([
       payload.find({
         collection: 'posts',
@@ -811,8 +886,50 @@ export default async function BlogPostPage({
           ],
         },
       }),
+      payload.find({
+        collection: 'posts',
+        depth: 1,
+        limit: 1,
+        sort: '-createdAt',
+        where: {
+          and: [
+            {
+              slug: {
+                not_equals: slug,
+              },
+            },
+            {
+              createdAt: {
+                less_than: post.createdAt,
+              },
+            },
+          ],
+        },
+      }),
+      payload.find({
+        collection: 'posts',
+        depth: 1,
+        limit: 1,
+        sort: 'createdAt',
+        where: {
+          and: [
+            {
+              slug: {
+                not_equals: slug,
+              },
+            },
+            {
+              createdAt: {
+                greater_than: post.createdAt,
+              },
+            },
+          ],
+        },
+      }),
     ])
   const relatedPostDocs = relatedPosts.docs.slice(0, 4)
+  const previousPost = previousPosts.docs[0]
+  const nextPost = nextPosts.docs[0]
   const approvedBlogComments = blogComments.docs
   const schemaGraph = buildBlogPostingSchemaGraph({
     page: {
@@ -949,8 +1066,6 @@ export default async function BlogPostPage({
                   </div>
                 </div>
                 <BlogPostEngagement
-                  authorName={authorInfo.name}
-                  authorTitle={authorInfo.title}
                   initialRatingAverage={ratingStats.average}
                   initialRatingCount={ratingStats.count}
                   initialViewCount={viewCount}
@@ -1077,23 +1192,17 @@ export default async function BlogPostPage({
                   )}
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <div className="flex gap-3">
-                    <button className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 transition-all hover:bg-[#1877F2] hover:text-white">
-                      <Share2 size={18} />
-                    </button>
-
-                    <button className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 transition-all hover:bg-black hover:text-white">
-                      <X size={18} />
-                    </button>
-
-                    <button className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 transition-all hover:bg-orange-600 hover:text-white">
-                      <LinkIcon size={18} />
-                    </button>
-                  </div>
-                </div>
+                <BlogShareButtons
+                  title={post.title}
+                  url={`${getSiteUrl().replace(/\/$/, '')}${canonicalUrl}`}
+                />
               </div>
             </article>
+
+            <BlogPostPager
+              previousPost={previousPost}
+              nextPost={nextPost}
+            />
 
             <BlogComments
               comments={approvedBlogComments}
@@ -1134,15 +1243,17 @@ export default async function BlogPostPage({
                   <BlogTocNav tocItems={tocItems} />
                 </div>
               )}
-
-              {relatedPostDocs.length > 0 && (
-                <RelatedPostsCarousel
-                  posts={relatedPostDocs}
-                />
-              )}
             </div>
           </aside>
         </div>
+
+        {relatedPostDocs.length > 0 && (
+          <div className="mt-12">
+            <RelatedPostsCarousel
+              posts={relatedPostDocs}
+            />
+          </div>
+        )}
       </div>
     </div>
   )

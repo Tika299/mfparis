@@ -210,12 +210,16 @@ function resolveDataFile(filename: string, fallback?: string) {
   return primary
 }
 
-function applySlice<T>(items: T[]) {
+function applyItemSlice<T>(items: T[]) {
   const offsetItems = ITEM_OFFSET > 0 ? items.slice(ITEM_OFFSET) : items
   return ITEM_LIMIT > 0 ? offsetItems.slice(0, ITEM_LIMIT) : offsetItems
 }
 
-function readJSON<T = AnyRecord>(filename: string, fallback?: string): T[] {
+function readJSON<T = AnyRecord>(
+  filename: string,
+  fallback?: string,
+  options: { slice?: boolean } = {},
+): T[] {
   const filePath = resolveDataFile(filename, fallback)
 
   if (!fs.existsSync(filePath)) {
@@ -230,7 +234,7 @@ function readJSON<T = AnyRecord>(filename: string, fallback?: string): T[] {
     return []
   }
 
-  return applySlice(data)
+  return options.slice ? applyItemSlice(data) : data
 }
 
 function getRendered(value: unknown): string {
@@ -1303,7 +1307,9 @@ async function resolveCategoryIds(payload: any, rawProduct: AnyRecord, maps: Imp
 }
 
 async function importProducts(payload: any, maps: ImportMaps) {
-  const rawProducts = readJSON<AnyRecord>(DATA_FILES.productsRaw, DATA_FILES.productsRawFallback)
+  const rawProducts = readJSON<AnyRecord>(DATA_FILES.productsRaw, DATA_FILES.productsRawFallback, {
+    slice: true,
+  })
   const preparedBySlug = mapBySlug(readJSON<AnyRecord>(DATA_FILES.productsPrepared))
 
   console.log(`\nImport products: ${rawProducts.length}`)
@@ -1389,7 +1395,7 @@ async function resolvePostCategoryIds(payload: any, post: AnyRecord, maps: Impor
 }
 
 async function importPosts(payload: any, maps: ImportMaps) {
-  const postsData = readJSON<AnyRecord>(DATA_FILES.posts)
+  const postsData = readJSON<AnyRecord>(DATA_FILES.posts, undefined, { slice: true })
   console.log(`\nImport posts: ${postsData.length}`)
 
   let placeholderMediaId: ID | null = null
@@ -1454,6 +1460,9 @@ async function run() {
   console.log(`Mode: ${ONLY}`)
   console.log(`Dry run: ${DRY_RUN ? 'yes' : 'no'}`)
   console.log(`Skip media: ${SKIP_MEDIA ? 'yes' : 'no'}`)
+  if (ITEM_LIMIT || ITEM_OFFSET) {
+    console.log(`Slice: offset=${ITEM_OFFSET}, limit=${ITEM_LIMIT} chi ap dung cho products/posts`)
+  }
 
   const configPromise = (await import('@payload-config')).default
   const payload = await getPayload({ config: configPromise })

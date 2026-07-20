@@ -5,13 +5,10 @@ import {
   CheckCircle2,
   Eye,
   Star,
-  UserRound,
 } from 'lucide-react'
 
 type BlogPostEngagementProps = Readonly<{
   postId: number | string
-  authorName: string
-  authorTitle?: string | null
   reviewerName?: string | null
   reviewerTitle?: string | null
   reviewedAt?: string | null
@@ -39,6 +36,15 @@ function formatRating(value: number) {
   }).format(value)
 }
 
+function formatDate(value?: string | null) {
+  if (!value) return null
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return null
+
+  return date.toLocaleDateString('vi-VN')
+}
+
 function getPointerRating(
   event: React.PointerEvent<HTMLDivElement>,
   element: HTMLDivElement,
@@ -55,8 +61,6 @@ function getPointerRating(
 
 export function BlogPostEngagement({
   postId,
-  authorName,
-  authorTitle,
   reviewerName,
   reviewerTitle,
   reviewedAt,
@@ -88,6 +92,7 @@ export function BlogPostEngagement({
     [postId],
   )
   const displayRating = hoverRating ?? selectedRating ?? ratingAverage
+  const reviewedDate = formatDate(reviewedAt)
 
   useEffect(() => {
     const storedRating = window.localStorage.getItem(storageKey)
@@ -210,29 +215,9 @@ export function BlogPostEngagement({
 
   return (
     <section className="mt-6 rounded-[2rem] border border-gray-100 bg-[#fffaf7] p-4 shadow-sm md:p-5">
-      <div className="grid gap-4 md:grid-cols-[1fr_1fr] xl:grid-cols-[1.2fr_1fr_1fr]">
-        <div className="flex min-w-0 items-start gap-3">
-          <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-[#E54D2E] shadow-sm">
-            <UserRound size={18} />
-          </div>
-
-          <div className="min-w-0">
-            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-gray-400">
-              Tác giả
-            </p>
-            <p className="mt-1 truncate text-sm font-bold text-gray-950">
-              {authorName}
-            </p>
-            {authorTitle ? (
-              <p className="mt-0.5 text-xs text-gray-500">
-                {authorTitle}
-              </p>
-            ) : null}
-          </div>
-        </div>
-
+      <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]">
         {reviewerName ? (
-          <div className="flex min-w-0 gap-3 items-center">
+          <div className="flex min-w-0 items-center gap-3">
             <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-emerald-600 shadow-sm">
               <CheckCircle2 size={18} />
             </div>
@@ -241,11 +226,19 @@ export function BlogPostEngagement({
               <p className="text-[11px] font-black uppercase tracking-[0.18em] text-gray-400">
                 Đã kiểm duyệt
               </p>
+              <p className="mt-1 truncate text-sm font-bold text-gray-950">
+                {reviewerName}
+              </p>
+              {[reviewerTitle, reviewedDate].filter(Boolean).length ? (
+                <p className="mt-0.5 text-xs text-gray-500">
+                  {[reviewerTitle, reviewedDate].filter(Boolean).join(' - ')}
+                </p>
+              ) : null}
             </div>
           </div>
         ) : null}
 
-        <div className="flex min-w-0 flex-col gap-3 md:col-span-2 xl:col-span-1">
+        <div className="flex min-w-0 flex-col gap-3">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
               <Eye size={16} />
@@ -307,6 +300,12 @@ export function BlogPostEngagement({
               )
             })}
           </div>
+
+          {message ? (
+            <p className="text-xs font-semibold text-gray-500">
+              {isSubmitting ? 'Đang gửi đánh giá...' : message}
+            </p>
+          ) : null}
         </div>
       </div>
     </section>

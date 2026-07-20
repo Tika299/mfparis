@@ -1,11 +1,13 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/lib/store'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Trash2, Plus, Minus } from 'lucide-react'
+import { Minus, Plus, Trash2 } from 'lucide-react'
 import Image from 'next/image'
+import { toast } from 'sonner'
 
 const formatMoney = (value: number) => {
   return Number(value || 0).toLocaleString('vi-VN')
@@ -18,16 +20,68 @@ const getVariantPrice = (variant: any) => {
   return salePrice > 0 ? salePrice : basePrice
 }
 
-export default function CartPage() {
-  const { items, removeItem, updateQuantity, changeVariant, syncItems } = useCartStore() as any
-  const [checkingStock, setCheckingStock] = useState(false)
+const getItemSelectionId = (item: any) => String(item?.id)
 
-  const totalPrice = items.reduce(
-    (total: number, item: any) => total + Number(item.price || 0) * Number(item.quantity || 0),
+const isCartItemInvalid = (item: any) => {
+  const stock = Number(item?.stock || 0)
+  const quantity = Number(item?.quantity || 0)
+  const price = Number(item?.price || 0)
+
+  return (
+    item?.isAvailable === false ||
+    item?.isOutOfStock === true ||
+    item?.isContactPrice === true ||
+    stock <= 0 ||
+    quantity > stock ||
+    price <= 0
+  )
+}
+
+export default function CartPage() {
+  const router = useRouter()
+  const { items, removeItem, updateQuantity, changeVariant, syncItems } =
+    useCartStore() as any
+
+  const [checkingStock, setCheckingStock] = useState(false)
+  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([])
+
+  const hasValidatedCartRef = useRef(false)
+  const hasInitializedSelectionRef = useRef(false)
+
+  const validItems = useMemo(
+    () => items.filter((item: any) => !isCartItemInvalid(item)),
+    [items],
+  )
+
+  const invalidItems = useMemo(
+    () => items.filter((item: any) => isCartItemInvalid(item)),
+    [items],
+  )
+
+  const selectedItems = useMemo(
+    () =>
+      validItems.filter((item: any) =>
+        selectedItemIds.includes(getItemSelectionId(item)),
+      ),
+    [selectedItemIds, validItems],
+  )
+
+  const fullCartTotal = items.reduce(
+    (total: number, item: any) =>
+      total + Number(item.price || 0) * Number(item.quantity || 0),
     0,
   )
 
-  const hasValidatedCartRef = useRef(false)
+  const selectedTotalPrice = selectedItems.reduce(
+    (total: number, item: any) =>
+      total + Number(item.price || 0) * Number(item.quantity || 0),
+    0,
+  )
+
+  const allSelectableSelected =
+    validItems.length > 0 && selectedItems.length === validItems.length
+
+  const hasInvalidItems = invalidItems.length > 0
 
   useEffect(() => {
     if (!items.length) return
@@ -83,6 +137,19 @@ export default function CartPage() {
   }, [items.length, syncItems])
 
   useEffect(() => {
+    const validIds = validItems.map((item: any) => getItemSelectionId(item))
+
+    setSelectedItemIds((currentIds) => {
+      if (!hasInitializedSelectionRef.current) {
+        hasInitializedSelectionRef.current = true
+        return validIds
+      }
+
+      return currentIds.filter((id) => validIds.includes(id))
+    })
+  }, [validItems])
+
+  useEffect(() => {
     const refreshOnFocus = () => {
       hasValidatedCartRef.current = false
     }
@@ -94,22 +161,35 @@ export default function CartPage() {
     }
   }, [])
 
-  const invalidItems = items.filter((item: any) => {
-    const stock = Number(item.stock || 0)
-    const quantity = Number(item.quantity || 0)
-    const price = Number(item.price || 0)
+  const toggleSelectAll = () => {
+    if (allSelectableSelected) {
+      setSelectedItemIds([])
+      return
+    }
 
-    return (
-      item.isAvailable === false ||
-      item.isOutOfStock === true ||
-      item.isContactPrice === true ||
-      stock <= 0 ||
-      quantity > stock ||
-      price <= 0
+    setSelectedItemIds(validItems.map((item: any) => getItemSelectionId(item)))
+  }
+
+  const toggleItemSelection = (item: any) => {
+    if (isCartItemInvalid(item)) return
+
+    const itemId = getItemSelectionId(item)
+
+    setSelectedItemIds((currentIds) =>
+      currentIds.includes(itemId)
+        ? currentIds.filter((id) => id !== itemId)
+        : [...currentIds, itemId],
     )
-  })
+  }
 
-  const hasInvalidItems = invalidItems.length > 0
+  const handleRemoveItem = (item: any) => {
+    const itemId = getItemSelectionId(item)
+
+    setSelectedItemIds((currentIds) =>
+      currentIds.filter((id) => id !== itemId),
+    )
+    removeItem(item.id)
+  }
 
   const handleChangeVariant = (item: any, variantId: string) => {
     const variant = item.variants?.find((variant: any) => String(variant.id) === variantId)
@@ -127,9 +207,11 @@ export default function CartPage() {
     const stock = Number(variant?.stock || 0)
     const isContactPrice = price <= 0
     const baseTitle = item.baseTitle || item.title
+    const nextItemId = `${productId}-${variant.id}`
+    const wasSelected = selectedItemIds.includes(getItemSelectionId(item))
 
     changeVariant(item.id, {
-      id: `${productId}-${variant.id}`,
+      id: nextItemId,
       productId,
       variantId: variant.id,
       variantName: variant.name,
@@ -150,6 +232,27 @@ export default function CartPage() {
 
       variants: item.variants || [],
     })
+
+    if (wasSelected && stock > 0 && !isContactPrice) {
+      setSelectedItemIds((currentIds) => [
+        ...currentIds.filter((id) => id !== getItemSelectionId(item)),
+        nextItemId,
+      ])
+    }
+  }
+
+  const handleProceedToCheckout = () => {
+    if (selectedItems.length === 0) {
+      toast.error('Vui lòng chọn ít nhất một sản phẩm để thanh toán')
+      return
+    }
+
+    window.localStorage.setItem(
+      'mf-paris-checkout-items',
+      JSON.stringify(selectedItems),
+    )
+
+    router.push('/checkout?mode=selection')
   }
 
   if (items.length === 0) {
@@ -168,9 +271,29 @@ export default function CartPage() {
 
   return (
     <div className="container mx-auto px-4 py-16 md:py-20">
-      <h1 className="mb-10 text-2xl font-bold uppercase tracking-widest">
-        Giỏ hàng của bạn
-      </h1>
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold uppercase tracking-widest">
+            Giỏ hàng của bạn
+          </h1>
+
+          <p className="mt-2 text-sm text-gray-500">
+            Chọn sản phẩm bạn muốn thanh toán trong đơn hàng này.
+          </p>
+        </div>
+
+        <label className="inline-flex cursor-pointer items-center gap-3 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-gray-700 shadow-sm">
+          <input
+            type="checkbox"
+            checked={allSelectableSelected}
+            onChange={toggleSelectAll}
+            disabled={validItems.length === 0}
+            className="h-4 w-4 accent-[#b72828]"
+          />
+          Chọn tất cả
+        </label>
+      </div>
+
       {checkingStock && (
         <p className="mb-6 rounded-2xl bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700">
           Đang cập nhật tồn kho mới nhất...
@@ -184,12 +307,27 @@ export default function CartPage() {
             const stock = Number(item.stock || 0)
             const isOutOfStock = stock <= 0
             const isMaxQuantity = stock > 0 && item.quantity >= stock
+            const isInvalid = isCartItemInvalid(item)
+            const isSelected = selectedItemIds.includes(getItemSelectionId(item))
 
             return (
               <div
                 key={item.id}
-                className="flex gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm md:gap-5 md:p-5"
+                className={
+                  isSelected
+                    ? 'flex gap-3 rounded-2xl border-2 border-[#b72828] bg-white p-4 shadow-sm md:gap-5 md:p-5'
+                    : 'flex gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm md:gap-5 md:p-5'
+                }
               >
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  disabled={isInvalid}
+                  onChange={() => toggleItemSelection(item)}
+                  aria-label={`Chọn ${item.title}`}
+                  className="mt-10 h-5 w-5 shrink-0 accent-[#b72828] disabled:cursor-not-allowed disabled:opacity-40"
+                />
+
                 <div className="relative h-28 w-24 shrink-0 overflow-hidden rounded-xl bg-gray-100 md:h-32 md:w-28">
                   <Image
                     src={item.image || '/api/media/file/placeholder.webp'}
@@ -225,7 +363,7 @@ export default function CartPage() {
                     </div>
 
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => handleRemoveItem(item)}
                       className="h-9 w-9 shrink-0 rounded-full text-gray-400 transition hover:bg-red-50 hover:text-red-600"
                       aria-label="Xóa sản phẩm"
                     >
@@ -317,43 +455,53 @@ export default function CartPage() {
           })}
         </div>
 
-        <div className="h-fit rounded-3xl bg-gray-50 p-6 md:p-8">
+        <div className="h-fit rounded-3xl bg-gray-50 p-6 md:sticky md:top-28 md:p-8">
           <h2 className="mb-6 border-b pb-4 text-sm font-bold uppercase">
             Tóm tắt đơn hàng
           </h2>
 
+          <div className="mb-4 flex justify-between text-sm">
+            <span>Đã chọn:</span>
+            <span className="font-bold">
+              {selectedItems.length}/{validItems.length} sản phẩm
+            </span>
+          </div>
+
           <div className="mb-4 flex justify-between">
             <span>Tạm tính:</span>
-            <span className="font-bold">{formatMoney(totalPrice)}₫</span>
+            <span className="font-bold">{formatMoney(selectedTotalPrice)}₫</span>
           </div>
+
+          {selectedItems.length !== items.length && (
+            <div className="mb-4 flex justify-between text-sm text-gray-500">
+              <span>Tổng giỏ hàng:</span>
+              <span>{formatMoney(fullCartTotal)}₫</span>
+            </div>
+          )}
 
           <div className="mb-8 flex justify-between text-lg">
             <span>Tổng cộng:</span>
             <span className="text-xl font-bold text-[#b72828]">
-              {formatMoney(totalPrice)}₫
+              {formatMoney(selectedTotalPrice)}₫
             </span>
           </div>
 
           {hasInvalidItems && (
             <p className="mb-4 rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
-              Giỏ hàng có sản phẩm đã hết hàng hoặc vượt số lượng tồn kho. Vui lòng xóa hoặc giảm số lượng trước khi thanh toán.
+              Một số sản phẩm đã hết hàng, vượt tồn kho hoặc cần liên hệ báo giá nên không thể chọn để thanh toán.
             </p>
           )}
 
-          {hasInvalidItems ? (
-            <Button
-              disabled
-              className="h-14 w-full cursor-not-allowed bg-gray-300 font-bold uppercase tracking-widest"
-            >
-              Vui lòng cập nhật giỏ hàng
-            </Button>
-          ) : (
-            <Link href="/checkout">
-              <Button className="h-14 w-full bg-black font-bold uppercase tracking-widest">
-                Tiến hành thanh toán
-              </Button>
-            </Link>
-          )}
+          <Button
+            type="button"
+            onClick={handleProceedToCheckout}
+            disabled={selectedItems.length === 0}
+            className="h-14 w-full bg-black font-bold uppercase tracking-widest disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            {selectedItems.length === 0
+              ? 'Chọn sản phẩm để thanh toán'
+              : 'Tiến hành thanh toán'}
+          </Button>
 
           <p className="mt-4 text-center text-[10px] italic text-gray-500">
             Phí vận chuyển sẽ được tính ở trang thanh toán.

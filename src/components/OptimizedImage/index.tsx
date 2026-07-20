@@ -5,6 +5,7 @@ import { cn } from '@/utilities'
 type MediaSizeName =
   | 'thumbnail'
   | 'card'
+  | 'blogCard'
   | 'large'
   | 'heroMobile'
   | 'heroTablet'
@@ -15,6 +16,7 @@ interface OptimizedImageProps {
   size?: MediaSizeName
   alt?: string
   className?: string
+  imageClassName?: string
   priority?: boolean
   sizes?: string
   quality?: number
@@ -25,6 +27,7 @@ export const OptimizedImage = ({
   size = 'card',
   alt,
   className,
+  imageClassName,
   priority = false,
   sizes,
   quality = 85,
@@ -82,6 +85,8 @@ export const OptimizedImage = ({
         ? '150px'
         : size === 'card'
           ? '(max-width: 767px) 50vw, (max-width: 1279px) 33.33vw, 25vw'
+          : size === 'blogCard'
+            ? '(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 25vw'
           : size === 'heroMobile' ||
             size === 'heroTablet' ||
             size === 'heroDesktop'
@@ -109,7 +114,10 @@ export const OptimizedImage = ({
         sizes={imageSizes}
         quality={quality}
         loading={priority ? undefined : 'lazy'}
-        className="object-cover transition-transform duration-700 ease-in-out"
+        className={cn(
+          'object-cover transition-transform duration-700 ease-in-out',
+          imageClassName,
+        )}
       />
 
       <span className="hidden">
