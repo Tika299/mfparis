@@ -12,6 +12,7 @@ import * as migration_20260717_043357_add_col_new from './20260717_043357_add_co
 import * as migration_20260718_142438 from './20260718_142438';
 import * as migration_20260719_050200_add_blog_comment_parent from './20260719_050200_add_blog_comment_parent';
 import * as migration_20260719_075325 from './20260719_075325';
+import * as migration_20260720_153323 from './20260720_153323';
 
 export const migrations = [
   {
@@ -82,6 +83,11 @@ export const migrations = [
   {
     up: migration_20260719_075325.up,
     down: migration_20260719_075325.down,
-    name: '20260719_075325'
+    name: '20260719_075325',
+  },
+  {
+    up: migration_20260720_153323.up,
+    down: migration_20260720_153323.down,
+    name: '20260720_153323'
   },
 ];
