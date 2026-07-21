@@ -136,6 +136,44 @@ function stripHTML(html: unknown): string {
     : ''
 }
 
+function escapeHtmlText(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+function normalizePayloadTextarea(value: unknown): string {
+  return String(value ?? '')
+    .replace(/\u0000/g, '')
+    .replace(/[\u0001-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '')
+}
+
+function buildPlainHtmlFallback(html: string): string {
+  const text = normalizePayloadTextarea(stripHTML(html))
+
+  return text ? `<p>${escapeHtmlText(text)}</p>` : ''
+}
+
+function isContentValidationError(error: unknown): boolean {
+  const message =
+    error instanceof Error
+      ? error.message
+      : typeof error === 'object' && error
+        ? String((error as AnyRecord).message || '')
+        : String(error || '')
+
+  const payloadErrors =
+    typeof error === 'object' && error
+      ? JSON.stringify((error as AnyRecord).data || (error as AnyRecord).errors || '')
+      : ''
+
+  return /Nội dung bài viết|Ná»™i dung bÃ i viáº¿t|content/i.test(
+    `${message} ${payloadErrors}`,
+  )
+}
+
 function toNumber(value: unknown, fallback = 0): number {
   const number = Number(value)
   return Number.isFinite(number) ? number : fallback
@@ -1610,12 +1648,14 @@ async function importPosts(payload: any, maps: ImportMaps) {
         continue
       }
 
-      const content = await normalizeHtmlWithMedia(payload, item.content, {
-        altFallback: title,
-        importedFrom: 'wordpress',
-      })
+      const content = normalizePayloadTextarea(
+        await normalizeHtmlWithMedia(payload, item.content, {
+          altFallback: title,
+          importedFrom: 'wordpress',
+        }),
+      )
 
-      const result = await createOrUpdateBySlug(payload, 'posts', slug, {
+      const postData = {
         title,
         slug,
         thumbnail: featuredImageId,
@@ -1628,7 +1668,28 @@ async function importPosts(payload: any, maps: ImportMaps) {
         }),
         wpId: Number(item.id) || undefined,
         sourceUrl: item.link || undefined,
-      })
+      }
+
+      let result
+
+      try {
+        result = await createOrUpdateBySlug(payload, 'posts', slug, postData)
+      } catch (contentError) {
+        if (!isContentValidationError(contentError)) {
+          throw contentError
+        }
+
+        const fallbackContent = buildPlainHtmlFallback(content)
+
+        console.warn(
+          `   Post warning: content HTML invalid, retry plain content: ${title}`,
+        )
+
+        result = await createOrUpdateBySlug(payload, 'posts', slug, {
+          ...postData,
+          content: fallbackContent,
+        })
+      }
 
       console.log(`   ${result.action} post: ${title}`)
     } catch (error: any) {
