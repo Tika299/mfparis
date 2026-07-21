@@ -1,4 +1,4 @@
-import { sanitizeWordPressHtml } from './sanitizeWordPressHtml'
+import { decodeHtmlEntities, sanitizeWordPressHtml } from './sanitizeWordPressHtml'
 
 type LexicalNode = Record<string, any>
 
@@ -150,14 +150,7 @@ export function normalizeContentHtml(value: unknown): string {
 }
 
 export function htmlToPlainText(value: unknown): string {
-  return normalizeContentHtml(value)
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
+  return decodeHtmlEntities(normalizeContentHtml(value).replace(/<[^>]*>/g, ' '))
     .replace(/\s+/g, ' ')
     .trim()
 }

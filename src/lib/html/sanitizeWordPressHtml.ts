@@ -127,6 +127,80 @@ const styleProperties = new Set([
   'width',
 ])
 
+const namedHtmlEntities: Record<string, string> = {
+  amp: '&',
+  apos: "'",
+  hellip: '...',
+  ldquo: '"',
+  lsquo: "'",
+  mdash: '-',
+  ndash: '-',
+  nbsp: ' ',
+  quot: '"',
+  rdquo: '"',
+  rsquo: "'",
+  times: 'x',
+}
+
+export function normalizeBrokenHtmlEntities(value: string): string {
+  return value
+    .replace(/\$#(x?[0-9a-f]+);/gi, '&#$1;')
+    .replace(/\$amp;/gi, '&amp;')
+    .replace(/&amp;(#x?[0-9a-f]+;)/gi, '&$1')
+    .replace(/&amp;([a-z][a-z0-9]+;)/gi, '&$1')
+}
+
+export function decodeHtmlEntities(value: string): string {
+  let decoded = normalizeBrokenHtmlEntities(value)
+
+  for (let index = 0; index < 3; index += 1) {
+    const nextDecoded = decoded.replace(
+      /&(#x?[0-9a-f]+|[a-z][a-z0-9]+);/gi,
+      (full, rawEntity) => {
+        const entity = String(rawEntity).toLowerCase()
+
+        if (entity.startsWith('#x')) {
+          const codePoint = Number.parseInt(entity.slice(2), 16)
+
+          if (Number.isFinite(codePoint)) {
+            try {
+              return codePoint === 160 ? ' ' : String.fromCodePoint(codePoint)
+            } catch {
+              return full
+            }
+          }
+
+          return full
+        }
+
+        if (entity.startsWith('#')) {
+          const codePoint = Number.parseInt(entity.slice(1), 10)
+
+          if (Number.isFinite(codePoint)) {
+            try {
+              return codePoint === 160 ? ' ' : String.fromCodePoint(codePoint)
+            } catch {
+              return full
+            }
+          }
+
+          return full
+        }
+
+        return namedHtmlEntities[entity] ?? full
+      },
+    )
+
+    if (nextDecoded === decoded) {
+      break
+    }
+
+    decoded = nextDecoded
+  }
+
+  return decoded.replace(/\u00a0/g, ' ')
+}
+
 function escapeAttribute(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -327,7 +401,7 @@ export function sanitizeWordPressHtml(html: unknown): string {
     return ''
   }
 
-  return unwrapImageOnlyLinks(html)
+  return unwrapImageOnlyLinks(decodeHtmlEntities(html))
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(
       /<\s*(script|style|iframe|object|embed|form|input|button|textarea|select|option|meta|link|base)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi,

@@ -7,7 +7,10 @@ import fetch from 'node-fetch'
 import pLimit from 'p-limit'
 import sharp from 'sharp'
 import { lexicalToHtml } from '@/lib/html/contentHtml'
-import { sanitizeWordPressHtml } from '@/lib/html/sanitizeWordPressHtml'
+import {
+  decodeHtmlEntities,
+  sanitizeWordPressHtml,
+} from '@/lib/html/sanitizeWordPressHtml'
 
 type AnyRecord = Record<string, any>
 type ID = string | number
@@ -117,14 +120,7 @@ function makeSafeSlug(value: string, fallbackId?: string | number): string {
 }
 
 function decodeBasicEntities(value: string): string {
-  return value
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&#215;/g, 'x')
+  return decodeHtmlEntities(value)
 }
 
 function stripHTML(html: unknown): string {
@@ -145,7 +141,7 @@ function escapeHtmlText(value: string): string {
 }
 
 function normalizePayloadTextarea(value: unknown): string {
-  return String(value ?? '')
+  return decodeHtmlEntities(String(value ?? ''))
     .replace(/\u0000/g, '')
     .replace(/[\u0001-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '')
 }

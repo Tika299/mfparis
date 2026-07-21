@@ -39,7 +39,8 @@
     "redirects:audit": "tsx src/scripts/audit-redirects.ts",
     "redirects:backfill-content": "tsx src/scripts/backfill-legacy-content-redirects.ts",
     "repair:wp-images": "tsx src/scripts/repair-wordpress-lazy-images.ts",
-    "sync:product-sku": "tsx src/scripts/sync-product-sku-from-wp-id.ts"
+    "sync:product-sku": "tsx src/scripts/sync-product-sku-from-wp-id.ts",
+    "repair:html-entities": "tsx src/scripts/repair-html-entities.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.85.0",
