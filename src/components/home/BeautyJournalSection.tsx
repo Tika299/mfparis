@@ -192,25 +192,36 @@ export function BeautyJournalSection({
                                         >
                                             {/* IMAGE */}
                                             <div className="relative">
-                                                <div className="relative aspect-[2.12/1] w-full overflow-hidden bg-[#f7f4f2]">
-                                                    <OptimizedImage
-                                                        media={
-                                                            post.thumbnail
-                                                        }
-                                                        size="card"
-                                                        alt={post.title}
-                                                        className="h-full w-full transition-transform duration-500 group-hover/card:scale-[1.035] [&_img]:h-full [&_img]:w-full [&_img]:object-cover"
-                                                    />
+                                                <div className="relative aspect-video w-full overflow-hidden bg-[#f4f0ed]">
+                                                    {post.thumbnail ? (
+                                                        <OptimizedImage
+                                                            media={
+                                                                post.thumbnail
+                                                            }
+                                                            size="blogCard"
+                                                            alt={post.title}
+                                                            className="h-full w-full"
+                                                            imageClassName="object-cover object-center transition-transform duration-700 group-hover/card:scale-105"
+                                                        />
+                                                    ) : (
+                                                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#f8f1ef] to-[#fff] px-6 text-center">
+                                                            <span className="font-heading text-2xl font-bold text-primary/80">
+                                                                MF Paris
+                                                            </span>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/0 to-black/0 opacity-70" />
                                                 </div>
 
                                                 {/* CATEGORY BADGE */}
-                                                <span className="absolute bottom-0 left-5 z-10 max-w-[calc(100%-40px)] translate-y-1/2 truncate rounded-[10px] bg-white px-4 py-2 text-[11px] font-bold uppercase tracking-[0.01em] text-[#b40008] shadow-[0_5px_16px_rgba(0,0,0,0.10)] sm:text-[12px]">
+                                                <span className="absolute left-4 top-4 z-10 max-w-[calc(100%-32px)] truncate rounded-full bg-white/95 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.18em] text-primary shadow-sm">
                                                     {category}
                                                 </span>
                                             </div>
 
                                             {/* CONTENT */}
-                                            <div className="flex flex-1 flex-col px-4 pb-4 pt-7 sm:px-5 sm:pb-5">
+                                            <div className="flex flex-1 flex-col px-4 pb-4 pt-5 sm:px-5 sm:pb-5">
                                                 <h3 className="line-clamp-2 min-h-[48px] text-[16px] font-bold leading-[1.48] tracking-[-0.012em] text-[#202020] transition-colors group-hover/card:text-[#b40008] sm:text-[17px]">
                                                     {post.title}
                                                 </h3>
