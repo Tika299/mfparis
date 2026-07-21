@@ -23,6 +23,7 @@ import {
   parsePositiveInteger,
 } from '@/lib/productSearchFilters'
 import { cn } from '@/utilities'
+import { normalizeSearchText } from '@/utilities/searchKeywords'
 
 type SearchPageParams = Readonly<Record<string, string | string[] | undefined>>
 
