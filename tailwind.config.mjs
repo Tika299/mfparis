@@ -18,7 +18,7 @@ export default {
             maxWidth: '100%', // Cho phép nội dung tràn rộng
             color: '#374151', // Màu xám đậm sang trọng
             h2: {
-              fontFamily: 'var(--font-serif)',
+              fontFamily: 'var(--font-heading)',
               fontStyle: 'italic',
               fontWeight: '700',
               color: '#000000', // Màu xanh đặc trưng của bạn

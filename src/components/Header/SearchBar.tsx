@@ -29,7 +29,7 @@ function normalizeSearchKey(value: string): string {
   return value
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[Ä‘Ä]/g, 'd')
+    .replace(/[\u0111\u0110]/g, 'd')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
     .trim()
@@ -192,16 +192,16 @@ export const SearchBar = ({
         onBlur={() => {
           window.setTimeout(() => setIsOpen(false), 120)
         }}
-        placeholder="Báº¡n tÃ¬m sáº£n pháº©m gÃ¬..."
+        placeholder="Bạn tìm sản phẩm gì..."
         autoComplete="off"
         className="h-full min-w-0 flex-1 bg-transparent text-[13px] font-normal text-[#202020] outline-none placeholder:text-[#8a8a8a]"
-        aria-label="Nháº­p tá»« khÃ³a tÃ¬m kiáº¿m"
+        aria-label="Nhập từ khóa tìm kiếm"
       />
 
       <button
         type="submit"
         className="ml-2 flex h-8 w-8 shrink-0 items-center justify-center text-[#555555] transition-colors hover:text-[#ad0509]"
-        aria-label="TÃ¬m kiáº¿m"
+        aria-label="Tìm kiếm"
       >
         <Search
           size={mobile ? 19 : 21}
@@ -261,7 +261,7 @@ export const SearchBar = ({
             </div>
           ) : (
             <div className="px-4 py-3 text-sm text-neutral-500">
-              {isLoading ? 'Äang tÃ¬m nhanh...' : 'Nháº¥n Enter Ä‘á»ƒ xem táº¥t cáº£ káº¿t quáº£.'}
+              {isLoading ? 'Đang tìm nhanh...' : 'Nhấn Enter để xem tất cả kết quả.'}
             </div>
           )}
         </div>

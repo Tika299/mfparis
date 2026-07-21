@@ -23,13 +23,13 @@ body,
 .app-header,
 .payload-admin-fonts {
     background-color: var(--theme-bg) !important;
-    font-family: var(--font-be-vietnam) !important;
+    font-family: var(--font-admin-body) !important;
 }
 
 /* Ép toàn bộ admin dùng font body mặc định */
 .payload-admin-fonts,
 .payload-admin-fonts * {
-    font-family: var(--font-be-vietnam);
+    font-family: var(--font-admin-body);
 }
 
 /* 2. Thanh Sidebar bên trái (Navigation) */
@@ -40,7 +40,7 @@ body,
 }
 
 .nav-group__label {
-    font-family: var(--font-be-vietnam) !important;
+    font-family: var(--font-admin-body) !important;
     font-style: italic !important;
     text-transform: none !important;
     font-size: 1.1rem !important;
@@ -84,7 +84,7 @@ body,
 }
 
 .collections__label {
-    font-family: var(--font-be-vietnam) !important;
+    font-family: var(--font-admin-body) !important;
     font-style: italic !important;
     font-size: 1.8rem !important;
     color: var(--color-primary-500) !important;
@@ -119,7 +119,7 @@ body,
 }
 
 .card__title {
-    font-family: var(--font-be-vietnam) !important;
+    font-family: var(--font-admin-body) !important;
     font-weight: 700 !important;
     font-size: 15px !important;
     color: #1a1a1a !important;
@@ -216,7 +216,7 @@ body,
 }
 
 .chat-card__title {
-    font-family: var(--font-be-vietnam) !important;
+    font-family: var(--font-admin-body) !important;
     font-style: italic;
     font-size: 26px;
     font-weight: 700;
@@ -352,7 +352,7 @@ body,
             border-bottom: 1px solid #f9f9f9;
 
             .sidebar-title {
-                font-family: var(--font-be-vietnam);
+                font-family: var(--font-admin-body);
                 font-size: 24px;
                 margin: 0 0 20px 0;
             }
@@ -630,7 +630,7 @@ body,
             }
 
             p {
-                font-family: var(--font-be-vietnam);
+                font-family: var(--font-admin-body);
                 font-size: 18px;
             }
         }
@@ -668,7 +668,7 @@ body,
 
 .wp-html-editor {
     margin: 12px 0 24px;
-    font-family: var(--font-be-vietnam), system-ui, sans-serif;
+    font-family: var(--font-admin-body), system-ui, sans-serif;
 }
 
 .wp-html-editor--error {
@@ -837,7 +837,7 @@ body,
 
 .tiptap-html-editor {
     margin: 12px 0 24px;
-    font-family: var(--font-be-vietnam), system-ui, sans-serif;
+    font-family: var(--font-admin-body), system-ui, sans-serif;
 }
 
 .tiptap-html-editor--error {
@@ -1032,7 +1032,7 @@ body,
 
 .tinymce-html-editor {
     margin: 12px 0 24px;
-    font-family: var(--font-be-vietnam), system-ui, sans-serif;
+    font-family: var(--font-admin-body), system-ui, sans-serif;
 }
 
 .tinymce-html-editor--error {
