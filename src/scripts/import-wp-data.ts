@@ -1,10 +1,11 @@
-import { getPayload } from 'payload'
+﻿import { getPayload } from 'payload'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
 import fetch from 'node-fetch'
 import pLimit from 'p-limit'
+import sharp from 'sharp'
 import { lexicalToHtml } from '@/lib/html/contentHtml'
 import { sanitizeWordPressHtml } from '@/lib/html/sanitizeWordPressHtml'
 
@@ -93,7 +94,7 @@ function formatSlug(value: string): string {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[đĐ]/g, 'd')
+    .replace(/[Ä‘Ä]/g, 'd')
     .replace(/&/g, ' va ')
     .replace(/([^0-9a-z-\s])/g, '')
     .replace(/(\s+)/g, '-')
@@ -357,13 +358,56 @@ function getImageCaption(image: unknown): string {
   return stripHTML(record.caption || record.description || '')
 }
 
+const MAX_IMPORT_FILENAME_LENGTH = 110
+const MAX_IMPORT_FILENAME_STEM_LENGTH = 72
+
+function safeDecodeUriPart(value: string) {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
+}
+
+function shortStableHash(value: string) {
+  let hash = 2166136261
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index)
+    hash = Math.imul(hash, 16777619)
+  }
+
+  return (hash >>> 0).toString(36)
+}
+
+function normalizeImportFilename(basename: string, fallback: string, source = '') {
+  const cleanBasename = safeDecodeUriPart(String(basename || '')).replace(/[\\/]+/g, '-')
+  const extFromBasename = path.extname(cleanBasename).toLowerCase()
+  const ext = /^\.(jpe?g|png|gif|webp|avif|svg)$/i.test(extFromBasename)
+    ? extFromBasename
+    : '.jpg'
+  const stemSource = extFromBasename
+    ? cleanBasename.slice(0, -extFromBasename.length)
+    : cleanBasename
+  const stemFallback = makeSafeSlug(fallback || 'wp-media')
+  const stem = makeSafeSlug(stemSource || stemFallback)
+  const hash = shortStableHash(source || cleanBasename || stemFallback)
+  const maxStemLength = Math.min(
+    MAX_IMPORT_FILENAME_STEM_LENGTH,
+    MAX_IMPORT_FILENAME_LENGTH - ext.length - hash.length - 1,
+  )
+  const shortStem = stem.slice(0, Math.max(16, maxStemLength)).replace(/-+$/g, '') || stemFallback
+
+  return `${shortStem}-${hash}${ext}`
+}
+
 function getFilenameFromUrl(url: string, fallback = 'wp-media') {
   try {
     const parsed = new URL(url, WP_BASE_URL)
     const basename = path.basename(parsed.pathname)
-    return basename || `${fallback}.jpg`
+    return normalizeImportFilename(basename, fallback, parsed.toString())
   } catch {
-    return `${fallback}.jpg`
+    return normalizeImportFilename('', fallback, url)
   }
 }
 
@@ -382,6 +426,95 @@ function getMimeType(filename: string) {
   if (ext === '.avif') return 'image/avif'
   if (ext === '.svg') return 'image/svg+xml'
   return 'image/jpeg'
+}
+
+const MAX_IMPORT_IMAGE_DIMENSION = 2400
+const MAX_IMPORT_IMAGE_PIXELS = 12_000_000
+const MAX_IMPORT_IMAGE_BYTES = 8 * 1024 * 1024
+
+type PreparedImportImage = {
+  buffer: Buffer
+  filename: string
+  mimetype: string
+}
+
+function replaceFileExtension(filename: string, extension: string) {
+  const currentExtension = path.extname(filename)
+  const stem = currentExtension ? filename.slice(0, -currentExtension.length) : filename
+
+  return `${stem}${extension}`
+}
+
+async function prepareImportImageBuffer(
+  buffer: Buffer,
+  filename: string,
+  sourceUrl: string,
+): Promise<PreparedImportImage | null> {
+  const extension = path.extname(filename).toLowerCase()
+
+  if (extension === '.svg') {
+    return {
+      buffer,
+      filename,
+      mimetype: getMimeType(filename),
+    }
+  }
+
+  try {
+    const image = sharp(buffer, {
+      failOn: 'none',
+      limitInputPixels: false,
+    }).rotate()
+
+    const metadata = await image.metadata()
+    const width = Number(metadata.width || 0)
+    const height = Number(metadata.height || 0)
+    const pixels = width * height
+    const shouldNormalize =
+      width > MAX_IMPORT_IMAGE_DIMENSION ||
+      height > MAX_IMPORT_IMAGE_DIMENSION ||
+      pixels > MAX_IMPORT_IMAGE_PIXELS ||
+      buffer.length > MAX_IMPORT_IMAGE_BYTES ||
+      extension === '.avif' ||
+      extension === '.heic' ||
+      extension === '.heif'
+
+    if (!shouldNormalize) {
+      return {
+        buffer,
+        filename,
+        mimetype: getMimeType(filename),
+      }
+    }
+
+    const normalizedBuffer = await image
+      .resize({
+        width: MAX_IMPORT_IMAGE_DIMENSION,
+        height: MAX_IMPORT_IMAGE_DIMENSION,
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .webp({
+        quality: 82,
+        effort: 4,
+      })
+      .toBuffer()
+
+    const normalizedFilename = replaceFileExtension(filename, '.webp')
+
+    console.warn(
+      `   Media warning: normalized large image ${sourceUrl} -> ${normalizedFilename}`,
+    )
+
+    return {
+      buffer: normalizedBuffer,
+      filename: normalizedFilename,
+      mimetype: 'image/webp',
+    }
+  } catch (error: any) {
+    console.warn(`   Media warning: skip invalid image ${sourceUrl} - ${error?.message || error}`)
+    return null
+  }
 }
 
 function getPayloadMediaUrl(doc: AnyRecord, fallbackFilename: string) {
@@ -476,6 +609,23 @@ async function uploadMedia(
       return preferred
     }
 
+    if (options.wpId) {
+      const existingByWpId = await findOne(payload, 'media', {
+        wpId: { equals: options.wpId },
+      })
+
+      if (existingByWpId?.id) {
+        const ref = {
+          id: existingByWpId.id,
+          url: getPayloadMediaUrl(existingByWpId, filename),
+          filename: existingByWpId.filename || filename,
+        }
+
+        rememberMedia(ref, normalizedUrl)
+        return ref
+      }
+    }
+
     const existing = await findExistingMedia(payload, normalizedUrl, filename)
 
     if (existing) {
@@ -493,40 +643,72 @@ async function uploadMedia(
       return dryRef
     }
 
-    const response = await fetch(normalizedUrl, {
-      headers: { 'user-agent': USER_AGENT },
-    })
+    let response: Awaited<ReturnType<typeof fetch>>
 
-    if (!response.ok) {
-      throw new Error(`Cannot download image ${normalizedUrl}: ${response.status}`)
+    try {
+      response = await fetch(normalizedUrl, {
+        headers: { 'user-agent': USER_AGENT },
+      })
+    } catch (error: any) {
+      console.warn(`   Media warning: skip image ${normalizedUrl} - ${error?.message || error}`)
+      return null
     }
 
-    const buffer = Buffer.from(await response.arrayBuffer())
+    if (!response.ok) {
+      console.warn(`   Media warning: skip image ${normalizedUrl} - HTTP ${response.status}`)
+      return null
+    }
 
-    const media = await payload.create({
-      collection: 'media',
-      data: withoutUndefined({
-        alt: alt || filename,
-        title: options.title || alt || filename,
-        caption: options.caption || undefined,
-        wpId: options.wpId || undefined,
-        sourceUrl: normalizedUrl,
-        sourceFilename: filename,
-        importedFrom: options.importedFrom || 'wordpress',
-      }),
-      file: {
-        data: buffer,
-        name: filename,
-        mimetype: getMimeType(filename),
-        size: buffer.length,
-      },
-      overrideAccess: true,
-    })
+    let downloadedBuffer: Buffer
+
+    try {
+      downloadedBuffer = Buffer.from(await response.arrayBuffer())
+    } catch (error: any) {
+      console.warn(`   Media warning: cannot read image ${normalizedUrl} - ${error?.message || error}`)
+      return null
+    }
+
+    const preparedImage = await prepareImportImageBuffer(
+      downloadedBuffer,
+      filename,
+      normalizedUrl,
+    )
+
+    if (!preparedImage) {
+      return null
+    }
+
+    let media: any
+
+    try {
+      media = await payload.create({
+        collection: 'media',
+        data: withoutUndefined({
+          alt: alt || filename,
+          title: options.title || alt || filename,
+          caption: options.caption || undefined,
+          wpId: options.wpId || undefined,
+          sourceUrl: normalizedUrl,
+          sourceFilename: filename,
+          importedFrom: options.importedFrom || 'wordpress',
+        }),
+        file: {
+          data: preparedImage.buffer,
+          name: preparedImage.filename,
+          mimetype: preparedImage.mimetype,
+          size: preparedImage.buffer.length,
+        },
+        overrideAccess: true,
+      })
+    } catch (error: any) {
+      console.warn(`   Media warning: cannot create media ${filename} - ${error?.message || error}`)
+      return null
+    }
 
     const ref = {
       id: media.id,
       url: getPayloadMediaUrl(media, filename),
-      filename: media.filename || filename,
+      filename: media.filename || preparedImage.filename,
     }
 
     rememberMedia(ref, normalizedUrl)
@@ -1519,3 +1701,8 @@ run().catch((error) => {
   console.error('Import failed:', error)
   process.exit(1)
 })
+
+
+
+
+
