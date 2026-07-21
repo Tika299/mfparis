@@ -118,20 +118,16 @@ function buildSearchWhere(
   ]
 
   if (query) {
+    const normalizedQuery = normalizeSearchText(query)
+    const normalizedSlugQuery = normalizedQuery.replace(/\s+/g, '-')
+
     andConditions.push({
       or: [
+        { searchKeywords: { contains: normalizedQuery } },
         { title: { contains: query } },
+        { title: { contains: normalizedQuery } },
+        { slug: { contains: normalizedSlugQuery } },
         { sku: { contains: query } },
-        { 'brand.name': { contains: query } },
-        { 'brand.slug': { contains: query } },
-        { 'categories.name': { contains: query } },
-        { 'categories.slug': { contains: query } },
-        { 'productAttributes.values.label': { contains: query } },
-        { 'productAttributes.values.slug': { contains: query } },
-        { 'specifications.value': { contains: query } },
-        { 'fragranceProfile.topNotes.name': { contains: query } },
-        { 'fragranceProfile.middleNotes.name': { contains: query } },
-        { 'fragranceProfile.baseNotes.name': { contains: query } },
       ],
     })
   }

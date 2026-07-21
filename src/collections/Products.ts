@@ -9,6 +9,7 @@ import { trackProductSlugHistory } from '@/collections/hooks/trackSlugHistory'
 import { ensureLegacyProductRedirectHook } from '@/collections/hooks/ensureLegacyProductRedirect'
 import { productSeoLifecycleFields } from '@/collections/fields/productSeoLifecycleFields'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
+import { buildProductSearchKeywords } from '@/utilities/searchKeywords'
 
 type EntityID = string | number
 
@@ -46,6 +47,31 @@ function getRelationshipID(
     typeof id === 'number'
     ? id
     : undefined
+}
+
+const syncProductSearchKeywords: CollectionBeforeChangeHook = async ({
+  data,
+  originalDoc,
+}) => {
+  if (!data || typeof data !== 'object') {
+    return data
+  }
+
+  const keys = Object.keys(data)
+
+  if (
+    keys.length === 1 &&
+    typeof data.searchKeywords === 'string'
+  ) {
+    return data
+  }
+
+  data.searchKeywords = buildProductSearchKeywords({
+    ...(originalDoc || {}),
+    ...data,
+  })
+
+  return data
 }
 
 const syncVariantPrice: CollectionBeforeChangeHook = async ({ data }) => {
@@ -132,7 +158,7 @@ export const Products: CollectionConfig = {
         await revalidateProductTags()
       },
     ],
-    beforeChange: [syncVariantPrice],
+    beforeChange: [syncProductSearchKeywords, syncVariantPrice],
   },
 
   fields: [
@@ -851,6 +877,19 @@ export const Products: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
+      },
+    },
+    {
+      name: 'searchKeywords',
+      type: 'textarea',
+      index: true,
+      label: 'Search keywords',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        hidden: true,
+        description:
+          'Normalized text used for fast product search suggestions and search pages.',
       },
     },
     {

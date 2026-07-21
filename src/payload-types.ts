@@ -451,6 +451,10 @@ export interface Product {
   reviewCount?: number | null;
   status?: ('draft' | 'published') | null;
   displayLocation?: ('best-seller' | 'combo' | 'new-arrival' | 'flash-sale')[] | null;
+  /**
+   * Normalized text used for fast product search suggestions and search pages.
+   */
+  searchKeywords?: string | null;
   wpId?: number | null;
   sourceUrl?: string | null;
   importNotes?: string | null;
@@ -1360,6 +1364,7 @@ export interface ProductsSelect<T extends boolean = true> {
   reviewCount?: T;
   status?: T;
   displayLocation?: T;
+  searchKeywords?: T;
   wpId?: T;
   sourceUrl?: T;
   importNotes?: T;

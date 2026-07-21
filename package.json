@@ -41,7 +41,9 @@
     "repair:wp-images": "tsx src/scripts/repair-wordpress-lazy-images.ts",
     "sync:product-sku": "tsx src/scripts/sync-product-sku-from-wp-id.ts",
     "repair:html-entities": "tsx src/scripts/repair-html-entities.ts",
-    "repair:product-brands": "tsx src/scripts/repair-product-brands.ts"
+    "repair:product-brands": "tsx src/scripts/repair-product-brands.ts",
+    "backfill:product-search-keywords": "tsx src/scripts/backfill-product-search-keywords.ts",
+    "db:search-indexes": "tsx src/scripts/create-search-indexes.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.85.0",
