@@ -279,39 +279,93 @@ function readPostsExport() {
   return data as AnyRecord[]
 }
 
-async function findExistingPost(payload: any, item: AnyRecord, slug: string) {
-  const wpId = Number(item.id)
+function getExportSlug(item: AnyRecord) {
+  const title = normalizeText(getRendered(item.title) || item.title || item.slug || `Post ${item.id}`)
 
-  if (Number.isFinite(wpId) && wpId > 0) {
-    const byWpId = await payload.find({
-      collection: 'posts',
-      where: { wpId: { equals: wpId } },
-      depth: 0,
-      limit: 1,
-      pagination: false,
-      overrideAccess: true,
-    })
+  return formatSlug(String(item.slug || title || item.id))
+}
 
-    if (byWpId.docs[0]) return byWpId.docs[0] as AnyRecord
+function buildExportMaps(items: AnyRecord[]) {
+  const byWpId = new Map<number, AnyRecord>()
+  const bySlug = new Map<string, AnyRecord>()
+
+  for (const item of items) {
+    const wpId = Number(item.id)
+    const slug = getExportSlug(item)
+
+    if (Number.isFinite(wpId) && wpId > 0 && !byWpId.has(wpId)) {
+      byWpId.set(wpId, item)
+    }
+
+    if (slug && !bySlug.has(slug)) {
+      bySlug.set(slug, item)
+    }
+
+    if (typeof item.slug === 'string' && item.slug && !bySlug.has(item.slug)) {
+      bySlug.set(item.slug, item)
+    }
   }
 
-  const bySlug = await payload.find({
+  return { byWpId, bySlug }
+}
+
+function findExportForPayloadPost(
+  doc: AnyRecord,
+  maps: ReturnType<typeof buildExportMaps>,
+) {
+  const wpId = Number(doc.wpId)
+
+  if (Number.isFinite(wpId) && wpId > 0) {
+    const byWpId = maps.byWpId.get(wpId)
+
+    if (byWpId) {
+      return byWpId
+    }
+  }
+
+  const slug = typeof doc.slug === 'string' ? doc.slug : ''
+
+  return maps.bySlug.get(slug) || maps.bySlug.get(formatSlug(slug)) || null
+}
+
+function shouldSkipPayloadPost(doc: AnyRecord, index: number) {
+  if (OFFSET > 0 && index < OFFSET) return true
+  if (ONLY_WP_ID > 0 && Number(doc.wpId) !== ONLY_WP_ID) return true
+  if (ONLY_SLUG && String(doc.slug || '') !== ONLY_SLUG) return true
+
+  return false
+}
+
+function countMatches(value: string, pattern: RegExp) {
+  return value.match(pattern)?.length || 0
+}
+
+function summarizeHtml(value: unknown) {
+  const html = typeof value === 'string' ? value : ''
+
+  return {
+    length: html.length,
+    headings: countMatches(html, /<h[2-4]\b/gi),
+    figures: countMatches(html, /<figure\b/gi),
+    tables: countMatches(html, /<table\b/gi),
+    lists: countMatches(html, /<(?:ul|ol)\b/gi),
+    paragraphs: countMatches(html, /<p\b/gi),
+  }
+}
+
+function formatSummary(summary: ReturnType<typeof summarizeHtml>) {
+  return `len=${summary.length}, h=${summary.headings}, fig=${summary.figures}, table=${summary.tables}, list=${summary.lists}, p=${summary.paragraphs}`
+}
+
+async function verifyUpdatedContent(payload: any, id: unknown, expectedContent: string) {
+  const verified = await payload.findByID({
     collection: 'posts',
-    where: { slug: { equals: slug } },
+    id,
     depth: 0,
-    limit: 1,
-    pagination: false,
     overrideAccess: true,
   })
 
-  return (bySlug.docs[0] as AnyRecord | undefined) || null
-}
-
-function shouldSkipItem(item: AnyRecord, index: number) {
-  if (OFFSET > 0 && index < OFFSET) return true
-  if (ONLY_WP_ID > 0 && Number(item.id) !== ONLY_WP_ID) return true
-  if (ONLY_SLUG && String(item.slug || '') !== ONLY_SLUG) return true
-  return false
+  return verified?.content === expectedContent
 }
 
 async function run() {
@@ -319,85 +373,129 @@ async function run() {
   console.log(`Data file: ${POSTS_FILE}`)
   console.log(`Dry run: ${DRY_RUN ? 'yes' : 'no'}`)
   console.log(`Media map: ${SKIP_MEDIA_MAP ? 'skip' : 'yes'}`)
+  console.log(`Mode: scan Payload posts -> update content only`)
 
   const configPromise = (await import('@payload-config')).default
   const payload = await getPayload({ config: configPromise })
   const mediaMap = await buildMediaMap(payload)
-  const posts = readPostsExport()
+  const exportPosts = readPostsExport()
+  const exportMaps = buildExportMaps(exportPosts)
 
   let scanned = 0
   let matched = 0
   let changed = 0
   let skippedSame = 0
-  let missing = 0
+  let missingExport = 0
   let empty = 0
   let failed = 0
+  let verified = 0
+  let page = 1
+  let visited = 0
 
-  for (const [index, item] of posts.entries()) {
-    if (shouldSkipItem(item, index)) continue
-    if (LIMIT > 0 && scanned >= LIMIT) break
+  while (true) {
+    const result = await payload.find({
+      collection: 'posts',
+      depth: 0,
+      limit: PAGE_SIZE,
+      page,
+      overrideAccess: true,
+    })
 
-    scanned += 1
+    for (const existing of result.docs as AnyRecord[]) {
+      if (shouldSkipPayloadPost(existing, visited)) {
+        visited += 1
+        continue
+      }
 
-    const title = normalizeText(getRendered(item.title) || item.title || item.slug || `Post ${item.id}`)
-    const slug = formatSlug(String(item.slug || title || item.id))
-    const content = normalizePostHtml(item, mediaMap)
+      visited += 1
 
-    if (!content.trim()) {
-      empty += 1
-      console.warn(`   Empty content: ${title}`)
-      continue
-    }
+      if (LIMIT > 0 && scanned >= LIMIT) {
+        break
+      }
 
-    const existing = await findExistingPost(payload, item, slug)
+      scanned += 1
 
-    if (!existing?.id) {
-      missing += 1
-      console.warn(`   Missing post in Payload: ${title} (${slug})`)
-      continue
-    }
+      const item = findExportForPayloadPost(existing, exportMaps)
+      const title = normalizeText(existing.title || existing.slug || `Post ${existing.id}`)
 
-    matched += 1
+      if (!item) {
+        missingExport += 1
+        console.warn(
+          `   Missing WordPress export for Payload post #${existing.id}: ${title} (wpId=${existing.wpId || 'none'}, slug=${existing.slug || 'none'})`,
+        )
+        continue
+      }
 
-    if (!FORCE && existing.content === content) {
-      skippedSame += 1
-      continue
-    }
+      const content = normalizePostHtml(item, mediaMap)
 
-    changed += 1
-    const currentLength = typeof existing.content === 'string' ? existing.content.length : 0
-    console.log(
-      `   ${DRY_RUN ? '[dry-run] ' : ''}update post #${existing.id} wpId=${item.id}: ${title} (${currentLength} -> ${content.length})`,
-    )
+      if (!content.trim()) {
+        empty += 1
+        console.warn(`   Empty WordPress content: ${title}`)
+        continue
+      }
 
-    if (!DRY_RUN) {
-      try {
-        await payload.update({
-          collection: 'posts',
-          id: existing.id,
-          data: { content },
-          depth: 0,
-          overrideAccess: true,
-        })
-      } catch (error) {
-        failed += 1
-        const message = error instanceof Error ? error.message : String(error)
-        console.warn(`   Update failed #${existing.id}: ${message}`)
+      matched += 1
+
+      if (!FORCE && existing.content === content) {
+        skippedSame += 1
+        continue
+      }
+
+      changed += 1
+      const beforeSummary = summarizeHtml(existing.content)
+      const afterSummary = summarizeHtml(content)
+
+      console.log(
+        `   ${DRY_RUN ? '[dry-run] ' : ''}update content post #${existing.id} wpId=${existing.wpId || item.id}: ${title}`,
+      )
+      console.log(`      before: ${formatSummary(beforeSummary)}`)
+      console.log(`      after : ${formatSummary(afterSummary)}`)
+
+      if (!DRY_RUN) {
+        try {
+          await payload.update({
+            collection: 'posts',
+            id: existing.id,
+            data: { content },
+            depth: 0,
+            overrideAccess: true,
+          })
+
+          const ok = await verifyUpdatedContent(payload, existing.id, content)
+
+          if (ok) {
+            verified += 1
+          } else {
+            failed += 1
+            console.warn(`   Verify failed: DB content still differs after update for post #${existing.id}`)
+          }
+        } catch (error) {
+          failed += 1
+          const message = error instanceof Error ? error.message : String(error)
+          console.warn(`   Update failed #${existing.id}: ${message}`)
+        }
       }
     }
+
+    if (!result.hasNextPage || (LIMIT > 0 && scanned >= LIMIT)) {
+      break
+    }
+
+    page += 1
   }
 
   console.log('\nDone.')
-  console.log(`Scanned export posts: ${scanned}`)
-  console.log(`Matched Payload posts: ${matched}`)
+  console.log(`Scanned Payload posts: ${scanned}`)
+  console.log(`Matched WordPress export posts: ${matched}`)
   console.log(`${DRY_RUN ? 'Would update' : 'Updated'}: ${changed}`)
+  console.log(`Verified after update: ${verified}`)
   console.log(`Already same: ${skippedSame}`)
-  console.log(`Missing in Payload: ${missing}`)
-  console.log(`Empty content: ${empty}`)
+  console.log(`Missing WordPress export: ${missingExport}`)
+  console.log(`Empty WordPress content: ${empty}`)
   console.log(`Failed: ${failed}`)
 
   if (DRY_RUN) {
-    console.log('\nRun real update: npm run repair:blog-content -- --yes')
+    console.log('\nRun real update: npm run repair:blog-content -- --yes --force')
   }
 
   process.exit(failed > 0 ? 1 : 0)
