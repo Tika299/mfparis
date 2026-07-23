@@ -132,13 +132,6 @@ function stripHTML(html: unknown): string {
     : ''
 }
 
-function escapeHtmlText(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-}
 
 function normalizePayloadTextarea(value: unknown): string {
   return decodeHtmlEntities(String(value ?? ''))
@@ -146,11 +139,6 @@ function normalizePayloadTextarea(value: unknown): string {
     .replace(/[\u0001-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '')
 }
 
-function buildPlainHtmlFallback(html: string): string {
-  const text = normalizePayloadTextarea(stripHTML(html))
-
-  return text ? `<p>${escapeHtmlText(text)}</p>` : ''
-}
 
 function isContentValidationError(error: unknown): boolean {
   const message =
@@ -1675,16 +1663,11 @@ async function importPosts(payload: any, maps: ImportMaps) {
           throw contentError
         }
 
-        const fallbackContent = buildPlainHtmlFallback(content)
-
-        console.warn(
-          `   Post warning: content HTML invalid, retry plain content: ${title}`,
+        console.error(
+          `   Post error: content HTML invalid, skip instead of stripping HTML: ${title}`,
         )
 
-        result = await createOrUpdateBySlug(payload, 'posts', slug, {
-          ...postData,
-          content: fallbackContent,
-        })
+        continue
       }
 
       console.log(`   ${result.action} post: ${title}`)
