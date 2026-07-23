@@ -68,6 +68,14 @@ function looksLikeMojibake(value: string) {
   return /(?:Ã.|Ä.|Å.|Æ.|â€|Â|áº|á»|�)/.test(value)
 }
 
+function countMojibakeMarkers(value: string) {
+  return (value.match(/(?:Ã.|Ä.|Å.|Æ.|â€|Â|áº|á»|�)/g) || []).length
+}
+
+function countVietnameseLetters(value: string) {
+  return (value.match(/[À-ỹĐđ]/g) || []).length
+}
+
 function decodeUtf8Mojibake(value: string) {
   try {
     return Buffer.from(value, 'latin1').toString('utf8')
@@ -87,6 +95,18 @@ function fixVietnameseEncoding(value: string): string {
     const decoded = decodeUtf8Mojibake(next)
 
     if (!decoded || decoded === next) {
+      break
+    }
+
+    const currentBrokenScore = countMojibakeMarkers(next)
+    const decodedBrokenScore = countMojibakeMarkers(decoded)
+    const currentVietnameseScore = countVietnameseLetters(next)
+    const decodedVietnameseScore = countVietnameseLetters(decoded)
+
+    if (
+      decodedBrokenScore > currentBrokenScore ||
+      (decodedBrokenScore === currentBrokenScore && decodedVietnameseScore < currentVietnameseScore)
+    ) {
       break
     }
 

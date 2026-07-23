@@ -128,23 +128,83 @@ const styleProperties = new Set([
 ])
 
 const namedHtmlEntities: Record<string, string> = {
+  aacute: '\u00e1',
+  Aacute: '\u00c1',
+  acirc: '\u00e2',
+  Acirc: '\u00c2',
+  agrave: '\u00e0',
+  Agrave: '\u00c0',
   amp: '&',
+  aring: '\u00e5',
+  Aring: '\u00c5',
   apos: "'",
+  atilde: '\u00e3',
+  Atilde: '\u00c3',
+  auml: '\u00e4',
+  Auml: '\u00c4',
+  ccedil: '\u00e7',
+  Ccedil: '\u00c7',
+  eacute: '\u00e9',
+  Eacute: '\u00c9',
+  ecirc: '\u00ea',
+  Ecirc: '\u00ca',
+  egrave: '\u00e8',
+  Egrave: '\u00c8',
+  euml: '\u00eb',
+  Euml: '\u00cb',
+  gt: '>',
   hellip: '...',
+  iacute: '\u00ed',
+  Iacute: '\u00cd',
+  icirc: '\u00ee',
+  Icirc: '\u00ce',
+  igrave: '\u00ec',
+  Igrave: '\u00cc',
+  iuml: '\u00ef',
+  Iuml: '\u00cf',
   ldquo: '"',
   lsquo: "'",
+  lt: '<',
   mdash: '-',
   ndash: '-',
   nbsp: ' ',
+  ntilde: '\u00f1',
+  Ntilde: '\u00d1',
+  oacute: '\u00f3',
+  Oacute: '\u00d3',
+  ocirc: '\u00f4',
+  Ocirc: '\u00d4',
+  ograve: '\u00f2',
+  Ograve: '\u00d2',
+  oslash: '\u00f8',
+  Oslash: '\u00d8',
+  otilde: '\u00f5',
+  Otilde: '\u00d5',
+  ouml: '\u00f6',
+  Ouml: '\u00d6',
   quot: '"',
   rdquo: '"',
   rsquo: "'",
+  szlig: '\u00df',
+  uacute: '\u00fa',
+  Uacute: '\u00da',
+  ucirc: '\u00fb',
+  Ucirc: '\u00db',
+  ugrave: '\u00f9',
+  Ugrave: '\u00d9',
+  uuml: '\u00fc',
+  Uuml: '\u00dc',
   times: 'x',
+  yacute: '\u00fd',
+  Yacute: '\u00dd',
+  yuml: '\u00ff',
+  Yuml: '\u0178',
 }
 
 export function normalizeBrokenHtmlEntities(value: string): string {
   return value
     .replace(/\$#(x?[0-9a-f]+);/gi, '&#$1;')
+    .replace(/&0*#?([0-9]{2,6});/g, '&#$1;')
     .replace(/\$amp;/gi, '&amp;')
     .replace(/&amp;(#x?[0-9a-f]+;)/gi, '&$1')
     .replace(/&amp;([a-z][a-z0-9]+;)/gi, '&$1')
@@ -187,7 +247,7 @@ export function decodeHtmlEntities(value: string): string {
           return full
         }
 
-        return namedHtmlEntities[entity] ?? full
+        return namedHtmlEntities[entity] ?? namedHtmlEntities[rawEntity] ?? full
       },
     )
 
@@ -207,6 +267,62 @@ function escapeAttribute(value: string): string {
     .replace(/"/g, '&quot;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
+}
+
+function cleanSlugPathSegment(value: string): string {
+  try {
+    return encodeURIComponent(decodeURIComponent(value.trim()))
+  } catch {
+    return encodeURIComponent(value.trim())
+  }
+}
+
+export function normalizeLegacyInternalUrl(value: string): string {
+  const raw = String(value || '').trim()
+
+  if (!raw) {
+    return raw
+  }
+
+  const hashMatch = raw.match(/#.*$/)
+  const hash = hashMatch?.[0] || ''
+  const withoutHash = hash ? raw.slice(0, -hash.length) : raw
+  const hadTrailingSlash = /\/$/.test(withoutHash)
+
+  try {
+    const parsed = new URL(withoutHash, 'https://mfparis.vn')
+    const host = parsed.hostname.toLowerCase().replace(/^www\./, '')
+    const isKnownHost = host === 'mfparis.vn' || host === 'maraisdefrance.vn'
+    const pathname = parsed.pathname.replace(/\/+$/g, '')
+
+    if (isKnownHost) {
+      const brandFromQuery = parsed.searchParams.get('filter_brand')
+
+      if (brandFromQuery && (pathname === '/shop' || pathname === '/products')) {
+        return '/brands/' + cleanSlugPathSegment(brandFromQuery) + hash
+      }
+
+      const brandMatch = pathname.match(/^\/thuong-hieu\/([^/]+)(?:\/san-pham)?$/i)
+
+      if (brandMatch?.[1]) {
+        return '/brands/' + cleanSlugPathSegment(brandMatch[1]) + (hadTrailingSlash ? '/' : '') + hash
+      }
+
+      if (raw.startsWith('http://') || raw.startsWith('https://')) {
+        return parsed.pathname + parsed.search + hash
+      }
+    }
+  } catch {
+    // Fall through to path-only handling.
+  }
+
+  const pathOnlyMatch = withoutHash.match(/^\/thuong-hieu\/([^/?#]+)(?:\/san-pham)?\/?$/i)
+
+  if (pathOnlyMatch?.[1]) {
+    return '/brands/' + cleanSlugPathSegment(pathOnlyMatch[1]) + (hadTrailingSlash ? '/' : '') + hash
+  }
+
+  return raw
 }
 
 function isSafeUrl(value: string, tagName: string, attrName: string): boolean {
@@ -363,7 +479,12 @@ function sanitizeAttributes(tagName: string, attrs = ''): string {
       continue
     }
 
-    sanitized.push(`${attrName}="${escapeAttribute(attrValue)}"`)
+    const nextAttrValue =
+      tagName === 'a' && attrName === 'href'
+        ? normalizeLegacyInternalUrl(attrValue)
+        : attrValue
+
+    sanitized.push(`${attrName}="${escapeAttribute(nextAttrValue)}"`)
   }
 
   if (tagName === 'a' && sanitized.some((attr) => attr === 'target="_blank"')) {

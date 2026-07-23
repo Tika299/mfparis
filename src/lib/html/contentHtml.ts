@@ -178,10 +178,12 @@ export function extractHtmlHeadings(value: unknown): HtmlHeading[] {
   const items: HtmlHeading[] = []
 
   html.replace(/<h2(?:\s[^>]*)?>([\s\S]*?)<\/h2>/gi, (_match, rawText) => {
-    const text = String(rawText)
-      .replace(/<[^>]*>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
+    const text = decodeHtmlEntities(
+      String(rawText)
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim(),
+    )
 
     if (!text) {
       return ''

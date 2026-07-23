@@ -31,6 +31,8 @@ const onlyCollections = onlyArg
   : null
 
 const htmlEntityPattern = /(?:&(?:#x?[0-9a-f]+|[a-z][a-z0-9]+);|\$#x?[0-9a-f]+;|\$amp;|\u00a0)/i
+const legacyInternalLinkPattern =
+  /(?:https?:\/\/(?:www\.)?(?:mfparis\.vn|maraisdefrance\.vn))?\/thuong-hieu\/[^"' <>)]+|(?:https?:\/\/(?:www\.)?(?:mfparis\.vn|maraisdefrance\.vn))?\/shop\/?\?[^"' <>)]*filter_brand=/i
 
 const collectionConfigs: Array<{
   slug: CollectionSlug
@@ -51,7 +53,7 @@ const collectionConfigs: Array<{
     label: 'bai viet',
     htmlFields: ['content'],
     textFields: ['title', 'slug', 'excerpt', 'sourceUrl'],
-    objectFields: ['seo', 'faq', 'authorInfo'],
+    objectFields: ['seo', 'faq', 'author', 'reviewer'],
   },
   {
     slug: 'brands',
@@ -105,6 +107,14 @@ const collectionConfigs: Array<{
 
 function hasEntity(value: unknown): boolean {
   return typeof value === 'string' && htmlEntityPattern.test(value)
+}
+
+function hasLegacyInternalLink(value: unknown): boolean {
+  return typeof value === 'string' && legacyInternalLinkPattern.test(value)
+}
+
+function needsHtmlRepair(value: unknown): boolean {
+  return hasEntity(value) || hasLegacyInternalLink(value)
 }
 
 function normalizeText(value: unknown): unknown {
@@ -168,7 +178,7 @@ function buildRepairData(doc: AnyRecord, config: (typeof collectionConfigs)[numb
   const data: AnyRecord = {}
 
   for (const field of config.htmlFields) {
-    if (!hasEntity(doc[field])) {
+    if (!needsHtmlRepair(doc[field])) {
       continue
     }
 

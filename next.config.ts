@@ -8,6 +8,32 @@ const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  async redirects() {
+    return [
+      {
+        source: '/thuong-hieu/:brand',
+        destination: '/brands/:brand',
+        permanent: true,
+      },
+      {
+        source: '/thuong-hieu/:brand/san-pham',
+        destination: '/brands/:brand',
+        permanent: true,
+      },
+      {
+        source: '/shop',
+        has: [
+          {
+            type: 'query',
+            key: 'filter_brand',
+            value: '(?<brand>[^&]+)',
+          },
+        ],
+        destination: '/brands/:brand',
+        permanent: true,
+      },
+    ]
+  },
   async rewrites() {
     return [
       /*
@@ -34,10 +60,6 @@ const nextConfig: NextConfig = {
       {
         source: '/nuoc-hoa/:brand',
         destination: '/products?category=nuoc-hoa&brand=:brand',
-      },
-      {
-        source: '/thuong-hieu/:brand/san-pham',
-        destination: '/brands/:brand',
       },
       {
         source: '/danh-muc/:category',
