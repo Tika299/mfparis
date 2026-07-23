@@ -28,6 +28,7 @@ const ONLY_SLUG = getArg('--slug', '')
 const ONLY_WP_ID = Math.max(0, Number(getArg('--wp-id', '0')) || 0)
 const SKIP_MEDIA_MAP = hasFlag('--skip-media-map')
 const FORCE = hasFlag('--force')
+const ONLY_BROKEN = hasFlag('--only-broken') || hasFlag('--broken-only') || hasFlag('--mojibake-only')
 const PAGE_SIZE = Math.max(1, Math.min(200, Number(getArg('--page-size', '100')) || 100))
 const WP_BASE_URL = getArg('--wp-base-url', process.env.WP_BASE_URL || 'https://mfparis.vn')
 const DATA_DIR = path.resolve(
@@ -70,6 +71,10 @@ function looksLikeMojibake(value: string) {
 
 function countMojibakeMarkers(value: string) {
   return (value.match(/(?:Ã.|Ä.|Å.|Æ.|â€|Â|áº|á»|�)/g) || []).length
+}
+
+function countControlCharacters(value: string) {
+  return (value.match(/[\u0001-\u0008\u000b\u000c\u000e-\u001f\u007f]/g) || []).length
 }
 
 function countVietnameseLetters(value: string) {
@@ -360,11 +365,20 @@ function countMatches(value: string, pattern: RegExp) {
   return value.match(pattern)?.length || 0
 }
 
+function isBrokenImportedText(value: unknown) {
+  if (typeof value !== 'string' || !value) {
+    return false
+  }
+
+  return countMojibakeMarkers(value) > 0 || countControlCharacters(value) > 0
+}
+
 function summarizeHtml(value: unknown) {
   const html = typeof value === 'string' ? value : ''
 
   return {
     length: html.length,
+    broken: countMojibakeMarkers(html) + countControlCharacters(html),
     headings: countMatches(html, /<h[2-4]\b/gi),
     figures: countMatches(html, /<figure\b/gi),
     tables: countMatches(html, /<table\b/gi),
@@ -374,7 +388,7 @@ function summarizeHtml(value: unknown) {
 }
 
 function formatSummary(summary: ReturnType<typeof summarizeHtml>) {
-  return `len=${summary.length}, h=${summary.headings}, fig=${summary.figures}, table=${summary.tables}, list=${summary.lists}, p=${summary.paragraphs}`
+  return `len=${summary.length}, broken=${summary.broken}, h=${summary.headings}, fig=${summary.figures}, table=${summary.tables}, list=${summary.lists}, p=${summary.paragraphs}`
 }
 
 async function verifyUpdatedContent(payload: any, id: unknown, expectedContent: string) {
@@ -394,6 +408,9 @@ async function run() {
   console.log(`Dry run: ${DRY_RUN ? 'yes' : 'no'}`)
   console.log(`Media map: ${SKIP_MEDIA_MAP ? 'skip' : 'yes'}`)
   console.log(`Mode: scan Payload posts -> update content only`)
+  if (ONLY_BROKEN) {
+    console.log('Only broken posts: yes')
+  }
 
   const configPromise = (await import('@payload-config')).default
   const payload = await getPayload({ config: configPromise })
@@ -455,6 +472,11 @@ async function run() {
       }
 
       matched += 1
+
+      if (ONLY_BROKEN && !isBrokenImportedText(existing.content)) {
+        skippedSame += 1
+        continue
+      }
 
       if (!FORCE && existing.content === content) {
         skippedSame += 1
