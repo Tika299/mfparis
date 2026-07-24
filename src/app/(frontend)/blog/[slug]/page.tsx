@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import type { Where } from 'payload'
 
 import { getPayload } from 'payload'
@@ -143,7 +143,7 @@ function truncateText(
 
   return `${value
     .slice(0, maxLength - 1)
-    .trim()}…`
+    .trim()}â€¦`
 }
 
 function getPostDescription(
@@ -169,7 +169,7 @@ function getPostDescription(
     return truncateText(contentText, 160)
   }
 
-  return `Khám phá bài viết ${post.title ?? 'mới nhất'} tại MF Paris.`
+  return `KhÃ¡m phÃ¡ bÃ i viáº¿t ${post.title ?? 'má»›i nháº¥t'} táº¡i MF Paris.`
 }
 
 function getMediaUrl(
@@ -323,7 +323,7 @@ function getBlogSchemaBreadcrumbItems(
 ): BlogBreadcrumbItem[] {
   return [
     {
-      name: 'Trang chủ',
+      name: 'Trang chá»§',
       url: '/',
     },
     ...categoryBreadcrumbItems,
@@ -355,7 +355,7 @@ function slugify(text: string): string {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[đĐ]/g, 'd')
+    .replace(/[Ä‘Ä]/g, 'd')
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()
     .replace(/\s+/g, '-')
@@ -581,7 +581,7 @@ function BlogPostPager({
 
   return (
     <nav
-      aria-label="Bài viết trước và sau"
+      aria-label="BÃ i viáº¿t trÆ°á»›c vÃ  sau"
       className="mt-10 grid gap-4 md:grid-cols-2"
     >
       {previousPost ? (
@@ -597,7 +597,7 @@ function BlogPostPager({
           </span>
           <span className="min-w-0">
             <span className="block text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
-              Bài trước
+              BÃ i trÆ°á»›c
             </span>
             <span className="mt-1 line-clamp-2 block text-sm font-bold leading-snug text-gray-950 group-hover:text-primary">
               {previousPost.title}
@@ -620,7 +620,7 @@ function BlogPostPager({
         >
           <span className="min-w-0">
             <span className="block text-[10px] font-black uppercase tracking-[0.18em] text-gray-400">
-              Bài sau
+              BÃ i sau
             </span>
             <span className="mt-1 line-clamp-2 block text-sm font-bold leading-snug text-gray-950 group-hover:text-primary">
               {nextPost.title}
@@ -654,9 +654,9 @@ export async function generateMetadata({
 
   if (!post) {
     return {
-      title: 'Bài viết không tồn tại | MF Paris',
+      title: 'BÃ i viáº¿t khÃ´ng tá»“n táº¡i | MF Paris',
       description:
-        'Bài viết bạn đang tìm kiếm hiện không tồn tại tại MF Paris.',
+        'BÃ i viáº¿t báº¡n Ä‘ang tÃ¬m kiáº¿m hiá»‡n khÃ´ng tá»“n táº¡i táº¡i MF Paris.',
       robots: {
         index: false,
         follow: true,
@@ -799,7 +799,7 @@ export default async function BlogPostPage({
     title: 'MF Paris Editorial',
     url: '/author/mfparis/',
     avatarUrl: '/api/media/file/logo-thuong-hieu-marais-de-france-1200x1200-1-edited-e1768551529162.webp',
-    bio: 'Marais de France là đội ngũ yêu thích hương thơm, chia sẻ kinh nghiệm đánh giá nước hoa và mỹ phẩm nhằm giúp khách hàng lựa chọn sản phẩm phù hợp.',
+    bio: 'Marais de France lÃ  Ä‘á»™i ngÅ© yÃªu thÃ­ch hÆ°Æ¡ng thÆ¡m, chia sáº» kinh nghiá»‡m Ä‘Ã¡nh giÃ¡ nÆ°á»›c hoa vÃ  má»¹ pháº©m nháº±m giÃºp khÃ¡ch hÃ ng lá»±a chá»n sáº£n pháº©m phÃ¹ há»£p.',
   }
   const defaultAuthorInfo = getBlogAuthorProfileInfo(
     defaultAuthorResult.docs[0],
@@ -813,6 +813,7 @@ export default async function BlogPostPage({
     post.authorProfile,
     legacyAuthorInfo,
   )
+  const authorHref = authorInfo.url || '/author/mfparis/'
   const reviewerInfo = getBlogPersonInfo(post.reviewer, {
     name: 'Marais de France',
     title: 'Content Reviewer',
@@ -996,7 +997,7 @@ export default async function BlogPostPage({
             href="/"
             className="hover:text-black"
           >
-            Trang chủ
+            Trang chá»§
           </Link>
 
           {blogBreadcrumbItems.map((item) => (
@@ -1048,21 +1049,26 @@ export default async function BlogPostPage({
                     <div className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-100">
                       <User size={16} />
                     </div>
-                    <span>{authorInfo.name}</span>
+                    <Link
+                      href={authorHref}
+                      className="transition-colors hover:text-[#E54D2E]"
+                    >
+                      {authorInfo.name}
+                    </Link>
                   </div>
 
                   <div className="flex items-center gap-1.5">
                     <Calendar size={14} />
-                    Ngày đăng: {formatPostDate(post.createdAt)}
+                    NgÃ y Ä‘Äƒng: {formatPostDate(post.createdAt)}
                   </div>
 
                   <div className="flex items-center gap-1.5">
                     <Calendar size={14} />
-                    Cập nhật: {formatPostDate(post.updatedAt || post.createdAt)}
+                    Cáº­p nháº­t: {formatPostDate(post.updatedAt || post.createdAt)}
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <Clock size={14} /> {readingMinutes} phút đọc
+                    <Clock size={14} /> {readingMinutes} phÃºt Ä‘á»c
                   </div>
                 </div>
                 <BlogPostEngagement
@@ -1112,13 +1118,18 @@ export default async function BlogPostPage({
 
                   <div className="min-w-0">
                     <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#E54D2E]">
-                      Tác giả
+                      TÃ¡c giáº£
                     </p>
                     <h2
                       id="blog-author-heading"
                       className="mt-1 text-xl font-black text-gray-950"
                     >
-                      {authorInfo.name}
+                      <Link
+                        href={authorHref}
+                        className="transition-colors hover:text-[#E54D2E]"
+                      >
+                        {authorInfo.name}
+                      </Link>
                     </h2>
                     {authorInfo.title ? (
                       <p className="mt-1 text-sm font-semibold text-gray-500">
@@ -1130,6 +1141,12 @@ export default async function BlogPostPage({
                         {authorInfo.bio}
                       </p>
                     ) : null}
+                    <Link
+                      href={authorHref}
+                      className="mt-4 inline-flex w-fit items-center rounded-full border border-gray-100 bg-white px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-gray-500 transition hover:border-[#E54D2E] hover:text-[#E54D2E]"
+                    >
+                      Xem há»“ sÆ¡ tÃ¡c giáº£
+                    </Link>
                   </div>
                 </div>
               </section>
@@ -1147,7 +1164,7 @@ export default async function BlogPostPage({
                     id="post-faq-heading"
                     className="mt-2 text-2xl font-black tracking-tight text-gray-950 md:text-3xl"
                   >
-                    Câu hỏi thường gặp
+                    CÃ¢u há»i thÆ°á»ng gáº·p
                   </h2>
 
                   <div className="mt-6 divide-y divide-orange-100">
@@ -1219,14 +1236,14 @@ export default async function BlogPostPage({
               <input
                 name="q"
                 type="text"
-                placeholder="Tìm bài viết..."
+                placeholder="TÃ¬m bÃ i viáº¿t..."
                 className="h-12 w-full rounded-2xl border border-gray-100 bg-white pl-5 pr-12 text-sm shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-100"
               />
 
               <button
                 type="submit"
                 className="absolute right-3 top-2.5 flex h-7 w-7 items-center justify-center rounded-full text-gray-300 transition-colors hover:bg-red-50 hover:text-primary"
-                aria-label="Tìm bài viết"
+                aria-label="TÃ¬m bÃ i viáº¿t"
               >
                 <Search size={18} />
               </button>
@@ -1237,7 +1254,7 @@ export default async function BlogPostPage({
                 <div className="rounded-[2.5rem] border border-gray-100 bg-white p-8 shadow-sm">
                   <h3 className="mb-2 flex items-center gap-3 text-[13px] font-black uppercase tracking-[0.2em] text-gray-900">
                     <span className="h-5 w-1 bg-primary"></span>
-                    Mục lục
+                    Má»¥c lá»¥c
                   </h3>
 
                   <BlogTocNav tocItems={tocItems} />
