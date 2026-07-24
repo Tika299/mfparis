@@ -10,7 +10,7 @@ import {
   Calendar,
   User,
   Clock,
-  Search,  ChevronLeft,
+  Search, ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
 import {
@@ -798,7 +798,7 @@ export default async function BlogPostPage({
     name: 'Marais de France',
     title: 'MF Paris Editorial',
     url: '/author/mfparis/',
-    avatarUrl: '/api/media/file/logo-thuong-hieu-marais-de-france-1200x1200-1-edited-e1768551529162.png',
+    avatarUrl: '/api/media/file/logo-thuong-hieu-marais-de-france-1200x1200-1-edited-e1768551529162.webp',
     bio: 'Marais de France là đội ngũ yêu thích hương thơm, chia sẻ kinh nghiệm đánh giá nước hoa và mỹ phẩm nhằm giúp khách hàng lựa chọn sản phẩm phù hợp.',
   }
   const defaultAuthorInfo = getBlogAuthorProfileInfo(
