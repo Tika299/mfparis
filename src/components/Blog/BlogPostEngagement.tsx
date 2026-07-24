@@ -214,8 +214,8 @@ export function BlogPostEngagement({
   }
 
   return (
-    <section className="mt-6 rounded-[2rem] border border-gray-100 bg-[#fffaf7] p-4 shadow-sm md:p-5">
-      <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]">
+    <section className="mt-5 rounded-[1.5rem] border border-gray-100 bg-[#fffaf7] p-4 shadow-sm">
+      <div className="grid items-center gap-4 md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
         {reviewerName ? (
           <div className="flex min-w-0 items-center gap-3">
             <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-emerald-600 shadow-sm">
@@ -238,17 +238,17 @@ export function BlogPostEngagement({
           </div>
         ) : null}
 
-        <div className="flex min-w-0 flex-col gap-3">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
-              <Eye size={16} />
-              <span>{formatNumber(viewCount)} lượt xem</span>
-            </div>
-
+        <div className="flex min-w-0 flex-col gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
             <div className="text-xs font-bold text-gray-950">
               {ratingCount > 0
-                ? formatRating(ratingAverage) + '/5'
+                ? formatRating(ratingAverage) + '/5,0'
                 : 'Chưa có đánh giá'}
+            </div>
+
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500">
+              <Eye size={15} />
+              <span>{formatNumber(viewCount)} lượt xem</span>
             </div>
           </div>
 
