@@ -51,34 +51,80 @@ function getRelationshipID(value: RelationshipValue): string | number | null {
     return null
 }
 
+function getAncestorCategoryIDs(
+    categoryID: string,
+    parentIDByCategoryID: Map<string, string>,
+) {
+    const result: string[] = []
+    const seen = new Set<string>([categoryID])
+    let currentID = categoryID
+
+    while (true) {
+        const parentID = parentIDByCategoryID.get(currentID)
+
+        if (!parentID || seen.has(parentID)) {
+            break
+        }
+
+        result.push(parentID)
+        seen.add(parentID)
+        currentID = parentID
+    }
+
+    return result
+}
+
 const getCachedCategoriesPageData = unstable_cache(
     async (page: number, limit: number) => {
         const payload = await getPayload({
             config: configPromise,
         })
 
-        const categoriesRes = await payload.find({
-            collection: 'categories',
-            limit,
-            page,
-            sort: 'name',
-            depth: 1,
-        })
+        const [categoriesRes, productsRes, allCategoriesRes] =
+            await Promise.all([
+                payload.find({
+                    collection: 'categories',
+                    limit,
+                    page,
+                    sort: 'name',
+                    depth: 1,
+                }),
+                payload.find({
+                    collection: 'products',
+                    depth: 0,
+                    pagination: false,
+                    overrideAccess: true,
+                    where: {
+                        status: {
+                            equals: 'published',
+                        },
+                    },
+                    select: {
+                        categories: true,
+                    },
+                }),
+                payload.find({
+                    collection: 'categories',
+                    depth: 1,
+                    pagination: false,
+                    overrideAccess: true,
+                    select: {
+                        id: true,
+                        parent: true,
+                    },
+                }),
+            ])
 
-        const productsRes = await payload.find({
-            collection: 'products',
-            depth: 0,
-            pagination: false,
-            overrideAccess: true,
-            where: {
-                status: {
-                    equals: 'published',
-                },
-            },
-            select: {
-                categories: true,
-            },
-        })
+        const parentIDByCategoryID = new Map<string, string>()
+
+        for (const category of allCategoriesRes.docs) {
+            const categoryID = getRelationshipID(category.id)
+            const parentID = getRelationshipID(category.parent)
+
+            if (categoryID !== null && parentID !== null) {
+                parentIDByCategoryID.set(String(categoryID), String(parentID))
+            }
+        }
 
         const productCountByCategory = new Map<string, number>()
 
@@ -92,8 +138,18 @@ const getCachedCategoriesPageData = unstable_cache(
             for (const category of product.categories) {
                 const categoryID = getRelationshipID(category)
 
-                if (categoryID !== null) {
-                    uniqueCategoryIDs.add(String(categoryID))
+                if (categoryID === null) {
+                    continue
+                }
+
+                const normalizedCategoryID = String(categoryID)
+                uniqueCategoryIDs.add(normalizedCategoryID)
+
+                for (const ancestorID of getAncestorCategoryIDs(
+                    normalizedCategoryID,
+                    parentIDByCategoryID,
+                )) {
+                    uniqueCategoryIDs.add(ancestorID)
                 }
             }
 

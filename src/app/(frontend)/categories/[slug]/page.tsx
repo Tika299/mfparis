@@ -55,12 +55,103 @@ type RelationshipMedia =
   | null
   | undefined
 
+type RelationshipValue =
+  | string
+  | number
+  | {
+    id?: string | number | null
+  }
+  | null
+  | undefined
+
+type CategoryTreeItem = {
+  id: string | number
+  parent?: RelationshipValue
+}
+
 function getSiteUrl(): string {
   return (
     process.env.NEXT_PUBLIC_BASE_URL ||
     process.env.NEXT_PUBLIC_SITE_URL ||
     SITE_ORIGIN
   )
+}
+
+function getRelationshipID(value: RelationshipValue): string | number | null {
+  if (typeof value === 'string' || typeof value === 'number') {
+    return value
+  }
+
+  if (
+    value &&
+    typeof value === 'object' &&
+    'id' in value
+  ) {
+    const id = value.id
+
+    if (typeof id === 'string' || typeof id === 'number') {
+      return id
+    }
+  }
+
+  return null
+}
+
+function getCategoryScopeIDs(
+  rootCategoryID: string | number,
+  categories: CategoryTreeItem[],
+) {
+  const rootID = String(rootCategoryID)
+  const childrenByParentID = new Map<string, string[]>()
+
+  for (const category of categories) {
+    const parentID = getRelationshipID(category.parent)
+
+    if (parentID === null) {
+      continue
+    }
+
+    const key = String(parentID)
+    const children = childrenByParentID.get(key) ?? []
+    children.push(String(category.id))
+    childrenByParentID.set(key, children)
+  }
+
+  const result = new Set<string>([rootID])
+  const queue = [...(childrenByParentID.get(rootID) ?? [])]
+
+  while (queue.length > 0) {
+    const categoryID = queue.shift()
+
+    if (!categoryID || result.has(categoryID)) {
+      continue
+    }
+
+    result.add(categoryID)
+    queue.push(...(childrenByParentID.get(categoryID) ?? []))
+  }
+
+  return Array.from(result)
+}
+
+function buildCategoryContainsWhere(categoryIDs: string[]): Where {
+  const conditions = categoryIDs.map((categoryID) => ({
+    categories: {
+      contains: categoryID,
+    },
+  }))
+
+  if (conditions.length <= 1) {
+    return conditions[0] ?? {
+      categories: {
+        contains: '',
+      },
+    }
+  }
+
+  return {
+    or: conditions,
+  }
 }
 
 async function getCategoryBySlug(slug: string) {
@@ -356,6 +447,23 @@ export default async function CategoryPage({
     notFound()
   }
 
+  const allCategoriesRes = await payload.find({
+    collection: 'categories',
+    depth: 1,
+    limit: 1000,
+    pagination: false,
+    overrideAccess: true,
+    select: {
+      id: true,
+      parent: true,
+    },
+  })
+
+  const categoryScopeIDs = getCategoryScopeIDs(
+    currentCategory.id,
+    allCategoriesRes.docs as CategoryTreeItem[],
+  )
+
   /*
    * Bước 2: Tạo điều kiện lấy sản phẩm.
    */
@@ -365,11 +473,7 @@ export default async function CategoryPage({
         equals: 'published',
       },
     },
-    {
-      categories: {
-        contains: currentCategory.id,
-      },
-    },
+    buildCategoryContainsWhere(categoryScopeIDs),
   ]
 
   if (brand) {
