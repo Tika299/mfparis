@@ -614,6 +614,8 @@ async function uploadMedia(
     wpId?: number
     importedFrom?: 'wordpress' | 'woocommerce'
     preferredMediaByFilename?: Map<string, MediaRef>
+    createdAt?: string
+    updatedAt?: string
   } = {},
 ): Promise<MediaRef | null> {
   if (!url || SKIP_MEDIA) {
@@ -713,6 +715,8 @@ async function uploadMedia(
           sourceUrl: normalizedUrl,
           sourceFilename: filename,
           importedFrom: options.importedFrom || 'wordpress',
+          createdAt: options.createdAt,
+          updatedAt: options.updatedAt,
         }),
         file: {
           data: preparedImage.buffer,
@@ -936,6 +940,7 @@ async function fetchWPFeaturedMedia(mediaId: unknown) {
       caption: stripHTML(media.caption?.rendered || ''),
       title: stripHTML(media.title?.rendered || ''),
       wpId: id,
+      ...getImportedTimestamps(media),
     }
   } catch {
     return null
@@ -1172,6 +1177,7 @@ async function importBrands(payload: any) {
         altFallback: item.name || slug,
         importedFrom: 'wordpress',
       })
+      const importedTimestamps = getImportedTimestamps(item)
 
       const result = await createOrUpdateBySlug(payload, 'brands', slug, {
         name: item.name || slug,
@@ -1180,6 +1186,7 @@ async function importBrands(payload: any) {
         logo: logo?.id || undefined,
         isFeatured: Boolean(item.count && Number(item.count) > 0),
         wpId: Number(item.id) || undefined,
+        ...importedTimestamps,
         sourceUrl: item.link || item._links?.self?.[0]?.href || undefined,
       })
 
@@ -1221,6 +1228,7 @@ async function importProductCategories(payload: any) {
         altFallback: item.name || slug,
         importedFrom: 'wordpress',
       })
+      const importedTimestamps = getImportedTimestamps(item)
 
       const result = await createOrUpdateBySlug(payload, 'categories', slug, {
         name: item.name || slug,
@@ -1228,6 +1236,7 @@ async function importProductCategories(payload: any) {
         description,
         image: image?.id || undefined,
         wpId: Number(item.id) || undefined,
+        ...importedTimestamps,
         sourceUrl: item.link || item._links?.self?.[0]?.href || undefined,
       })
 
@@ -1272,12 +1281,14 @@ async function importPostCategories(payload: any) {
         altFallback: title || slug,
         importedFrom: 'wordpress',
       })
+      const importedTimestamps = getImportedTimestamps(item)
 
       const result = await createOrUpdateBySlug(payload, 'post-categories', slug, {
         title,
         slug,
         description,
         wpId: Number(item.id) || undefined,
+        ...importedTimestamps,
         sourceUrl: item.link || item._links?.self?.[0]?.href || undefined,
       })
 
@@ -1623,6 +1634,8 @@ async function importPosts(payload: any, maps: ImportMaps) {
               caption: featuredMedia.caption,
               wpId: featuredMedia.wpId,
               importedFrom: 'wordpress',
+              createdAt: featuredMedia.createdAt,
+              updatedAt: featuredMedia.updatedAt,
             })
           : null
       const featuredImageId = featuredImage?.id || placeholderMediaId
@@ -1651,6 +1664,7 @@ async function importPosts(payload: any, maps: ImportMaps) {
           metaDescription: stripHTML(getRendered(item.excerpt) || '').slice(0, 160) || undefined,
         }),
         wpId: Number(item.id) || undefined,
+        ...importedTimestamps,
         sourceUrl: item.link || undefined,
       }
 

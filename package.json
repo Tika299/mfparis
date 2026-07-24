@@ -44,7 +44,8 @@
     "repair:product-brands": "tsx src/scripts/repair-product-brands.ts",
     "backfill:product-search-keywords": "tsx src/scripts/backfill-product-search-keywords.ts",
     "db:search-indexes": "tsx src/scripts/create-search-indexes.ts",
-    "repair:blog-content": "tsx src/scripts/repair-blog-content-from-wp.ts"
+    "repair:blog-content": "tsx src/scripts/repair-blog-content-from-wp.ts",
+    "repair:imported-dates": "tsx src/scripts/repair-imported-dates.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.85.0",
