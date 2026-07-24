@@ -110,7 +110,7 @@ function formatSlug(value: string): string {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[Ä‘Ä]/g, 'd')
+    .replace(/[đĐ]/g, 'd')
     .replace(/&/g, ' va ')
     .replace(/([^0-9a-z-\s])/g, '')
     .replace(/(\s+)/g, '-')
@@ -166,7 +166,7 @@ function isContentValidationError(error: unknown): boolean {
       ? JSON.stringify((error as AnyRecord).data || (error as AnyRecord).errors || '')
       : ''
 
-  return /Nội dung bài viết|Ná»™i dung bÃ i viáº¿t|content/i.test(
+  return /Nội dung bài viết|Nội dung bài viết|content/i.test(
     `${message} ${payloadErrors}`,
   )
 }

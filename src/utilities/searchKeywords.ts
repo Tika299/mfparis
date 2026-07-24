@@ -8,7 +8,7 @@ export function normalizeSearchText(value: unknown): string {
   return String(value || '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[Ä‘Ä]/g, 'd')
+    .replace(/[đĐ]/g, 'd')
     .toLowerCase()
     .replace(/&amp;|&#038;/g, ' va ')
     .replace(/&quot;|&#34;/g, ' ')

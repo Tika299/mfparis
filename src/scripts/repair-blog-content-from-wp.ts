@@ -57,7 +57,7 @@ function formatSlug(value: string): string {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[đĐÄ‘Ä]/g, 'd')
+    .replace(/[đĐđĐ]/g, 'd')
     .replace(/&/g, ' va ')
     .replace(/([^0-9a-z-\s])/g, '')
     .replace(/(\s+)/g, '-')
