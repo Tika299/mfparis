@@ -21,6 +21,19 @@ type MediaRef = {
   filename: string
 }
 
+type ImportedTimestamps = {
+  createdAt?: string
+  updatedAt?: string
+}
+
+type WPFeaturedMedia = ImportedTimestamps & {
+  url: string
+  alt: string
+  caption: string
+  title: string
+  wpId: number
+}
+
 type ImportMaps = {
   attributes: Map<number | string, ID>
   attributeValues: Map<string, ID>
@@ -195,7 +208,7 @@ function normalizeImportedTimestamp(value: unknown, isGmt = false): string | und
   return Number.isFinite(date.getTime()) ? date.toISOString() : undefined
 }
 
-function getImportedTimestamps(item: AnyRecord) {
+function getImportedTimestamps(item: AnyRecord): ImportedTimestamps {
   const createdAt =
     normalizeImportedTimestamp(item.date_created_gmt, true) ||
     normalizeImportedTimestamp(item.date_gmt, true) ||
@@ -907,7 +920,7 @@ async function normalizeHtmlWithMedia(
   return sanitizeWordPressHtml(html)
 }
 
-async function fetchWPFeaturedMedia(mediaId: unknown) {
+async function fetchWPFeaturedMedia(mediaId: unknown): Promise<WPFeaturedMedia | null> {
   const id = Number(mediaId)
 
   if (!Number.isFinite(id) || id <= 0 || SKIP_MEDIA) {
