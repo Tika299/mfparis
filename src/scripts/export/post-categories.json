@@ -1,9 +1,9 @@
 [
   {
     "id": 448,
-    "count": 40,
+    "count": 39,
     "description": "Bảng Xếp Hạng nước hoa giúp bạn có thể lựa chọn những chai nước hoa ưa thích phù hợp với thời điểm mà bạn sử dụng.",
-    "link": "https://mfparis.vn/tap-chi-nuoc-hoa-mf/bang-xep-hang/",
+    "link": "https://maraisdefrance.vn/tap-chi-nuoc-hoa-mf/bang-xep-hang/",
     "name": "Bảng Xếp Hạng",
     "slug": "bang-xep-hang",
     "taxonomy": "category",
@@ -12,7 +12,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/448",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/448",
           "targetHints": {
             "allow": [
               "GET"
@@ -22,23 +22,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/45"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/45"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=448"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=448"
         }
       ],
       "curies": [
@@ -54,7 +54,7 @@
     "id": 454,
     "count": 2,
     "description": "",
-    "link": "https://mfparis.vn/tap-chi-lam-dep/bang-xep-hang-my-pham/",
+    "link": "https://maraisdefrance.vn/tap-chi-lam-dep/bang-xep-hang-my-pham/",
     "name": "Bảng Xếp Hạng Mỹ Phẩm",
     "slug": "bang-xep-hang-my-pham",
     "taxonomy": "category",
@@ -63,7 +63,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/454",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/454",
           "targetHints": {
             "allow": [
               "GET"
@@ -73,23 +73,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/42"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/42"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=454"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=454"
         }
       ],
       "curies": [
@@ -105,7 +105,7 @@
     "id": 455,
     "count": 3,
     "description": "",
-    "link": "https://mfparis.vn/tap-chi-suc-khoe/bang-xep-hang-thuc-pham-chuc-nang/",
+    "link": "https://maraisdefrance.vn/tap-chi-suc-khoe/bang-xep-hang-thuc-pham-chuc-nang/",
     "name": "Bảng Xếp Hạng Thực Phẩm Chức Năng",
     "slug": "bang-xep-hang-thuc-pham-chuc-nang",
     "taxonomy": "category",
@@ -114,7 +114,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/455",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/455",
           "targetHints": {
             "allow": [
               "GET"
@@ -124,23 +124,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/91"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/91"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=455"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=455"
         }
       ],
       "curies": [
@@ -156,7 +156,7 @@
     "id": 458,
     "count": 1,
     "description": "",
-    "link": "https://mfparis.vn/goc-me-va-be/bao-ve-be/",
+    "link": "https://maraisdefrance.vn/goc-me-va-be/bao-ve-be/",
     "name": "Bảo Vệ Bé",
     "slug": "bao-ve-be",
     "taxonomy": "category",
@@ -165,7 +165,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/458",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/458",
           "targetHints": {
             "allow": [
               "GET"
@@ -175,68 +175,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/445"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/445"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=458"
-        }
-      ],
-      "curies": [
-        {
-          "name": "wp",
-          "href": "https://api.w.org/{rel}",
-          "templated": true
-        }
-      ]
-    }
-  },
-  {
-    "id": 7979,
-    "count": 0,
-    "description": "",
-    "link": "https://mfparis.vn/body/",
-    "name": "Body",
-    "slug": "body",
-    "taxonomy": "category",
-    "parent": 0,
-    "meta": [],
-    "_links": {
-      "self": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/7979",
-          "targetHints": {
-            "allow": [
-              "GET"
-            ]
-          }
-        }
-      ],
-      "collection": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
-        }
-      ],
-      "about": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
-        }
-      ],
-      "wp:post_type": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=7979"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=458"
         }
       ],
       "curies": [
@@ -252,7 +207,7 @@
     "id": 451,
     "count": 3,
     "description": "Để có một body đẹp vạn người mê chúng ta cần có cách Chăm Sóc Body đúng cách và hiểu quả lâu dài. Nơi này sẻ cho bạn nhiều kinh nghiệm cũng như kiến thức về việc chăm sóc body hiệu quả. Tìm hiểu ngay nhé!",
-    "link": "https://mfparis.vn/tap-chi-lam-dep/goc-cham-soc-body/",
+    "link": "https://maraisdefrance.vn/tap-chi-lam-dep/goc-cham-soc-body/",
     "name": "Chăm Sóc Body",
     "slug": "goc-cham-soc-body",
     "taxonomy": "category",
@@ -261,7 +216,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/451",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/451",
           "targetHints": {
             "allow": [
               "GET"
@@ -271,23 +226,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/42"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/42"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=451"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=451"
         }
       ],
       "curies": [
@@ -301,9 +256,9 @@
   },
   {
     "id": 449,
-    "count": 13,
+    "count": 15,
     "description": "Nơi chia sẻ kinh nghiệm kiến thức và các mẹo <strong>Chăm Sóc Da </strong>bổ ích mà bạn có thể mang về chăm sóc cho bản thân.",
-    "link": "https://mfparis.vn/tap-chi-lam-dep/goc-cham-soc-da/",
+    "link": "https://maraisdefrance.vn/tap-chi-lam-dep/goc-cham-soc-da/",
     "name": "Chăm Sóc Da",
     "slug": "goc-cham-soc-da",
     "taxonomy": "category",
@@ -312,7 +267,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/449",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/449",
           "targetHints": {
             "allow": [
               "GET"
@@ -322,23 +277,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/42"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/42"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=449"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=449"
         }
       ],
       "curies": [
@@ -354,7 +309,7 @@
     "id": 453,
     "count": 2,
     "description": "Chăm Sóc Mẹ Bầu là chủ đề các ông bố và bà mẹ luôn luôn quan tâm để bảo vệ và giữ gìn sức khỏe cho người mẹ từ khi mang thai đến khi sinh còn và cả sau sinh.",
-    "link": "https://mfparis.vn/goc-me-va-be/cham-soc-me-bau/",
+    "link": "https://maraisdefrance.vn/goc-me-va-be/cham-soc-me-bau/",
     "name": "Chăm Sóc Mẹ Bầu",
     "slug": "cham-soc-me-bau",
     "taxonomy": "category",
@@ -363,7 +318,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/453",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/453",
           "targetHints": {
             "allow": [
               "GET"
@@ -373,23 +328,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/445"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/445"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=453"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=453"
         }
       ],
       "curies": [
@@ -403,9 +358,9 @@
   },
   {
     "id": 450,
-    "count": 14,
+    "count": 16,
     "description": "Để chăm sóc tóc khỏe mạnh bạn cần phải có thật nhiều kiến thức và nơi này có thể giúp bạn có một mái tóc đẹp lâu dài.",
-    "link": "https://mfparis.vn/tap-chi-lam-dep/goc-cham-soc-toc/",
+    "link": "https://maraisdefrance.vn/tap-chi-lam-dep/goc-cham-soc-toc/",
     "name": "Chăm Sóc Tóc",
     "slug": "goc-cham-soc-toc",
     "taxonomy": "category",
@@ -414,7 +369,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/450",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/450",
           "targetHints": {
             "allow": [
               "GET"
@@ -424,23 +379,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/42"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/42"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=450"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=450"
         }
       ],
       "curies": [
@@ -456,7 +411,7 @@
     "id": 214,
     "count": 12,
     "description": "",
-    "link": "https://mfparis.vn/chia-se-kinh-nghiem/",
+    "link": "https://maraisdefrance.vn/chia-se-kinh-nghiem/",
     "name": "Chia Sẻ Kinh Nghiệm",
     "slug": "chia-se-kinh-nghiem",
     "taxonomy": "category",
@@ -465,7 +420,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/214",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/214",
           "targetHints": {
             "allow": [
               "GET"
@@ -475,17 +430,17 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=214"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=214"
         }
       ],
       "curies": [
@@ -501,7 +456,7 @@
     "id": 456,
     "count": 4,
     "description": "",
-    "link": "https://mfparis.vn/tap-chi-suc-khoe/dinh-duong/",
+    "link": "https://maraisdefrance.vn/tap-chi-suc-khoe/dinh-duong/",
     "name": "Dinh Dưỡng",
     "slug": "dinh-duong",
     "taxonomy": "category",
@@ -510,7 +465,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/456",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/456",
           "targetHints": {
             "allow": [
               "GET"
@@ -520,23 +475,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/91"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/91"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=456"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=456"
         }
       ],
       "curies": [
@@ -552,7 +507,7 @@
     "id": 452,
     "count": 1,
     "description": "",
-    "link": "https://mfparis.vn/goc-me-va-be/dinh-duong-cho-me/",
+    "link": "https://maraisdefrance.vn/goc-me-va-be/dinh-duong-cho-me/",
     "name": "Dinh Dưỡng Cho Mẹ",
     "slug": "dinh-duong-cho-me",
     "taxonomy": "category",
@@ -561,7 +516,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/452",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/452",
           "targetHints": {
             "allow": [
               "GET"
@@ -571,23 +526,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/445"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/445"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=452"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=452"
         }
       ],
       "curies": [
@@ -603,7 +558,7 @@
     "id": 7656,
     "count": 4,
     "description": "",
-    "link": "https://mfparis.vn/tap-chi-lam-dep/giam-can/",
+    "link": "https://maraisdefrance.vn/tap-chi-lam-dep/giam-can/",
     "name": "Giảm Cân",
     "slug": "giam-can",
     "taxonomy": "category",
@@ -612,7 +567,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/7656",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/7656",
           "targetHints": {
             "allow": [
               "GET"
@@ -622,23 +577,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/42"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/42"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=7656"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=7656"
         }
       ],
       "curies": [
@@ -654,7 +609,7 @@
     "id": 445,
     "count": 6,
     "description": "Góc mẹ và bé cùng nhau chia sẻ kinh nghiệm cho các mẹ cùng nhau tìm hiểu chăm sóc con nhỏ từ lúc mang thai đến lúc sinh con.",
-    "link": "https://mfparis.vn/goc-me-va-be/",
+    "link": "https://maraisdefrance.vn/goc-me-va-be/",
     "name": "Góc Mẹ Và Bé",
     "slug": "goc-me-va-be",
     "taxonomy": "category",
@@ -663,7 +618,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/445",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/445",
           "targetHints": {
             "allow": [
               "GET"
@@ -673,107 +628,17 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=445"
-        }
-      ],
-      "curies": [
-        {
-          "name": "wp",
-          "href": "https://api.w.org/{rel}",
-          "templated": true
-        }
-      ]
-    }
-  },
-  {
-    "id": 7978,
-    "count": 0,
-    "description": "",
-    "link": "https://mfparis.vn/hair/",
-    "name": "Hair",
-    "slug": "hair",
-    "taxonomy": "category",
-    "parent": 0,
-    "meta": [],
-    "_links": {
-      "self": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/7978",
-          "targetHints": {
-            "allow": [
-              "GET"
-            ]
-          }
-        }
-      ],
-      "collection": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
-        }
-      ],
-      "about": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
-        }
-      ],
-      "wp:post_type": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=7978"
-        }
-      ],
-      "curies": [
-        {
-          "name": "wp",
-          "href": "https://api.w.org/{rel}",
-          "templated": true
-        }
-      ]
-    }
-  },
-  {
-    "id": 7980,
-    "count": 0,
-    "description": "",
-    "link": "https://mfparis.vn/makeup/",
-    "name": "Makeup",
-    "slug": "makeup",
-    "taxonomy": "category",
-    "parent": 0,
-    "meta": [],
-    "_links": {
-      "self": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/7980",
-          "targetHints": {
-            "allow": [
-              "GET"
-            ]
-          }
-        }
-      ],
-      "collection": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
-        }
-      ],
-      "about": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
-        }
-      ],
-      "wp:post_type": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=7980"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=445"
         }
       ],
       "curies": [
@@ -789,7 +654,7 @@
     "id": 447,
     "count": 14,
     "description": "Mẹo Sử Dụng Nước Hoa đúng cách sẽ giúp bạn có thể mang hương thơm lâu hơn bền bỉ hơn và lan tỏa mùi hương đi khắp nơi chia sẻ cho mọi người.",
-    "link": "https://mfparis.vn/tap-chi-nuoc-hoa-mf/meo-su-dung-nuoc-hoa/",
+    "link": "https://maraisdefrance.vn/tap-chi-nuoc-hoa-mf/meo-su-dung-nuoc-hoa/",
     "name": "Mẹo Sử Dụng Nước Hoa",
     "slug": "meo-su-dung-nuoc-hoa",
     "taxonomy": "category",
@@ -798,7 +663,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/447",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/447",
           "targetHints": {
             "allow": [
               "GET"
@@ -808,23 +673,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/45"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/45"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=447"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=447"
         }
       ],
       "curies": [
@@ -840,7 +705,7 @@
     "id": 446,
     "count": 147,
     "description": "<h1><strong>Review Nước Hoa</strong></h1>\r\n<strong>Review Nước Hoa</strong> cụm từ mà bạn đang tìm kiếm trước khi đưa ra quyết định mua một chai nước hoa nào. Ở đây chúng tôi đưa ra những nhận xét và chia sẻ về những chai nước hoa một cách tổng quát nhất để bạn cảm nhận về chai nước hoa xem nó có phù hợp với bạn hay không trước khi đưa ra quyết định mua hàng.",
-    "link": "https://mfparis.vn/review-nuoc-hoa/",
+    "link": "https://maraisdefrance.vn/review-nuoc-hoa/",
     "name": "Review Nước Hoa",
     "slug": "review-nuoc-hoa",
     "taxonomy": "category",
@@ -849,7 +714,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/446",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/446",
           "targetHints": {
             "allow": [
               "GET"
@@ -859,17 +724,17 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=446"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=446"
         }
       ],
       "curies": [
@@ -885,7 +750,7 @@
     "id": 7533,
     "count": 4,
     "description": "",
-    "link": "https://mfparis.vn/tap-chi-suc-khoe/sinh-ly/",
+    "link": "https://maraisdefrance.vn/tap-chi-suc-khoe/sinh-ly/",
     "name": "Sinh Lý",
     "slug": "sinh-ly",
     "taxonomy": "category",
@@ -894,7 +759,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/7533",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/7533",
           "targetHints": {
             "allow": [
               "GET"
@@ -904,113 +769,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/91"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/91"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=7533"
-        }
-      ],
-      "curies": [
-        {
-          "name": "wp",
-          "href": "https://api.w.org/{rel}",
-          "templated": true
-        }
-      ]
-    }
-  },
-  {
-    "id": 7981,
-    "count": 3,
-    "description": "",
-    "link": "https://mfparis.vn/skincare/",
-    "name": "Skincare",
-    "slug": "skincare",
-    "taxonomy": "category",
-    "parent": 0,
-    "meta": [],
-    "_links": {
-      "self": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/7981",
-          "targetHints": {
-            "allow": [
-              "GET"
-            ]
-          }
-        }
-      ],
-      "collection": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
-        }
-      ],
-      "about": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
-        }
-      ],
-      "wp:post_type": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=7981"
-        }
-      ],
-      "curies": [
-        {
-          "name": "wp",
-          "href": "https://api.w.org/{rel}",
-          "templated": true
-        }
-      ]
-    }
-  },
-  {
-    "id": 7982,
-    "count": 0,
-    "description": "",
-    "link": "https://mfparis.vn/sunscreen/",
-    "name": "Sunscreen",
-    "slug": "sunscreen",
-    "taxonomy": "category",
-    "parent": 0,
-    "meta": [],
-    "_links": {
-      "self": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/7982",
-          "targetHints": {
-            "allow": [
-              "GET"
-            ]
-          }
-        }
-      ],
-      "collection": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
-        }
-      ],
-      "about": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
-        }
-      ],
-      "wp:post_type": [
-        {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=7982"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=7533"
         }
       ],
       "curies": [
@@ -1024,9 +799,9 @@
   },
   {
     "id": 42,
-    "count": 42,
+    "count": 50,
     "description": "Tạp Chí Làm Đẹp nơi mang lại cho bạn kiến thức kinh nghiệm trong quá trình chăm sóc bản thân và những niềm vui trong quá trình làm đẹp của bạn thân cho mọi người cùng biết.",
-    "link": "https://mfparis.vn/tap-chi-lam-dep/",
+    "link": "https://maraisdefrance.vn/tap-chi-lam-dep/",
     "name": "Tạp Chí Làm Đẹp",
     "slug": "tap-chi-lam-dep",
     "taxonomy": "category",
@@ -1035,7 +810,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/42",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/42",
           "targetHints": {
             "allow": [
               "GET"
@@ -1045,17 +820,17 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=42"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=42"
         }
       ],
       "curies": [
@@ -1069,9 +844,9 @@
   },
   {
     "id": 45,
-    "count": 129,
+    "count": 128,
     "description": "Tạp Chí Nước Hoa nơi chia sẻ kiến thức về các loại nước hoa cho các tín đồ đam mê nước hoa cùng thưởng thức nhiều hương thơm và bàn luận về các câu chuyện bên trong chai nước hoa.",
-    "link": "https://mfparis.vn/tap-chi-nuoc-hoa-mf/",
+    "link": "https://maraisdefrance.vn/tap-chi-nuoc-hoa-mf/",
     "name": "Tạp Chí Nước Hoa",
     "slug": "tap-chi-nuoc-hoa-mf",
     "taxonomy": "category",
@@ -1080,7 +855,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/45",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/45",
           "targetHints": {
             "allow": [
               "GET"
@@ -1090,17 +865,17 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=45"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=45"
         }
       ],
       "curies": [
@@ -1114,9 +889,9 @@
   },
   {
     "id": 91,
-    "count": 32,
+    "count": 34,
     "description": "Tạp Chí Sức Khỏe nơi cho bạn những lựa chọn tốt nhất để có thể chăm sóc sức khỏe bản thân và mang lại cuộc sống vui khỏe bổ ích.",
-    "link": "https://mfparis.vn/tap-chi-suc-khoe/",
+    "link": "https://maraisdefrance.vn/tap-chi-suc-khoe/",
     "name": "Tạp Chí Sức Khỏe",
     "slug": "tap-chi-suc-khoe",
     "taxonomy": "category",
@@ -1125,7 +900,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/91",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/91",
           "targetHints": {
             "allow": [
               "GET"
@@ -1135,17 +910,17 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=91"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=91"
         }
       ],
       "curies": [
@@ -1161,7 +936,7 @@
     "id": 457,
     "count": 1,
     "description": "",
-    "link": "https://mfparis.vn/tap-chi-suc-khoe/tuoi-gia/",
+    "link": "https://maraisdefrance.vn/tap-chi-suc-khoe/tuoi-gia/",
     "name": "Tuổi Già",
     "slug": "tuoi-gia",
     "taxonomy": "category",
@@ -1170,7 +945,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/457",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/457",
           "targetHints": {
             "allow": [
               "GET"
@@ -1180,23 +955,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/91"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/91"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=457"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=457"
         }
       ],
       "curies": [
@@ -1210,9 +985,9 @@
   },
   {
     "id": 1,
-    "count": 2,
+    "count": 0,
     "description": "",
-    "link": "https://mfparis.vn/uncategorized/",
+    "link": "https://maraisdefrance.vn/uncategorized/",
     "name": "Uncategorized",
     "slug": "uncategorized",
     "taxonomy": "category",
@@ -1221,7 +996,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/1",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/1",
           "targetHints": {
             "allow": [
               "GET"
@@ -1231,17 +1006,17 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=1"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=1"
         }
       ],
       "curies": [
@@ -1257,7 +1032,7 @@
     "id": 444,
     "count": 25,
     "description": "Cập nhật xu hướng nước hoa mới nhất để giúp mọi người đưa ra sự lựa chọn tốt nhất cho chai nước hoa mình yêu thích.",
-    "link": "https://mfparis.vn/tap-chi-nuoc-hoa-mf/xu-huong-nuoc-hoa/",
+    "link": "https://maraisdefrance.vn/tap-chi-nuoc-hoa-mf/xu-huong-nuoc-hoa/",
     "name": "Xu Hướng Nước Hoa",
     "slug": "xu-huong-nuoc-hoa",
     "taxonomy": "category",
@@ -1266,7 +1041,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/444",
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/444",
           "targetHints": {
             "allow": [
               "GET"
@@ -1276,23 +1051,23 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories"
         }
       ],
       "about": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/taxonomies/category"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/taxonomies/category"
         }
       ],
       "up": [
         {
           "embeddable": true,
-          "href": "https://mfparis.vn/wp-json/wp/v2/categories/45"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/categories/45"
         }
       ],
       "wp:post_type": [
         {
-          "href": "https://mfparis.vn/wp-json/wp/v2/posts?categories=444"
+          "href": "https://maraisdefrance.vn/wp-json/wp/v2/posts?categories=444"
         }
       ],
       "curies": [

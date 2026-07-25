@@ -12,7 +12,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8683",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8683",
           "targetHints": {
             "allow": [
               "GET",
@@ -26,12 +26,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8563"
         }
       ]
     }
@@ -49,7 +49,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8560",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8560",
           "targetHints": {
             "allow": [
               "GET",
@@ -63,7 +63,7 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ]
     }
@@ -81,7 +81,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8594",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8594",
           "targetHints": {
             "allow": [
               "GET",
@@ -95,12 +95,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7766"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7766"
         }
       ]
     }
@@ -118,7 +118,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8551",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8551",
           "targetHints": {
             "allow": [
               "GET",
@@ -132,12 +132,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8523"
         }
       ]
     }
@@ -155,7 +155,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8090",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8090",
           "targetHints": {
             "allow": [
               "GET",
@@ -169,7 +169,7 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ]
     }
@@ -187,7 +187,7 @@
       "date_created_gmt": "2025-07-30T05:46:47",
       "date_modified": "2025-07-30T12:47:31",
       "date_modified_gmt": "2025-07-30T05:47:31",
-      "src": "https://mfparis.vn/wp-content/uploads/2025/07/goi-bo-sung-collagen-forte-pharma-expert-collagen-intense-2x14-1.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2025/07/goi-bo-sung-collagen-forte-pharma-expert-collagen-intense-2x14-1.jpg",
       "name": "Gói Bổ Sung Collagen Forté Pharma Expert Collagen Intense 2&#215;14",
       "alt": "Gói Bổ Sung Collagen Forté Pharma Expert Collagen Intense 2x14"
     },
@@ -196,7 +196,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8534",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8534",
           "targetHints": {
             "allow": [
               "GET",
@@ -210,12 +210,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8523"
         }
       ]
     }
@@ -233,7 +233,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8679",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8679",
           "targetHints": {
             "allow": [
               "GET",
@@ -247,12 +247,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8563"
         }
       ]
     }
@@ -270,7 +270,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8559",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8559",
           "targetHints": {
             "allow": [
               "GET",
@@ -284,12 +284,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8523"
         }
       ]
     }
@@ -307,7 +307,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8564",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8564",
           "targetHints": {
             "allow": [
               "GET",
@@ -321,12 +321,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8563"
         }
       ]
     }
@@ -344,7 +344,7 @@
       "date_created_gmt": "2024-04-09T09:48:57",
       "date_modified": "2024-04-09T16:49:08",
       "date_modified_gmt": "2024-04-09T09:49:08",
-      "src": "https://mfparis.vn/wp-content/uploads/2024/04/dau-goi-da-nhay-cam-bioderma-node-non-detergent-7.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2024/04/dau-goi-da-nhay-cam-bioderma-node-non-detergent-7.jpg",
       "name": "Dầu Gội Da Nhạy Cảm Bioderma Nodé Non-Detergent",
       "alt": "Dầu Gội Da Nhạy Cảm Bioderma Nodé Non-Detergent"
     },
@@ -353,7 +353,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7768",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7768",
           "targetHints": {
             "allow": [
               "GET",
@@ -367,12 +367,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -390,7 +390,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8109",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8109",
           "targetHints": {
             "allow": [
               "GET",
@@ -404,12 +404,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -427,7 +427,7 @@
       "date_created_gmt": "2023-03-13T09:39:02",
       "date_modified": "2023-03-13T16:39:48",
       "date_modified_gmt": "2023-03-13T09:39:48",
-      "src": "https://mfparis.vn/wp-content/uploads/2023/03/dau-xa-giu-mau-toc-phyto-color-protecting-mask-150ml.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2023/03/dau-xa-giu-mau-toc-phyto-color-protecting-mask-150ml.jpg",
       "name": "Dầu Xả Giữ Màu Tóc Phyto Color Protecting Mask",
       "alt": "Dầu Xả Giữ Màu Tóc Phyto Color Protecting Mask"
     },
@@ -436,7 +436,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8111",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8111",
           "targetHints": {
             "allow": [
               "GET",
@@ -450,12 +450,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -473,7 +473,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8566",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8566",
           "targetHints": {
             "allow": [
               "GET",
@@ -487,49 +487,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563"
-        }
-      ]
-    }
-  },
-  {
-    "id": 7895,
-    "name": "Dung Dịch Vệ Sinh",
-    "slug": "dung-dich-ve-sinh",
-    "parent": 50,
-    "description": "",
-    "display": "default",
-    "image": null,
-    "menu_order": 0,
-    "count": 0,
-    "_links": {
-      "self": [
-        {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7895",
-          "targetHints": {
-            "allow": [
-              "GET",
-              "POST",
-              "PUT",
-              "PATCH",
-              "DELETE"
-            ]
-          }
-        }
-      ],
-      "collection": [
-        {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
-        }
-      ],
-      "up": [
-        {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8563"
         }
       ]
     }
@@ -539,7 +502,7 @@
     "name": "Dung dịch vệ sinh phụ nữ",
     "slug": "dung-dich-ve-sinh-phu-nu",
     "parent": 8579,
-    "description": "",
+    "description": "[html_block id=\"49842\"]",
     "display": "default",
     "image": {
       "id": 44707,
@@ -547,7 +510,7 @@
       "date_created_gmt": "2025-09-18T09:35:05",
       "date_modified": "2025-09-18T16:35:25",
       "date_modified_gmt": "2025-09-18T09:35:25",
-      "src": "https://mfparis.vn/wp-content/uploads/2025/09/dung-dich-ve-sinh-soin-lavant-intime-hydratant.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2025/09/dung-dich-ve-sinh-soin-lavant-intime-hydratant.jpg",
       "name": "Dung Dịch Vệ Sinh Cavailles Soin Lavant Intime Hydratant",
       "alt": "Dung Dịch Vệ Sinh Cavailles Soin Lavant Intime Hydratant"
     },
@@ -556,7 +519,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8580",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8580",
           "targetHints": {
             "allow": [
               "GET",
@@ -570,12 +533,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8579"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8579"
         }
       ]
     }
@@ -593,7 +556,7 @@
       "date_created_gmt": "2025-01-20T07:43:03",
       "date_modified": "2025-01-20T14:43:18",
       "date_modified_gmt": "2025-01-20T07:43:18",
-      "src": "https://mfparis.vn/wp-content/uploads/2025/01/sap-duong-moi-nuxe-moisturizing-rose-lip-balm-15g.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2025/01/sap-duong-moi-nuxe-moisturizing-rose-lip-balm-15g.jpg",
       "name": "Sáp Dưỡng Môi Nuxe Moisturizing Rose Lip Balm 15g",
       "alt": "Sáp Dưỡng Môi Nuxe Moisturizing Rose Lip Balm 15g"
     },
@@ -602,7 +565,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8118",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8118",
           "targetHints": {
             "allow": [
               "GET",
@@ -616,12 +579,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -639,7 +602,7 @@
       "date_created_gmt": "2023-07-25T08:19:58",
       "date_modified": "2023-07-25T15:28:33",
       "date_modified_gmt": "2023-07-25T08:28:33",
-      "src": "https://mfparis.vn/wp-content/uploads/2023/07/duong-the-eucerin-urearepair-plus-lotion-5-urea-41WxbKNXGmL.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2023/07/duong-the-eucerin-urearepair-plus-lotion-5-urea-41WxbKNXGmL.jpg",
       "name": "Sữa Dưỡng Thể Eucerin UreaRepair Plus Lotion 5% Urea",
       "alt": "Sữa Dưỡng Thể Eucerin UreaRepair Plus Lotion 5% Urea"
     },
@@ -648,7 +611,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8113",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8113",
           "targetHints": {
             "allow": [
               "GET",
@@ -662,12 +625,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -685,7 +648,7 @@
       "date_created_gmt": "2025-02-08T08:56:14",
       "date_modified": "2025-02-08T15:56:25",
       "date_modified_gmt": "2025-02-08T08:56:25",
-      "src": "https://mfparis.vn/wp-content/uploads/2025/02/giai-doc-gan-biocyte-hepato-detox-60-vien-3.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2025/02/giai-doc-gan-biocyte-hepato-detox-60-vien-3.jpg",
       "name": "Giải Độc Gan Biocyte Hepato Detox 60 viên",
       "alt": "Giải Độc Gan Biocyte Hepato Detox 60 viên"
     },
@@ -694,7 +657,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8547",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8547",
           "targetHints": {
             "allow": [
               "GET",
@@ -708,12 +671,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8536"
         }
       ]
     }
@@ -731,7 +694,7 @@
       "date_created_gmt": "2025-09-04T13:08:36",
       "date_modified": "2025-09-04T20:09:01",
       "date_modified_gmt": "2025-09-04T13:09:01",
-      "src": "https://mfparis.vn/wp-content/uploads/2023/10/mucogyne-iprad-8x5ml.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2023/10/mucogyne-iprad-8x5ml.jpg",
       "name": "Mucogyne Iprad 8x5ml",
       "alt": "Mucogyne Iprad 8x5ml"
     },
@@ -740,7 +703,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8562",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8562",
           "targetHints": {
             "allow": [
               "GET",
@@ -754,12 +717,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8561"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8561"
         }
       ]
     }
@@ -777,7 +740,7 @@
       "date_created_gmt": "2022-08-14T12:28:35",
       "date_modified": "2023-04-11T13:43:37",
       "date_modified_gmt": "2023-04-11T06:43:37",
-      "src": "https://mfparis.vn/wp-content/uploads/2022/08/sua-tam-cho-da-kho-bioderma-atoderm-gel-1lit-mfparis.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2022/08/sua-tam-cho-da-kho-bioderma-atoderm-gel-1lit-mfparis.jpg",
       "name": "Sữa Tắm Bioderma Atoderm Gel 1 lit",
       "alt": "Sữa Tắm Bioderma Atoderm Gel 1 lit"
     },
@@ -786,7 +749,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8116",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8116",
           "targetHints": {
             "allow": [
               "GET",
@@ -800,12 +763,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -823,7 +786,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8602",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8602",
           "targetHints": {
             "allow": [
               "GET",
@@ -837,12 +800,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -860,7 +823,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8613",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8613",
           "targetHints": {
             "allow": [
               "GET",
@@ -874,12 +837,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8612"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8612"
         }
       ]
     }
@@ -897,7 +860,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8512",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8512",
           "targetHints": {
             "allow": [
               "GET",
@@ -911,12 +874,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8511"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8511"
         }
       ]
     }
@@ -934,7 +897,7 @@
       "date_created_gmt": "2021-12-12T06:55:37",
       "date_modified": "2021-12-12T13:55:49",
       "date_modified_gmt": "2021-12-12T06:55:49",
-      "src": "https://mfparis.vn/wp-content/uploads/2021/12/set-qua-tang-my-pham-Estee-Laude-Estee-Lauder-Blockbuster-2021-Gift-Set-GWP-Full-Reveal-2-mfparis.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2021/12/set-qua-tang-my-pham-Estee-Laude-Estee-Lauder-Blockbuster-2021-Gift-Set-GWP-Full-Reveal-2-mfparis.jpg",
       "name": "set-qua-tang-my-pham-Estee-Laude-Estee-Lauder-Blockbuster-2021-Gift-Set-GWP-Full-Reveal-2-mfparis",
       "alt": "Set Mỹ Phẩm Trang Điểm Estee Lauder Limited Edition Holiday 2021"
     },
@@ -943,7 +906,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/622",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/622",
           "targetHints": {
             "allow": [
               "GET",
@@ -957,7 +920,7 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ]
     }
@@ -975,7 +938,7 @@
       "date_created_gmt": "2023-07-07T04:37:57",
       "date_modified": "2023-07-07T11:37:57",
       "date_modified_gmt": "2023-07-07T04:37:57",
-      "src": "https://mfparis.vn/wp-content/uploads/2023/07/danh-muc-hang-phap.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2023/07/danh-muc-hang-phap.jpg",
       "name": "danh-muc-hang-phap",
       "alt": ""
     },
@@ -984,7 +947,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/251",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/251",
           "targetHints": {
             "allow": [
               "GET",
@@ -998,7 +961,7 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ]
     }
@@ -1016,7 +979,7 @@
       "date_created_gmt": "2023-07-07T04:38:00",
       "date_modified": "2023-07-07T11:38:00",
       "date_modified_gmt": "2023-07-07T04:38:00",
-      "src": "https://mfparis.vn/wp-content/uploads/2023/07/danh-muc-hang-uc.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2023/07/danh-muc-hang-uc.jpg",
       "name": "danh-muc-hang-uc",
       "alt": ""
     },
@@ -1025,7 +988,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/252",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/252",
           "targetHints": {
             "allow": [
               "GET",
@@ -1039,7 +1002,7 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ]
     }
@@ -1057,7 +1020,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8540",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8540",
           "targetHints": {
             "allow": [
               "GET",
@@ -1071,12 +1034,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8536"
         }
       ]
     }
@@ -1094,7 +1057,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8536",
           "targetHints": {
             "allow": [
               "GET",
@@ -1108,12 +1071,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/50"
         }
       ]
     }
@@ -1131,7 +1094,7 @@
       "date_created_gmt": "2025-08-30T03:36:17",
       "date_modified": "2025-08-30T10:37:16",
       "date_modified_gmt": "2025-08-30T03:37:16",
-      "src": "https://mfparis.vn/wp-content/uploads/2025/07/nuoc-uong-ho-tro-giam-can-superdiet-actimincyl-bio.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2025/07/nuoc-uong-ho-tro-giam-can-superdiet-actimincyl-bio.jpg",
       "name": "Nước Uống Giảm Cân Superdiet Actimincyl Bio, 20 ống",
       "alt": "Nước Uống Giảm Cân Superdiet Actimincyl Bio, 20 ống"
     },
@@ -1140,7 +1103,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8524",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8524",
           "targetHints": {
             "allow": [
               "GET",
@@ -1154,12 +1117,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8523"
         }
       ]
     }
@@ -1177,7 +1140,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8523",
           "targetHints": {
             "allow": [
               "GET",
@@ -1191,12 +1154,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/50"
         }
       ]
     }
@@ -1214,7 +1177,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8561",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8561",
           "targetHints": {
             "allow": [
               "GET",
@@ -1228,12 +1191,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8560"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8560"
         }
       ]
     }
@@ -1251,16 +1214,16 @@
       "date_created_gmt": "2024-11-11T09:59:28",
       "date_modified": "2024-11-11T16:59:43",
       "date_modified_gmt": "2024-11-11T09:59:43",
-      "src": "https://mfparis.vn/wp-content/uploads/2022/07/kem-chong-nang-ngua-ung-thu-isdin-eryfotona-ak-nmsc-spf-100-fluid-8.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2022/07/kem-chong-nang-ngua-ung-thu-isdin-eryfotona-ak-nmsc-spf-100-fluid-8.jpg",
       "name": "Kem Chống Nắng Ngừa Ung Thư Isdin Eryfotona AK-NMSC SPF 100+ Fluid",
       "alt": "Kem Chống Nắng Ngừa Ung Thư Isdin Eryfotona AK-NMSC SPF 100+ Fluid"
     },
     "menu_order": 0,
-    "count": 37,
+    "count": 38,
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7765",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7765",
           "targetHints": {
             "allow": [
               "GET",
@@ -1274,12 +1237,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -1297,7 +1260,7 @@
       "date_created_gmt": "2025-04-13T07:37:55",
       "date_modified": "2025-04-13T14:38:06",
       "date_modified_gmt": "2025-04-13T07:38:06",
-      "src": "https://mfparis.vn/wp-content/uploads/2025/04/kem-duong-nuxe-merveillance-lift-firming-powdery-cream.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2025/04/kem-duong-nuxe-merveillance-lift-firming-powdery-cream.jpg",
       "name": "NUXE Merveillance LIFT Firming Powdery Cream",
       "alt": "NUXE Merveillance LIFT Firming Powdery Cream"
     },
@@ -1306,7 +1269,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7766",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7766",
           "targetHints": {
             "allow": [
               "GET",
@@ -1320,12 +1283,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -1343,7 +1306,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8675",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8675",
           "targetHints": {
             "allow": [
               "GET",
@@ -1357,12 +1320,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8579"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8579"
         }
       ]
     }
@@ -1380,7 +1343,7 @@
       "date_created_gmt": "2023-02-15T03:53:27",
       "date_modified": "2023-04-10T15:18:11",
       "date_modified_gmt": "2023-04-10T08:18:11",
-      "src": "https://mfparis.vn/wp-content/uploads/2023/02/kem-duong-da-tay-avene-cold-cream-4.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2023/02/kem-duong-da-tay-avene-cold-cream-4.jpg",
       "name": "Kem Dưỡng Da Tay Avene Cold Cream",
       "alt": "Kem Dưỡng Da Tay Avene Cold Cream"
     },
@@ -1389,7 +1352,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8110",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8110",
           "targetHints": {
             "allow": [
               "GET",
@@ -1403,12 +1366,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7766"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7766"
         }
       ]
     }
@@ -1426,7 +1389,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8610",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8610",
           "targetHints": {
             "allow": [
               "GET",
@@ -1440,12 +1403,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -1463,7 +1426,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8616",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8616",
           "targetHints": {
             "allow": [
               "GET",
@@ -1477,12 +1440,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8536"
         }
       ]
     }
@@ -1500,16 +1463,16 @@
       "date_created_gmt": "2023-11-07T07:29:13",
       "date_modified": "2023-11-07T14:29:24",
       "date_modified_gmt": "2023-11-07T07:29:24",
-      "src": "https://mfparis.vn/wp-content/uploads/2023/11/lan-khu-mui-etiaxil-deodorant-douceur-48h-3.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2023/11/lan-khu-mui-etiaxil-deodorant-douceur-48h-3.jpg",
       "name": "Lăn Khử Mùi Etiaxil Deodorant Douceur 48h",
       "alt": "Lăn Khử Mùi Etiaxil Deodorant Douceur 48h"
     },
     "menu_order": 0,
-    "count": 15,
+    "count": 16,
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7767",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7767",
           "targetHints": {
             "allow": [
               "GET",
@@ -1523,12 +1486,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -1546,7 +1509,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8112",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8112",
           "targetHints": {
             "allow": [
               "GET",
@@ -1560,12 +1523,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -1583,7 +1546,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/24",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/24",
           "targetHints": {
             "allow": [
               "GET",
@@ -1597,7 +1560,7 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ]
     }
@@ -1615,7 +1578,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8511",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8511",
           "targetHints": {
             "allow": [
               "GET",
@@ -1629,12 +1592,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/50"
         }
       ]
     }
@@ -1652,16 +1615,16 @@
       "date_created_gmt": "2023-07-07T04:32:02",
       "date_modified": "2023-07-07T11:32:02",
       "date_modified_gmt": "2023-07-07T04:32:02",
-      "src": "https://mfparis.vn/wp-content/uploads/2023/07/danh-muc-my-pham.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2023/07/danh-muc-my-pham.jpg",
       "name": "danh-muc-my-pham",
       "alt": ""
     },
     "menu_order": 0,
-    "count": 494,
+    "count": 496,
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20",
           "targetHints": {
             "allow": [
               "GET",
@@ -1675,7 +1638,7 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ]
     }
@@ -1693,7 +1656,7 @@
       "date_created_gmt": "2025-02-09T03:24:48",
       "date_modified": "2025-02-09T10:25:08",
       "date_modified_gmt": "2025-02-09T03:25:08",
-      "src": "https://mfparis.vn/wp-content/uploads/2025/01/nen-thom-nuxe-huile-prodigieuse-70g-6.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2025/01/nen-thom-nuxe-huile-prodigieuse-70g-6.jpg",
       "name": "Nến Thơm Nuxe Huile Prodigieuse 70g",
       "alt": "Nến Thơm Nuxe Huile Prodigieuse 70g"
     },
@@ -1702,7 +1665,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8115",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8115",
           "targetHints": {
             "allow": [
               "GET",
@@ -1716,7 +1679,7 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ]
     }
@@ -1734,7 +1697,7 @@
       "date_created_gmt": "2023-02-21T09:55:19",
       "date_modified": "2023-04-10T15:08:26",
       "date_modified_gmt": "2023-04-10T08:08:26",
-      "src": "https://mfparis.vn/wp-content/uploads/2023/02/nhuom-toc-phyto-color-hair-thao-duoc-mau-3-e1677211863230.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2023/02/nhuom-toc-phyto-color-hair-thao-duoc-mau-3-e1677211863230.jpg",
       "name": "Nhuộm Tóc Phyto Color Hair Thảo Dược 3",
       "alt": "Nhuộm Tóc Phyto Color Hair Thảo Dược 3"
     },
@@ -1743,7 +1706,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8578",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8578",
           "targetHints": {
             "allow": [
               "GET",
@@ -1757,12 +1720,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -1780,16 +1743,16 @@
       "date_created_gmt": "2023-07-07T04:33:17",
       "date_modified": "2023-07-07T11:33:17",
       "date_modified_gmt": "2023-07-07T04:33:17",
-      "src": "https://mfparis.vn/wp-content/uploads/2023/07/danh-muc-nuoc-hoa.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2023/07/danh-muc-nuoc-hoa.jpg",
       "name": "danh-muc-nuoc-hoa",
       "alt": ""
     },
     "menu_order": 0,
-    "count": 1263,
+    "count": 1270,
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/5928",
           "targetHints": {
             "allow": [
               "GET",
@@ -1803,7 +1766,7 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ]
     }
@@ -1821,7 +1784,7 @@
       "date_created_gmt": "2023-11-14T08:02:59",
       "date_modified": "2023-11-14T15:02:59",
       "date_modified_gmt": "2023-11-14T08:02:59",
-      "src": "https://mfparis.vn/wp-content/uploads/2023/11/6337ba3b6c585-nuoc-hoa-mini-nu-yves-saint-laurent-mon-paris-couture-edp-chiet-10ml-boshop.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2023/11/6337ba3b6c585-nuoc-hoa-mini-nu-yves-saint-laurent-mon-paris-couture-edp-chiet-10ml-boshop.jpg",
       "name": "6337ba3b6c585-nuoc-hoa-mini-nu-yves-saint-laurent-mon-paris-couture-edp-chiet-10ml-boshop",
       "alt": ""
     },
@@ -1830,7 +1793,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/620",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/620",
           "targetHints": {
             "allow": [
               "GET",
@@ -1844,12 +1807,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/5928"
         }
       ]
     }
@@ -1867,7 +1830,7 @@
       "date_created_gmt": "2022-04-13T09:59:01",
       "date_modified": "2023-04-11T16:21:09",
       "date_modified_gmt": "2023-04-11T09:21:09",
-      "src": "https://mfparis.vn/wp-content/uploads/2022/04/so-sanh-nuoc-hoa-chanel-coco-mademoiselle-va-no5-2YuAPqlRQHUx4M8i-mfparis.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2022/04/so-sanh-nuoc-hoa-chanel-coco-mademoiselle-va-no5-2YuAPqlRQHUx4M8i-mfparis.jpg",
       "name": "Chanel Coco Mademoiselle Vs No5",
       "alt": "Chanel Coco Mademoiselle Vs No5"
     },
@@ -1876,7 +1839,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/562",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/562",
           "targetHints": {
             "allow": [
               "GET",
@@ -1890,12 +1853,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/5928"
         }
       ]
     }
@@ -1913,7 +1876,7 @@
       "date_created_gmt": "2022-10-29T09:54:10",
       "date_modified": "2023-04-10T19:03:35",
       "date_modified_gmt": "2023-04-10T12:03:35",
-      "src": "https://mfparis.vn/wp-content/uploads/2022/10/nuoc-hoa-hong-sanoflore-aqua-magnifica-toner.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2022/10/nuoc-hoa-hong-sanoflore-aqua-magnifica-toner.jpg",
       "name": "Nước Hoa Hồng Sanoflore Aqua Magnifica Toner",
       "alt": "Nước Hoa Hồng Sanoflore Aqua Magnifica Toner"
     },
@@ -1922,7 +1885,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7777",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7777",
           "targetHints": {
             "allow": [
               "GET",
@@ -1936,12 +1899,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -1959,7 +1922,7 @@
       "date_created_gmt": "2023-03-01T10:39:15",
       "date_modified": "2023-03-01T17:39:33",
       "date_modified_gmt": "2023-03-01T10:39:33",
-      "src": "https://mfparis.vn/wp-content/uploads/2023/03/2011211580-nuoc-hoa-mini-replica-jazz-club-chinh-hang.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2023/03/2011211580-nuoc-hoa-mini-replica-jazz-club-chinh-hang.jpg",
       "name": "Nước Hoa Mini Replica Jazz Club 7ml",
       "alt": "Nước Hoa Mini Replica Jazz Club 7ml"
     },
@@ -1968,7 +1931,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/4577",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/4577",
           "targetHints": {
             "allow": [
               "GET",
@@ -1982,12 +1945,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/5928"
         }
       ]
     }
@@ -2005,7 +1968,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7112",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7112",
           "targetHints": {
             "allow": [
               "GET",
@@ -2019,7 +1982,7 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ]
     }
@@ -2033,11 +1996,11 @@
     "display": "default",
     "image": null,
     "menu_order": 0,
-    "count": 258,
+    "count": 259,
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8025",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8025",
           "targetHints": {
             "allow": [
               "GET",
@@ -2051,12 +2014,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/5928"
         }
       ]
     }
@@ -2074,7 +2037,7 @@
       "date_created_gmt": "2021-08-12T11:34:40",
       "date_modified": "2023-05-06T21:27:53",
       "date_modified_gmt": "2023-05-06T14:27:53",
-      "src": "https://mfparis.vn/wp-content/uploads/2021/08/aventus-100ml-1500x1500new-1_1_1.png",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2021/08/aventus-100ml-1500x1500new-1_1_1.png",
       "name": "Creed Aventus For Him 100ml",
       "alt": "Creed Aventus For Him 100ml"
     },
@@ -2083,7 +2046,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/561",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/561",
           "targetHints": {
             "allow": [
               "GET",
@@ -2097,12 +2060,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/5928"
         }
       ]
     }
@@ -2120,16 +2083,16 @@
       "date_created_gmt": "2021-09-13T12:18:26",
       "date_modified": "2024-09-03T10:30:32",
       "date_modified_gmt": "2024-09-03T03:30:32",
-      "src": "https://mfparis.vn/wp-content/uploads/2021/09/good-girl-gone-bad-ky-kilian-100ml-e1651070796682.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2021/09/good-girl-gone-bad-ky-kilian-100ml-e1651070796682.jpg",
       "name": "Good Girl Gone Bad By Kilian EDP 50ml",
       "alt": "Good Girl Gone Bad By Kilian EDP 50ml"
     },
     "menu_order": 0,
-    "count": 574,
+    "count": 579,
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/63",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/63",
           "targetHints": {
             "allow": [
               "GET",
@@ -2143,12 +2106,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/5928"
         }
       ]
     }
@@ -2166,7 +2129,7 @@
       "date_created_gmt": "2022-09-04T08:13:21",
       "date_modified": "2023-04-11T13:10:34",
       "date_modified_gmt": "2023-04-11T06:10:34",
-      "src": "https://mfparis.vn/wp-content/uploads/2022/09/top-10-chai-nuoc-hoa-cua-phap-ban-chay-moi-thoi-dai.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2022/09/top-10-chai-nuoc-hoa-cua-phap-ban-chay-moi-thoi-dai.jpg",
       "name": "nước hoa của pháp bán chạy nhất",
       "alt": "nước hoa của pháp bán chạy nhất"
     },
@@ -2175,7 +2138,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/736",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/736",
           "targetHints": {
             "allow": [
               "GET",
@@ -2189,12 +2152,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/5928"
         }
       ]
     }
@@ -2212,16 +2175,16 @@
       "date_created_gmt": "2021-09-29T04:52:12",
       "date_modified": "2021-09-29T12:06:24",
       "date_modified_gmt": "2021-09-29T05:06:24",
-      "src": "https://mfparis.vn/wp-content/uploads/2021/09/nuoc-hoa-cao-cap-le-labo-another-13-100ml.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2021/09/nuoc-hoa-cao-cap-le-labo-another-13-100ml.jpg",
       "name": "nuoc-hoa-cao-cap-le-labo-another-13-100ml",
       "alt": "Le Labo Another 13 100ml"
     },
     "menu_order": 0,
-    "count": 247,
+    "count": 248,
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/208",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/208",
           "targetHints": {
             "allow": [
               "GET",
@@ -2235,12 +2198,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/5928"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/5928"
         }
       ]
     }
@@ -2258,7 +2221,7 @@
       "date_created_gmt": "2025-09-18T13:39:59",
       "date_modified": "2025-09-18T20:40:27",
       "date_modified_gmt": "2025-09-18T13:40:27",
-      "src": "https://mfparis.vn/wp-content/uploads/2025/09/arkopharma-arkogelules-omega-3-1.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2025/09/arkopharma-arkogelules-omega-3-1.jpg",
       "name": "Arkopharma Arkogélules® Omega 3",
       "alt": "Arkopharma Arkogélules® Omega 3"
     },
@@ -2267,7 +2230,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8565",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8565",
           "targetHints": {
             "allow": [
               "GET",
@@ -2281,12 +2244,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8563"
         }
       ]
     }
@@ -2304,7 +2267,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8660",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8660",
           "targetHints": {
             "allow": [
               "GET",
@@ -2318,12 +2281,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8536"
         }
       ]
     }
@@ -2341,7 +2304,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8645",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8645",
           "targetHints": {
             "allow": [
               "GET",
@@ -2355,7 +2318,7 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ]
     }
@@ -2373,7 +2336,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8605",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8605",
           "targetHints": {
             "allow": [
               "GET",
@@ -2387,12 +2350,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8604"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8604"
         }
       ]
     }
@@ -2410,7 +2373,7 @@
       "date_created_gmt": "2025-08-06T08:01:14",
       "date_modified": "2025-08-06T15:01:40",
       "date_modified_gmt": "2025-08-06T08:01:40",
-      "src": "https://mfparis.vn/wp-content/uploads/2025/08/avene-hydrance-boost-concentrated-hydrating-serum.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2025/08/avene-hydrance-boost-concentrated-hydrating-serum.jpg",
       "name": "Avène Hydrance Boost Concentrated Hydrating Serum",
       "alt": "Avène Hydrance Boost Concentrated Hydrating Serum"
     },
@@ -2419,7 +2382,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7764",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7764",
           "targetHints": {
             "allow": [
               "GET",
@@ -2433,12 +2396,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -2465,7 +2428,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8520",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8520",
           "targetHints": {
             "allow": [
               "GET",
@@ -2479,12 +2442,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/50"
         }
       ]
     }
@@ -2502,7 +2465,7 @@
       "date_created_gmt": "2025-08-21T13:41:08",
       "date_modified": "2025-08-21T20:46:43",
       "date_modified_gmt": "2025-08-21T13:46:43",
-      "src": "https://mfparis.vn/wp-content/uploads/2025/08/son-li-ysl-rouge-pur-couture-the-slim-416.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2025/08/son-li-ysl-rouge-pur-couture-the-slim-416.jpg",
       "name": "Son  Lì YSL Rouge Pur Couture The Slim 416",
       "alt": "Son Lì YSL Rouge Pur Couture The Slim 416"
     },
@@ -2511,7 +2474,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7763",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7763",
           "targetHints": {
             "allow": [
               "GET",
@@ -2525,12 +2488,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -2548,7 +2511,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8606",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8606",
           "targetHints": {
             "allow": [
               "GET",
@@ -2562,12 +2525,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -2585,7 +2548,7 @@
       "date_created_gmt": "2021-12-31T03:59:22",
       "date_modified": "2025-10-04T10:30:02",
       "date_modified_gmt": "2025-10-04T03:30:02",
-      "src": "https://mfparis.vn/wp-content/uploads/2021/12/sua-rua-mat-tao-bot-cerave-foaming-cleanser-236ml.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2021/12/sua-rua-mat-tao-bot-cerave-foaming-cleanser-236ml.jpg",
       "name": "Sửa Rửa Mặt Tạo Bọt Cerave Foaming Cleanser 236ml",
       "alt": "Sửa Rửa Mặt Tạo Bọt Cerave Foaming Cleanser 236ml"
     },
@@ -2594,7 +2557,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7770",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7770",
           "targetHints": {
             "allow": [
               "GET",
@@ -2608,12 +2571,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -2631,7 +2594,7 @@
       "date_created_gmt": "2025-01-22T03:04:43",
       "date_modified": "2025-01-22T10:05:03",
       "date_modified_gmt": "2025-01-22T03:05:03",
-      "src": "https://mfparis.vn/wp-content/uploads/2025/01/sua-tam-ngoc-trai-vang-nuxe.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2025/01/sua-tam-ngoc-trai-vang-nuxe.jpg",
       "name": "Sữa Tắm Ngọc Trai Vàng Nuxe",
       "alt": "Sữa Tắm Ngọc Trai Vàng Nuxe"
     },
@@ -2640,7 +2603,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7775",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7775",
           "targetHints": {
             "allow": [
               "GET",
@@ -2654,12 +2617,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -2677,7 +2640,7 @@
       "date_created_gmt": "2024-12-11T07:56:10",
       "date_modified": "2024-12-11T14:56:40",
       "date_modified_gmt": "2024-12-11T07:56:40",
-      "src": "https://mfparis.vn/wp-content/uploads/2024/12/mat-na-tay-te-bao-chet-avene-cleanance-mask-50ml.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2024/12/mat-na-tay-te-bao-chet-avene-cleanance-mask-50ml.jpg",
       "name": "Mặt Nạ Tẩy Tế Bào Chết Avene Cleanance Mask 50ml",
       "alt": "Mặt Nạ Tẩy Tế Bào Chết Avene Cleanance Mask 50ml"
     },
@@ -2686,7 +2649,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7774",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7774",
           "targetHints": {
             "allow": [
               "GET",
@@ -2700,12 +2663,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -2723,7 +2686,7 @@
       "date_created_gmt": "2024-04-09T07:39:25",
       "date_modified": "2024-04-09T14:39:35",
       "date_modified_gmt": "2024-04-09T07:39:35",
-      "src": "https://mfparis.vn/wp-content/uploads/2024/04/nuoc-tay-trang-da-dau-mun-bioderma-crealine-h2o.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2024/04/nuoc-tay-trang-da-dau-mun-bioderma-crealine-h2o.jpg",
       "name": "Nước Tẩy Trang Da Dầu Mụn Bioderma Créaline H2O",
       "alt": "Nước Tẩy Trang Da Dầu Mụn Bioderma Créaline H2O"
     },
@@ -2732,7 +2695,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7769",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7769",
           "targetHints": {
             "allow": [
               "GET",
@@ -2746,12 +2709,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -2769,7 +2732,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8659",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8659",
           "targetHints": {
             "allow": [
               "GET",
@@ -2783,12 +2746,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8536"
         }
       ]
     }
@@ -2806,7 +2769,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8612",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8612",
           "targetHints": {
             "allow": [
               "GET",
@@ -2820,12 +2783,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8560"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8560"
         }
       ]
     }
@@ -2843,7 +2806,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8625",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8625",
           "targetHints": {
             "allow": [
               "GET",
@@ -2857,12 +2820,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/50"
         }
       ]
     }
@@ -2880,7 +2843,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/50",
           "targetHints": {
             "allow": [
               "GET",
@@ -2894,7 +2857,7 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ]
     }
@@ -2912,7 +2875,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8665",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8665",
           "targetHints": {
             "allow": [
               "GET",
@@ -2926,12 +2889,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/50"
         }
       ]
     }
@@ -2949,7 +2912,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8554",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8554",
           "targetHints": {
             "allow": [
               "GET",
@@ -2963,12 +2926,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/50"
         }
       ]
     }
@@ -2986,7 +2949,7 @@
       "date_created_gmt": "2025-09-07T08:05:38",
       "date_modified": "2025-09-07T15:05:55",
       "date_modified_gmt": "2025-09-07T08:05:55",
-      "src": "https://mfparis.vn/wp-content/uploads/2025/09/vien-uong-moc-toc-duong-mong-phyto-phanere-120-vien.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2025/09/vien-uong-moc-toc-duong-mong-phyto-phanere-120-vien.jpg",
       "name": "Viên Uống Mọc Tóc, Dưỡng Móng Phyto Phanere 120 Viên",
       "alt": "Viên Uống Mọc Tóc, Dưỡng Móng Phyto Phanere 120 Viên"
     },
@@ -2995,7 +2958,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7834",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7834",
           "targetHints": {
             "allow": [
               "GET",
@@ -3009,12 +2972,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8523"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8523"
         }
       ]
     }
@@ -3032,7 +2995,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7847",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7847",
           "targetHints": {
             "allow": [
               "GET",
@@ -3046,12 +3009,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -3069,7 +3032,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8649",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8649",
           "targetHints": {
             "allow": [
               "GET",
@@ -3083,12 +3046,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -3106,7 +3069,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8604",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8604",
           "targetHints": {
             "allow": [
               "GET",
@@ -3120,7 +3083,7 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ]
     }
@@ -3138,7 +3101,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8579",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8579",
           "targetHints": {
             "allow": [
               "GET",
@@ -3152,12 +3115,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8560"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8560"
         }
       ]
     }
@@ -3175,7 +3138,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8676",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8676",
           "targetHints": {
             "allow": [
               "GET",
@@ -3189,12 +3152,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8520"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8520"
         }
       ]
     }
@@ -3212,7 +3175,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8510",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8510",
           "targetHints": {
             "allow": [
               "GET",
@@ -3226,12 +3189,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/50"
         }
       ]
     }
@@ -3249,7 +3212,7 @@
       "date_created_gmt": "2023-06-29T08:09:47",
       "date_modified": "2023-06-29T15:10:06",
       "date_modified_gmt": "2023-06-29T08:10:06",
-      "src": "https://mfparis.vn/wp-content/uploads/2023/06/vien-uong-bo-sung-vitamin-d-zinc-bion3-defense-90-vien-2.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2023/06/vien-uong-bo-sung-vitamin-d-zinc-bion3-defense-90-vien-2.jpg",
       "name": "Viên Uống Bổ Sung Vitamin D Zinc Bion3 Defense 90 Viên",
       "alt": "Viên Uống Bổ Sung Vitamin D Zinc Bion3 Defense 90 Viên"
     },
@@ -3258,7 +3221,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8563",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8563",
           "targetHints": {
             "allow": [
               "GET",
@@ -3272,12 +3235,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/50"
         }
       ]
     }
@@ -3295,7 +3258,7 @@
       "date_created_gmt": "2023-06-29T08:09:47",
       "date_modified": "2023-06-29T15:10:06",
       "date_modified_gmt": "2023-06-29T08:10:06",
-      "src": "https://mfparis.vn/wp-content/uploads/2023/06/vien-uong-bo-sung-vitamin-d-zinc-bion3-defense-90-vien-2.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2023/06/vien-uong-bo-sung-vitamin-d-zinc-bion3-defense-90-vien-2.jpg",
       "name": "Viên Uống Bổ Sung Vitamin D Zinc Bion3 Defense 90 Viên",
       "alt": "Viên Uống Bổ Sung Vitamin D Zinc Bion3 Defense 90 Viên"
     },
@@ -3304,7 +3267,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8080",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8080",
           "targetHints": {
             "allow": [
               "GET",
@@ -3318,12 +3281,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/50"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/50"
         }
       ]
     }
@@ -3341,7 +3304,7 @@
       "date_created_gmt": "2025-09-18T07:17:23",
       "date_modified": "2025-09-18T14:18:33",
       "date_modified_gmt": "2025-09-18T07:18:33",
-      "src": "https://mfparis.vn/wp-content/uploads/2025/09/xit-khoang-puressentiel-oai-huong.jpg",
+      "src": "https://maraisdefrance.vn/wp-content/uploads/2025/09/xit-khoang-puressentiel-oai-huong.jpg",
       "name": "Xịt khoáng Puressentiel oải hương",
       "alt": "Xịt khoáng Puressentiel oải hương"
     },
@@ -3350,7 +3313,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/7776",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/7776",
           "targetHints": {
             "allow": [
               "GET",
@@ -3364,12 +3327,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/20"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/20"
         }
       ]
     }
@@ -3387,7 +3350,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8539",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8539",
           "targetHints": {
             "allow": [
               "GET",
@@ -3401,12 +3364,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8536"
         }
       ]
     }
@@ -3424,7 +3387,7 @@
     "_links": {
       "self": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8615",
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8615",
           "targetHints": {
             "allow": [
               "GET",
@@ -3438,12 +3401,12 @@
       ],
       "collection": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories"
         }
       ],
       "up": [
         {
-          "href": "https://mfparis.vn/wp-json/wc/v3/products/categories/8536"
+          "href": "https://maraisdefrance.vn/wp-json/wc/v3/products/categories/8536"
         }
       ]
     }
