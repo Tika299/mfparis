@@ -68,7 +68,6 @@ const ONLY = getArg('--only', 'all')
 const UPDATE_EXISTING = hasFlag('--update')
 const SKIP_MEDIA = hasFlag('--skip-media')
 const DRY_RUN = hasFlag('--dry-run')
-const USE_PLACEHOLDER_FEATURED = hasFlag('--placeholder-featured')
 const DISABLE_FALLBACK_BRAND = hasFlag('--no-fallback-brand')
 const IMPORT_STOCK_QUANTITY = Math.max(0, Number(getArg('--import-stock', '99')) || 99)
 
@@ -332,7 +331,12 @@ async function findBySlug(payload: any, collection: string, slug: string) {
 }
 
 async function createOrUpdateBySlug(payload: any, collection: string, slug: string, data: AnyRecord) {
-  const existing = await findBySlug(payload, collection, slug)
+  const existingByWpId =
+    data.wpId !== undefined && data.wpId !== null
+      ? await findOne(payload, collection, { wpId: { equals: data.wpId } })
+      : null
+
+  const existing = existingByWpId || (await findBySlug(payload, collection, slug))
 
   if (existing?.id && !UPDATE_EXISTING) {
     return { id: existing.id, doc: existing, action: 'skip' as const }
@@ -1626,11 +1630,7 @@ async function importPosts(payload: any, maps: ImportMaps) {
   const postsData = readJSON<AnyRecord>(DATA_FILES.posts, undefined, { slice: true })
   console.log(`\nImport posts: ${postsData.length}`)
 
-  let placeholderMediaId: ID | null = null
-
-  if (USE_PLACEHOLDER_FEATURED || SKIP_MEDIA) {
-    placeholderMediaId = await createPlaceholderMedia(payload)
-  }
+  const placeholderMediaId: ID | null = await createPlaceholderMedia(payload)
 
   for (const item of postsData) {
     const title = stripHTML(getRendered(item.title) || item.title || item.slug || `Post ${item.id}`)
