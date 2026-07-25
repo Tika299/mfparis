@@ -5,6 +5,11 @@ import { fileURLToPath } from 'url'
 import { getPayload } from 'payload'
 import data from './silo-phase-1-3-data.json'
 
+import {
+  normalizeRedirectDestination,
+  normalizeRedirectSource,
+} from '@/utilities/redirects'
+
 type AnyRecord = Record<string, any>
 type CollectionSlug = 'categories' | 'post-categories'
 type ContentCollectionSlug = 'products' | 'posts'
@@ -61,6 +66,10 @@ function relationID(value: unknown): string {
     return typeof id === 'string' || typeof id === 'number' ? String(id) : ''
   }
   return ''
+}
+
+function relationPayloadID(value: string): string | number {
+  return /^\d+$/.test(value) ? Number(value) : value
 }
 
 function isSelectedPriority(row: AnyRecord): boolean {
@@ -153,6 +162,15 @@ function normalizeSiloRedirectTarget(pathname: string): string {
   }
 
   return normalizedPathname
+}
+
+function normalizeRedirectFrom(value: unknown): string {
+  return normalizeRedirectSource(normalizePathname(value)) || ''
+}
+
+function normalizeRedirectTo(value: unknown): string {
+  const target = normalizeSiloRedirectTarget(extractRedirectTarget(value))
+  return normalizeRedirectDestination(target) || ''
 }
 
 function buildNotes(row: AnyRecord): string {
@@ -340,7 +358,7 @@ async function moveAssignments(
           collection: contentCollection,
           id: doc.id,
           overrideAccess: true,
-          data: { [fieldName]: next },
+          data: { [fieldName]: next.map(relationPayloadID) },
         })
       }
 
@@ -409,17 +427,15 @@ async function applyRedirectPreview(payload: any, rows: AnyRecord[]) {
     const status = compact(row['Mã xử lý'])
     if (!status.includes('301')) continue
 
-    const from = normalizePathname(row['URL hiện tại'])
-    const to = normalizeSiloRedirectTarget(
-      extractRedirectTarget(row['URL đích / xử lý']),
-    )
+    const from = normalizeRedirectFrom(row['URL hiện tại'])
+    const to = normalizeRedirectTo(row['URL đích / xử lý'])
     if (!from || !to || to === '/') continue
     candidates += 1
 
     const existing = await findOne(payload, 'redirects', { from: { equals: from } })
 
     if (existing?.id) {
-      if (normalizePathname(existing.to) === to) {
+      if (normalizeRedirectDestination(existing.to) === to) {
         skipped += 1
       } else {
         conflicts += 1
