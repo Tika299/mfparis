@@ -14,6 +14,8 @@ import * as migration_20260719_050200_add_blog_comment_parent from './20260719_0
 import * as migration_20260719_075325 from './20260719_075325';
 import * as migration_20260720_153323 from './20260720_153323';
 import * as migration_20260721_140856_add_product_search_keywords from './20260721_140856_add_product_search_keywords';
+import * as migration_20260725_083819_silo_phase_1_3_fields from './20260725_083819_silo_phase_1_3_fields';
+import * as migration_20260725_123754 from './20260725_123754';
 
 export const migrations = [
   {
@@ -94,6 +96,16 @@ export const migrations = [
   {
     up: migration_20260721_140856_add_product_search_keywords.up,
     down: migration_20260721_140856_add_product_search_keywords.down,
-    name: '20260721_140856_add_product_search_keywords'
+    name: '20260721_140856_add_product_search_keywords',
+  },
+  {
+    up: migration_20260725_083819_silo_phase_1_3_fields.up,
+    down: migration_20260725_083819_silo_phase_1_3_fields.down,
+    name: '20260725_083819_silo_phase_1_3_fields',
+  },
+  {
+    up: migration_20260725_123754.up,
+    down: migration_20260725_123754.down,
+    name: '20260725_123754'
   },
 ];

@@ -14,7 +14,6 @@ import { SearchFilters } from '@/components/search-filters/SearchFilters'
 import { cn } from '@/utilities'
 import {
   generateCanonicalUrl,
-  INDEXABLE_FACET_KEYS,
 } from '@/utilities/seo'
 import { getProductFilterOptions } from '@/data/getProductFilterOptions'
 import { buildCollectionPageSchemaGraph } from '@/lib/structured-data'
@@ -72,10 +71,6 @@ type ProductsSeoContent = Readonly<{
   heading: string
   title: string
 }>
-
-const INDEXABLE_FACET_KEY_SET: ReadonlySet<string> = new Set(
-  INDEXABLE_FACET_KEYS,
-)
 
 const getCachedProducts = unstable_cache(
   async ({ page, sort, where }: ProductsQueryInput) => {
@@ -282,7 +277,7 @@ function convertToURLSearchParams(
   return urlSearchParams
 }
 
-function containsOnlyIndexableFacetParams(
+function hasAnyProductListFilterParams(
   searchParams: ProductsSearchParams,
 ): boolean {
   for (const [key, value] of Object.entries(searchParams)) {
@@ -290,12 +285,19 @@ function containsOnlyIndexableFacetParams(
       continue
     }
 
-    if (!INDEXABLE_FACET_KEY_SET.has(key)) {
-      return false
+    if (key === 'page') {
+      const pageValue = Array.isArray(value) ? value[0] : value
+      const page = Number(pageValue)
+
+      if (Number.isFinite(page) && page <= 1) {
+        continue
+      }
     }
+
+    return true
   }
 
-  return true
+  return false
 }
 
 function addStringFilterCondition(
@@ -631,9 +633,9 @@ export async function generateMetadata({
     resolvedSearchParams,
   )
 
-  const shouldIndex = containsOnlyIndexableFacetParams(
-    resolvedSearchParams,
-  ) && !hasAdvancedProductFilters(resolvedSearchParams)
+  const shouldIndex =
+    !hasAnyProductListFilterParams(resolvedSearchParams) &&
+    !hasAdvancedProductFilters(resolvedSearchParams)
 
   return {
     title: seoContent.title,

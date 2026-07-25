@@ -217,7 +217,7 @@ function getPostCategoryUrl(
       : ''
 
   return slug
-    ? `/blog?category=${encodeURIComponent(slug)}`
+    ? `/blog/category/${encodeURIComponent(slug)}`
     : '/blog'
 }
 
@@ -1030,12 +1030,13 @@ export default async function BlogPostPage({
                 <div className="mb-4 flex gap-2">
                   {post.categories?.map(
                     (cat: any) => (
-                      <span
+                      <Link
                         key={cat.id}
+                        href={getPostCategoryUrl(cat)}
                         className="rounded-full bg-orange-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#E54D2E]"
                       >
                         {cat.title}
-                      </span>
+                      </Link>
                     ),
                   )}
                 </div>
@@ -1199,12 +1200,13 @@ export default async function BlogPostPage({
 
                   {post.categories?.map(
                     (tag: any) => (
-                      <span
+                      <Link
                         key={tag.id}
+                        href={getPostCategoryUrl(tag)}
                         className="cursor-pointer rounded-full bg-gray-50 px-4 py-1.5 text-[11px] font-bold lowercase text-gray-500 transition-colors hover:bg-gray-100"
                       >
                         #{tag.title}
-                      </span>
+                      </Link>
                     ),
                   )}
                 </div>

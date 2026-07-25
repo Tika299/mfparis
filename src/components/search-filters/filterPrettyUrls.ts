@@ -1,18 +1,6 @@
 'use client'
 
-import { DEFAULT_SORT } from './search-filters.constants'
 import type { FilterRouteContext } from './search-filters.types'
-
-const prettyFilterKeys = new Set([
-  'brand',
-  'category',
-  'note',
-  'gender',
-  'volume',
-  'sale',
-  'availability',
-  'sort',
-])
 
 const segmentMap: Record<string, string> = {
   'thuong-hieu': 'brand',
@@ -32,18 +20,6 @@ function safeDecode(value: string): string {
 
 function safeEncode(value: string): string {
   return encodeURIComponent(value.trim())
-}
-
-function getSingle(params: URLSearchParams, key: string): string | null {
-  const values = params.getAll(key).filter(Boolean)
-  return values.length === 1 ? values[0] : null
-}
-
-function nonEmptyKeys(params: URLSearchParams): string[] {
-  return Array.from(new Set(Array.from(params.keys())))
-    .filter((key) => params.getAll(key).some(Boolean))
-    .filter((key) => key !== 'page')
-    .sort((left, right) => left.localeCompare(right, 'vi'))
 }
 
 export function getFilterParamsFromPrettyPathname(pathname: string): URLSearchParams {
@@ -161,92 +137,14 @@ export function getBaseFilterPathname(
 }
 
 export function buildPrettyFilterUrl(
-  params: URLSearchParams,
-  routeContext: FilterRouteContext,
+  _params: URLSearchParams,
+  _routeContext: FilterRouteContext,
 ): string | null {
-  const normalized = new URLSearchParams(params.toString())
-  const sort = normalized.get('sort')
-
-  if (sort === DEFAULT_SORT) {
-    normalized.delete('sort')
-  }
-
-  normalized.delete('page')
-
-  const q = getSingle(normalized, 'q')
-
-  if (q) {
-    return null
-  }
-
-  const keys = nonEmptyKeys(normalized)
-
-  if (keys.length === 0) {
-    return getBaseFilterPathname(routeContext, normalized)
-  }
-
-  const brand = getSingle(normalized, 'brand')
-  const category = getSingle(normalized, 'category')
-  const note = getSingle(normalized, 'note')
-  const gender = getSingle(normalized, 'gender')
-  const volume = getSingle(normalized, 'volume')
-  const sale = getSingle(normalized, 'sale')
-  const availability = getSingle(normalized, 'availability')
-  const currentSort = getSingle(normalized, 'sort')
-
-  if (keys.length === 2 && brand && category) {
-    return `/loc/danh-muc/${safeEncode(category)}/thuong-hieu/${safeEncode(brand)}`
-  }
-
-  if (keys.length === 1 && brand) {
-    return `/loc/thuong-hieu/${safeEncode(brand)}`
-  }
-
-  if (keys.length === 1 && category) {
-    return `/loc/danh-muc/${safeEncode(category)}`
-  }
-
-  if (keys.length === 1 && note) {
-    return `/loc/huong/${safeEncode(note)}`
-  }
-
-  if (keys.length === 1 && gender) {
-    return `/loc/gioi-tinh/${safeEncode(gender)}`
-  }
-
-  if (keys.length === 1 && volume) {
-    return `/loc/dung-tich/${safeEncode(volume)}`
-  }
-
-  if (keys.length === 1 && sale === 'yes') {
-    return '/san-pham-giam-gia'
-  }
-
-  if (keys.length === 1 && availability === 'in-stock') {
-    return '/san-pham-con-hang'
-  }
-
-  if (keys.length === 1 && currentSort === '-reviewCount') {
-    return '/san-pham-ban-chay'
-  }
-
-  if (keys.length === 1 && currentSort === '-createdAt') {
-    return '/san-pham-moi'
-  }
-
-  if (keys.length === 1) {
-    const key = keys[0]
-
-    if (key?.startsWith('attr_')) {
-      const attribute = key.replace(/^attr_/, '')
-      const value = getSingle(normalized, key)
-
-      if (attribute && value) {
-        return `/loc/thuoc-tinh/${safeEncode(attribute)}/${safeEncode(value)}`
-      }
-    }
-  }
-
+  /*
+   * SEO policy Phase 4-6:
+   * filter/facet combinations must stay as query parameters and noindex.
+   * Only real brand/category/collection landing pages should have clean indexable URLs.
+   */
   return null
 }
 

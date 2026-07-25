@@ -91,12 +91,56 @@ function hasUsableSlug(
     return typeof value === 'string' && value.trim().length > 0
 }
 
+function shouldIncludeTaxonomyPage(doc: {
+    redirectStatus?: string | null
+    seoIndex?: string | null
+    slug?: string | null
+    taxonomyType?: string | null
+}): boolean {
+    if (!hasUsableSlug(doc.slug)) {
+        return false
+    }
+
+    if (
+        [
+            'noindex',
+            'noindex-temporary',
+            'noindex-after-move',
+        ].includes(String(doc.seoIndex || 'index'))
+    ) {
+        return false
+    }
+
+    if (
+        [
+            'facet',
+            'removed',
+            'temporary-node',
+        ].includes(String(doc.taxonomyType || 'category'))
+    ) {
+        return false
+    }
+
+    if (
+        [
+            '301',
+            '410-noindex',
+            'noindex',
+            'keep-noindex',
+        ].includes(String(doc.redirectStatus || ''))
+    ) {
+        return false
+    }
+
+    return true
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const payload = await getPayload({
         config: configPromise,
     })
 
-    const [productsRes, categoriesRes, brandsRes, postsRes] = await Promise.all([
+    const [productsRes, categoriesRes, brandsRes, postsRes, postCategoriesRes] = await Promise.all([
         payload.find({
             collection: 'products',
             depth: 0,
@@ -111,6 +155,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             select: {
                 slug: true,
                 updatedAt: true,
+                seoIndex: true,
+                taxonomyType: true,
+                redirectStatus: true,
             },
         }),
         payload.find({
@@ -146,6 +193,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 updatedAt: true,
             },
         }),
+        payload.find({
+            collection: 'post-categories',
+            depth: 0,
+            limit: 10000,
+            pagination: false,
+            overrideAccess: true,
+            select: {
+                slug: true,
+                updatedAt: true,
+                seoIndex: true,
+                taxonomyType: true,
+                redirectStatus: true,
+            },
+        }),
     ])
 
     const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((route) => ({
@@ -165,7 +226,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }))
 
     const categoryEntries: MetadataRoute.Sitemap = categoriesRes.docs
-        .filter((category) => hasUsableSlug(category.slug))
+        .filter(shouldIncludeTaxonomyPage)
         .map((category) => ({
             url: toAbsoluteUrl(`/categories/${category.slug}`),
             lastModified: toValidLastModified(category.updatedAt),
@@ -191,11 +252,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.6,
         }))
 
+    const blogCategoryEntries: MetadataRoute.Sitemap = postCategoriesRes.docs
+        .filter(shouldIncludeTaxonomyPage)
+        .map((category) => ({
+            url: toAbsoluteUrl(`/blog/category/${category.slug}`),
+            lastModified: toValidLastModified(category.updatedAt),
+            changeFrequency: 'weekly',
+            priority: 0.55,
+        }))
+
     return [
         ...staticEntries,
         ...productEntries,
         ...categoryEntries,
         ...brandEntries,
+        ...blogCategoryEntries,
         ...blogEntries,
     ]
 }

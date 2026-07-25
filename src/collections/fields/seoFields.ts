@@ -638,3 +638,97 @@ export const landingSeoContentFields: Field[] = [
     label: 'Anh social rieng cho landing page',
   },
 ]
+
+export const blogLandingSeoContentFields: Field[] = [
+  {
+    name: 'h1Override',
+    type: 'text',
+    label: 'H1 tùy chỉnh',
+  },
+  {
+    name: 'introHtml',
+    type: 'textarea',
+    label: 'Nội dung mở đầu HTML',
+    admin: {
+      rows: 8,
+      description:
+        'Nội dung hiển thị phía trên danh sách bài viết.',
+    },
+  },
+  {
+    name: 'bottomContentHtml',
+    type: 'textarea',
+    label: 'Nội dung cuối trang HTML',
+    admin: {
+      rows: 10,
+      description:
+        'Nội dung SEO hiển thị phía dưới danh sách bài viết.',
+    },
+  },
+  {
+    name: 'faq',
+    type: 'array',
+    label: 'FAQ landing page',
+    fields: [
+      {
+        name: 'question',
+        type: 'text',
+        required: true,
+        label: 'Câu hỏi',
+      },
+      {
+        name: 'answer',
+        type: 'textarea',
+        required: true,
+        label: 'Câu trả lời',
+      },
+    ],
+  },
+  {
+    name: 'featuredPosts',
+    type: 'relationship',
+    relationTo: 'posts',
+    hasMany: true,
+    label: 'Bài viết nổi bật',
+  },
+  {
+    name: 'internalLinks',
+    type: 'array',
+    label: 'Internal link gợi ý',
+    fields: [
+      {
+        name: 'label',
+        type: 'text',
+        required: true,
+        label: 'Nhãn link',
+      },
+      {
+        name: 'url',
+        type: 'text',
+        required: true,
+        label: 'URL đích',
+        admin: {
+          placeholder: '/blog/category/tap-chi-nuoc-hoa',
+        },
+      },
+    ],
+  },
+  {
+    name: 'noindexWhenEmpty',
+    type: 'checkbox',
+    label: 'Noindex khi không có bài viết',
+    defaultValue: true,
+  },
+  {
+    name: 'thumbnail',
+    type: 'upload',
+    relationTo: 'media',
+    label: 'Thumbnail SEO',
+  },
+  {
+    name: 'ogImage',
+    type: 'upload',
+    relationTo: 'media',
+    label: 'Ảnh social riêng cho landing page',
+  },
+]

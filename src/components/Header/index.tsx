@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  ChevronRight,
   Gift,
   MapPin,
   Menu,
@@ -11,6 +10,7 @@ import {
 } from 'lucide-react'
 
 import { SearchBar } from './SearchBar'
+import { SiloMegaMenu } from './SiloMegaMenu'
 import { CartCount } from './CartCount'
 import { WishlistButton } from './WishlistButton'
 import { MobileMenu } from '../MobileMenu'
@@ -22,47 +22,105 @@ type HeaderNavItem = {
   id: string
   label: string
   link: string
+  megaGroups?: {
+    id: string
+    title: string
+    links: {
+      id: string
+      label: string
+      link: string
+    }[]
+  }[]
 }
 
-/**
- * Chỉ được dùng khi trong Payload chưa nhập menu.
- * Khi Payload đã có navItems, hệ thống sẽ ưu tiên dữ liệu từ Payload.
- */
-const fallbackNavItems: HeaderNavItem[] = [
+const siloNavItems: HeaderNavItem[] = [
   {
     id: 'nuoc-hoa',
-    label: 'Nước hoa',
-    link: '/nuoc-hoa',
+    label: 'Nước Hoa',
+    link: '/categories/nuoc-hoa',
+    megaGroups: [
+      {
+        id: 'nuoc-hoa-theo-nguoi-dung',
+        title: 'Theo người dùng',
+        links: [
+          { id: 'nuoc-hoa-nam', label: 'Nước hoa nam', link: '/categories/nuoc-hoa-nam' },
+          { id: 'nuoc-hoa-nu', label: 'Nước hoa nữ', link: '/categories/nuoc-hoa-nu' },
+          { id: 'nuoc-hoa-unisex', label: 'Nước hoa unisex', link: '/categories/nuoc-hoa-unisex' },
+          { id: 'nuoc-hoa-mini', label: 'Nước hoa mini', link: '/categories/nuoc-hoa-mini' },
+        ],
+      },
+      {
+        id: 'nuoc-hoa-theo-phan-khuc',
+        title: 'Theo phân khúc',
+        links: [
+          { id: 'nuoc-hoa-niche', label: 'Nước hoa niche', link: '/categories/nuoc-hoa-niche' },
+          { id: 'nuoc-hoa-designer', label: 'Nước hoa designer', link: '/categories/nuoc-hoa-designer' },
+          { id: 'nuoc-hoa-cao-cap', label: 'Nước hoa cao cấp', link: '/categories/nuoc-hoa-cao-cap' },
+          { id: 'gift-set-nuoc-hoa', label: 'Gift set nước hoa', link: '/categories/gift-set-nuoc-hoa' },
+        ],
+      },
+    ],
   },
   {
-    id: 'nuoc-hoa-niche',
-    label: 'Nước hoa niche',
-    link: '/nuoc-hoa-niche',
+    id: 'my-pham',
+    label: 'Mỹ Phẩm',
+    link: '/categories/my-pham',
+    megaGroups: [
+      {
+        id: 'my-pham-lam-dep',
+        title: 'Làm đẹp',
+        links: [
+          { id: 'cham-soc-da', label: 'Chăm sóc da', link: '/categories/cham-soc-da' },
+          { id: 'cham-soc-co-the', label: 'Chăm sóc cơ thể', link: '/categories/cham-soc-co-the' },
+          { id: 'cham-soc-toc', label: 'Chăm sóc tóc', link: '/categories/cham-soc-toc' },
+          { id: 'trang-diem', label: 'Trang điểm', link: '/categories/trang-diem' },
+        ],
+      },
+      {
+        id: 'my-pham-nhu-cau',
+        title: 'Theo nhu cầu',
+        links: [
+          { id: 'chong-nang', label: 'Chống nắng', link: '/categories/chong-nang' },
+          { id: 'lam-sach-da', label: 'Làm sạch da', link: '/categories/lam-sach-da' },
+          { id: 'duong-am', label: 'Dưỡng ẩm', link: '/categories/duong-am' },
+          { id: 'dau-xa', label: 'Dầu xả', link: '/categories/dau-xa' },
+        ],
+      },
+    ],
   },
   {
-    id: 'cham-soc-da',
-    label: 'Chăm sóc da',
-    link: '/cham-soc-da',
+    id: 'me-va-be',
+    label: 'Mẹ & Bé',
+    link: '/categories/me-va-be',
+    megaGroups: [
+      {
+        id: 'me-va-be-theo-nguoi-dung',
+        title: 'Theo người dùng',
+        links: [
+          { id: 'cham-soc-me-bau', label: 'Chăm sóc mẹ bầu', link: '/categories/cham-soc-me-bau' },
+          { id: 'cham-soc-be', label: 'Chăm sóc bé', link: '/categories/cham-soc-be' },
+          { id: 'dinh-duong-cho-me', label: 'Dinh dưỡng cho mẹ', link: '/categories/dinh-duong-cho-me' },
+          { id: 'goc-me-va-be', label: 'Góc mẹ và bé', link: '/categories/goc-me-va-be' },
+        ],
+      },
+    ],
   },
   {
-    id: 'makeup',
-    label: 'Makeup',
-    link: '/makeup',
-  },
-  {
-    id: 'cham-soc-co-the',
-    label: 'Chăm sóc cơ thể',
-    link: '/cham-soc-co-the',
-  },
-  {
-    id: 'toc-va-nuoc-hoa-toc',
-    label: 'Tóc & Nước hoa tóc',
-    link: '/toc-va-nuoc-hoa-toc',
-  },
-  {
-    id: 'qua-tang',
-    label: 'Quà tặng',
-    link: '/qua-tang',
+    id: 'thuc-pham-chuc-nang',
+    label: 'Thực phẩm bảo vệ sức khỏe',
+    link: '/categories/thuc-pham-chuc-nang',
+    megaGroups: [
+      {
+        id: 'suc-khoe-ho-tro',
+        title: 'Hỗ trợ sức khỏe',
+        links: [
+          { id: 'vitamin-khoang-chat', label: 'Vitamin & khoáng chất', link: '/categories/vitamin-khoang-chat' },
+          { id: 'omega-3', label: 'Omega 3', link: '/categories/omega-3' },
+          { id: 'ho-hap-ho-xoang', label: 'Hô hấp, ho xoang', link: '/categories/ho-hap-ho-xoang' },
+          { id: 'giam-mo', label: 'Giảm mỡ', link: '/categories/giam-mo' },
+        ],
+      },
+    ],
   },
   {
     id: 'uu-dai',
@@ -70,6 +128,10 @@ const fallbackNavItems: HeaderNavItem[] = [
     link: '/vouchers',
   },
 ]
+
+function buildSiloNavItems(_cmsNavItems: HeaderNavItem[]): HeaderNavItem[] {
+  return siloNavItems
+}
 
 export const Header = async () => {
   const [settings, searchBrandTargets] = await Promise.all([
@@ -123,10 +185,7 @@ export const Header = async () => {
     return result
   }, [])
 
-  const navItems =
-    cmsNavItems.length > 0
-      ? cmsNavItems
-      : fallbackNavItems
+  const navItems = buildSiloNavItems(cmsNavItems)
 
   return (
     <header
@@ -318,42 +377,7 @@ export const Header = async () => {
               <span>Danh mục</span>
             </Link>
 
-            {/* MENU ITEMS */}
-            <nav
-              className="flex min-w-0 flex-1 items-center justify-start gap-x-5 xl:gap-x-8"
-              aria-label="Điều hướng chính"
-            >
-              {navItems.map((item) => {
-                const isOffer =
-                  item.label
-                    .trim()
-                    .toLocaleLowerCase('vi') ===
-                  'ưu đãi'
-
-                return (
-                  <Link
-                    key={item.id}
-                    href={process.env.NEXT_PUBLIC_BASE_URL + item.link}
-                    className={
-                      isOffer
-                        ? 'group flex items-center gap-2 whitespace-nowrap text-[12.5px] font-semibold text-[#c31920] transition-opacity hover:opacity-70'
-                        : 'whitespace-nowrap text-[12.5px] font-medium text-[#202020] transition-colors hover:text-[#ad0509]'
-                    }
-                  >
-                    <span>{item.label}</span>
-
-                    {isOffer ? (
-                      <ChevronRight
-                        aria-hidden="true"
-                        size={13}
-                        strokeWidth={2.3}
-                        className="transition-transform group-hover:translate-x-0.5"
-                      />
-                    ) : null}
-                  </Link>
-                )
-              })}
-            </nav>
+            <SiloMegaMenu navItems={navItems} />
           </div>
         </div>
       </div>

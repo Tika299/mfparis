@@ -3,6 +3,8 @@ import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { trackCategorySlugHistory } from '@/collections/hooks/trackSlugHistory'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
+import { siloSeoFields } from '@/collections/fields/siloSeoFields'
+import { landingSeoContentFields } from '@/collections/fields/seoFields'
 
 const revalidateCategoryTags = async () => {
   try {
@@ -65,6 +67,16 @@ export const Categories: CollectionConfig = {
       type: 'relationship',
       relationTo: 'categories',
       label: 'Danh muc cha',
+    },
+    ...siloSeoFields({ kind: 'product' }),
+    {
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Nội dung SEO',
+          fields: landingSeoContentFields,
+        },
+      ],
     },
     {
       name: 'wpId',

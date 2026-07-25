@@ -296,6 +296,36 @@ export interface Brand {
    */
   description?: string | null;
   isFeatured?: boolean | null;
+  h1Override?: string | null;
+  /**
+   * Nội dung hien thi phia tren danh sach san pham.
+   */
+  introHtml?: string | null;
+  /**
+   * Nội dung SEO hien thi phia duoi danh sach san pham.
+   */
+  bottomContentHtml?: string | null;
+  faq?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  featuredProducts?: (number | Product)[] | null;
+  indexableFacets?:
+    | {
+        key: string;
+        value: string;
+        metaTitle?: string | null;
+        metaDescription?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  noindexWhenEmpty?: boolean | null;
+  canonicalToParent?: boolean | null;
+  thumbnail?: (number | null) | Media;
+  ogImage?: (number | null) | Media;
   wpId?: number | null;
   sourceUrl?: string | null;
   importNotes?: string | null;
@@ -478,6 +508,59 @@ export interface Category {
    */
   slug: string;
   parent?: (number | null) | Category;
+  /**
+   * Dùng để đổi nhãn trên frontend/admin mà vẫn có thể giữ slug cũ.
+   */
+  displayName?: string | null;
+  /**
+   * Category = loại sản phẩm bền vững; Collection SEO = trang gom nhóm có nhu cầu tìm kiếm.
+   */
+  taxonomyType?: ('category' | 'collection' | 'support' | 'temporary-node' | 'facet' | 'removed') | null;
+  /**
+   * Frontend dùng field này để xuất robots index/noindex cho trang danh mục.
+   */
+  seoIndex?: ('index' | 'conditional-index' | 'noindex-temporary' | 'noindex' | 'noindex-after-move') | null;
+  siloParentLabel?: string | null;
+  menuPlacement?: string | null;
+  implementationPriority?: ('P0' | 'P1' | 'P2' | 'P3') | null;
+  implementationStatus?: ('planned' | 'in-progress' | 'done' | 'needs-gsc-review' | 'deferred') | null;
+  siloAction?: string | null;
+  redirectStatus?: ('keep' | '301' | '410-noindex' | 'noindex' | 'keep-noindex' | 'review') | null;
+  /**
+   * Chỉ áp dụng 301 sau khi đã đối chiếu GSC/backlink/doanh thu.
+   */
+  redirectTo?: string | null;
+  siloNotes?: string | null;
+  h1Override?: string | null;
+  /**
+   * Nội dung hien thi phia tren danh sach san pham.
+   */
+  introHtml?: string | null;
+  /**
+   * Nội dung SEO hien thi phia duoi danh sach san pham.
+   */
+  bottomContentHtml?: string | null;
+  faq?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  featuredProducts?: (number | Product)[] | null;
+  indexableFacets?:
+    | {
+        key: string;
+        value: string;
+        metaTitle?: string | null;
+        metaDescription?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  noindexWhenEmpty?: boolean | null;
+  canonicalToParent?: boolean | null;
+  thumbnail?: (number | null) | Media;
+  ogImage?: (number | null) | Media;
   wpId?: number | null;
   sourceUrl?: string | null;
   importNotes?: string | null;
@@ -772,6 +855,57 @@ export interface PostCategory {
    * Mo ta danh muc bai viet luu dang HTML. Khi import se thay anh trong HTML bang media Payload.
    */
   description?: string | null;
+  parent?: (number | null) | PostCategory;
+  /**
+   * Dùng để đổi nhãn trên frontend/admin mà vẫn có thể giữ slug cũ.
+   */
+  displayName?: string | null;
+  /**
+   * Dùng để gom lại silo blog và tránh index category mỏng.
+   */
+  taxonomyType?: ('category' | 'collection' | 'support' | 'temporary-node' | 'facet' | 'removed') | null;
+  /**
+   * Frontend dùng field này để xuất robots index/noindex cho trang danh mục.
+   */
+  seoIndex?: ('index' | 'conditional-index' | 'noindex-temporary' | 'noindex' | 'noindex-after-move') | null;
+  siloParentLabel?: string | null;
+  menuPlacement?: string | null;
+  implementationPriority?: ('P0' | 'P1' | 'P2' | 'P3') | null;
+  implementationStatus?: ('planned' | 'in-progress' | 'done' | 'needs-gsc-review' | 'deferred') | null;
+  siloAction?: string | null;
+  redirectStatus?: ('keep' | '301' | '410-noindex' | 'noindex' | 'keep-noindex' | 'review') | null;
+  /**
+   * Chỉ áp dụng 301 sau khi đã đối chiếu GSC/backlink/doanh thu.
+   */
+  redirectTo?: string | null;
+  siloNotes?: string | null;
+  h1Override?: string | null;
+  /**
+   * Nội dung hiển thị phía trên danh sách bài viết.
+   */
+  introHtml?: string | null;
+  /**
+   * Nội dung SEO hiển thị phía dưới danh sách bài viết.
+   */
+  bottomContentHtml?: string | null;
+  faq?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  featuredPosts?: (number | Post)[] | null;
+  internalLinks?:
+    | {
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  noindexWhenEmpty?: boolean | null;
+  thumbnail?: (number | null) | Media;
+  ogImage?: (number | null) | Media;
   wpId?: number | null;
   sourceUrl?: string | null;
   importNotes?: string | null;
@@ -1272,6 +1406,30 @@ export interface BrandsSelect<T extends boolean = true> {
   logo?: T;
   description?: T;
   isFeatured?: T;
+  h1Override?: T;
+  introHtml?: T;
+  bottomContentHtml?: T;
+  faq?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  featuredProducts?: T;
+  indexableFacets?:
+    | T
+    | {
+        key?: T;
+        value?: T;
+        metaTitle?: T;
+        metaDescription?: T;
+        id?: T;
+      };
+  noindexWhenEmpty?: T;
+  canonicalToParent?: T;
+  thumbnail?: T;
+  ogImage?: T;
   wpId?: T;
   sourceUrl?: T;
   importNotes?: T;
@@ -1381,6 +1539,41 @@ export interface CategoriesSelect<T extends boolean = true> {
   description?: T;
   slug?: T;
   parent?: T;
+  displayName?: T;
+  taxonomyType?: T;
+  seoIndex?: T;
+  siloParentLabel?: T;
+  menuPlacement?: T;
+  implementationPriority?: T;
+  implementationStatus?: T;
+  siloAction?: T;
+  redirectStatus?: T;
+  redirectTo?: T;
+  siloNotes?: T;
+  h1Override?: T;
+  introHtml?: T;
+  bottomContentHtml?: T;
+  faq?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  featuredProducts?: T;
+  indexableFacets?:
+    | T
+    | {
+        key?: T;
+        value?: T;
+        metaTitle?: T;
+        metaDescription?: T;
+        id?: T;
+      };
+  noindexWhenEmpty?: T;
+  canonicalToParent?: T;
+  thumbnail?: T;
+  ogImage?: T;
   wpId?: T;
   sourceUrl?: T;
   importNotes?: T;
@@ -1527,6 +1720,39 @@ export interface PostCategoriesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   description?: T;
+  parent?: T;
+  displayName?: T;
+  taxonomyType?: T;
+  seoIndex?: T;
+  siloParentLabel?: T;
+  menuPlacement?: T;
+  implementationPriority?: T;
+  implementationStatus?: T;
+  siloAction?: T;
+  redirectStatus?: T;
+  redirectTo?: T;
+  siloNotes?: T;
+  h1Override?: T;
+  introHtml?: T;
+  bottomContentHtml?: T;
+  faq?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  featuredPosts?: T;
+  internalLinks?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
+  noindexWhenEmpty?: T;
+  thumbnail?: T;
+  ogImage?: T;
   wpId?: T;
   sourceUrl?: T;
   importNotes?: T;

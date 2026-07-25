@@ -66,7 +66,14 @@ type RelationshipValue =
 
 type CategoryTreeItem = {
   id: string | number
+  name?: string | null
+  slug?: string | null
   parent?: RelationshipValue
+}
+
+type LandingFaqItem = {
+  question?: string | null
+  answer?: string | null
 }
 
 function getSiteUrl(): string {
@@ -152,6 +159,78 @@ function buildCategoryContainsWhere(categoryIDs: string[]): Where {
   return {
     or: conditions,
   }
+}
+
+function getCategoryDisplayName(category: any): string {
+  return (
+    category?.h1Override ||
+    category?.displayName ||
+    category?.name ||
+    'Danh mục sản phẩm'
+  )
+}
+
+function getLandingFaqItems(value: unknown): { question: string; answer: string }[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value
+    .map((item: LandingFaqItem) => ({
+      question: String(item?.question || '').trim(),
+      answer: String(item?.answer || '').trim(),
+    }))
+    .filter((item) => item.question && item.answer)
+}
+
+function buildCategoryBreadcrumb(
+  currentCategory: any,
+  categories: CategoryTreeItem[],
+) {
+  const byID = new Map<string, CategoryTreeItem>()
+
+  for (const category of categories) {
+    byID.set(String(category.id), category)
+  }
+
+  const chain: CategoryTreeItem[] = []
+  let parentID = getRelationshipID(currentCategory.parent)
+  const visited = new Set<string>()
+
+  while (parentID !== null) {
+    const key = String(parentID)
+
+    if (visited.has(key)) {
+      break
+    }
+
+    visited.add(key)
+    const parent = byID.get(key)
+
+    if (!parent) {
+      break
+    }
+
+    chain.unshift(parent)
+    parentID = getRelationshipID(parent.parent)
+  }
+
+  return [
+    {
+      name: 'Trang chủ',
+      url: '/',
+    },
+    ...chain
+      .filter((category) => category.name && category.slug)
+      .map((category) => ({
+        name: String(category.name),
+        url: `/categories/${category.slug}`,
+      })),
+    {
+      name: getCategoryDisplayName(currentCategory),
+      url: `/categories/${currentCategory.slug}`,
+    },
+  ]
 }
 
 async function getCategoryBySlug(slug: string) {
@@ -270,13 +349,41 @@ function getMediaUrl(
   }
 }
 
+function shouldIndexCategoryPage(
+  category: any,
+  searchParams?: Record<string, string | undefined>,
+): boolean {
+  const seoIndex = String(category?.seoIndex || 'index')
+  const hasFilterParams = Boolean(
+    searchParams?.brand ||
+      searchParams?.min ||
+      searchParams?.max ||
+      (searchParams?.sort && searchParams.sort !== DEFAULT_SORT) ||
+      (searchParams?.page && searchParams.page !== '1'),
+  )
+
+  if (hasFilterParams) {
+    return false
+  }
+
+  return ![
+    'noindex',
+    'noindex-temporary',
+    'noindex-after-move',
+    'removed',
+  ].includes(seoIndex)
+}
+
 export async function generateMetadata({
   params,
+  searchParams,
 }: Pick<
   CategoryPageProps,
-  'params'
+  'params' | 'searchParams'
 >): Promise<Metadata> {
   const { slug } = await params
+  const resolvedSearchParams =
+    await searchParams
 
   const category =
     await getCategoryBySlug(slug)
@@ -302,12 +409,27 @@ export async function generateMetadata({
   const imageUrl = getMediaUrl(
     category.image,
   )
+  const shouldIndex = shouldIndexCategoryPage(
+    category,
+    resolvedSearchParams,
+  )
 
   return {
     title,
     description,
     alternates: {
       canonical: canonicalUrl,
+    },
+    robots: {
+      index: shouldIndex,
+      follow: true,
+      googleBot: {
+        index: shouldIndex,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
     },
     openGraph: {
       type: 'website',
@@ -455,6 +577,8 @@ export default async function CategoryPage({
     overrideAccess: true,
     select: {
       id: true,
+      name: true,
+      slug: true,
       parent: true,
     },
   })
@@ -558,23 +682,29 @@ export default async function CategoryPage({
   const hasDescription = Boolean(
     normalizeContentHtml(currentCategory.description),
   )
+  const introHtml = normalizeContentHtml(currentCategory.introHtml)
+  const bottomContentHtml = normalizeContentHtml(
+    currentCategory.bottomContentHtml,
+  )
+  const faqItems = getLandingFaqItems(currentCategory.faq)
+  const categoryDisplayName = getCategoryDisplayName(currentCategory)
+  const breadcrumb = buildCategoryBreadcrumb(
+    currentCategory,
+    allCategoriesRes.docs as CategoryTreeItem[],
+  )
 
   const categoryUrl = `/categories/${encodeURIComponent(slug)}`
   const schemaGraph = buildCollectionPageSchemaGraph({
     page: {
       url: categoryUrl,
-      name: currentCategory.name,
+      name: categoryDisplayName,
       description: getCategoryDescription(currentCategory),
-      breadcrumb: [
-        {
-          name: 'Trang chủ',
-          url: '/',
-        },
-        {
-          name: currentCategory.name,
-          url: categoryUrl,
-        },
-      ],
+      breadcrumb,
+      faq: faqItems.length > 0
+        ? {
+          questions: faqItems,
+        }
+        : undefined,
       items: productsRes.docs.map((product) => ({
         name: product.title,
         url: `/products/${product.slug}`,
@@ -666,7 +796,7 @@ export default async function CategoryPage({
       <div className="border-b border-gray-100 bg-white">
         <div className="container-ux py-5 md:py-7 lg:py-9">
           <h1 className="text-2xl font-black uppercase tracking-wide md:text-3xl lg:text-4xl">
-            {currentCategory.name}
+            {categoryDisplayName}
           </h1>
 
           <p className="mt-1 text-xs text-gray-500 md:text-sm">
@@ -836,6 +966,38 @@ export default async function CategoryPage({
                   </div>
                 </section>
               )}
+
+            {bottomContentHtml ? (
+              <section className="mt-10 rounded-2xl bg-white p-5 shadow-sm md:mt-12 md:p-8">
+                <div className="category-description prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
+                  <SafeHtmlContent html={bottomContentHtml} />
+                </div>
+              </section>
+            ) : null}
+
+            {faqItems.length > 0 ? (
+              <section className="mt-10 rounded-2xl bg-white p-5 shadow-sm md:mt-12 md:p-8">
+                <h2 className="mb-5 text-xl font-bold md:text-2xl">
+                  Câu hỏi thường gặp về {categoryDisplayName}
+                </h2>
+
+                <div className="divide-y divide-gray-100">
+                  {faqItems.map((item, index) => (
+                    <details
+                      key={`${item.question}-${index}`}
+                      className="group py-4"
+                    >
+                      <summary className="cursor-pointer list-none text-base font-bold text-gray-900">
+                        {item.question}
+                      </summary>
+                      <p className="mt-3 text-sm leading-7 text-gray-600">
+                        {item.answer}
+                      </p>
+                    </details>
+                  ))}
+                </div>
+              </section>
+            ) : null}
           </main>
         </div>
       </div>

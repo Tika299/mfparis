@@ -130,6 +130,7 @@ export type CollectionPageInput = {
     brandName?: string | null
   }> | null
   breadcrumb?: BreadcrumbItem[] | null
+  faq?: FAQInput | null
   subject?: CollectionSubjectInput | null
 }
 
@@ -1244,6 +1245,7 @@ export function buildCollectionPageSchemaGraph(input: {
     buildCollectionSubjectSchema(input.page),
     buildCollectionPageSchema(input.page),
     buildCollectionItemListSchema(input.page),
+    input.page.faq ? buildFAQPageSchema(input.page.faq, input.page.url) : null,
     breadcrumb,
   ])
 }

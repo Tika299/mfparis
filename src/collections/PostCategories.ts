@@ -1,6 +1,8 @@
 import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
+import { siloSeoFields } from '@/collections/fields/siloSeoFields'
+import { blogLandingSeoContentFields } from '@/collections/fields/seoFields'
 
 export const PostCategories: CollectionConfig = {
   slug: 'post-categories',
@@ -37,6 +39,25 @@ export const PostCategories: CollectionConfig = {
         'Mo ta danh muc bai viet luu dang HTML. Khi import se thay anh trong HTML bang media Payload.',
       rows: 20,
     }),
+    {
+      name: 'parent',
+      type: 'relationship',
+      relationTo: 'post-categories',
+      label: 'Danh mục cha',
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    ...siloSeoFields({ kind: 'post' }),
+    {
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Nội dung SEO',
+          fields: blogLandingSeoContentFields,
+        },
+      ],
+    },
     {
       name: 'wpId',
       type: 'number',

@@ -23,6 +23,15 @@ type MobileMenuProps = {
         id: string
         label: string
         link: string
+        megaGroups?: {
+            id: string
+            title: string
+            links: {
+                id: string
+                label: string
+                link: string
+            }[]
+        }[]
     }[]
     logoUrl?: string | null
     logoAlt?: string

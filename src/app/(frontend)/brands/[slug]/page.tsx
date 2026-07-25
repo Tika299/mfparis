@@ -47,6 +47,10 @@ type BrandProductsPageProps = {
   }>
 }
 
+type BrandProductsSearchParams = Awaited<
+  BrandProductsPageProps['searchParams']
+>
+
 type RelationshipMedia =
   | number
   | {
@@ -54,6 +58,11 @@ type RelationshipMedia =
   }
   | null
   | undefined
+
+type LandingFaqItem = {
+  question?: string | null
+  answer?: string | null
+}
 
 function getSiteUrl(): string {
   return (
@@ -132,8 +141,8 @@ function truncateText(
   }
 
   return `${value
-    .slice(0, maxLength - 1)
-    .trim()}…`
+    .slice(0, maxLength - 3)
+    .trim()}...`
 }
 
 function getBrandDescription(
@@ -177,11 +186,13 @@ function getMediaUrl(
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: Pick<
   BrandProductsPageProps,
-  'params'
+  'params' | 'searchParams'
 >): Promise<Metadata> {
   const { slug } = await params
+  const resolvedSearchParams = await searchParams
 
   const brand =
     await getBrandBySlug(slug)
@@ -207,12 +218,26 @@ export async function generateMetadata({
   const imageUrl = getMediaUrl(
     brand.logo,
   )
+  const shouldIndex = !hasAnyBrandListFilterParams(
+    resolvedSearchParams,
+  )
 
   return {
     title,
     description,
     alternates: {
       canonical: canonicalUrl,
+    },
+    robots: {
+      index: shouldIndex,
+      follow: true,
+      googleBot: {
+        index: shouldIndex,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
     },
     openGraph: {
       type: 'website',
@@ -241,6 +266,55 @@ export async function generateMetadata({
         : undefined,
     },
   }
+}
+
+function getBrandDisplayName(brand: any): string {
+  return (
+    brand?.h1Override ||
+    brand?.displayName ||
+    brand?.name ||
+    'Thương hiệu'
+  )
+}
+
+function getLandingFaqItems(value: unknown): { question: string; answer: string }[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value
+    .map((item: LandingFaqItem) => ({
+      question: String(item?.question || '').trim(),
+      answer: String(item?.answer || '').trim(),
+    }))
+    .filter((item) => item.question && item.answer)
+}
+
+function hasAnyBrandListFilterParams(
+  searchParams: BrandProductsSearchParams,
+): boolean {
+  for (const [key, value] of Object.entries(searchParams)) {
+    const values = Array.isArray(value) ? value : [value]
+    const hasValue = values.some(
+      (item) => typeof item === 'string' && item.trim().length > 0,
+    )
+
+    if (!hasValue) {
+      continue
+    }
+
+    if (key === 'page') {
+      const page = Number(values[0])
+
+      if (Number.isFinite(page) && page <= 1) {
+        continue
+      }
+    }
+
+    return true
+  }
+
+  return false
 }
 
 function hasRichTextContent(content: unknown): boolean {
@@ -453,12 +527,18 @@ export default async function BrandProductsPage({
   const hasDescription = Boolean(
     normalizeContentHtml(currentBrand.description),
   )
+  const introHtml = normalizeContentHtml(currentBrand.introHtml)
+  const bottomContentHtml = normalizeContentHtml(
+    currentBrand.bottomContentHtml,
+  )
+  const faqItems = getLandingFaqItems(currentBrand.faq)
+  const brandDisplayName = getBrandDisplayName(currentBrand)
 
   const brandUrl = `/brands/${encodeURIComponent(slug)}`
   const schemaGraph = buildCollectionPageSchemaGraph({
     page: {
       url: brandUrl,
-      name: currentBrand.name,
+      name: brandDisplayName,
       description: getBrandDescription(currentBrand),
       breadcrumb: [
         {
@@ -470,10 +550,15 @@ export default async function BrandProductsPage({
           url: '/brands',
         },
         {
-          name: currentBrand.name,
+          name: brandDisplayName,
           url: brandUrl,
         },
       ],
+      faq: faqItems.length > 0
+        ? {
+          questions: faqItems,
+        }
+        : undefined,
       subject: {
         type: 'Brand',
         name: currentBrand.name,
@@ -564,7 +649,7 @@ export default async function BrandProductsPage({
       <div className="border-b border-gray-100 bg-white">
         <div className="container-ux py-5 md:py-7 lg:py-9">
           <h1 className="text-2xl font-black uppercase tracking-wide md:text-3xl lg:text-4xl">
-            {currentBrand.name}
+            {brandDisplayName}
           </h1>
 
           <p className="mt-1 text-xs text-gray-500 md:text-sm">
@@ -732,6 +817,38 @@ export default async function BrandProductsPage({
                   </div>
                 </section>
               )}
+
+            {bottomContentHtml ? (
+              <section className="mt-10 rounded-2xl bg-white p-5 shadow-sm md:mt-12 md:p-8">
+                <div className="category-description prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
+                  <SafeHtmlContent html={bottomContentHtml} />
+                </div>
+              </section>
+            ) : null}
+
+            {faqItems.length > 0 ? (
+              <section className="mt-10 rounded-2xl bg-white p-5 shadow-sm md:mt-12 md:p-8">
+                <h2 className="mb-5 text-xl font-bold md:text-2xl">
+                  Câu hỏi thường gặp về {brandDisplayName}
+                </h2>
+
+                <div className="divide-y divide-gray-100">
+                  {faqItems.map((item, index) => (
+                    <details
+                      key={`${item.question}-${index}`}
+                      className="group py-4"
+                    >
+                      <summary className="cursor-pointer list-none text-base font-bold text-gray-900">
+                        {item.question}
+                      </summary>
+                      <p className="mt-3 text-sm leading-7 text-gray-600">
+                        {item.answer}
+                      </p>
+                    </details>
+                  ))}
+                </div>
+              </section>
+            ) : null}
           </main>
         </div>
       </div>

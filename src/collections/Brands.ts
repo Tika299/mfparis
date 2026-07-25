@@ -2,6 +2,7 @@ import { revalidateTag } from 'next/cache'
 import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
+import { landingSeoContentFields } from '@/collections/fields/seoFields'
 
 const revalidateBrandTags = async () => {
   try {
@@ -64,6 +65,15 @@ export const Brands: CollectionConfig = {
       name: 'isFeatured',
       type: 'checkbox',
       label: 'Thuong hieu noi bat',
+    },
+    {
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Nội dung SEO',
+          fields: landingSeoContentFields,
+        },
+      ],
     },
     {
       name: 'wpId',

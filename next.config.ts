@@ -21,6 +21,76 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: '/san-pham-moi',
+        destination: '/products?sort=-createdAt',
+        permanent: true,
+      },
+      {
+        source: '/san-pham-ban-chay',
+        destination: '/products?sort=-reviewCount',
+        permanent: true,
+      },
+      {
+        source: '/san-pham-giam-gia',
+        destination: '/products?sale=yes',
+        permanent: true,
+      },
+      {
+        source: '/san-pham-con-hang',
+        destination: '/products?availability=in-stock',
+        permanent: true,
+      },
+      {
+        source: '/nuoc-hoa/:brand',
+        destination: '/brands/:brand',
+        permanent: true,
+      },
+      {
+        source: '/danh-muc/:category',
+        destination: '/categories/:category',
+        permanent: true,
+      },
+      {
+        source: '/loc/danh-muc/:category/thuong-hieu/:brand',
+        destination: '/products?category=:category&brand=:brand',
+        permanent: true,
+      },
+      {
+        source: '/loc/thuong-hieu/:brand/danh-muc/:category',
+        destination: '/products?brand=:brand&category=:category',
+        permanent: true,
+      },
+      {
+        source: '/loc/thuong-hieu/:brand',
+        destination: '/brands/:brand',
+        permanent: true,
+      },
+      {
+        source: '/loc/danh-muc/:category',
+        destination: '/categories/:category',
+        permanent: true,
+      },
+      {
+        source: '/loc/huong/:note',
+        destination: '/products?note=:note',
+        permanent: true,
+      },
+      {
+        source: '/loc/gioi-tinh/:gender',
+        destination: '/products?gender=:gender',
+        permanent: true,
+      },
+      {
+        source: '/loc/dung-tich/:volume',
+        destination: '/products?volume=:volume',
+        permanent: true,
+      },
+      {
+        source: '/loc/thuoc-tinh/:attribute/:value',
+        destination: '/products?attribute=:attribute&value=:value',
+        permanent: true,
+      },
+      {
         source: '/shop',
         has: [
           {
@@ -35,69 +105,7 @@ const nextConfig: NextConfig = {
     ]
   },
   async rewrites() {
-    return [
-      /*
-       * Pretty URLs for filter/search pages.
-       * These are internal rewrites, not 301 redirects:
-       * users keep the clean URL while Next.js renders the existing route.
-       */
-      {
-        source: '/san-pham-moi',
-        destination: '/products?sort=-createdAt',
-      },
-      {
-        source: '/san-pham-ban-chay',
-        destination: '/products?sort=-reviewCount',
-      },
-      {
-        source: '/san-pham-giam-gia',
-        destination: '/products?sale=yes',
-      },
-      {
-        source: '/san-pham-con-hang',
-        destination: '/products?availability=in-stock',
-      },
-      {
-        source: '/nuoc-hoa/:brand',
-        destination: '/products?category=nuoc-hoa&brand=:brand',
-      },
-      {
-        source: '/danh-muc/:category',
-        destination: '/categories/:category',
-      },
-      {
-        source: '/loc/danh-muc/:category/thuong-hieu/:brand',
-        destination: '/products?category=:category&brand=:brand',
-      },
-      {
-        source: '/loc/thuong-hieu/:brand/danh-muc/:category',
-        destination: '/products?brand=:brand&category=:category',
-      },
-      {
-        source: '/loc/thuong-hieu/:brand',
-        destination: '/products?brand=:brand',
-      },
-      {
-        source: '/loc/danh-muc/:category',
-        destination: '/products?category=:category',
-      },
-      {
-        source: '/loc/huong/:note',
-        destination: '/products?note=:note',
-      },
-      {
-        source: '/loc/gioi-tinh/:gender',
-        destination: '/products?gender=:gender',
-      },
-      {
-        source: '/loc/dung-tich/:volume',
-        destination: '/products?volume=:volume',
-      },
-      {
-        source: '/loc/thuoc-tinh/:attribute/:value',
-        destination: '/products?attribute=:attribute&value=:value',
-      },
-    ]
+    return []
   },
   images: {
     formats: ['image/avif', 'image/webp'],

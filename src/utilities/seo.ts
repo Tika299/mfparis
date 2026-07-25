@@ -1,11 +1,6 @@
 export const SITE_ORIGIN = process.env.NEXT_PUBLIC_BASE_URL || 'https://mfparis.vn' as const
 
-export const INDEXABLE_FACET_KEYS = [
-    'brand',
-    'gender',
-    'scent',
-    'volume',
-] as const satisfies readonly string[]
+export const INDEXABLE_FACET_KEYS = [] as const satisfies readonly string[]
 
 export type IndexableFacetKey = (typeof INDEXABLE_FACET_KEYS)[number]
 

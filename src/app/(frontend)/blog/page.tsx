@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { OptimizedImage } from '@/components/OptimizedImage'
@@ -7,10 +9,44 @@ import { ChevronLeft, ChevronRight, Search, Sparkles, X } from 'lucide-react'
 import '@/styles/blog.css'
 import { buildCollectionPageSchemaGraph } from '@/lib/structured-data'
 
-export const metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://mfparis.vn'),
-  title: 'Blog | MF Paris Chính Hãng',
-  description: 'Cập nhật kiến thức nước hoa, mỹ phẩm, chăm sóc da và sức khỏe từ MF Paris.',
+export async function generateMetadata({
+  searchParams,
+}: PageProps): Promise<Metadata> {
+  const resolvedSearchParams = await searchParams
+  const q = resolvedSearchParams?.q?.trim() || ''
+  const categorySlug = resolvedSearchParams?.category?.trim() || ''
+  const page = Number(resolvedSearchParams?.page || 1)
+  const hasQueryState = Boolean(q || categorySlug || page > 1)
+  const canonical = categorySlug
+    ? `/blog/category/${encodeURIComponent(categorySlug)}`
+    : q
+      ? `/blog?q=${encodeURIComponent(q)}`
+      : '/blog'
+  const title = q
+    ? `Tìm kiếm blog "${q}" | MF Paris`
+    : 'Blog | MF Paris Chính Hãng'
+  const description =
+    'Cập nhật kiến thức nước hoa, mỹ phẩm, chăm sóc da và sức khỏe từ MF Paris.'
+
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://mfparis.vn'),
+    title,
+    description,
+    alternates: {
+      canonical,
+    },
+    robots: {
+      index: !hasQueryState,
+      follow: true,
+      googleBot: {
+        index: !hasQueryState,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
+  }
 }
 
 type PageProps = {
