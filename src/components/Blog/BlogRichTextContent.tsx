@@ -132,7 +132,7 @@ export function BlogMobileTocButton({ tocItems }: BlogTocNavProps) {
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={open}
-        className="fixed bottom-5 right-4 z-50 inline-flex h-11 items-center gap-2 rounded-full bg-[#E54D2E] px-4 text-[12px] font-black uppercase tracking-[0.12em] text-white shadow-[0_14px_34px_rgba(229,77,46,0.34)] transition hover:bg-[#d43f22] focus:outline-none focus:ring-4 focus:ring-red-100"
+        className="fixed left-4 bottom-[calc(env(safe-area-inset-bottom)+5.75rem)] z-[65] inline-flex h-11 items-center gap-2 rounded-full bg-[#E54D2E] px-4 text-[12px] font-black uppercase tracking-[0.12em] text-white shadow-[0_14px_34px_rgba(229,77,46,0.34)] transition hover:bg-[#d43f22] focus:outline-none focus:ring-4 focus:ring-red-100"
       >
         <ListTree size={17} strokeWidth={2.2} />
         Mục lục
@@ -140,7 +140,7 @@ export function BlogMobileTocButton({ tocItems }: BlogTocNavProps) {
 
       {open ? (
         <div
-          className="fixed inset-0 z-[70] bg-black/35 px-3 pb-4 pt-20 backdrop-blur-[2px]"
+          className="fixed inset-0 z-[80] bg-black/35 px-3 pb-4 pt-20 backdrop-blur-[2px]"
           role="dialog"
           aria-modal="true"
           aria-label="Mục lục bài viết"
