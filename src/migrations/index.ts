@@ -18,6 +18,7 @@ import * as migration_20260725_083819_silo_phase_1_3_fields from './20260725_083
 import * as migration_20260725_123754 from './20260725_123754';
 import * as migration_20260726_030821 from './20260726_030821';
 import * as migration_20260726_042909_add_media_description from './20260726_042909_add_media_description';
+import * as migration_20260726_055313 from './20260726_055313';
 
 export const migrations = [
   {
@@ -118,6 +119,11 @@ export const migrations = [
   {
     up: migration_20260726_042909_add_media_description.up,
     down: migration_20260726_042909_add_media_description.down,
-    name: '20260726_042909_add_media_description'
+    name: '20260726_042909_add_media_description',
+  },
+  {
+    up: migration_20260726_055313.up,
+    down: migration_20260726_055313.down,
+    name: '20260726_055313'
   },
 ];
