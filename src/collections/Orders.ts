@@ -416,6 +416,14 @@ const sendOrderEmail = async ({ doc, operation, req }: any) => {
     }
 
     const orderItems = Array.isArray(doc.items) ? doc.items : []
+    const customerEmail =
+      typeof doc.customerInfo?.email === 'string'
+        ? doc.customerInfo.email.trim().toLowerCase()
+        : ''
+
+    const canSendCustomerEmail =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)
+
     const orderItemRows = orderItems.length > 0
       ? orderItems
         .map((item: any) => {
@@ -512,6 +520,57 @@ const sendOrderEmail = async ({ doc, operation, req }: any) => {
       </div>
     `
 
+    const customerHtmlEmail = `
+      <div style="font-family: Arial, sans-serif; max-width: 640px; margin: auto; color: #222; border: 1px solid #eee; border-radius: 12px; overflow: hidden;">
+        <div style="background: #b72828; color: #fff; padding: 24px; text-align: center;">
+          <div style="font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase;">Marais de France</div>
+          <h2 style="margin: 10px 0 0; font-size: 24px;">Cảm ơn bạn đã đặt hàng</h2>
+        </div>
+
+        <div style="padding: 24px;">
+          <p style="margin: 0 0 12px;">Xin chào <b>${escapeEmailHTML(doc.customerInfo.fullName)}</b>,</p>
+          <p style="margin: 0 0 18px; line-height: 1.6;">
+            MF Paris đã nhận được đơn hàng <b>#${escapeEmailHTML(doc.id)}</b>. Chúng tôi sẽ kiểm tra và liên hệ xác nhận trong thời gian sớm nhất.
+          </p>
+
+          <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <thead>
+              <tr style="background: #f8f9fa;">
+                <th style="text-align: left; padding: 10px; border: 1px solid #ddd;">Sản phẩm</th>
+                <th style="text-align: center; padding: 10px; border: 1px solid #ddd;">SL</th>
+                <th style="text-align: right; padding: 10px; border: 1px solid #ddd;">Đơn giá</th>
+                <th style="text-align: right; padding: 10px; border: 1px solid #ddd;">Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${orderItemRows}
+            </tbody>
+          </table>
+
+          <div style="text-align: right; font-size: 18px; margin: 18px 0;">
+            <b>Tổng thanh toán: <span style="color: #b72828;">${formatEmailMoney(doc.totalAmount)}₫</span></b>
+          </div>
+
+          <div style="background: #f9fafb; padding: 16px; border-radius: 10px; line-height: 1.6;">
+            <p style="margin: 0 0 6px;"><b>Thông tin nhận hàng</b></p>
+            <p style="margin: 0;">SĐT: ${escapeEmailHTML(doc.customerInfo.phone)}</p>
+            <p style="margin: 0;">Địa chỉ: ${escapeEmailHTML(doc.customerInfo.address)}, ${escapeEmailHTML(doc.customerInfo.province)}</p>
+            <p style="margin: 0;">Thanh toán: ${escapeEmailHTML(String(doc.paymentMethod || '').toUpperCase())}</p>
+          </div>
+
+          <p style="margin: 18px 0 0; color: #666; line-height: 1.6;">
+            Nếu thông tin đơn hàng chưa đúng, bạn vui lòng phản hồi email này hoặc liên hệ hotline 079.29.79.299 để MF Paris hỗ trợ.
+          </p>
+
+          <p style="text-align: center; margin: 26px 0 0;">
+            <a href="${NEXT_PUBLIC_URL}" style="display: inline-block; background: #111; color: #fff; padding: 12px 22px; border-radius: 999px; text-decoration: none; font-weight: bold;">
+              Tiếp tục mua sắm
+            </a>
+          </p>
+        </div>
+      </div>
+    `
+
     try {
       await payload.sendEmail({
         to: 'vukofa9120@gmail.com', // Email bạn muốn nhận thông báo
@@ -519,7 +578,19 @@ const sendOrderEmail = async ({ doc, operation, req }: any) => {
         html: htmlEmail,
       })
     } catch (error) {
-      console.error('Lỗi gửi email:', error)
+      console.error('Lỗi gửi email đơn hàng cho shop:', error)
+    }
+
+    if (canSendCustomerEmail) {
+      try {
+        await payload.sendEmail({
+          to: customerEmail,
+          subject: `[MF Paris] Xác nhận đơn hàng #${doc.id}`,
+          html: customerHtmlEmail,
+        })
+      } catch (error) {
+        console.error('Lỗi gửi email xác nhận cho khách:', error)
+      }
     }
   }
 }

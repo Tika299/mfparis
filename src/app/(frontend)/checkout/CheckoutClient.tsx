@@ -621,6 +621,18 @@ export default function CheckoutPage({
                                     <Input id="phone" name="phone" type="tel" placeholder="0901234567" required className="h-12 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#b72828]/20" />
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
+                                    <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Email nhận thông tin đơn hàng</Label>
+                                    <Input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        inputMode="email"
+                                        autoComplete="email"
+                                        placeholder="email@example.com"
+                                        className="h-12 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#b72828]/20"
+                                    />
+                                </div>
+                                <div className="md:col-span-2 space-y-2">
                                     <Label htmlFor="province" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Tỉnh / Thành phố</Label>
                                     <select
                                         id="province"
