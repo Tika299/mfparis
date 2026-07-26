@@ -17,6 +17,7 @@ import * as migration_20260721_140856_add_product_search_keywords from './202607
 import * as migration_20260725_083819_silo_phase_1_3_fields from './20260725_083819_silo_phase_1_3_fields';
 import * as migration_20260725_123754 from './20260725_123754';
 import * as migration_20260726_030821 from './20260726_030821';
+import * as migration_20260726_042909_add_media_description from './20260726_042909_add_media_description';
 
 export const migrations = [
   {
@@ -112,6 +113,11 @@ export const migrations = [
   {
     up: migration_20260726_030821.up,
     down: migration_20260726_030821.down,
-    name: '20260726_030821'
+    name: '20260726_030821',
+  },
+  {
+    up: migration_20260726_042909_add_media_description.up,
+    down: migration_20260726_042909_add_media_description.down,
+    name: '20260726_042909_add_media_description'
   },
 ];

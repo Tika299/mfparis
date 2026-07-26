@@ -2,11 +2,121 @@ import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 
+
+const DEFAULT_BLOG_AUTHOR_DATA = {
+  name: 'Marais de France',
+  slug: 'mfparis',
+  title: 'MF Paris Editorial',
+  url: '/author/mfparis/',
+  bio: 'Marais de France là đội ngũ yêu thích hương thơm, chia sẻ kinh nghiệm đánh giá nước hoa và mỹ phẩm nhằm giúp khách hàng lựa chọn sản phẩm phù hợp.',
+  isDefault: true,
+}
+
+function getRelationshipId(value: unknown): number | string | null {
+  if (typeof value === 'number' || typeof value === 'string') {
+    return value
+  }
+
+  if (value && typeof value === 'object') {
+    const id = (value as { id?: number | string }).id
+
+    if (typeof id === 'number' || typeof id === 'string') {
+      return id
+    }
+  }
+
+  return null
+}
+
+async function findDefaultBlogAuthorId(req: any): Promise<number | string | null> {
+  const payload = req?.payload
+
+  if (!payload?.find) {
+    return null
+  }
+
+  const defaultResult = await payload.find({
+    collection: 'blog-authors',
+    depth: 0,
+    limit: 1,
+    pagination: false,
+    sort: '-updatedAt',
+    where: {
+      isDefault: {
+        equals: true,
+      },
+    },
+  })
+
+  const defaultId = getRelationshipId(defaultResult?.docs?.[0])
+
+  if (defaultId) {
+    return defaultId
+  }
+
+  const slugResult = await payload.find({
+    collection: 'blog-authors',
+    depth: 0,
+    limit: 1,
+    pagination: false,
+    where: {
+      slug: {
+        equals: DEFAULT_BLOG_AUTHOR_DATA.slug,
+      },
+    },
+  })
+
+  const slugId = getRelationshipId(slugResult?.docs?.[0])
+
+  if (slugId) {
+    return slugId
+  }
+
+  if (!payload?.create) {
+    return null
+  }
+
+  const created = await payload.create({
+    collection: 'blog-authors',
+    data: DEFAULT_BLOG_AUTHOR_DATA,
+    overrideAccess: true,
+  })
+
+  return getRelationshipId(created)
+}
+
+async function assignDefaultBlogAuthor({ data, originalDoc, req }: any) {
+  if (!data || typeof data !== 'object') {
+    return data
+  }
+
+  const incomingAuthorId = getRelationshipId(data.authorProfile)
+  const existingAuthorId = getRelationshipId(originalDoc?.authorProfile)
+
+  if (incomingAuthorId || (data.authorProfile === undefined && existingAuthorId)) {
+    return data
+  }
+
+  const defaultAuthorId = await findDefaultBlogAuthorId(req)
+
+  if (!defaultAuthorId) {
+    return data
+  }
+
+  return {
+    ...data,
+    authorProfile: defaultAuthorId,
+  }
+}
+
 export const Posts: CollectionConfig = {
   slug: 'posts',
   admin: {
     useAsTitle: 'title',
     group: 'Nội dung',
+  },
+  hooks: {
+    beforeValidate: [assignDefaultBlogAuthor],
   },
   fields: [
     {
@@ -54,46 +164,8 @@ export const Posts: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description:
-          'Ch\u1ecdn t\u00e1c gi\u1ea3 t\u1eeb Blog Authors. N\u1ebfu b\u1ecf tr\u1ed1ng, frontend s\u1ebd d\u00f9ng th\u00f4ng tin t\u00e1c gi\u1ea3 c\u0169 trong b\u00e0i ho\u1eb7c t\u00e1c gi\u1ea3 m\u1eb7c \u0111\u1ecbnh.',
+          'Chọn tác giả từ Blog Authors. Nếu bỏ trống, hệ thống sẽ tự gán tác giả mặc định.',
       },
-    },
-    {
-      name: 'author',
-      type: 'group',
-      label: 'Tác giả',
-      fields: [
-        {
-          name: 'name',
-          type: 'text',
-          label: 'Tên tác giả',
-          defaultValue: 'Marais de France',
-        },
-        {
-          name: 'title',
-          type: 'text',
-          label: 'Chức danh',
-          defaultValue: 'MF Paris Editorial',
-        },
-        {
-          name: 'avatar',
-          type: 'upload',
-          relationTo: 'media',
-          label: 'Ảnh tác giả',
-        },
-        {
-          name: 'url',
-          type: 'text',
-          label: 'URL tác giả',
-          defaultValue: '/author/mfparis/',
-        },
-        {
-          name: 'bio',
-          type: 'textarea',
-          label: 'Mô tả ngắn',
-          defaultValue:
-            'Marais de France là đội ngũ yêu thích hương thơm, chia sẻ kinh nghiệm đánh giá nước hoa và mỹ phẩm nhằm giúp khách hàng lựa chọn sản phẩm phù hợp.',
-        },
-      ],
     },
     {
       name: 'reviewer',

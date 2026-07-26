@@ -398,42 +398,109 @@ const sendOrderEmail = async ({ doc, operation, req }: any) => {
   if (operation === 'create') {
     const { payload } = req
     console.log('Dữ liệu đơn hàng:', doc.id)
+
+    const escapeEmailHTML = (value: unknown): string =>
+      String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+
+    const formatEmailMoney = (value: unknown): string => {
+      const amount = typeof value === 'number' ? value : Number(value ?? 0)
+
+      return Number.isFinite(amount)
+        ? amount.toLocaleString('vi-VN')
+        : '0'
+    }
+
+    const orderItems = Array.isArray(doc.items) ? doc.items : []
+    const orderItemRows = orderItems.length > 0
+      ? orderItems
+        .map((item: any) => {
+          const product =
+            item.product &&
+              typeof item.product === 'object'
+              ? item.product
+              : null
+
+          const title =
+            item.productTitleSnapshot ||
+            product?.title ||
+            'Sản phẩm'
+
+          const variantName =
+            item.variantNameSnapshot
+              ? `<div style="margin-top: 4px; color: #555; font-size: 12px;">${escapeEmailHTML(item.variantNameSnapshot)}</div>`
+              : ''
+
+          const sku =
+            item.skuSnapshot
+              ? `<div style="margin-top: 2px; color: #777; font-size: 12px;">SKU: ${escapeEmailHTML(item.skuSnapshot)}</div>`
+              : ''
+
+          const quantity =
+            typeof item.quantity === 'number' &&
+              Number.isFinite(item.quantity)
+              ? item.quantity
+              : 0
+
+          const price =
+            typeof item.priceAtPurchase === 'number' &&
+              Number.isFinite(item.priceAtPurchase)
+              ? item.priceAtPurchase
+              : 0
+
+          return `
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">
+                  <b>${escapeEmailHTML(title)}</b>
+                  ${variantName}
+                  ${sku}
+                </td>
+                <td style="text-align: center; padding: 8px; border: 1px solid #ddd;">${quantity}</td>
+                <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">${formatEmailMoney(price)}₫</td>
+                <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">${formatEmailMoney(quantity * price)}₫</td>
+              </tr>
+            `
+        })
+        .join('')
+      : `
+              <tr>
+                <td colspan="4" style="padding: 12px; border: 1px solid #ddd; text-align: center; color: #777;">
+                  Chưa có sản phẩm trong đơn.
+                </td>
+              </tr>
+            `
+
     // Nội dung Email dạng HTML
     const htmlEmail = `
       <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px;">
         <h2 style="text-align: center; color: #d90429;">ĐƠN HÀNG MỚI #${doc.id}</h2>
-        <p>Chào chủ shop, bạn có một đơn hàng mới từ <b>${doc.customerInfo.fullName}</b>.</p>
+        <p>Chào chủ shop, bạn có một đơn hàng mới từ <b>${escapeEmailHTML(doc.customerInfo.fullName)}</b>.</p>
         
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <thead>
             <tr style="background: #f8f9fa;">
               <th style="text-align: left; padding: 8px; border: 1px solid #ddd;">Sản phẩm</th>
               <th style="text-align: center; padding: 8px; border: 1px solid #ddd;">SL</th>
-              <th style="text-align: right; padding: 8px; border: 1px solid #ddd;">Giá</th>
+              <th style="text-align: right; padding: 8px; border: 1px solid #ddd;">Đơn giá</th>
+              <th style="text-align: right; padding: 8px; border: 1px solid #ddd;">Thành tiền</th>
             </tr>
           </thead>
           <tbody>
-            ${doc.items
-        .map(
-          (item: any) => `
-              <tr>
-                <td style="padding: 8px; border: 1px solid #ddd;">${item.product.title || 'Sản phẩm'}</td>
-                <td style="text-align: center; padding: 8px; border: 1px solid #ddd;">${item.quantity}</td>
-                <td style="text-align: right; padding: 8px; border: 1px solid #ddd;">${item.priceAtPurchase.toLocaleString()}₫</td>
-              </tr>
-            `,
-        )
-        .join('')}
+            ${orderItemRows}
           </tbody>
         </table>
 
-        <p style="text-align: right; font-size: 18px;"><b>Tổng cộng: <span style="color: #d90429;">${doc.totalAmount.toLocaleString()}₫</span></b></p>
+        <p style="text-align: right; font-size: 18px;"><b>Tổng cộng: <span style="color: #d90429;">${formatEmailMoney(doc.totalAmount)}₫</span></b></p>
         
         <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px;">
           <h4 style="margin-top: 0;">Thông tin giao hàng:</h4>
-          <p style="margin: 5px 0;">SĐT: ${doc.customerInfo.phone}</p>
-          <p style="margin: 5px 0;">Địa chỉ: ${doc.customerInfo.address}, ${doc.customerInfo.province}</p>
-          <p style="margin: 5px 0;">Thanh toán: ${doc.paymentMethod.toUpperCase()}</p>
+          <p style="margin: 5px 0;">SĐT: ${escapeEmailHTML(doc.customerInfo.phone)}</p>
+          <p style="margin: 5px 0;">Địa chỉ: ${escapeEmailHTML(doc.customerInfo.address)}, ${escapeEmailHTML(doc.customerInfo.province)}</p>
+          <p style="margin: 5px 0;">Thanh toán: ${escapeEmailHTML(String(doc.paymentMethod || '').toUpperCase())}</p>
         </div>
         
         <p style="text-align: center; margin-top: 30px;">
@@ -447,7 +514,7 @@ const sendOrderEmail = async ({ doc, operation, req }: any) => {
 
     try {
       await payload.sendEmail({
-        to: 'mfparisvn@gmail.com', // Email bạn muốn nhận thông báo
+        to: 'vukofa9120@gmail.com', // Email bạn muốn nhận thông báo
         subject: `[MF PARIS] Đơn hàng mới #${doc.id} - ${doc.customerInfo.fullName}`,
         html: htmlEmail,
       })
@@ -470,6 +537,17 @@ export const Orders: CollectionConfig = {
     group: 'Kinh doanh',
   },
   fields: [
+    {
+      name: 'adminOrderSummary',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: {
+            path: '@/components/Admin/OrderAdminSummary#OrderAdminSummary',
+          },
+        },
+      },
+    },
     // TRƯỜNG QUAN TRỌNG NHẤT: Thêm trường customer để sửa lỗi Join
     {
       name: 'customer',

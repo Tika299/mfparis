@@ -212,7 +212,15 @@ export interface Media {
    * Tên để quản trị tìm kiếm media. Đổi tên này sẽ cập nhật ở các nội dung dùng relationship media.
    */
   title?: string | null;
+  /**
+   * Đổi phần tên file trong URL ảnh, ví dụ ten-anh-moi.webp. Nếu không nhập đuôi file, hệ thống giữ đuôi hiện tại.
+   */
+  fileName?: string | null;
   caption?: string | null;
+  /**
+   * Mô tả nội dung/hậu trường của ảnh, tương tự trường Description trong WordPress Media.
+   */
+  description?: string | null;
   wpId?: number | null;
   sourceUrl?: string | null;
   sourceFilename?: string | null;
@@ -787,16 +795,9 @@ export interface Post {
   thumbnail: number | Media;
   categories?: (number | PostCategory)[] | null;
   /**
-   * Chọn tác giả từ Blog Authors. Nếu bỏ trống, frontend sẽ dùng thông tin tác giả cũ trong bài hoặc tác giả mặc định.
+   * Chọn tác giả từ Blog Authors. Nếu bỏ trống, hệ thống sẽ tự gán tác giả mặc định.
    */
   authorProfile?: (number | null) | BlogAuthor;
-  author?: {
-    name?: string | null;
-    title?: string | null;
-    avatar?: (number | null) | Media;
-    url?: string | null;
-    bio?: string | null;
-  };
   reviewer?: {
     name?: string | null;
     title?: string | null;
@@ -1315,7 +1316,9 @@ export interface UsersSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   title?: T;
+  fileName?: T;
   caption?: T;
+  description?: T;
   wpId?: T;
   sourceUrl?: T;
   sourceFilename?: T;
@@ -1639,15 +1642,6 @@ export interface PostsSelect<T extends boolean = true> {
   thumbnail?: T;
   categories?: T;
   authorProfile?: T;
-  author?:
-    | T
-    | {
-        name?: T;
-        title?: T;
-        avatar?: T;
-        url?: T;
-        bio?: T;
-      };
   reviewer?:
     | T
     | {
@@ -2046,6 +2040,22 @@ export interface SiteSetting {
       | {
           label: string;
           link: string;
+          /**
+           * Chỉ là nhãn nhóm trong menu, frontend render bằng div/span để không ảnh hưởng cấu trúc heading SEO.
+           */
+          megaGroups?:
+            | {
+                title: string;
+                links?:
+                  | {
+                      label: string;
+                      link: string;
+                      id?: string | null;
+                    }[]
+                  | null;
+                id?: string | null;
+              }[]
+            | null;
           id?: string | null;
         }[]
       | null;
@@ -2075,6 +2085,16 @@ export interface SiteSetting {
           icon: 'facebook' | 'instagram' | 'youtube' | 'tiktok' | 'zalo';
           name: string;
           url: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Các link ở cột footer Về chúng tôi. Tiêu đề cột chỉ hiển thị bằng div, không dùng thẻ heading.
+     */
+    aboutLinks?:
+      | {
+          label: string;
+          link: string;
           id?: string | null;
         }[]
       | null;
@@ -2156,6 +2176,19 @@ export interface SiteSettingsSelect<T extends boolean = true> {
           | {
               label?: T;
               link?: T;
+              megaGroups?:
+                | T
+                | {
+                    title?: T;
+                    links?:
+                      | T
+                      | {
+                          label?: T;
+                          link?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                  };
               id?: T;
             };
       };
@@ -2191,6 +2224,13 @@ export interface SiteSettingsSelect<T extends boolean = true> {
               icon?: T;
               name?: T;
               url?: T;
+              id?: T;
+            };
+        aboutLinks?:
+          | T
+          | {
+              label?: T;
+              link?: T;
               id?: T;
             };
         policyLinks?:

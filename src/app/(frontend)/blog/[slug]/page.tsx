@@ -806,13 +806,9 @@ export default async function BlogPostPage({
     defaultAuthorResult.docs[0],
     siteFallbackAuthor,
   )
-  const legacyAuthorInfo = getBlogPersonInfo(
-    post.author,
-    defaultAuthorInfo,
-  )
   const authorInfo = getBlogAuthorProfileInfo(
     post.authorProfile,
-    legacyAuthorInfo,
+    defaultAuthorInfo,
   )
   const authorHref = authorInfo.url || '/author/mfparis/'
   const reviewerInfo = getBlogPersonInfo(post.reviewer, {

@@ -47,6 +47,7 @@
     "repair:blog-content": "tsx src/scripts/repair-blog-content-from-wp.ts",
     "repair:imported-dates": "tsx src/scripts/repair-imported-dates.ts",
     "repair:imported-categories": "tsx src/scripts/repair-imported-categories.ts",
+    "repair:blog-authors": "tsx src/scripts/assign-default-blog-author.ts",
     "silo:phase1-3": "tsx src/scripts/apply-silo-phase-1-3.ts",
     "silo:redirects": "tsx src/scripts/apply-silo-phase-1-3.ts --only=redirects --all-priorities",
     "silo:redirects:apply": "tsx src/scripts/apply-silo-phase-1-3.ts --only=redirects --all-priorities --apply-redirects --yes",
