@@ -1,4 +1,5 @@
-FROM node:22.17.0-alpine AS base
+ARG NODE_IMAGE=public.ecr.aws/docker/library/node:22.17.0-alpine
+FROM ${NODE_IMAGE} AS base
 
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
