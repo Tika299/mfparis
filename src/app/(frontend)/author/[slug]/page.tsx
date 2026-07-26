@@ -71,23 +71,10 @@ async function getAuthor(slug: string) {
 
 async function getAuthorPosts(author: any) {
   const payload = await getPayload({ config: configPromise })
-  const authorUrl = author?.slug ? '/author/' + author.slug + '/' : ''
-  const where: any = {
-    or: [
-      {
-        authorProfile: {
-          equals: author.id,
-        },
-      },
-    ],
-  }
-
-  if (authorUrl) {
-    where.or.push({
-      'author.url': {
-        contains: authorUrl,
-      },
-    })
+  const where = {
+    authorProfile: {
+      equals: author.id,
+    },
   }
 
   const posts = await payload.find({
