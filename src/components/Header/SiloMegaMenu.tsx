@@ -85,9 +85,9 @@ export function SiloMegaMenu({ navItems }: SiloMegaMenuProps) {
                     aria-label={group.title}
                     className="min-w-0"
                   >
-                    <h3 className="mb-3 text-[12px] font-bold uppercase tracking-normal text-[#ad0509]">
+                    <div className="mb-3 text-[12px] font-bold uppercase tracking-normal text-[#ad0509]">
                       {group.title}
-                    </h3>
+                    </div>
 
                     <ul className="space-y-2">
                       {group.links.map((link) => (

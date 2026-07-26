@@ -732,9 +732,9 @@ function FooterHeading({
   children: React.ReactNode
 }>) {
   return (
-    <h3 className="text-[14px] font-bold uppercase leading-5 tracking-[0.015em] text-white sm:text-[15px]">
+    <div className="text-[14px] font-bold uppercase leading-5 tracking-[0.015em] text-white sm:text-[15px]">
       {children}
-    </h3>
+    </div>
   )
 }
 

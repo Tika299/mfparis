@@ -3,7 +3,6 @@ import Link from 'next/link'
 import {
   Gift,
   MapPin,
-  Menu,
   ShoppingBag,
   Smartphone,
   UserRound,
@@ -18,119 +17,108 @@ import { getHeaderSearchBrands } from '@/data/getHeaderSearchBrands'
 import { getSiteSettings } from '@/data/getSiteSettings'
 import { HeaderHeightSync } from './HeaderHeightSync'
 
-type HeaderNavItem = {
+type HeaderNavLink = {
   id: string
   label: string
   link: string
-  megaGroups?: {
-    id: string
-    title: string
-    links: {
-      id: string
-      label: string
-      link: string
-    }[]
-  }[]
 }
 
-const siloNavItems: HeaderNavItem[] = [
-  {
-    id: 'nuoc-hoa',
-    label: 'Nước Hoa',
-    link: '/categories/nuoc-hoa',
-    megaGroups: [
-      {
-        id: 'nuoc-hoa-theo-nguoi-dung',
-        title: 'Theo người dùng',
-        links: [
-          { id: 'nuoc-hoa-nam', label: 'Nước hoa nam', link: '/categories/nuoc-hoa-nam' },
-          { id: 'nuoc-hoa-nu', label: 'Nước hoa nữ', link: '/categories/nuoc-hoa-nu' },
-          { id: 'nuoc-hoa-unisex', label: 'Nước hoa unisex', link: '/categories/nuoc-hoa-unisex' },
-          { id: 'nuoc-hoa-mini', label: 'Nước hoa mini', link: '/categories/nuoc-hoa-mini' },
-        ],
-      },
-      {
-        id: 'nuoc-hoa-theo-phan-khuc',
-        title: 'Theo phân khúc',
-        links: [
-          { id: 'nuoc-hoa-niche', label: 'Nước hoa niche', link: '/categories/nuoc-hoa-niche' },
-          { id: 'nuoc-hoa-designer', label: 'Nước hoa designer', link: '/categories/nuoc-hoa-designer' },
-          { id: 'nuoc-hoa-cao-cap', label: 'Nước hoa cao cấp', link: '/categories/nuoc-hoa-cao-cap' },
-          { id: 'gift-set-nuoc-hoa', label: 'Gift set nước hoa', link: '/categories/gift-set-nuoc-hoa' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'my-pham',
-    label: 'Mỹ Phẩm',
-    link: '/categories/my-pham',
-    megaGroups: [
-      {
-        id: 'my-pham-lam-dep',
-        title: 'Làm đẹp',
-        links: [
-          { id: 'cham-soc-da', label: 'Chăm sóc da', link: '/categories/cham-soc-da' },
-          { id: 'cham-soc-co-the', label: 'Chăm sóc cơ thể', link: '/categories/cham-soc-co-the' },
-          { id: 'cham-soc-toc', label: 'Chăm sóc tóc', link: '/categories/cham-soc-toc' },
-          { id: 'trang-diem', label: 'Trang điểm', link: '/categories/trang-diem' },
-        ],
-      },
-      {
-        id: 'my-pham-nhu-cau',
-        title: 'Theo nhu cầu',
-        links: [
-          { id: 'chong-nang', label: 'Chống nắng', link: '/categories/chong-nang' },
-          { id: 'lam-sach-da', label: 'Làm sạch da', link: '/categories/lam-sach-da' },
-          { id: 'duong-am', label: 'Dưỡng ẩm', link: '/categories/duong-am' },
-          { id: 'dau-xa', label: 'Dầu xả', link: '/categories/dau-xa' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'me-va-be',
-    label: 'Mẹ & Bé',
-    link: '/categories/me-va-be',
-    megaGroups: [
-      {
-        id: 'me-va-be-theo-nguoi-dung',
-        title: 'Theo người dùng',
-        links: [
-          { id: 'cham-soc-me-bau', label: 'Chăm sóc mẹ bầu', link: '/categories/cham-soc-me-bau' },
-          { id: 'cham-soc-be', label: 'Chăm sóc bé', link: '/categories/cham-soc-be' },
-          { id: 'dinh-duong-cho-me', label: 'Dinh dưỡng cho mẹ', link: '/categories/dinh-duong-cho-me' },
-          { id: 'goc-me-va-be', label: 'Góc mẹ và bé', link: '/categories/goc-me-va-be' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'thuc-pham-chuc-nang',
-    label: 'Thực phẩm bảo vệ sức khỏe',
-    link: '/categories/thuc-pham-chuc-nang',
-    megaGroups: [
-      {
-        id: 'suc-khoe-ho-tro',
-        title: 'Hỗ trợ sức khỏe',
-        links: [
-          { id: 'vitamin-khoang-chat', label: 'Vitamin & khoáng chất', link: '/categories/vitamin-khoang-chat' },
-          { id: 'omega-3', label: 'Omega 3', link: '/categories/omega-3' },
-          { id: 'ho-hap-ho-xoang', label: 'Hô hấp, ho xoang', link: '/categories/ho-hap-ho-xoang' },
-          { id: 'giam-mo', label: 'Giảm mỡ', link: '/categories/giam-mo' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'uu-dai',
-    label: 'Ưu đãi',
-    link: '/vouchers',
-  },
-]
+type HeaderNavGroup = {
+  id: string
+  title: string
+  links: HeaderNavLink[]
+}
 
-function buildSiloNavItems(_cmsNavItems: HeaderNavItem[]): HeaderNavItem[] {
-  return siloNavItems
+type HeaderNavItem = HeaderNavLink & {
+  megaGroups?: HeaderNavGroup[]
+}
+
+function normalizeMenuText(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : ''
+}
+
+function normalizeMenuLink(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : ''
+}
+
+function createMenuId(label: string, index: number): string {
+  return label
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-') + '-' + index
+}
+
+function normalizeMenuLinks(value: unknown): HeaderNavLink[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value.reduce<HeaderNavLink[]>((result, item, index) => {
+    const label = normalizeMenuText(item?.label)
+    const link = normalizeMenuLink(item?.link)
+
+    if (!label || !link) {
+      return result
+    }
+
+    result.push({
+      id: String(item?.id ?? createMenuId(label, index)),
+      label,
+      link,
+    })
+
+    return result
+  }, [])
+}
+
+function normalizeMegaGroups(value: unknown): HeaderNavGroup[] | undefined {
+  if (!Array.isArray(value)) {
+    return undefined
+  }
+
+  const groups = value.reduce<HeaderNavGroup[]>((result, group, index) => {
+    const title = normalizeMenuText(group?.title)
+    const links = normalizeMenuLinks(group?.links)
+
+    if (!title || links.length === 0) {
+      return result
+    }
+
+    result.push({
+      id: String(group?.id ?? createMenuId(title, index)),
+      title,
+      links,
+    })
+
+    return result
+  }, [])
+
+  return groups.length > 0 ? groups : undefined
+}
+
+function buildHeaderNavItems(cmsNavItems: unknown): HeaderNavItem[] {
+  if (!Array.isArray(cmsNavItems)) {
+    return []
+  }
+
+  return cmsNavItems.reduce<HeaderNavItem[]>((result, item, index) => {
+    const label = normalizeMenuText(item?.label)
+    const link = normalizeMenuLink(item?.link)
+
+    if (!label || !link) {
+      return result
+    }
+
+    result.push({
+      id: String(item?.id ?? createMenuId(label, index)),
+      label,
+      link,
+      megaGroups: normalizeMegaGroups(item?.megaGroups),
+    })
+
+    return result
+  }, [])
 }
 
 export const Header = async () => {
@@ -157,35 +145,7 @@ export const Header = async () => {
       logo.alt
       ? logo.alt
       : 'Marais de France'
-
-  const cmsNavItems = (settings.header?.navItems ?? []).reduce<HeaderNavItem[]>((result, item, index) => {
-    const label =
-      typeof item?.label === 'string'
-        ? item.label.trim()
-        : ''
-
-    const link =
-      typeof item?.link === 'string'
-        ? item.link.trim()
-        : ''
-
-    if (!label || !link) {
-      return result
-    }
-
-    result.push({
-      id: String(
-        item.id ??
-        `${label.toLowerCase().replaceAll(' ', '-')}-${index}`,
-      ),
-      label,
-      link,
-    })
-
-    return result
-  }, [])
-
-  const navItems = buildSiloNavItems(cmsNavItems)
+  const navItems = buildHeaderNavItems(settings.header?.navItems)
 
   return (
     <header
@@ -362,21 +322,6 @@ export const Header = async () => {
         {/* DESKTOP NAVIGATION */}
         <div className="h-[49px] border-y border-[#ececec] bg-white">
           <div className="mx-auto flex h-full w-full max-w-[1280px] items-center px-7">
-            {/* DANH MỤC */}
-            <Link
-              href="/categories"
-              className="group flex h-full shrink-0 items-center gap-3 pr-10 text-[12.5px] font-medium text-[#202020]"
-            >
-              <Menu
-                aria-hidden="true"
-                size={21}
-                strokeWidth={3}
-                className="text-[#7d0007] transition-colors group-hover:text-[#ad0509]"
-              />
-
-              <span>Danh mục</span>
-            </Link>
-
             <SiloMegaMenu navItems={navItems} />
           </div>
         </div>

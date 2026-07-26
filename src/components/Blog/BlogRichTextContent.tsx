@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { ListTree, X } from 'lucide-react'
 import { ExpandableContent } from '@/components/ExpandableContent'
 import { addHeadingIds } from '@/lib/html/contentHtml'
 
@@ -86,6 +87,105 @@ export function BlogRichTextContent({
       >
         <div dangerouslySetInnerHTML={{ __html: html }} />
       </ExpandableContent>
+    </div>
+  )
+}
+
+
+export function BlogMobileTocButton({ tocItems }: BlogTocNavProps) {
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (!open) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [open])
+
+  if (tocItems.length === 0) {
+    return null
+  }
+
+  const selectHeading = (id: string) => {
+    setOpen(false)
+
+    window.dispatchEvent(
+      new CustomEvent(BLOG_TOC_SCROLL_EVENT, {
+        detail: { id },
+      }),
+    )
+  }
+
+  return (
+    <div className="lg:hidden">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        className="fixed bottom-5 right-4 z-50 inline-flex h-11 items-center gap-2 rounded-full bg-[#E54D2E] px-4 text-[12px] font-black uppercase tracking-[0.12em] text-white shadow-[0_14px_34px_rgba(229,77,46,0.34)] transition hover:bg-[#d43f22] focus:outline-none focus:ring-4 focus:ring-red-100"
+      >
+        <ListTree size={17} strokeWidth={2.2} />
+        Mục lục
+      </button>
+
+      {open ? (
+        <div
+          className="fixed inset-0 z-[70] bg-black/35 px-3 pb-4 pt-20 backdrop-blur-[2px]"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mục lục bài viết"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="ml-auto flex max-h-[72vh] w-full max-w-[420px] flex-col overflow-hidden rounded-[1.5rem] bg-white shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+              <div className="flex items-center gap-2 text-[12px] font-black uppercase tracking-[0.18em] text-gray-950">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-red-50 text-[#E54D2E]">
+                  <ListTree size={17} strokeWidth={2.2} />
+                </span>
+                Mục lục bài viết
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Đóng mục lục"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-50 hover:text-gray-900"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <nav className="overflow-y-auto px-3 py-3">
+              {tocItems.map((item, index) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => selectHeading(item.id)}
+                  className="flex w-full gap-3 rounded-2xl px-3 py-3 text-left text-sm leading-6 text-gray-700 transition hover:bg-red-50 hover:text-[#E54D2E]"
+                >
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[11px] font-black text-gray-500">
+                    {index + 1}
+                  </span>
+                  <span className="font-semibold">{item.text}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

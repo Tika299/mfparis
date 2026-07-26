@@ -14,6 +14,7 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import {
+  BlogMobileTocButton,
   BlogRichTextContent,
   BlogTocNav,
 } from '@/components/Blog/BlogRichTextContent'
@@ -1093,6 +1094,8 @@ export default async function BlogPostPage({
                 />
               </div>
 
+              <BlogMobileTocButton tocItems={tocItems} />
+
               <BlogRichTextContent
                 content={post.content}
                 tocItems={tocItems}
@@ -1251,13 +1254,13 @@ export default async function BlogPostPage({
               </button>
             </form>
 
-            <div className="space-y-10 lg:sticky lg:top-[190px]">
+            <div className="hidden space-y-10 lg:sticky lg:top-[190px] lg:block">
               {tocItems.length > 0 && (
                 <div className="rounded-[2.5rem] border border-gray-100 bg-white p-8 shadow-sm">
-                  <h3 className="mb-2 flex items-center gap-3 text-[13px] font-black uppercase tracking-[0.2em] text-gray-900">
+                  <div className="mb-2 flex items-center gap-3 text-[13px] font-black uppercase tracking-[0.2em] text-gray-900">
                     <span className="h-5 w-1 bg-primary"></span>
                     Mục lục
-                  </h3>
+                  </div>
 
                   <BlogTocNav tocItems={tocItems} />
                 </div>

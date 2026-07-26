@@ -55,16 +55,81 @@ export const SiteSettings: GlobalConfig = {
           label: 'Menu điều hướng',
           fields: [
             {
-              name: 'label',
-              type: 'text',
-              label: 'Tên mục menu (VD: Nước hoa)',
-              required: true,
+              type: 'row',
+              fields: [
+                {
+                  name: 'label',
+                  type: 'text',
+                  label: 'Tên mục menu',
+                  required: true,
+                  admin: {
+                    width: '40%',
+                    placeholder: 'Nước hoa',
+                  },
+                },
+                {
+                  name: 'link',
+                  type: 'text',
+                  label: 'Đường dẫn',
+                  required: true,
+                  admin: {
+                    width: '60%',
+                    placeholder: '/categories/nuoc-hoa',
+                  },
+                },
+              ],
             },
             {
-              name: 'link',
-              type: 'text',
-              label: 'Đường dẫn (VD: /categories/nuoc-hoa)',
-              required: true,
+              name: 'megaGroups',
+              type: 'array',
+              label: 'Nhóm mega menu',
+              admin: {
+                description:
+                  'Chỉ là nhãn nhóm trong menu, frontend render bằng div/span để không ảnh hưởng cấu trúc heading SEO.',
+              },
+              fields: [
+                {
+                  name: 'title',
+                  type: 'text',
+                  label: 'Tên nhóm',
+                  required: true,
+                  admin: {
+                    placeholder: 'Theo người dùng',
+                  },
+                },
+                {
+                  name: 'links',
+                  type: 'array',
+                  label: 'Liên kết trong nhóm',
+                  fields: [
+                    {
+                      type: 'row',
+                      fields: [
+                        {
+                          name: 'label',
+                          type: 'text',
+                          label: 'Tên liên kết',
+                          required: true,
+                          admin: {
+                            width: '40%',
+                            placeholder: 'Nước hoa nam',
+                          },
+                        },
+                        {
+                          name: 'link',
+                          type: 'text',
+                          label: 'Đường dẫn',
+                          required: true,
+                          admin: {
+                            width: '60%',
+                            placeholder: '/categories/nuoc-hoa-nam',
+                          },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
             },
           ],
         },
@@ -198,6 +263,32 @@ export const SiteSettings: GlobalConfig = {
               type: 'text',
               label: 'URL',
               required: true,
+            },
+          ],
+        },
+        {
+          name: 'aboutLinks',
+          type: 'array',
+          label: 'Liên kết Về chúng tôi',
+          admin: {
+            description:
+              'Các link ở cột footer Về chúng tôi. Tiêu đề cột chỉ hiển thị bằng div, không dùng thẻ heading.',
+          },
+          fields: [
+            {
+              name: 'label',
+              type: 'text',
+              label: 'Tên liên kết',
+              required: true,
+            },
+            {
+              name: 'link',
+              type: 'text',
+              label: 'Đường dẫn',
+              required: true,
+              admin: {
+                placeholder: '/about',
+              },
             },
           ],
         },
