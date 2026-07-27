@@ -5,7 +5,6 @@ import {
   MapPin,
   ShoppingBag,
   Smartphone,
-  UserRound,
 } from 'lucide-react'
 
 import { SearchBar } from './SearchBar'
@@ -226,7 +225,7 @@ export const Header = async () => {
 
         {/* MAIN HEADER */}
         <div className="bg-white">
-          <div className="mx-auto grid h-[86px] w-full max-w-[1280px] grid-cols-[269px_minmax(315px,1fr)_305px] items-center gap-x-6 px-7">
+          <div className="mx-auto grid h-[86px] w-full max-w-[1280px] grid-cols-[269px_minmax(315px,1fr)_220px] items-center gap-x-6 px-7">
             {/* LOGO */}
             <div className="flex items-center pl-6">
               <Link
@@ -262,32 +261,8 @@ export const Header = async () => {
               <SearchBar brandTargets={searchBrandTargets} />
             </div>
 
-            {/* ACCOUNT / WISHLIST / CART */}
-            <div className="flex w-[305px] items-center justify-end gap-6">
-              {/* ACCOUNT */}
-              <Link
-                href="/tai-khoan"
-                className="group flex items-center gap-2 text-[#252525]"
-                aria-label="Tài khoản"
-              >
-                <UserRound
-                  aria-hidden="true"
-                  size={26}
-                  strokeWidth={1.65}
-                  className="shrink-0 transition-colors group-hover:text-[#ad0509]"
-                />
-
-                <span className="whitespace-nowrap text-[12px] leading-[16px]">
-                  <span className="block font-medium">
-                    Tài khoản
-                  </span>
-
-                  <span className="block font-normal text-[#777777]">
-                    Đăng nhập
-                  </span>
-                </span>
-              </Link>
-
+            {/* WISHLIST / CART */}
+            <div className="flex w-[220px] items-center justify-end gap-6">
               {/* WISHLIST */}
               <WishlistButton mode="desktop" />
 

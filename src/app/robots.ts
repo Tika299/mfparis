@@ -8,6 +8,12 @@ const DISALLOWED_ROUTE_SEGMENTS = [
     '/cart',
     '/checkout',
     '/fundiin',
+    '/my-route',
+    '/test-fragrance-profile',
+    '/test-filter',
+    '/tra-cuu-don-hang',
+    '/tai-ung-dung',
+    '/wishlist',
 ] as const satisfies readonly string[]
 
 const DISALLOWED_QUERY_PARAMETERS = [

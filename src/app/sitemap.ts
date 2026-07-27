@@ -65,6 +65,36 @@ const STATIC_ROUTES = [
         changeFrequency: 'monthly',
         priority: 0.6,
     },
+    {
+        url: `${SITE_ORIGIN}/vouchers`,
+        changeFrequency: 'weekly',
+        priority: 0.55,
+    },
+    {
+        url: `${SITE_ORIGIN}/he-thong-cua-hang`,
+        changeFrequency: 'monthly',
+        priority: 0.6,
+    },
+    {
+        url: `${SITE_ORIGIN}/huong-dan-mua-hang`,
+        changeFrequency: 'monthly',
+        priority: 0.55,
+    },
+    {
+        url: `${SITE_ORIGIN}/cau-hoi-thuong-gap`,
+        changeFrequency: 'monthly',
+        priority: 0.55,
+    },
+    {
+        url: `${SITE_ORIGIN}/chinh-sach-kiem-hang`,
+        changeFrequency: 'monthly',
+        priority: 0.55,
+    },
+    {
+        url: `${SITE_ORIGIN}/cam-ket-chinh-hang`,
+        changeFrequency: 'monthly',
+        priority: 0.55,
+    },
 ] as const satisfies ReadonlyArray<{
     url: string
     changeFrequency: NonNullable<MetadataRoute.Sitemap[number]['changeFrequency']>

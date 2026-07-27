@@ -1,9 +1,21 @@
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { CheckCircle } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
+
+export const metadata: Metadata = {
+  title: 'Đặt hàng thành công | MF Paris',
+  description: 'Trang xác nhận đặt hàng thành công tại MF Paris.',
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
+
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 export const fetchCache = 'force-no-store'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { CheckCircle } from 'lucide-react'
 
 export default function SuccessPage() {
   return (

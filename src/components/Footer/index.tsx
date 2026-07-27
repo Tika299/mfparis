@@ -169,7 +169,12 @@ const fallbackPolicyLinks: FooterLink[] = [
     label: 'Phương thức thanh toán',
     link: '/phuong-thuc-thanh-toan',
   },
-]
+].concat([
+  { id: 'buying-guide', label: 'Hướng dẫn mua hàng', link: '/huong-dan-mua-hang' },
+  { id: 'inspection-policy', label: 'Chính sách kiểm hàng', link: '/chinh-sach-kiem-hang' },
+  { id: 'authenticity', label: 'Cam kết chính hãng', link: '/cam-ket-chinh-hang' },
+  { id: 'faq', label: 'Câu hỏi thường gặp', link: '/cau-hoi-thuong-gap' },
+])
 
 type NormalizedFooterLink = FooterLink & {
   label: string
@@ -189,6 +194,13 @@ const knownSafeInternalRoutes = new Set<string>([
   '/chinh-sach-bao-mat',
   '/dieu-khoan-su-dung',
   '/phuong-thuc-thanh-toan',
+  '/vouchers',
+  '/he-thong-cua-hang',
+  '/huong-dan-mua-hang',
+  '/cau-hoi-thuong-gap',
+  '/chinh-sach-kiem-hang',
+  '/cam-ket-chinh-hang',
+  '/tra-cuu-don-hang',
 ])
 
 function normalizeInternalPath(

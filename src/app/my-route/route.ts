@@ -1,12 +1,13 @@
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
+import { NextResponse } from 'next/server'
 
-export const GET = async (request: Request) => {
-  const payload = await getPayload({
-    config: configPromise,
-  })
+export const dynamic = 'force-static'
 
-  return Response.json({
-    message: 'This is an example of a custom route.',
+export function GET() {
+  return new NextResponse('Route nay khong con duoc su dung.', {
+    status: 410,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'X-Robots-Tag': 'noindex, nofollow',
+    },
   })
 }
