@@ -87,7 +87,7 @@ async function main(): Promise<void> {
 
     totalPages = result.totalPages || 1
 
-    for (const post of result.docs as Array<Record<string, unknown>>) {
+    for (const post of result.docs as unknown as Array<Record<string, unknown>>) {
       stats.scanned += 1
 
       if (ONLY_PUBLISHED && !isPublishedPost(post)) {

@@ -30,6 +30,40 @@ import { BlogAuthors } from '@/collections/BlogAuthors'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+const smtpHost = process.env.SMTP_HOST?.trim() || 'smtp.gmail.com'
+const smtpPort = Number(process.env.SMTP_PORT || 465)
+const smtpUser =
+  process.env.SMTP_USER?.trim() ||
+  process.env.SMTP_USERNAME?.trim() ||
+  process.env.SMTP_EMAIL?.trim() ||
+  'mfparisvn@gmail.com'
+const smtpPassword =
+  process.env.SMTP_PASSWORD?.trim() ||
+  process.env.SMTP_PASS?.trim()
+const emailFromAddress =
+  process.env.SMTP_FROM_ADDRESS?.trim() ||
+  smtpUser ||
+  'mfparisvn@gmail.com'
+const emailFromName =
+  process.env.SMTP_FROM_NAME?.trim() ||
+  'MF PARIS - Hệ thống Đơn hàng'
+
+const emailAdapter = smtpUser && smtpPassword
+  ? nodemailerAdapter({
+    defaultFromAddress: emailFromAddress,
+    defaultFromName: emailFromName,
+    transportOptions: {
+      host: smtpHost,
+      port: Number.isFinite(smtpPort) ? smtpPort : 465,
+      secure: (process.env.SMTP_SECURE ?? 'true') !== 'false',
+      auth: {
+        user: smtpUser,
+        pass: smtpPassword,
+      },
+    },
+  })
+  : undefined
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -82,17 +116,5 @@ export default buildConfig({
   ),
   sharp,
   plugins: [],
-  email: nodemailerAdapter({
-    defaultFromAddress: 'mfparisvn@gmail.com',
-    defaultFromName: 'MF PARIS - Hệ thống Đơn hàng',
-    transportOptions: {
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: {
-        user: 'mfparisvn@gmail.com',
-        pass: process.env.SMTP_PASSWORD,
-      },
-    },
-  }),
+  ...(emailAdapter ? { email: emailAdapter } : {}),
 })
