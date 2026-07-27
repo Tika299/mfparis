@@ -38,6 +38,7 @@
     "redirects:backfill-products": "tsx src/scripts/backfill-wordpress-product-redirects.ts",
     "redirects:audit": "tsx src/scripts/audit-redirects.ts",
     "redirects:backfill-content": "tsx src/scripts/backfill-legacy-content-redirects.ts",
+    "redirects:backfill-blog": "tsx src/scripts/backfill-legacy-blog-redirects.ts",
     "repair:wp-images": "tsx src/scripts/repair-wordpress-lazy-images.ts",
     "sync:product-sku": "tsx src/scripts/sync-product-sku-from-wp-id.ts",
     "repair:html-entities": "tsx src/scripts/repair-html-entities.ts",
