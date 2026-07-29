@@ -347,6 +347,20 @@ export const Posts: CollectionConfig = {
         position: 'sidebar',
         rows: 3,
       },
+    },
+    {
+      name: 'internalLinkPreview',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: {
+            path: '@/components/Admin/InternalLinkPreview#InternalLinkPreview',
+            clientProps: {
+              collection: 'posts',
+            },
+          },
+        },
+      },
     }
   ],
 }

@@ -568,8 +568,8 @@ export async function POST(req: Request) {
             lang: "vi",
             extraData: `Order_${order.id}`,
             description: removeTones(`Thanh toan don hang ${order.id} tai MF Paris`),
-            successRedirectUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success`,
-            unSuccessRedirectUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout`,
+            successRedirectUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payments/fundiin/return?orderId=${order.id}&status=success`,
+            unSuccessRedirectUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payments/fundiin/return?orderId=${order.id}&status=cancelled`,
             amount: {
                 currency: 'VND',
                 value: trustedAmounts.totalAmount,

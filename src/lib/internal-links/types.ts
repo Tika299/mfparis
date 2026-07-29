@@ -51,14 +51,48 @@ export type ApplyInternalLinksInput = {
     excludeKeywords?: string[]
 }
 
+export type InternalLinkSkipReason =
+    | 'self_link'
+    | 'existing_link'
+    | 'heading'
+    | 'blocked_tag'
+    | 'max_links_reached'
+    | 'max_target_reached'
+    | 'max_anchor_reached'
+    | 'duplicate_paragraph'
+    | 'disabled'
+    | 'preview_only'
+    | 'no_rules'
+    | 'empty_html'
+    | 'excluded_keyword'
+
+export type InternalLinkSkippedItem = {
+    keyword?: string
+    anchorText?: string
+    targetUrl?: string
+    ruleId?: string | number
+    ruleTitle?: string
+    reason: InternalLinkSkipReason
+    textPreview?: string
+}
+
 export type InternalLinkInsertion = {
-    ruleId: string | number
     keyword: string
     anchorText: string
     targetUrl: string
+    ruleId?: string | number
+    ruleTitle?: string
+    paragraphIndex?: number
 }
 
 export type ApplyInternalLinksResult = {
     html: string
     insertions: InternalLinkInsertion[]
+    skipped: InternalLinkSkippedItem[]
+    stats: {
+        totalInserted: number
+        totalSkipped: number
+        rulesMatched: number
+        uniqueTargetUrls: number
+    }
 }

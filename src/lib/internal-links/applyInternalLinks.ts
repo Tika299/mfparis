@@ -18,6 +18,7 @@ type ApplyForRenderInput = {
     maxLinksOverride?: number | null
     excludeKeywords?: string[]
     payload?: Payload
+    forcePreview?: boolean
 }
 
 export async function applyInternalLinksForRender({
