@@ -26,6 +26,7 @@ import { Reviews } from '@/collections/Reviews'
 import { VoucherRedemptions } from '@/collections/VoucherRedemptions'
 import { BlogComments } from '@/collections/BlogComments'
 import { BlogAuthors } from '@/collections/BlogAuthors'
+import { InternalLinkRules } from '@/collections/InternalLinkRules'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -102,6 +103,7 @@ export default buildConfig({
     Reviews,
     BlogComments,
     VoucherRedemptions,
+    InternalLinkRules,
   ],
   globals: [SiteSettings, AboutPage],
   secret: process.env.PAYLOAD_SECRET || '',

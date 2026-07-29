@@ -3,6 +3,7 @@ import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 import { siloSeoFields } from '@/collections/fields/siloSeoFields'
 import { blogLandingSeoContentFields } from '@/collections/fields/seoFields'
+import { internalLinkingFields } from '@/collections/fields/internalLinkingFields'
 
 export const PostCategories: CollectionConfig = {
   slug: 'post-categories',
@@ -14,6 +15,7 @@ export const PostCategories: CollectionConfig = {
     read: () => true,
   },
   fields: [
+    internalLinkingFields,
     {
       name: 'title',
       type: 'text',

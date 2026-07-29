@@ -1,6 +1,7 @@
 import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
+import { internalLinkingFields } from '@/collections/fields/internalLinkingFields'
 
 
 const DEFAULT_BLOG_AUTHOR_DATA = {
@@ -119,6 +120,7 @@ export const Posts: CollectionConfig = {
     beforeValidate: [assignDefaultBlogAuthor],
   },
   fields: [
+    internalLinkingFields,
     {
       name: 'title',
       type: 'text',

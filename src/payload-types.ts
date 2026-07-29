@@ -88,6 +88,7 @@ export interface Config {
     reviews: Review;
     'blog-comments': BlogComment;
     'voucher-redemptions': VoucherRedemption;
+    'internal-link-rules': InternalLinkRule;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -115,6 +116,7 @@ export interface Config {
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     'blog-comments': BlogCommentsSelect<false> | BlogCommentsSelect<true>;
     'voucher-redemptions': VoucherRedemptionsSelect<false> | VoucherRedemptionsSelect<true>;
+    'internal-link-rules': InternalLinkRulesSelect<false> | InternalLinkRulesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -293,6 +295,16 @@ export interface Media {
  */
 export interface Brand {
   id: number;
+  internalLinking?: {
+    disableAutoLinks?: boolean | null;
+    maxLinksOverride?: number | null;
+    excludeKeywords?:
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   name: string;
   /**
    * Tu dong tao tu ten, co the chinh sua thu cong de toi uu SEO
@@ -346,6 +358,16 @@ export interface Brand {
  */
 export interface Product {
   id: number;
+  internalLinking?: {
+    disableAutoLinks?: boolean | null;
+    maxLinksOverride?: number | null;
+    excludeKeywords?:
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   /**
    * Quyết định cách trang chi tiết sản phẩm được render, index và chuyển hướng.
    */
@@ -505,6 +527,16 @@ export interface Product {
  */
 export interface Category {
   id: number;
+  internalLinking?: {
+    disableAutoLinks?: boolean | null;
+    maxLinksOverride?: number | null;
+    excludeKeywords?:
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   name: string;
   image?: (number | null) | Media;
   /**
@@ -787,6 +819,16 @@ export interface Voucher {
  */
 export interface Post {
   id: number;
+  internalLinking?: {
+    disableAutoLinks?: boolean | null;
+    maxLinksOverride?: number | null;
+    excludeKeywords?:
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   title: string;
   /**
    * Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO
@@ -850,6 +892,16 @@ export interface Post {
  */
 export interface PostCategory {
   id: number;
+  internalLinking?: {
+    disableAutoLinks?: boolean | null;
+    maxLinksOverride?: number | null;
+    excludeKeywords?:
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
   title: string;
   slug: string;
   /**
@@ -1133,6 +1185,30 @@ export interface VoucherRedemption {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal-link-rules".
+ */
+export interface InternalLinkRule {
+  id: number;
+  title: string;
+  enabled?: boolean | null;
+  priority: 'primary_keyword' | 'category' | 'brand' | 'product' | 'post';
+  keywords: {
+    keyword: string;
+    matchType?: ('contains' | 'phrase') | null;
+    weight?: number | null;
+    id?: string | null;
+  }[];
+  targetType: 'custom_url' | 'product' | 'category' | 'brand' | 'post' | 'post_category';
+  targetUrl: string;
+  scope?: ('posts' | 'products' | 'categories' | 'brands' | 'post-categories')[] | null;
+  maxInsertionsPerPage?: number | null;
+  totalInsertions?: number | null;
+  lastUsedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1234,6 +1310,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'voucher-redemptions';
         value: number | VoucherRedemption;
+      } | null)
+    | ({
+        relationTo: 'internal-link-rules';
+        value: number | InternalLinkRule;
       } | null);
   globalSlug?: string | null;
   user:
@@ -1404,6 +1484,18 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "brands_select".
  */
 export interface BrandsSelect<T extends boolean = true> {
+  internalLinking?:
+    | T
+    | {
+        disableAutoLinks?: T;
+        maxLinksOverride?: T;
+        excludeKeywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+      };
   name?: T;
   slug?: T;
   logo?: T;
@@ -1444,6 +1536,18 @@ export interface BrandsSelect<T extends boolean = true> {
  * via the `definition` "products_select".
  */
 export interface ProductsSelect<T extends boolean = true> {
+  internalLinking?:
+    | T
+    | {
+        disableAutoLinks?: T;
+        maxLinksOverride?: T;
+        excludeKeywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+      };
   seoStatus?: T;
   relatedProduct?: T;
   title?: T;
@@ -1537,6 +1641,18 @@ export interface ProductsSelect<T extends boolean = true> {
  * via the `definition` "categories_select".
  */
 export interface CategoriesSelect<T extends boolean = true> {
+  internalLinking?:
+    | T
+    | {
+        disableAutoLinks?: T;
+        maxLinksOverride?: T;
+        excludeKeywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+      };
   name?: T;
   image?: T;
   description?: T;
@@ -1637,6 +1753,18 @@ export interface OrdersSelect<T extends boolean = true> {
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
+  internalLinking?:
+    | T
+    | {
+        disableAutoLinks?: T;
+        maxLinksOverride?: T;
+        excludeKeywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+      };
   title?: T;
   slug?: T;
   thumbnail?: T;
@@ -1711,6 +1839,18 @@ export interface BlogAuthorsSelect<T extends boolean = true> {
  * via the `definition` "post-categories_select".
  */
 export interface PostCategoriesSelect<T extends boolean = true> {
+  internalLinking?:
+    | T
+    | {
+        disableAutoLinks?: T;
+        maxLinksOverride?: T;
+        excludeKeywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+      };
   title?: T;
   slug?: T;
   description?: T;
@@ -1981,6 +2121,31 @@ export interface VoucherRedemptionsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal-link-rules_select".
+ */
+export interface InternalLinkRulesSelect<T extends boolean = true> {
+  title?: T;
+  enabled?: T;
+  priority?: T;
+  keywords?:
+    | T
+    | {
+        keyword?: T;
+        matchType?: T;
+        weight?: T;
+        id?: T;
+      };
+  targetType?: T;
+  targetUrl?: T;
+  scope?: T;
+  maxInsertionsPerPage?: T;
+  totalInsertions?: T;
+  lastUsedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -2113,6 +2278,16 @@ export interface SiteSetting {
      * Chọn tối đa 4 voucher từ kho voucher. Có thể kéo thả để thay đổi thứ tự hiển thị.
      */
     vouchers?: (number | Voucher)[] | null;
+  };
+  internalLinking?: {
+    enabled?: boolean | null;
+    previewOnly?: boolean | null;
+    maxLinksPerPost?: number | null;
+    maxLinksPerProduct?: number | null;
+    maxLinksPerLanding?: number | null;
+    maxLinksPerParagraph?: number | null;
+    maxSameTargetUrl?: number | null;
+    maxSameAnchor?: number | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -2247,6 +2422,18 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         enabled?: T;
         endTime?: T;
         vouchers?: T;
+      };
+  internalLinking?:
+    | T
+    | {
+        enabled?: T;
+        previewOnly?: T;
+        maxLinksPerPost?: T;
+        maxLinksPerProduct?: T;
+        maxLinksPerLanding?: T;
+        maxLinksPerParagraph?: T;
+        maxSameTargetUrl?: T;
+        maxSameAnchor?: T;
       };
   updatedAt?: T;
   createdAt?: T;

@@ -10,6 +10,7 @@ import { ensureLegacyProductRedirectHook } from '@/collections/hooks/ensureLegac
 import { productSeoLifecycleFields } from '@/collections/fields/productSeoLifecycleFields'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 import { buildProductSearchKeywords } from '@/utilities/searchKeywords'
+import { internalLinkingFields } from '@/collections/fields/internalLinkingFields'
 
 type EntityID = string | number
 
@@ -162,6 +163,7 @@ export const Products: CollectionConfig = {
   },
 
   fields: [
+    internalLinkingFields,
     ...productSeoLifecycleFields,
     {
       type: 'tabs',

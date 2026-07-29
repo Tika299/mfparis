@@ -5,6 +5,7 @@ import { trackCategorySlugHistory } from '@/collections/hooks/trackSlugHistory'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 import { siloSeoFields } from '@/collections/fields/siloSeoFields'
 import { landingSeoContentFields } from '@/collections/fields/seoFields'
+import { internalLinkingFields } from '@/collections/fields/internalLinkingFields'
 
 const revalidateCategoryTags = async () => {
   try {
@@ -41,6 +42,7 @@ export const Categories: CollectionConfig = {
   },
   admin: { useAsTitle: 'name' },
   fields: [
+    internalLinkingFields,
     { name: 'name', type: 'text', required: true },
     { name: 'image', type: 'upload', relationTo: 'media' },
     htmlEditorField({

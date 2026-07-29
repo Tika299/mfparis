@@ -3,6 +3,7 @@ import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 import { landingSeoContentFields } from '@/collections/fields/seoFields'
+import { internalLinkingFields } from '@/collections/fields/internalLinkingFields'
 
 const revalidateBrandTags = async () => {
   try {
@@ -38,6 +39,7 @@ export const Brands: CollectionConfig = {
   },
   admin: { useAsTitle: 'name' },
   fields: [
+    internalLinkingFields,
     { name: 'name', type: 'text', required: true },
     {
       name: 'slug',
