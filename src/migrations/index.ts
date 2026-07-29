@@ -20,6 +20,7 @@ import * as migration_20260726_030821 from './20260726_030821';
 import * as migration_20260726_042909_add_media_description from './20260726_042909_add_media_description';
 import * as migration_20260726_055313 from './20260726_055313';
 import * as migration_20260729_025249 from './20260729_025249';
+import * as migration_20260729_062424_internal_link_logs from './20260729_062424_internal_link_logs';
 
 export const migrations = [
   {
@@ -130,6 +131,11 @@ export const migrations = [
   {
     up: migration_20260729_025249.up,
     down: migration_20260729_025249.down,
-    name: '20260729_025249'
+    name: '20260729_025249',
+  },
+  {
+    up: migration_20260729_062424_internal_link_logs.up,
+    down: migration_20260729_062424_internal_link_logs.down,
+    name: '20260729_062424_internal_link_logs'
   },
 ];

@@ -29,6 +29,7 @@ export async function applyInternalLinksForRender({
     maxLinksOverride,
     excludeKeywords,
     payload,
+    forcePreview,
 }: ApplyForRenderInput): Promise<ApplyInternalLinksResult> {
     const resolvedPayload =
         payload ||
@@ -50,7 +51,7 @@ export async function applyInternalLinksForRender({
         disabled:
             disabled ||
             settings.internalLinking?.enabled !== true ||
-            settings.internalLinking?.previewOnly === true,
+            (settings.internalLinking?.previewOnly === true && !forcePreview),
         maxLinksOverride,
         excludeKeywords,
     } satisfies ApplyInternalLinksInput)

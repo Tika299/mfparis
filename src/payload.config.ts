@@ -27,6 +27,7 @@ import { VoucherRedemptions } from '@/collections/VoucherRedemptions'
 import { BlogComments } from '@/collections/BlogComments'
 import { BlogAuthors } from '@/collections/BlogAuthors'
 import { InternalLinkRules } from '@/collections/InternalLinkRules'
+import { InternalLinkLogs } from '@/collections/InternalLinkLogs'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -78,6 +79,10 @@ export default buildConfig({
           Component: '@/components/Admin/ChatCenter#ChatCenter',
           path: '/chat',
         },
+        InternalLinkSuggestions: {
+          Component: '@/components/Admin/InternalLinkSuggestions#InternalLinkSuggestions',
+          path: '/internal-links/suggestions',
+        },
       },
       beforeDashboard: ['@/components/Admin/ChatDashboardCard#ChatDashboardCard'],
     },
@@ -104,6 +109,7 @@ export default buildConfig({
     BlogComments,
     VoucherRedemptions,
     InternalLinkRules,
+    InternalLinkLogs,
   ],
   globals: [SiteSettings, AboutPage],
   secret: process.env.PAYLOAD_SECRET || '',

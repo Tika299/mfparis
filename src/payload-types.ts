@@ -89,6 +89,7 @@ export interface Config {
     'blog-comments': BlogComment;
     'voucher-redemptions': VoucherRedemption;
     'internal-link-rules': InternalLinkRule;
+    'internal-link-logs': InternalLinkLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -117,6 +118,7 @@ export interface Config {
     'blog-comments': BlogCommentsSelect<false> | BlogCommentsSelect<true>;
     'voucher-redemptions': VoucherRedemptionsSelect<false> | VoucherRedemptionsSelect<true>;
     'internal-link-rules': InternalLinkRulesSelect<false> | InternalLinkRulesSelect<true>;
+    'internal-link-logs': InternalLinkLogsSelect<false> | InternalLinkLogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -1209,6 +1211,34 @@ export interface InternalLinkRule {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal-link-logs".
+ */
+export interface InternalLinkLog {
+  id: number;
+  summary: string;
+  logKey: string;
+  sourceType: 'posts' | 'products' | 'categories' | 'brands' | 'post-categories';
+  sourceId: string;
+  sourceTitle?: string | null;
+  sourceUrl: string;
+  rule?: (number | null) | InternalLinkRule;
+  ruleTitle?: string | null;
+  keyword: string;
+  anchorText?: string | null;
+  targetUrl: string;
+  insertedCount?: number | null;
+  skippedCount?: number | null;
+  totalInsertedCount?: number | null;
+  previewCount?: number | null;
+  skipReasons?: string | null;
+  lastTextPreview?: string | null;
+  lastRunId?: string | null;
+  lastCheckedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1314,6 +1344,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'internal-link-rules';
         value: number | InternalLinkRule;
+      } | null)
+    | ({
+        relationTo: 'internal-link-logs';
+        value: number | InternalLinkLog;
       } | null);
   globalSlug?: string | null;
   user:
@@ -2141,6 +2175,33 @@ export interface InternalLinkRulesSelect<T extends boolean = true> {
   maxInsertionsPerPage?: T;
   totalInsertions?: T;
   lastUsedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal-link-logs_select".
+ */
+export interface InternalLinkLogsSelect<T extends boolean = true> {
+  summary?: T;
+  logKey?: T;
+  sourceType?: T;
+  sourceId?: T;
+  sourceTitle?: T;
+  sourceUrl?: T;
+  rule?: T;
+  ruleTitle?: T;
+  keyword?: T;
+  anchorText?: T;
+  targetUrl?: T;
+  insertedCount?: T;
+  skippedCount?: T;
+  totalInsertedCount?: T;
+  previewCount?: T;
+  skipReasons?: T;
+  lastTextPreview?: T;
+  lastRunId?: T;
+  lastCheckedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
