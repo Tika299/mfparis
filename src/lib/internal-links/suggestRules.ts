@@ -127,9 +127,17 @@ function scopeFor(type: InternalLinkSuggestionSource): InternalLinkScope[] {
 function makeKeywords(doc: Record<string, unknown>, type: InternalLinkSuggestionSource) {
     const title = cleanText(doc.title || doc.name)
     const slug = cleanText(doc.slug).replace(/-/g, ' ')
-    const seoTitle = isRecord(doc.seo) ? cleanText(doc.seo.title) : cleanText(doc.seoTitle)
+    const seoTitle = isRecord(doc.seo)
+        ? cleanText(doc.seo.title || doc.seo.metaTitle)
+        : cleanText(doc.seoTitle)
+    const seoKeywords =
+        isRecord(doc.seo) && Array.isArray(doc.seo.keywords)
+            ? doc.seo.keywords
+                .map((item) => (isRecord(item) ? cleanText(item.keyword) : ''))
+                .filter(Boolean)
+            : []
 
-    const keywords = [title, seoTitle]
+    const keywords = [title, seoTitle, ...seoKeywords]
 
     if (type === 'brands') keywords.push(`${title} chính hãng`)
     if (type === 'categories') keywords.push(`${title} chính hãng`, `mua ${title}`)
@@ -187,18 +195,12 @@ export async function suggestInternalLinkRules({
     const suggestions: InternalLinkSuggestion[] = []
 
     for (const collection of collections) {
-        const where =
-            collection === 'products' || collection === 'posts'
-                ? { status: { equals: 'published' } }
-                : undefined
-
         const result = await payload.find({
             collection: collection as any,
             depth: 0,
             limit,
             pagination: false,
             overrideAccess: true,
-            ...(where ? { where } : {}),
         })
 
         for (const doc of result.docs as any[]) {
@@ -249,7 +251,20 @@ export async function suggestInternalLinkRules({
         }
     }
 
-    return suggestions.sort((a, b) => b.score - a.score).slice(0, limit)
+    const sortedSuggestions = suggestions.sort((a, b) => b.score - a.score)
+
+    if (sourceType !== 'all') {
+        return sortedSuggestions.slice(0, limit)
+    }
+
+    const perCollectionLimit = Math.max(1, Math.ceil(limit / collections.length))
+    const balancedSuggestions = collections.flatMap((collection) =>
+        sortedSuggestions
+            .filter((suggestion) => suggestion.sourceType === collection)
+            .slice(0, perCollectionLimit),
+    )
+
+    return balancedSuggestions.slice(0, limit)
 }
 
 export async function createInternalLinkRuleFromSuggestion(
