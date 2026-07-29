@@ -42,6 +42,8 @@ import {
   ProductReviews,
   type ProductReviewItem,
 } from '@/components/product/ProductReviews'
+import { applyInternalLinksForRender } from '@/lib/internal-links/applyInternalLinks'
+import { getInternalLinkingConfig } from '@/lib/internal-links/getInternalLinkingConfig'
 
 export const revalidate = 300
 export const dynamicParams = true
@@ -1060,11 +1062,11 @@ const sortRelatedCandidates = (
       return (
         getComparableTimestamp(
           right.candidate.updatedAt ||
-            right.candidate.createdAt,
+          right.candidate.createdAt,
         ) -
         getComparableTimestamp(
           left.candidate.updatedAt ||
-            left.candidate.createdAt,
+          left.candidate.createdAt,
         )
       )
     })
@@ -2038,6 +2040,19 @@ export default async function ProductPage({
       ? DISCONTINUED_RELATED_PRODUCTS_LIMIT
       : DEFAULT_RELATED_PRODUCTS_LIMIT
 
+
+  const internalLinkingConfig = getInternalLinkingConfig(product)
+
+  const payload = await getPayload({ config: configPromise })
+  const canonicalUrl = getProductCanonicalUrl(product.slug)
+  const linkedProductDescription = await applyInternalLinksForRender({
+    html: product.description,
+    currentUrl: canonicalUrl,
+    scope: 'products',
+    payload,
+    ...internalLinkingConfig,
+  })
+
   const [
     recommendationGroups,
     approvedReviews,
@@ -2133,6 +2148,7 @@ export default async function ProductPage({
           >
         > => review !== null,
       )
+
 
     const jsonLd: Record<
       string,
@@ -2888,9 +2904,7 @@ export default async function ProductPage({
         }}
       />
 
-      <ProductQuickNav
-        description={product.description}
-      />
+      <ProductQuickNav description={linkedProductDescription.html} />
 
       <div className="border-b border-gray-100 bg-white">
         <nav
@@ -3148,9 +3162,7 @@ export default async function ProductPage({
               title="Kiến trúc mùi hương"
               eyebrow="Fragrance profile"
             />
-            <ProductRichTextContent
-              description={product.description}
-            />
+            <ProductRichTextContent description={linkedProductDescription.html} />
 
 
             {productFaqItems.length > 0 ? (

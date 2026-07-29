@@ -29,6 +29,8 @@ import { buildBlogPostingSchemaGraph } from '@/lib/structured-data'
 import '@/styles/blog.css'
 import '@/styles/prose.css'
 import '@/styles/carousel-overrides.css'
+import { applyInternalLinksForRender } from '@/lib/internal-links/applyInternalLinks'
+import { getInternalLinkingConfig } from '@/lib/internal-links/getInternalLinkingConfig'
 
 type BlogPostPageProps = {
   params: Promise<{
@@ -675,6 +677,7 @@ export async function generateMetadata({
     (post as any).thumbnail,
   )
 
+
   return {
     title,
     description,
@@ -778,6 +781,14 @@ export default async function BlogPostPage({
   })
 
   const canonicalUrl = `/blog/${encodeURIComponent(slug)}`
+  const internalLinkingConfig = getInternalLinkingConfig(post)
+  const linkedContent = await applyInternalLinksForRender({
+    html: post.content,
+    currentUrl: canonicalUrl,
+    scope: 'posts',
+    payload,
+    ...internalLinkingConfig,
+  })
   const description = getPostDescription(post)
   const imageUrl = getMediaUrl(post.thumbnail)
   const postPlainText = htmlToPlainText(post.content)
@@ -1093,7 +1104,7 @@ export default async function BlogPostPage({
               <BlogMobileTocButton tocItems={tocItems} />
 
               <BlogRichTextContent
-                content={post.content}
+                content={linkedContent.html}
                 tocItems={tocItems}
                 maxHeight={500}
               />

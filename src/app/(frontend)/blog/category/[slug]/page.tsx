@@ -13,6 +13,8 @@ import { SafeHtmlContent } from '@/components/SafeHtmlContent'
 import { buildCollectionPageSchemaGraph } from '@/lib/structured-data'
 import { htmlToPlainText, normalizeContentHtml } from '@/lib/html/contentHtml'
 import '@/styles/blog.css'
+import { applyInternalLinksForRender } from '@/lib/internal-links/applyInternalLinks'
+import { getInternalLinkingConfig } from '@/lib/internal-links/getInternalLinkingConfig'
 
 const POSTS_PER_PAGE = 9
 
@@ -377,6 +379,31 @@ export default async function BlogCategoryPage({
   const displayName = getCategoryDisplayName(currentCategory)
   const introHtml = normalizeContentHtml(currentCategory.introHtml)
   const bottomContentHtml = normalizeContentHtml(currentCategory.bottomContentHtml)
+  const internalLinkingConfig = getInternalLinkingConfig(currentCategory)
+
+  const linkedCategoryDescription = await applyInternalLinksForRender({
+    html: currentCategory.description,
+    currentUrl: categoryUrl,
+    scope: 'categories',
+    payload,
+    ...internalLinkingConfig,
+  })
+
+  const linkedBottomContent = await applyInternalLinksForRender({
+    html: bottomContentHtml,
+    currentUrl: categoryUrl,
+    scope: 'categories',
+    payload,
+    ...internalLinkingConfig,
+  })
+
+  const linkedIntroContent = await applyInternalLinksForRender({
+    html: introHtml,
+    currentUrl: categoryUrl,
+    scope: 'categories',
+    payload,
+    ...internalLinkingConfig,
+  })
   const faqItems = getLandingFaqItems(currentCategory.faq)
   const breadcrumb = buildBlogCategoryBreadcrumb(
     currentCategory,
@@ -453,7 +480,7 @@ export default async function BlogCategoryPage({
         {introHtml ? (
           <section className="mt-8 rounded-[2rem] border border-gray-100 bg-white p-6 shadow-sm md:p-8">
             <div className="prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
-              <SafeHtmlContent html={introHtml} />
+              <SafeHtmlContent html={linkedIntroContent.html} />
             </div>
           </section>
         ) : null}
@@ -570,7 +597,7 @@ export default async function BlogCategoryPage({
         {bottomContentHtml ? (
           <section className="mt-12 rounded-[2rem] border border-gray-100 bg-white p-6 shadow-sm md:p-8">
             <div className="prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
-              <SafeHtmlContent html={bottomContentHtml} />
+              <SafeHtmlContent html={linkedBottomContent.html} />
             </div>
           </section>
         ) : null}

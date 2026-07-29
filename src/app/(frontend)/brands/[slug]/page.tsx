@@ -20,6 +20,8 @@ import {
   appendAdvancedProductWhereConditions,
   appendAdvancedSearchParams,
 } from '@/lib/productSearchFilters'
+import { getInternalLinkingConfig } from '@/lib/internal-links/getInternalLinkingConfig'
+import { applyInternalLinksForRender } from '@/lib/internal-links/applyInternalLinks'
 
 const PRODUCTS_PER_PAGE = 20
 const DEFAULT_SORT = '-createdAt'
@@ -535,6 +537,24 @@ export default async function BrandProductsPage({
   const brandDisplayName = getBrandDisplayName(currentBrand)
 
   const brandUrl = `/brands/${encodeURIComponent(slug)}`
+
+  const internalLinkingConfig = getInternalLinkingConfig(currentBrand)
+
+  const linkedBrandDescription = await applyInternalLinksForRender({
+    html: currentBrand.description,
+    currentUrl: brandUrl,
+    scope: 'categories',
+    payload,
+    ...internalLinkingConfig,
+  })
+
+  const linkedBottomContent = await applyInternalLinksForRender({
+    html: bottomContentHtml,
+    currentUrl: brandUrl,
+    scope: 'categories',
+    payload,
+    ...internalLinkingConfig,
+  })
   const schemaGraph = buildCollectionPageSchemaGraph({
     page: {
       url: brandUrl,
@@ -810,7 +830,7 @@ export default async function BrandProductsPage({
                     <ExpandableContent maxHeight={500}>
                       <SafeHtmlContent
                         html={
-                          currentBrand.description
+                          linkedBrandDescription.html
                         }
                       />
                     </ExpandableContent>
@@ -821,7 +841,7 @@ export default async function BrandProductsPage({
             {bottomContentHtml ? (
               <section className="mt-10 rounded-2xl bg-white p-5 shadow-sm md:mt-12 md:p-8">
                 <div className="category-description prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
-                  <SafeHtmlContent html={bottomContentHtml} />
+                  <SafeHtmlContent html={linkedBottomContent.html} />
                 </div>
               </section>
             ) : null}

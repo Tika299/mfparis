@@ -20,6 +20,8 @@ import {
   appendAdvancedProductWhereConditions,
   appendAdvancedSearchParams,
 } from '@/lib/productSearchFilters'
+import { applyInternalLinksForRender } from '@/lib/internal-links/applyInternalLinks'
+import { getInternalLinkingConfig } from '@/lib/internal-links/getInternalLinkingConfig'
 
 const PRODUCTS_PER_PAGE = 20
 const DEFAULT_SORT = '-createdAt'
@@ -356,10 +358,10 @@ function shouldIndexCategoryPage(
   const seoIndex = String(category?.seoIndex || 'index')
   const hasFilterParams = Boolean(
     searchParams?.brand ||
-      searchParams?.min ||
-      searchParams?.max ||
-      (searchParams?.sort && searchParams.sort !== DEFAULT_SORT) ||
-      (searchParams?.page && searchParams.page !== '1'),
+    searchParams?.min ||
+    searchParams?.max ||
+    (searchParams?.sort && searchParams.sort !== DEFAULT_SORT) ||
+    (searchParams?.page && searchParams.page !== '1'),
   )
 
   if (hasFilterParams) {
@@ -694,6 +696,24 @@ export default async function CategoryPage({
   )
 
   const categoryUrl = `/categories/${encodeURIComponent(slug)}`
+
+  const internalLinkingConfig = getInternalLinkingConfig(currentCategory)
+
+  const linkedCategoryDescription = await applyInternalLinksForRender({
+    html: currentCategory.description,
+    currentUrl: categoryUrl,
+    scope: 'categories',
+    payload,
+    ...internalLinkingConfig,
+  })
+
+  const linkedBottomContent = await applyInternalLinksForRender({
+    html: bottomContentHtml,
+    currentUrl: categoryUrl,
+    scope: 'categories',
+    payload,
+    ...internalLinkingConfig,
+  })
   const schemaGraph = buildCollectionPageSchemaGraph({
     page: {
       url: categoryUrl,
@@ -959,7 +979,7 @@ export default async function CategoryPage({
                     <ExpandableContent maxHeight={500}>
                       <SafeHtmlContent
                         html={
-                          currentCategory.description
+                          linkedCategoryDescription.html
                         }
                       />
                     </ExpandableContent>
@@ -970,7 +990,7 @@ export default async function CategoryPage({
             {bottomContentHtml ? (
               <section className="mt-10 rounded-2xl bg-white p-5 shadow-sm md:mt-12 md:p-8">
                 <div className="category-description prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
-                  <SafeHtmlContent html={bottomContentHtml} />
+                  <SafeHtmlContent html={linkedBottomContent.html} />
                 </div>
               </section>
             ) : null}
