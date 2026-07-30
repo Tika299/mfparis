@@ -6,6 +6,8 @@ import {
   exportContentExcel,
   importContentExcel,
   parseCsvList,
+  type ContentExcelExportFormat,
+  type ContentExcelExportProfile,
   type ContentExcelOnly,
 } from '@/lib/content-excel/contentExcel'
 
@@ -29,6 +31,18 @@ function normalizeOnly(value: string | null): ContentExcelOnly {
   return 'all'
 }
 
+function normalizeFormat(value: string | null): ContentExcelExportFormat {
+  if (value === 'csv') return 'csv'
+
+  return 'xls'
+}
+
+function normalizeProfile(value: string | null): ContentExcelExportProfile {
+  if (value === 'google-sheets') return 'google-sheets'
+
+  return 'full'
+}
+
 function timestampForFileName() {
   return new Date().toISOString().replace(/[:.]/g, '-')
 }
@@ -40,21 +54,31 @@ export async function GET(request: Request) {
 
     const url = new URL(request.url)
     const only = normalizeOnly(url.searchParams.get('only'))
-    const { workbookXml } = await exportContentExcel({
+    const format = normalizeFormat(url.searchParams.get('format'))
+    const profile = normalizeProfile(url.searchParams.get('profile'))
+    const includeContent = url.searchParams.get('includeContent') === 'true'
+    const { csv, workbookXml } = await exportContentExcel({
+      format,
+      includeContent,
       payload: auth.payload,
       only,
+      profile,
       productIds: parseCsvList(url.searchParams.get('productIds')),
       productSlugs: parseCsvList(url.searchParams.get('productSlugs')),
       postIds: parseCsvList(url.searchParams.get('postIds')),
       postSlugs: parseCsvList(url.searchParams.get('postSlugs')),
       limit: Number(url.searchParams.get('limit') || 0) || 0,
     })
-    const fileName = `mfparis-${only}-content-${timestampForFileName()}.xls`
+    const extension = format === 'csv' ? 'csv' : 'xls'
+    const fileName = `mfparis-${only}-content-${profile}-${timestampForFileName()}.${extension}`
 
-    return new Response(workbookXml, {
+    return new Response(format === 'csv' ? csv : workbookXml, {
       headers: {
         'Content-Disposition': `attachment; filename="${fileName}"`,
-        'Content-Type': 'application/vnd.ms-excel; charset=utf-8',
+        'Content-Type':
+          format === 'csv'
+            ? 'text/csv; charset=utf-8'
+            : 'application/vnd.ms-excel; charset=utf-8',
         'Cache-Control': 'no-store',
       },
     })
@@ -81,10 +105,16 @@ export async function POST(request: Request) {
     }
 
     const only = normalizeOnly(String(formData.get('only') || 'all'))
+    const fileName = file.name.toLowerCase()
+    const format =
+      String(formData.get('format') || '').toLowerCase() === 'csv' || fileName.endsWith('.csv')
+        ? 'csv'
+        : 'xls'
     const dryRun = String(formData.get('dryRun') || 'true') !== 'false'
     const includeReadOnly = String(formData.get('includeReadOnly') || 'false') === 'true'
     const workbookXml = Buffer.from(await file.arrayBuffer()).toString('utf8')
     const result = await importContentExcel({
+      format,
       payload: auth.payload,
       workbookXml,
       only,

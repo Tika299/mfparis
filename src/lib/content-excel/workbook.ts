@@ -39,6 +39,119 @@ export function valueToCell(value: unknown) {
   return JSON.stringify(value)
 }
 
+function escapeCsvCell(value: unknown) {
+  const cell = String(value ?? '').replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+
+  if (/[",\n]/.test(cell)) {
+    return `"${cell.replace(/"/g, '""')}"`
+  }
+
+  return cell
+}
+
+export function createCsv(rows: WorkbookRow[]) {
+  const headerSet = new Set<string>(rows[0] ? Object.keys(rows[0]) : ['id'])
+
+  for (const row of rows) {
+    Object.keys(row).forEach((header) => headerSet.add(header))
+  }
+
+  const headers = Array.from(headerSet)
+  const lines = [
+    headers.map(escapeCsvCell).join(','),
+    ...rows.map((row) => headers.map((header) => escapeCsvCell(row[header] ?? '')).join(',')),
+  ]
+
+  return `\uFEFF${lines.join('\n')}`
+}
+
+function parseCsvLine(line: string) {
+  const cells: string[] = []
+  let cell = ''
+  let inQuotes = false
+
+  for (let index = 0; index < line.length; index += 1) {
+    const character = line[index]
+    const nextCharacter = line[index + 1]
+
+    if (character === '"' && inQuotes && nextCharacter === '"') {
+      cell += '"'
+      index += 1
+      continue
+    }
+
+    if (character === '"') {
+      inQuotes = !inQuotes
+      continue
+    }
+
+    if (character === ',' && !inQuotes) {
+      cells.push(cell)
+      cell = ''
+      continue
+    }
+
+    cell += character
+  }
+
+  cells.push(cell)
+
+  return cells
+}
+
+export function parseCsv(csv: string): WorkbookRow[] {
+  const normalizedCsv = csv.replace(/^\uFEFF/u, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+  const lines: string[] = []
+  let currentLine = ''
+  let inQuotes = false
+
+  for (let index = 0; index < normalizedCsv.length; index += 1) {
+    const character = normalizedCsv[index]
+    const nextCharacter = normalizedCsv[index + 1]
+
+    if (character === '"' && inQuotes && nextCharacter === '"') {
+      currentLine += '""'
+      index += 1
+      continue
+    }
+
+    if (character === '"') {
+      inQuotes = !inQuotes
+      currentLine += character
+      continue
+    }
+
+    if (character === '\n' && !inQuotes) {
+      lines.push(currentLine)
+      currentLine = ''
+      continue
+    }
+
+    currentLine += character
+  }
+
+  if (currentLine || normalizedCsv.endsWith('\n')) {
+    lines.push(currentLine)
+  }
+
+  const [headerLine, ...bodyLines] = lines
+  const headers = parseCsvLine(headerLine || '').map((header) => header.trim())
+
+  return bodyLines
+    .filter((line) => line.trim().length > 0)
+    .map((line) => {
+      const cells = parseCsvLine(line)
+      const row: WorkbookRow = {}
+
+      headers.forEach((header, index) => {
+        if (!header) return
+        row[header] = cells[index] ?? ''
+      })
+
+      return row
+    })
+}
+
 function cellXml(value: unknown) {
   return `<Cell><Data ss:Type="String">${escapeXml(value)}</Data></Cell>`
 }

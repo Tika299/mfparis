@@ -3,6 +3,8 @@
 import React, { useMemo, useState } from 'react'
 
 type OnlyMode = 'all' | 'products' | 'posts'
+type ExportFormat = 'xls' | 'csv'
+type ExportProfile = 'full' | 'google-sheets'
 
 type ImportResult = {
   dryRun: boolean
@@ -56,6 +58,9 @@ function splitList(value: string) {
 
 export function ContentExcelManager() {
   const [exportOnly, setExportOnly] = useState<OnlyMode>('all')
+  const [exportFormat, setExportFormat] = useState<ExportFormat>('csv')
+  const [exportProfile, setExportProfile] = useState<ExportProfile>('google-sheets')
+  const [includeContent, setIncludeContent] = useState(false)
   const [productIds, setProductIds] = useState('')
   const [productSlugs, setProductSlugs] = useState('')
   const [postIds, setPostIds] = useState('')
@@ -73,6 +78,9 @@ export function ContentExcelManager() {
     const params = new URLSearchParams()
 
     params.set('only', exportOnly)
+    params.set('format', exportFormat)
+    params.set('profile', exportProfile)
+    params.set('includeContent', includeContent ? 'true' : 'false')
 
     if (productIds.trim()) params.set('productIds', splitList(productIds))
     if (productSlugs.trim()) params.set('productSlugs', splitList(productSlugs))
@@ -81,7 +89,17 @@ export function ContentExcelManager() {
     if (limit.trim()) params.set('limit', limit.trim())
 
     return `/api/admin/content-excel?${params.toString()}`
-  }, [exportOnly, limit, postIds, postSlugs, productIds, productSlugs])
+  }, [
+    exportFormat,
+    exportOnly,
+    exportProfile,
+    includeContent,
+    limit,
+    postIds,
+    postSlugs,
+    productIds,
+    productSlugs,
+  ])
 
   function downloadExcel() {
     window.location.href = exportUrl
@@ -102,6 +120,7 @@ export function ContentExcelManager() {
 
       formData.set('file', file)
       formData.set('only', importOnly)
+      formData.set('format', file.name.toLowerCase().endsWith('.csv') ? 'csv' : 'xls')
       formData.set('dryRun', dryRun ? 'true' : 'false')
       formData.set('includeReadOnly', includeReadOnly ? 'true' : 'false')
 
@@ -150,6 +169,47 @@ export function ContentExcelManager() {
                 <option value="products">Chỉ sản phẩm</option>
                 <option value="posts">Chỉ bài viết</option>
               </select>
+            </label>
+
+            <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+              <label>
+                <div style={{ fontWeight: 600, marginBottom: 6 }}>Dinh dang</div>
+                <select
+                  style={selectStyle}
+                  value={exportFormat}
+                  onChange={(event) => {
+                    const nextFormat = event.target.value as ExportFormat
+
+                    setExportFormat(nextFormat)
+                    setExportProfile(nextFormat === 'csv' ? 'google-sheets' : 'full')
+                    setIncludeContent(nextFormat === 'xls')
+                  }}
+                >
+                  <option value="csv">CSV nhe cho Google Sheets</option>
+                  <option value="xls">Excel day du</option>
+                </select>
+              </label>
+
+              <label>
+                <div style={{ fontWeight: 600, marginBottom: 6 }}>Ho so xuat</div>
+                <select
+                  style={selectStyle}
+                  value={exportProfile}
+                  onChange={(event) => setExportProfile(event.target.value as ExportProfile)}
+                >
+                  <option value="google-sheets">Google Sheets - cot hay sua</option>
+                  <option value="full">Day du tat ca field</option>
+                </select>
+              </label>
+            </div>
+
+            <label style={{ alignItems: 'center', display: 'flex', gap: 8 }}>
+              <input
+                checked={includeContent}
+                type="checkbox"
+                onChange={(event) => setIncludeContent(event.target.checked)}
+              />
+              Kem noi dung dai/HTML. Bat muc nay se lam file nang hon.
             </label>
 
             <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
@@ -203,7 +263,7 @@ export function ContentExcelManager() {
 
             <div>
               <button type="button" onClick={downloadExcel}>
-                Tải file Excel
+                {exportFormat === 'csv' ? 'Tai CSV cho Google Sheets' : 'Tai file Excel'}
               </button>
             </div>
           </div>
@@ -226,7 +286,7 @@ export function ContentExcelManager() {
             </label>
 
             <input
-              accept=".xls,.xml"
+              accept=".csv,.xls,.xml"
               type="file"
               onChange={(event) => setFile(event.target.files?.[0] || null)}
             />

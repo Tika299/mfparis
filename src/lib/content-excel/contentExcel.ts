@@ -1,7 +1,9 @@
 import type { Payload } from 'payload'
 
 import {
+  createCsv,
   createExcelXmlWorkbook,
+  parseCsv,
   parseExcelXmlWorkbook,
   valueToCell,
   type WorkbookRow,
@@ -10,12 +12,17 @@ import {
 
 export type ContentExcelCollection = 'products' | 'posts'
 export type ContentExcelOnly = ContentExcelCollection | 'all'
+export type ContentExcelExportFormat = 'xls' | 'csv'
+export type ContentExcelExportProfile = 'full' | 'google-sheets'
 
 type AnyRecord = Record<string, any>
 
 type ExportInput = {
+  format?: ContentExcelExportFormat
+  includeContent?: boolean
   payload: Payload
   only?: ContentExcelOnly
+  profile?: ContentExcelExportProfile
   productIds?: string[]
   productSlugs?: string[]
   postIds?: string[]
@@ -25,6 +32,7 @@ type ExportInput = {
 }
 
 type ImportInput = {
+  format?: ContentExcelExportFormat
   payload: Payload
   workbookXml: string
   only?: ContentExcelOnly
@@ -136,12 +144,75 @@ function preferredHeaders(collection: ContentExcelCollection) {
   ]
 }
 
-function buildRows(collection: ContentExcelCollection, docs: AnyRecord[]) {
-  const preferred = preferredHeaders(collection)
+function googleSheetsHeaders(collection: ContentExcelCollection, includeContent: boolean) {
+  if (collection === 'products') {
+    return [
+      '__collection',
+      'id',
+      'title',
+      'slug',
+      'sku',
+      'status',
+      'wpId',
+      'sourceUrl',
+      'brand',
+      'categories',
+      'price',
+      'productType',
+      'shortDescription',
+      ...(includeContent ? ['description'] : []),
+      'seoTitle',
+      'seoDescription',
+      'createdAt',
+      'updatedAt',
+    ]
+  }
+
+  return [
+    '__collection',
+    'id',
+    'title',
+    'slug',
+    'wpId',
+    'sourceUrl',
+    'categories',
+    'authorProfile',
+    'thumbnail',
+    'excerpt',
+    ...(includeContent ? ['content'] : []),
+    'seo',
+    'viewCount',
+    'rating',
+    'createdAt',
+    'updatedAt',
+  ]
+}
+
+function getExportHeaders(
+  collection: ContentExcelCollection,
+  profile: ContentExcelExportProfile,
+  includeContent: boolean,
+) {
+  if (profile === 'google-sheets') {
+    return googleSheetsHeaders(collection, includeContent)
+  }
+
+  return preferredHeaders(collection)
+}
+
+function buildRows(
+  collection: ContentExcelCollection,
+  docs: AnyRecord[],
+  profile: ContentExcelExportProfile = 'full',
+  includeContent = true,
+) {
+  const preferred = getExportHeaders(collection, profile, includeContent)
   const headers = new Set<string>(preferred)
 
-  for (const doc of docs) {
-    Object.keys(doc).forEach((key) => headers.add(key))
+  if (profile === 'full') {
+    for (const doc of docs) {
+      Object.keys(doc).forEach((key) => headers.add(key))
+    }
   }
 
   const orderedHeaders = [
@@ -195,15 +266,32 @@ async function fetchAllDocs(input: ExportInput, collection: ContentExcelCollecti
 export async function exportContentExcel(input: ExportInput) {
   const sheets: WorkbookSheets = {}
   const counts: Record<string, number> = {}
+  const profile = input.profile || 'full'
+  const includeContent = input.includeContent ?? profile === 'full'
 
   for (const collection of getCollections(input.only)) {
     const docs = await fetchAllDocs(input, collection)
-    sheets[collection] = buildRows(collection, docs)
+    sheets[collection] = buildRows(collection, docs, profile, includeContent)
     counts[collection] = docs.length
+  }
+
+  if (input.format === 'csv') {
+    const collections = getCollections(input.only)
+    const rows =
+      collections.length === 1
+        ? sheets[collections[0]] || []
+        : collections.flatMap((collection) => sheets[collection] || [])
+
+    return {
+      counts,
+      csv: createCsv(rows),
+      workbookXml: '',
+    }
   }
 
   return {
     counts,
+    csv: '',
     workbookXml: createExcelXmlWorkbook(sheets),
   }
 }
@@ -351,7 +439,10 @@ async function importRows({
 }
 
 export async function importContentExcel(input: ImportInput) {
-  const sheets = parseExcelXmlWorkbook(input.workbookXml)
+  const sheets =
+    input.format === 'csv'
+      ? rowsToSheets(parseCsv(input.workbookXml), input.only || 'all')
+      : parseExcelXmlWorkbook(input.workbookXml)
   const result: Record<string, Awaited<ReturnType<typeof importRows>>> = {}
 
   for (const collection of getCollections(input.only)) {
@@ -365,4 +456,17 @@ export async function importContentExcel(input: ImportInput) {
   }
 
   return result
+}
+
+function rowsToSheets(rows: WorkbookRow[], only: ContentExcelOnly): WorkbookSheets {
+  if (only === 'products' || only === 'posts') {
+    return {
+      [only]: rows,
+    }
+  }
+
+  return {
+    products: rows.filter((row) => row.__collection === 'products'),
+    posts: rows.filter((row) => row.__collection === 'posts'),
+  }
 }
