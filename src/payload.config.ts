@@ -83,6 +83,10 @@ export default buildConfig({
           Component: '@/components/Admin/InternalLinkSuggestions#InternalLinkSuggestions',
           path: '/internal-links/suggestions',
         },
+        ContentExcelManager: {
+          Component: '@/components/Admin/ContentExcelManager#ContentExcelManager',
+          path: '/content-excel',
+        },
       },
       beforeDashboard: ['@/components/Admin/ChatDashboardCard#ChatDashboardCard'],
     },

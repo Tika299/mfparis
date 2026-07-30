@@ -4,6 +4,7 @@ import { OrderAdminSummary as OrderAdminSummary_3b2dadd5d8707428ed22658ea734a041
 import { ChatDashboardCard as ChatDashboardCard_8a3e17a3fa476a8458ea76f65d84dfb9 } from '@/components/Admin/ChatDashboardCard'
 import { ChatCenter as ChatCenter_050613f0254c8a13f71b4dddce99a646 } from '@/components/Admin/ChatCenter'
 import { InternalLinkSuggestions as InternalLinkSuggestions_896596b78d8d83cb6e948853d75b13b5 } from '@/components/Admin/InternalLinkSuggestions'
+import { ContentExcelManager as ContentExcelManager_1e474d6fb3136692e761eb163a4482eb } from '@/components/Admin/ContentExcelManager'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -14,5 +15,6 @@ export const importMap = {
   "@/components/Admin/ChatDashboardCard#ChatDashboardCard": ChatDashboardCard_8a3e17a3fa476a8458ea76f65d84dfb9,
   "@/components/Admin/ChatCenter#ChatCenter": ChatCenter_050613f0254c8a13f71b4dddce99a646,
   "@/components/Admin/InternalLinkSuggestions#InternalLinkSuggestions": InternalLinkSuggestions_896596b78d8d83cb6e948853d75b13b5,
+  "@/components/Admin/ContentExcelManager#ContentExcelManager": ContentExcelManager_1e474d6fb3136692e761eb163a4482eb,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
