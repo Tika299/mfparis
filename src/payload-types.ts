@@ -2360,11 +2360,24 @@ export interface SiteSetting {
 export interface AboutPage {
   id: number;
   hero?: {
+    eyebrow?: string | null;
     title?: string | null;
+    subtitle?: string | null;
     image?: (number | null) | Media;
+    productImage?: (number | null) | Media;
+    stats?:
+      | {
+          value?: string | null;
+          label?: string | null;
+          id?: string | null;
+        }[]
+      | null;
   };
   story?: {
+    eyebrow?: string | null;
     heading?: string | null;
+    summary?: string | null;
+    signature?: string | null;
     /**
      * Nội dung HTML. Co the soan truc quan hoac chinh truc tiep ma HTML.
      */
@@ -2374,11 +2387,30 @@ export interface AboutPage {
      * Dán link YouTube, YouTube Shorts, youtu.be hoặc Vimeo.
      */
     videoUrl?: string | null;
-    /**
-     * Nội dung nay duoc dung lam title cho iframe va ho tro kha nang truy cap.
-     */
     videoTitle?: string | null;
   };
+  difference?: {
+    eyebrow?: string | null;
+    heading?: string | null;
+    intro?: string | null;
+    ctaLabel?: string | null;
+    ctaHref?: string | null;
+    cards?:
+      | {
+          image?: (number | null) | Media;
+          title?: string | null;
+          description?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  serviceHighlights?:
+    | {
+        title?: string | null;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   values?:
     | {
         title?: string | null;
@@ -2386,6 +2418,16 @@ export interface AboutPage {
         id?: string | null;
       }[]
     | null;
+  showroom?: {
+    image?: (number | null) | Media;
+    heading?: string | null;
+    ctaLabel?: string | null;
+    ctaHref?: string | null;
+    locationTitle?: string | null;
+    locationText?: string | null;
+    channelsTitle?: string | null;
+    channelsText?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2508,17 +2550,54 @@ export interface AboutPageSelect<T extends boolean = true> {
   hero?:
     | T
     | {
+        eyebrow?: T;
         title?: T;
+        subtitle?: T;
         image?: T;
+        productImage?: T;
+        stats?:
+          | T
+          | {
+              value?: T;
+              label?: T;
+              id?: T;
+            };
       };
   story?:
     | T
     | {
+        eyebrow?: T;
         heading?: T;
+        summary?: T;
+        signature?: T;
         content?: T;
         image?: T;
         videoUrl?: T;
         videoTitle?: T;
+      };
+  difference?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+        ctaLabel?: T;
+        ctaHref?: T;
+        cards?:
+          | T
+          | {
+              image?: T;
+              title?: T;
+              description?: T;
+              id?: T;
+            };
+      };
+  serviceHighlights?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
       };
   values?:
     | T
@@ -2526,6 +2605,18 @@ export interface AboutPageSelect<T extends boolean = true> {
         title?: T;
         description?: T;
         id?: T;
+      };
+  showroom?:
+    | T
+    | {
+        image?: T;
+        heading?: T;
+        ctaLabel?: T;
+        ctaHref?: T;
+        locationTitle?: T;
+        locationText?: T;
+        channelsTitle?: T;
+        channelsText?: T;
       };
   updatedAt?: T;
   createdAt?: T;

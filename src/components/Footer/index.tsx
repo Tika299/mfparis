@@ -13,6 +13,10 @@ import {
 import { getSiteSettings } from '@/data/getSiteSettings'
 import { SITE_ORIGIN } from '@/utilities/seo'
 
+const BO_CONG_THUONG_URL =
+  'http://online.gov.vn/nen-tang/0b38011e-cd02-475e-9746-3842a34a8adc'
+const BO_CONG_THUONG_LOGO_SRC = '/images/bo-cong-thuong.png'
+
 type FooterLink = {
   id?: string | number | null
   label?: string | null
@@ -696,8 +700,27 @@ export const Footer = async () => {
             reserved.
           </p>
 
-          {/* PAYMENT METHODS */}
-          <PaymentMethods />
+          {/* PAYMENT METHODS + BỘ CÔNG THƯƠNG */}
+          <div className="flex flex-col items-center gap-4">
+            <PaymentMethods />
+
+            <a
+              href={BO_CONG_THUONG_URL}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              aria-label="Đã thông báo Bộ Công Thương"
+              className="inline-flex rounded-md bg-white/95 p-1.5 shadow-[0_8px_22px_rgba(66,0,0,0.18)] transition-transform hover:-translate-y-0.5 hover:bg-white"
+            >
+              <Image
+                src={BO_CONG_THUONG_LOGO_SRC}
+                alt="Đã thông báo Bộ Công Thương"
+                width={260}
+                height={96}
+                sizes="(max-width: 768px) 180px, 210px"
+                className="h-auto w-[178px] object-contain md:w-[210px]"
+              />
+            </a>
+          </div>
 
           {/* CHAT BUTTON */}
           <div className="flex justify-center lg:justify-end">
