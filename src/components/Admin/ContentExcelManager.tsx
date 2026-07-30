@@ -59,8 +59,8 @@ function splitList(value: string) {
 export function ContentExcelManager() {
   const [exportOnly, setExportOnly] = useState<OnlyMode>('all')
   const [exportFormat, setExportFormat] = useState<ExportFormat>('csv')
-  const [exportProfile, setExportProfile] = useState<ExportProfile>('google-sheets')
-  const [includeContent, setIncludeContent] = useState(false)
+  const [exportProfile, setExportProfile] = useState<ExportProfile>('full')
+  const [includeContent, setIncludeContent] = useState(true)
   const [productIds, setProductIds] = useState('')
   const [productSlugs, setProductSlugs] = useState('')
   const [postIds, setPostIds] = useState('')
@@ -181,11 +181,11 @@ export function ContentExcelManager() {
                     const nextFormat = event.target.value as ExportFormat
 
                     setExportFormat(nextFormat)
-                    setExportProfile(nextFormat === 'csv' ? 'google-sheets' : 'full')
-                    setIncludeContent(nextFormat === 'xls')
+                    setExportProfile('full')
+                    setIncludeContent(true)
                   }}
                 >
-                  <option value="csv">CSV nhe cho Google Sheets</option>
+                  <option value="csv">CSV day du</option>
                   <option value="xls">Excel day du</option>
                 </select>
               </label>
@@ -197,8 +197,8 @@ export function ContentExcelManager() {
                   value={exportProfile}
                   onChange={(event) => setExportProfile(event.target.value as ExportProfile)}
                 >
-                  <option value="google-sheets">Google Sheets - cot hay sua</option>
                   <option value="full">Day du tat ca field</option>
+                  <option value="google-sheets">Google Sheets - cot hay sua</option>
                 </select>
               </label>
             </div>
@@ -209,7 +209,7 @@ export function ContentExcelManager() {
                 type="checkbox"
                 onChange={(event) => setIncludeContent(event.target.checked)}
               />
-              Kem noi dung dai/HTML. Bat muc nay se lam file nang hon.
+              Kem noi dung dai/HTML.
             </label>
 
             <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
@@ -263,7 +263,7 @@ export function ContentExcelManager() {
 
             <div>
               <button type="button" onClick={downloadExcel}>
-                {exportFormat === 'csv' ? 'Tai CSV cho Google Sheets' : 'Tai file Excel'}
+                {exportFormat === 'csv' ? 'Tai CSV day du' : 'Tai file Excel'}
               </button>
             </div>
           </div>
