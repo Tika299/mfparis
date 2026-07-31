@@ -200,19 +200,6 @@ export default async function AboutPage() {
               })}
             </div>
           </div>
-
-          <div className="relative hidden min-h-[420px] lg:block">
-            <div className="absolute right-0 top-1/2 aspect-[4/5] w-[58%] -translate-y-1/2 overflow-hidden rounded-[2.4rem] bg-white/30 shadow-[0_34px_90px_rgba(71,45,28,0.22)] backdrop-blur-sm">
-              <OptimizedImage
-                media={hero.productImage || hero.image}
-                size="heroDesktop"
-                sizes="40vw"
-                className="h-full w-full"
-                imageClassName="object-cover"
-                alt="Marais de France"
-              />
-            </div>
-          </div>
         </div>
       </section>
 
