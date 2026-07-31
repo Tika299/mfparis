@@ -2,13 +2,32 @@ import { FieldHook } from 'payload'
 import { formatSlug } from '../utilities/formatSlug'
 
 export const beforeChangeSlug: FieldHook = ({ operation, value, data, originalDoc }) => {
-  // 1. Nếu người dùng đang tự gõ vào ô Slug, hãy lấy giá trị đó và format lại cho chuẩn
-  if (typeof value === 'string' && value.length > 0 && value !== originalDoc?.slug) {
-    return formatSlug(value)
+  const currentValue = typeof value === 'string' ? value.trim() : ''
+  const originalSlug =
+    typeof originalDoc?.slug === 'string' ? originalDoc.slug.trim() : ''
+
+  if (operation === 'update' && originalSlug) {
+    if (!currentValue || currentValue === originalSlug) {
+      return formatSlug(originalSlug)
+    }
+
+    const titleSlug =
+      typeof data?.title === 'string' && data.title.trim()
+        ? formatSlug(data.title)
+        : ''
+
+    if (titleSlug && currentValue === titleSlug && originalSlug !== titleSlug) {
+      return formatSlug(originalSlug)
+    }
+
+    return formatSlug(currentValue)
   }
 
-  // 2. Nếu tên (title) thay đổi, tự động tạo slug mới từ tên
-  if (data?.title) {
+  if (currentValue) {
+    return formatSlug(currentValue)
+  }
+
+  if (typeof data?.title === 'string' && data.title.trim()) {
     return formatSlug(data.title)
   }
 
