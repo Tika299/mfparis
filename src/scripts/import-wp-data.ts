@@ -82,6 +82,11 @@ const DEFAULT_DATA_DIR = path.resolve(__dirname, 'export')
 const DATA_DIR = path.resolve(
   getArg('--data-dir', process.env.WP_IMPORT_DATA_DIR || DEFAULT_DATA_DIR),
 )
+const DEFAULT_LOCAL_MEDIA_DIR = path.resolve(DATA_DIR, 'media')
+const LOCAL_MEDIA_DIR = path.resolve(
+  getArg('--local-media-dir', process.env.WP_IMPORT_LOCAL_MEDIA_DIR || DEFAULT_LOCAL_MEDIA_DIR),
+)
+const USE_LOCAL_MEDIA_FALLBACK = !hasFlag('--no-local-media')
 
 const DATA_FILES = {
   brands: 'brands.merged.json',
@@ -430,14 +435,13 @@ function normalizeImportFilename(basename: string, fallback: string, source = ''
     : cleanBasename
   const stemFallback = makeSafeSlug(fallback || 'wp-media')
   const stem = makeSafeSlug(stemSource || stemFallback)
-  const hash = shortStableHash(source || cleanBasename || stemFallback)
   const maxStemLength = Math.min(
     MAX_IMPORT_FILENAME_STEM_LENGTH,
-    MAX_IMPORT_FILENAME_LENGTH - ext.length - hash.length - 1,
+    MAX_IMPORT_FILENAME_LENGTH - ext.length,
   )
   const shortStem = stem.slice(0, Math.max(16, maxStemLength)).replace(/-+$/g, '') || stemFallback
 
-  return `${shortStem}-${hash}${ext}`
+  return `${shortStem}${ext}`
 }
 
 function getFilenameFromUrl(url: string, fallback = 'wp-media') {
@@ -450,11 +454,165 @@ function getFilenameFromUrl(url: string, fallback = 'wp-media') {
   }
 }
 
+function getRawFilenameFromUrl(url: string, fallback = 'wp-media') {
+  try {
+    const parsed = new URL(url, WP_BASE_URL)
+    const basename = safeDecodeUriPart(path.basename(parsed.pathname)).replace(/[\\/]+/g, '-')
+    return basename || `${makeSafeSlug(fallback || 'wp-media')}.jpg`
+  } catch {
+    return `${makeSafeSlug(fallback || 'wp-media')}.jpg`
+  }
+}
+
 function normalizeFilenameKey(value: string): string {
   const filename = getFilenameFromUrl(value).toLowerCase()
   return filename
     .replace(/\?.*$/g, '')
     .replace(/-\d+x\d+(?=\.[a-z0-9]+$)/i, '')
+}
+
+const LOCAL_MEDIA_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.avif', '.gif', '.svg']
+
+type LocalMediaSource = {
+  filePath: string
+  filename: string
+}
+
+let localMediaIndex: Map<string, LocalMediaSource> | null = null
+
+function removeWpImageSizeSuffixFromFilename(filename: string) {
+  const extension = path.extname(filename)
+  const stem = extension ? filename.slice(0, -extension.length) : filename
+
+  return `${stem.replace(/-\d+x\d+$/i, '')}${extension}`
+}
+
+function removeImportHashSuffixFromFilename(filename: string) {
+  const extension = path.extname(filename)
+  const stem = extension ? filename.slice(0, -extension.length) : filename
+  const cleanedStem = stem.replace(/-([a-z0-9]{5,10})$/i, (match, suffix) => {
+    return /[a-z]/i.test(suffix) && /\d/.test(suffix) ? '' : match
+  })
+
+  return `${cleanedStem}${extension}`
+}
+
+function addLocalMediaLookupKeys(map: Map<string, LocalMediaSource>, filename: string, source: LocalMediaSource) {
+  const cleanFilename = safeDecodeUriPart(String(filename || '')).replace(/[\\/]+/g, '-')
+  const basename = path.basename(cleanFilename)
+  const extension = path.extname(basename).toLowerCase()
+  const stem = extension ? basename.slice(0, -extension.length) : basename
+  const safeStem = makeSafeSlug(stem)
+  const stemVariants = new Set<string>([
+    stem,
+    stem.replace(/-\d+x\d+$/i, ''),
+    stem.replace(/-([a-z0-9]{5,10})$/i, (match, suffix) => {
+      return /[a-z]/i.test(suffix) && /\d/.test(suffix) ? '' : match
+    }),
+  ])
+
+  if (safeStem) {
+    stemVariants.add(safeStem)
+    stemVariants.add(safeStem.replace(/-\d+x\d+$/i, ''))
+    stemVariants.add(
+      safeStem.replace(/-([a-z0-9]{5,10})$/i, (match, suffix) => {
+        return /[a-z]/i.test(suffix) && /\d/.test(suffix) ? '' : match
+      }),
+    )
+  }
+
+  for (const variant of stemVariants) {
+    const cleanVariant = String(variant || '').replace(/-+$/g, '')
+
+    if (!cleanVariant) {
+      continue
+    }
+
+    if (extension) {
+      map.set(`${cleanVariant}${extension}`.toLowerCase(), source)
+    }
+
+    for (const nextExtension of LOCAL_MEDIA_EXTENSIONS) {
+      map.set(`${cleanVariant}${nextExtension}`.toLowerCase(), source)
+    }
+  }
+
+  if (basename) {
+    map.set(basename.toLowerCase(), source)
+    map.set(removeWpImageSizeSuffixFromFilename(basename).toLowerCase(), source)
+    map.set(removeImportHashSuffixFromFilename(basename).toLowerCase(), source)
+  }
+}
+
+function buildLocalMediaIndex() {
+  const map = new Map<string, LocalMediaSource>()
+
+  if (!USE_LOCAL_MEDIA_FALLBACK || !fs.existsSync(LOCAL_MEDIA_DIR)) {
+    return map
+  }
+
+  const stack = [LOCAL_MEDIA_DIR]
+
+  while (stack.length) {
+    const currentDir = stack.pop()
+
+    if (!currentDir) {
+      continue
+    }
+
+    for (const entry of fs.readdirSync(currentDir, { withFileTypes: true })) {
+      const entryPath = path.join(currentDir, entry.name)
+
+      if (entry.isDirectory()) {
+        stack.push(entryPath)
+        continue
+      }
+
+      if (!entry.isFile()) {
+        continue
+      }
+
+      const extension = path.extname(entry.name).toLowerCase()
+
+      if (!LOCAL_MEDIA_EXTENSIONS.includes(extension)) {
+        continue
+      }
+
+      addLocalMediaLookupKeys(map, entry.name, {
+        filePath: entryPath,
+        filename: entry.name,
+      })
+    }
+  }
+
+  return map
+}
+
+function findLocalMediaFile(...filenames: string[]): LocalMediaSource | null {
+  if (!USE_LOCAL_MEDIA_FALLBACK) {
+    return null
+  }
+
+  localMediaIndex ||= buildLocalMediaIndex()
+
+  for (const filename of filenames) {
+    const candidates = new Set<string>([
+      filename,
+      removeWpImageSizeSuffixFromFilename(filename),
+      removeImportHashSuffixFromFilename(filename),
+      removeWpImageSizeSuffixFromFilename(removeImportHashSuffixFromFilename(filename)),
+    ])
+
+    for (const candidate of candidates) {
+      const source = localMediaIndex.get(candidate.toLowerCase())
+
+      if (source) {
+        return source
+      }
+    }
+  }
+
+  return null
 }
 
 function getMimeType(filename: string) {
@@ -642,6 +800,7 @@ async function uploadMedia(
   return mediaLimit(async () => {
     const normalizedUrl = new URL(url, WP_BASE_URL).toString()
     const filename = getFilenameFromUrl(normalizedUrl, makeSafeSlug(alt || 'wp-media'))
+    const rawFilename = getRawFilenameFromUrl(normalizedUrl, makeSafeSlug(alt || 'wp-media'))
     const filenameKey = normalizeFilenameKey(filename)
     const preferred = options.preferredMediaByFilename?.get(filenameKey)
 
@@ -684,35 +843,48 @@ async function uploadMedia(
       return dryRef
     }
 
-    let response: Awaited<ReturnType<typeof fetch>>
+    let downloadedBuffer: Buffer | null = null
+    let sourceLabel = normalizedUrl
+    const localSource = findLocalMediaFile(filename, rawFilename)
 
-    try {
-      response = await fetch(normalizedUrl, {
-        headers: { 'user-agent': USER_AGENT },
-      })
-    } catch (error: any) {
-      console.warn(`   Media warning: skip image ${normalizedUrl} - ${error?.message || error}`)
-      return null
+    if (localSource) {
+      try {
+        downloadedBuffer = fs.readFileSync(localSource.filePath)
+        sourceLabel = localSource.filePath
+      } catch (error: any) {
+        console.warn(`   Media warning: cannot read local image ${localSource.filePath} - ${error?.message || error}`)
+      }
     }
 
-    if (!response.ok) {
-      console.warn(`   Media warning: skip image ${normalizedUrl} - HTTP ${response.status}`)
-      return null
-    }
+    if (!downloadedBuffer) {
+      let response: Awaited<ReturnType<typeof fetch>>
 
-    let downloadedBuffer: Buffer
+      try {
+        response = await fetch(normalizedUrl, {
+          headers: { 'user-agent': USER_AGENT },
+        })
+      } catch (error: any) {
+        console.warn(`   Media warning: skip image ${normalizedUrl} - ${error?.message || error}`)
+        return null
+      }
 
-    try {
-      downloadedBuffer = Buffer.from(await response.arrayBuffer())
-    } catch (error: any) {
-      console.warn(`   Media warning: cannot read image ${normalizedUrl} - ${error?.message || error}`)
-      return null
+      if (!response.ok) {
+        console.warn(`   Media warning: skip image ${normalizedUrl} - HTTP ${response.status}`)
+        return null
+      }
+
+      try {
+        downloadedBuffer = Buffer.from(await response.arrayBuffer())
+      } catch (error: any) {
+        console.warn(`   Media warning: cannot read image ${normalizedUrl} - ${error?.message || error}`)
+        return null
+      }
     }
 
     const preparedImage = await prepareImportImageBuffer(
       downloadedBuffer,
       filename,
-      normalizedUrl,
+      sourceLabel,
     )
 
     if (!preparedImage) {

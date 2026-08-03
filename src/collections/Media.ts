@@ -266,10 +266,9 @@ export const Media: CollectionConfig = {
     {
       name: 'title',
       type: 'text',
-      label: 'Ten hien thi',
+      label: 'Tên hiển thị',
       admin: {
-        description:
-          'Tên để quản trị tìm kiếm media. Đổi tên này sẽ cập nhật ở các nội dung dùng relationship media.',
+        description: 'Tên để quản trị tìm kiếm media. Đổi tên này sẽ cập nhật ở các nội dung dùng relationship media.',
       },
     },
     {
@@ -278,14 +277,13 @@ export const Media: CollectionConfig = {
       label: 'Tên file URL',
       admin: {
         position: 'sidebar',
-        description:
-          'Đổi phần tên file trong URL ảnh, ví dụ ten-anh-moi.webp. Nếu không nhập đuôi file, hệ thống giữ đuôi hiện tại.',
+        description: 'Đổi phần tên file trong URL ảnh, ví dụ ten-anh-moi.webp. Nếu không nhập đuôi file, hệ thống giữ đuôi hiện tại.',
       },
     },
     {
       name: 'caption',
       type: 'textarea',
-      label: 'Chu thich anh',
+      label: 'Chú thích ảnh',
       admin: {
         rows: 3,
       },
@@ -296,8 +294,7 @@ export const Media: CollectionConfig = {
       label: 'Mô tả ảnh',
       admin: {
         rows: 4,
-        description:
-          'Mô tả nội dung/hậu trường của ảnh, tương tự trường Description trong WordPress Media.',
+        description: 'Mô tả nội dung/hậu trường của ảnh, tương tự trường Description trong WordPress Media.',
       },
     },
     {
@@ -315,7 +312,7 @@ export const Media: CollectionConfig = {
       name: 'sourceUrl',
       type: 'text',
       index: true,
-      label: 'URL anh goc',
+      label: 'URL ảnh gốc',
       admin: {
         position: 'sidebar',
         readOnly: true,
@@ -325,7 +322,7 @@ export const Media: CollectionConfig = {
       name: 'sourceFilename',
       type: 'text',
       index: true,
-      label: 'Ten file goc',
+      label: 'Tên file gốc',
       admin: {
         position: 'sidebar',
         readOnly: true,
@@ -334,10 +331,10 @@ export const Media: CollectionConfig = {
     {
       name: 'importedFrom',
       type: 'select',
-      label: 'Nguon import',
+      label: 'Nguồn import',
       defaultValue: 'manual',
       options: [
-        { label: 'Nhap tay', value: 'manual' },
+        { label: 'Nhập tay', value: 'manual' },
         { label: 'WordPress', value: 'wordpress' },
         { label: 'WooCommerce', value: 'woocommerce' },
       ],
