@@ -472,7 +472,7 @@ async function scanAndUpdateCollection(
 
       if (!DRY_RUN) {
         await payload.update({
-          collection: arguments[2],
+          collection: collectionSlug,
           id: doc.id,
           data: sanitizeForUpdate(replaceResult.value as AnyRecord),
           overrideAccess: true,
