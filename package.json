@@ -69,7 +69,9 @@
     "report:slug-mismatches": "tsx src/scripts/report-slug-mismatches.ts",
     "report:slug-mismatches:posts": "tsx src/scripts/report-slug-mismatches.ts --only=posts",
     "report:slug-mismatches:products": "tsx src/scripts/report-slug-mismatches.ts --only=products",
-    "clear:internal-links": "tsx src/scripts/clear-internal-link-rules.ts"
+    "clear:internal-links": "tsx src/scripts/clear-internal-link-rules.ts",
+    "repair:media-duplicates": "tsx src/scripts/repair-media-duplicates.ts",
+    "repair:media-duplicates:apply": "tsx src/scripts/repair-media-duplicates.ts --yes --trust-name"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.85.0",
