@@ -57,6 +57,10 @@ function getImageAlt(item: any, fallback = 'Product image') {
   return media?.alt || media?.filename || fallback
 }
 
+function shouldBypassNextImage(src: string) {
+  return src.startsWith('/api/media/file/')
+}
+
 type ProductGalleryImages = NonNullable<
   Product['images']
 >
@@ -105,6 +109,7 @@ export const ProductGallery = ({ images }: ProductGalleryProps) => {
             fill
             className="object-contain transition-all duration-500"
             priority
+            unoptimized={shouldBypassNextImage(activeImageUrl)}
             sizes="(max-width: 768px) 100vw, 700px"
           />
         ) : (
@@ -162,6 +167,7 @@ export const ProductGallery = ({ images }: ProductGalleryProps) => {
                     alt={thumbAlt}
                     fill
                     className="object-contain p-2"
+                    unoptimized={shouldBypassNextImage(thumbUrl)}
                     sizes="85px"
                   />
                 ) : (

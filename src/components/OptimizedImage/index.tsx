@@ -22,6 +22,10 @@ interface OptimizedImageProps {
   quality?: number
 }
 
+function shouldBypassNextImage(src: string) {
+  return src.startsWith('/api/media/file/')
+}
+
 export const OptimizedImage = ({
   media,
   size = 'card',
@@ -63,6 +67,7 @@ export const OptimizedImage = ({
           alt="Placeholder"
           fill
           sizes={sizes ?? '100vw'}
+          unoptimized={shouldBypassNextImage('/api/media/file/placeholder.webp')}
           className="object-cover"
         />
       </div>
@@ -113,6 +118,7 @@ export const OptimizedImage = ({
         priority={priority}
         sizes={imageSizes}
         quality={quality}
+        unoptimized={shouldBypassNextImage(src)}
         loading={priority ? undefined : 'lazy'}
         className={cn(
           'object-cover transition-transform duration-700 ease-in-out',
