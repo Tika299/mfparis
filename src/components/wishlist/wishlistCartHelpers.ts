@@ -30,8 +30,8 @@ function getImageUrl(
     }
 
     return (
-        media.sizes?.card?.url ??
         media.url ??
+        media.sizes?.card?.url ??
         media.sizes?.thumbnail?.url ??
         ''
     )

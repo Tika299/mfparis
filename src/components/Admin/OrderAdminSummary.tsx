@@ -121,7 +121,7 @@ function getImageURL(item: OrderItem): string {
   const image = item.product.featuredImage
 
   if (image && typeof image === 'object') {
-    return image.sizes?.thumbnail?.url || image.thumbnailURL || image.url || ''
+    return image.url || image.thumbnailURL || image.sizes?.thumbnail?.url || ''
   }
 
   const galleryImage = item.product.images?.find((entry) => {
@@ -129,7 +129,7 @@ function getImageURL(item: OrderItem): string {
   })?.image
 
   if (galleryImage && typeof galleryImage === 'object') {
-    return galleryImage.sizes?.thumbnail?.url || galleryImage.thumbnailURL || galleryImage.url || ''
+    return galleryImage.url || galleryImage.thumbnailURL || galleryImage.sizes?.thumbnail?.url || ''
   }
 
   return ''

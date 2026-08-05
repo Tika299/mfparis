@@ -446,25 +446,25 @@ function getProductOpenGraphImageData(
   }
 
   const candidate =
-    firstImage.sizes?.heroDesktop?.url
+    firstImage.url
       ? {
-        url: firstImage.sizes.heroDesktop.url,
-        width:
-          firstImage.sizes.heroDesktop.width ?? undefined,
-        height:
-          firstImage.sizes.heroDesktop.height ?? undefined,
+        url: firstImage.url,
+        width: firstImage.width ?? undefined,
+        height: firstImage.height ?? undefined,
       }
-      : firstImage.sizes?.card?.url
+      : firstImage.sizes?.heroDesktop?.url
         ? {
-          url: firstImage.sizes.card.url,
-          width: firstImage.sizes.card.width ?? undefined,
-          height: firstImage.sizes.card.height ?? undefined,
+          url: firstImage.sizes.heroDesktop.url,
+          width:
+            firstImage.sizes.heroDesktop.width ?? undefined,
+          height:
+            firstImage.sizes.heroDesktop.height ?? undefined,
         }
-        : firstImage.url
+        : firstImage.sizes?.card?.url
           ? {
-            url: firstImage.url,
-            width: firstImage.width ?? undefined,
-            height: firstImage.height ?? undefined,
+            url: firstImage.sizes.card.url,
+            width: firstImage.sizes.card.width ?? undefined,
+            height: firstImage.sizes.card.height ?? undefined,
           }
           : null
 
