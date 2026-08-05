@@ -11,8 +11,8 @@ function getMediaUrl(media: any): string {
     }
 
     return (
-        media.url ||
         media.sizes?.card?.url ||
+        media.url ||
         media.sizes?.thumbnail?.url ||
         ''
     )

@@ -76,8 +76,8 @@ export const OptimizedImage = ({
 
   const sizedMedia = media.sizes?.[size]
   const src =
-    media.url ||
     sizedMedia?.url ||
+    media.url ||
     '/api/media/file/placeholder.webp'
 
   const imageAlt =

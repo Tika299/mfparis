@@ -84,8 +84,8 @@ function getUploadUrl(
   }
 
   return (
-    upload.url ??
     upload.sizes?.card?.url ??
+    upload.url ??
     upload.sizes?.thumbnail?.url ??
     ''
   )

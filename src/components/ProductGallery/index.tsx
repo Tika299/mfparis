@@ -32,21 +32,21 @@ function getImageUrl(item: any, type: 'main' | 'thumb' = 'main') {
 
   if (type === 'thumb') {
     return (
-      media?.url ||
       sizes?.thumbnail?.url ||
       sizes?.card?.url ||
       sizes?.medium?.url ||
       firstSizeUrl ||
+      media?.url ||
       ''
     )
   }
 
   return (
-    media?.url ||
     sizes?.card?.url ||
     sizes?.medium?.url ||
     sizes?.thumbnail?.url ||
     firstSizeUrl ||
+    media?.url ||
     ''
   )
 }
