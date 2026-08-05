@@ -32,6 +32,7 @@ const getArg = (name: string, fallback = '') => {
 
 const YES = hasFlag('--yes')
 const DRY_RUN = hasFlag('--dry-run') || !YES
+const CREATE_FILES = hasFlag('--create-files') || hasFlag('--create-main-from-size')
 const PAGE_SIZE = Math.max(1, Math.min(200, Number(getArg('--page-size', '100')) || 100))
 const LIMIT = Math.max(0, Number(getArg('--limit', '0')) || 0)
 const MEDIA_DIR = path.resolve(process.env.MEDIA_DIR || path.resolve(process.cwd(), 'media'))
@@ -144,6 +145,72 @@ function fileUrl(filename: string) {
   return `/api/media/file/${encodeURIComponent(filename)}`
 }
 
+function parseSizeArea(filename: string) {
+  const match = filename.match(/-(\d+)x(\d+)\.[^.]+$/i)
+  if (!match) return 0
+
+  return Number(match[1]) * Number(match[2])
+}
+
+function findBestExistingVariant(filename: string) {
+  const { stem } = getFilenameParts(path.basename(filename))
+  const candidates = fs
+    .readdirSync(MEDIA_DIR)
+    .filter((entry) => {
+      if (!imageExtensionPattern.test(entry)) return false
+      if (entry === filename) return false
+      return entry.startsWith(`${stem}-`) || entry.startsWith(stem)
+    })
+    .map((entry) => ({
+      filename: entry,
+      area: parseSizeArea(entry),
+      isPreferredFormat: path.extname(entry).toLowerCase() === path.extname(filename).toLowerCase(),
+    }))
+    .sort((a, b) => {
+      if (b.area !== a.area) return b.area - a.area
+      return Number(b.isPreferredFormat) - Number(a.isPreferredFormat)
+    })
+
+  return candidates[0]?.filename || ''
+}
+
+async function createMissingFileFromVariant(targetFilename: string, sourceFilename: string) {
+  const targetPath = path.join(MEDIA_DIR, targetFilename)
+  const sourcePath = path.join(MEDIA_DIR, sourceFilename)
+  const targetExtension = path.extname(targetFilename).toLowerCase()
+  const sourceExtension = path.extname(sourceFilename).toLowerCase()
+
+  if (targetExtension === sourceExtension) {
+    await fs.promises.copyFile(sourcePath, targetPath)
+    return
+  }
+
+  const sharp = (await import('sharp')).default
+  const pipeline = sharp(sourcePath)
+
+  if (targetExtension === '.webp') {
+    await pipeline.webp({ quality: 82 }).toFile(targetPath)
+    return
+  }
+
+  if (targetExtension === '.avif') {
+    await pipeline.avif({ quality: 70 }).toFile(targetPath)
+    return
+  }
+
+  if (targetExtension === '.jpg' || targetExtension === '.jpeg') {
+    await pipeline.jpeg({ quality: 86 }).toFile(targetPath)
+    return
+  }
+
+  if (targetExtension === '.png') {
+    await pipeline.png().toFile(targetPath)
+    return
+  }
+
+  await fs.promises.copyFile(sourcePath, targetPath)
+}
+
 function csvCell(value: unknown) {
   const text = String(value ?? '')
   return `"${text.replace(/"/g, '""')}"`
@@ -250,6 +317,8 @@ async function main() {
   let missingFile = 0
   let matchedCleanFile = 0
   let updated = 0
+  let wouldCreateFiles = 0
+  let createdFiles = 0
   let skipped = 0
   let failed = 0
 
@@ -283,7 +352,53 @@ async function main() {
 
         if (!plan) {
           if (isMissing) {
-            reportRows.push(['missing_unmatched', doc.id, filename, '', ''].map(csvCell).join(','))
+            const sourceVariant = findBestExistingVariant(filename)
+
+            if (sourceVariant) {
+              if (CREATE_FILES) {
+                try {
+                  if (!DRY_RUN) {
+                    await createMissingFileFromVariant(filename, sourceVariant)
+                    createdFiles += 1
+                  } else {
+                    wouldCreateFiles += 1
+                  }
+
+                  reportRows.push(
+                    [
+                      DRY_RUN ? 'would_create_file' : 'created_file',
+                      doc.id,
+                      filename,
+                      sourceVariant,
+                      'main file recreated from existing size variant',
+                    ]
+                      .map(csvCell)
+                      .join(','),
+                  )
+                } catch (error: any) {
+                  failed += 1
+                  reportRows.push(
+                    ['failed_create_file', doc.id, filename, sourceVariant, error?.message || error]
+                      .map(csvCell)
+                      .join(','),
+                  )
+                }
+              } else {
+                reportRows.push(
+                  [
+                    'can_create_file',
+                    doc.id,
+                    filename,
+                    sourceVariant,
+                    'run with --create-files --yes',
+                  ]
+                    .map(csvCell)
+                    .join(','),
+                )
+              }
+            } else {
+              reportRows.push(['missing_unmatched', doc.id, filename, '', ''].map(csvCell).join(','))
+            }
           }
 
           skipped += 1
@@ -340,6 +455,8 @@ async function main() {
         missingFile,
         matchedCleanFile,
         updated,
+        wouldCreateFiles,
+        createdFiles,
         skipped,
         failed,
         report: REPORT_CSV,
