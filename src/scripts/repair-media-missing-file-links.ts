@@ -41,6 +41,7 @@ const REPORT_CSV = path.join(REPORT_DIR, 'media-missing-file-links-repair.csv')
 const imageExtensionPattern = /\.(jpe?g|png|gif|webp|avif|svg)$/i
 const hashSuffixPattern = /-([a-z0-9]{5,10})$/i
 const sizeSuffixPattern = /-\d+x\d+$/i
+const fallbackExtensions = ['.webp', '.jpg', '.jpeg', '.png', '.avif']
 
 const sizeColumns: Record<string, { filename: string; url: string }> = {
   thumbnail: { filename: 'sizes_thumbnail_filename', url: 'sizes_thumbnail_url' },
@@ -87,7 +88,34 @@ function cleanMainFilename(filename: string) {
   return `${cleanedStem}${extension.toLowerCase()}`
 }
 
-function cleanSizeFilename(filename: string) {
+function existingCandidate(stem: string, preferredExtension: string) {
+  const extensions = [
+    preferredExtension.toLowerCase(),
+    ...fallbackExtensions.filter((extension) => extension !== preferredExtension.toLowerCase()),
+  ]
+
+  for (const extension of extensions) {
+    const candidate = `${stem}${extension}`
+
+    if (fileExists(candidate)) {
+      return candidate
+    }
+  }
+
+  return ''
+}
+
+function findExistingCleanMainFilename(filename: string) {
+  const cleaned = cleanMainFilename(filename)
+
+  if (!cleaned) return ''
+  if (fileExists(cleaned)) return cleaned
+
+  const { extension, stem } = getFilenameParts(cleaned)
+  return existingCandidate(stem, extension)
+}
+
+function findExistingCleanSizeFilename(filename: string) {
   const raw = path.basename(String(filename || '').replace(/\\/g, '/'))
 
   if (!raw || !imageExtensionPattern.test(raw)) return ''
@@ -102,9 +130,14 @@ function cleanSizeFilename(filename: string) {
   const sizeSuffix = sizeMatch[0]
   const stemBeforeSize = stem.slice(0, -sizeSuffix.length)
   const cleanedStem = removeImportHashSuffix(stemBeforeSize).replace(/-+$/g, '')
-  const next = `${cleanedStem}${sizeSuffix}${extension.toLowerCase()}`
+  const nextStem = `${cleanedStem}${sizeSuffix}`
+  const next = `${nextStem}${extension.toLowerCase()}`
 
-  return next === raw ? '' : next
+  if (next !== raw && fileExists(next)) {
+    return next
+  }
+
+  return existingCandidate(nextStem, extension)
 }
 
 function fileUrl(filename: string) {
@@ -140,7 +173,7 @@ async function createPlan(payload: any, doc: MediaDoc): Promise<UpdatePlan | nul
     return null
   }
 
-  const newFilename = cleanMainFilename(oldFilename)
+  const newFilename = findExistingCleanMainFilename(oldFilename)
 
   if (!newFilename || newFilename === oldFilename || !fileExists(newFilename)) {
     return null
@@ -161,7 +194,7 @@ async function createPlan(payload: any, doc: MediaDoc): Promise<UpdatePlan | nul
 
   for (const [sizeName, columns] of Object.entries(sizeColumns)) {
     const currentSizeFilename = String(doc.sizes?.[sizeName]?.filename || '').trim()
-    const nextSizeFilename = cleanSizeFilename(currentSizeFilename)
+    const nextSizeFilename = findExistingCleanSizeFilename(currentSizeFilename)
 
     if (currentSizeFilename && nextSizeFilename && fileExists(nextSizeFilename)) {
       fields[columns.filename] = nextSizeFilename
@@ -241,13 +274,18 @@ async function main() {
         scanned += 1
 
         const filename = String(doc.filename || doc.fileName || '').trim()
-        if (filename && !fileExists(filename)) {
+        const isMissing = Boolean(filename && !fileExists(filename))
+        if (isMissing) {
           missingFile += 1
         }
 
         const plan = await createPlan(payload, doc)
 
         if (!plan) {
+          if (isMissing) {
+            reportRows.push(['missing_unmatched', doc.id, filename, '', ''].map(csvCell).join(','))
+          }
+
           skipped += 1
           continue
         }
