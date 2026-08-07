@@ -15,6 +15,7 @@ type PayloadMedia = {
   caption?: string | null
   description?: string | null
   filename?: string | null
+  sourceFilename?: string | null
   url?: string | null
   width?: number | null
   height?: number | null
@@ -23,6 +24,16 @@ type PayloadMedia = {
       url?: string | null
     } | null
   } | null
+}
+
+type MediaPagination = {
+  page: number
+  totalPages: number
+  totalDocs: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
+  nextPage?: number | null
+  prevPage?: number | null
 }
 
 type ImageDraft = {
@@ -66,6 +77,56 @@ function getMediaThumbnailUrl(media: PayloadMedia): string {
 
 function getMediaLabel(media: PayloadMedia): string {
   return media.title || media.alt || media.filename || 'Ảnh'
+}
+
+const MEDIA_PAGE_SIZE = 60
+
+const mediaSearchFields = [
+  'filename',
+  'alt',
+  'title',
+  'caption',
+  'description',
+  'sourceFilename',
+]
+
+function buildMediaSearchUrl({
+  page,
+  search,
+}: {
+  page: number
+  search: string
+}): string {
+  const params = new URLSearchParams({
+    depth: '0',
+    limit: String(MEDIA_PAGE_SIZE),
+    page: String(page),
+    sort: '-createdAt',
+  })
+  const query = search.trim()
+
+  if (query) {
+    mediaSearchFields.forEach((field, index) => {
+      params.set('where[or][' + index + '][' + field + '][like]', query)
+    })
+  }
+
+  return '/api/media?' + params.toString()
+}
+
+function uniqueMediaItems(items: PayloadMedia[]): PayloadMedia[] {
+  const seen = new Set<string>()
+
+  return items.filter((item) => {
+    const key = String(item.id)
+
+    if (seen.has(key)) {
+      return false
+    }
+
+    seen.add(key)
+    return true
+  })
 }
 
 function createImageDraft(media?: PayloadMedia | null): ImageDraft {
@@ -137,6 +198,15 @@ export function TinyMCEHtmlEditor({ path, field }: TinyMCEHtmlEditorProps) {
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false)
   const [mediaSearch, setMediaSearch] = useState('')
   const [mediaItems, setMediaItems] = useState<PayloadMedia[]>([])
+  const [mediaPagination, setMediaPagination] = useState<MediaPagination>({
+    page: 1,
+    totalPages: 1,
+    totalDocs: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+    nextPage: null,
+    prevPage: null,
+  })
   const [selectedMedia, setSelectedMedia] = useState<PayloadMedia | null>(null)
   const [imageDraft, setImageDraft] = useState<ImageDraft>(() => createImageDraft())
   const [uploadFile, setUploadFile] = useState<File | null>(null)
@@ -172,19 +242,6 @@ export function TinyMCEHtmlEditor({ path, field }: TinyMCEHtmlEditorProps) {
     [html, mode, sourceDraftHtml],
   )
 
-  const filteredMediaItems = useMemo(() => {
-    const query = mediaSearch.trim().toLowerCase()
-
-    if (!query) {
-      return mediaItems
-    }
-
-    return mediaItems.filter((item) => {
-      const text = `${item.filename || ''} ${item.alt || ''} ${item.title || ''} ${item.caption || ''} ${item.description || ''}`.toLowerCase()
-
-      return text.includes(query)
-    })
-  }, [mediaItems, mediaSearch])
 
   const selectMedia = useCallback((media: PayloadMedia) => {
     setSelectedMedia(media)
@@ -193,36 +250,53 @@ export function TinyMCEHtmlEditor({ path, field }: TinyMCEHtmlEditorProps) {
     setMediaNotice(null)
   }, [])
 
-  const loadMediaItems = useCallback(async () => {
-    setIsMediaLoading(true)
-    setMediaError(null)
+  const loadMediaItems = useCallback(
+    async (nextPage = 1, options: { append?: boolean } = {}) => {
+      setIsMediaLoading(true)
+      setMediaError(null)
 
-    try {
-      const response = await fetch('/api/media?limit=80&depth=0&sort=-createdAt', {
-        credentials: 'include',
-      })
+      try {
+        const response = await fetch(
+          buildMediaSearchUrl({ page: nextPage, search: mediaSearch }),
+          {
+            credentials: 'include',
+          },
+        )
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`)
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`)
+        }
+
+        const result = await response.json()
+        const docs = Array.isArray(result.docs) ? (result.docs as PayloadMedia[]) : []
+        setMediaPagination({
+          page: Number(result.page || nextPage) || nextPage,
+          totalPages: Number(result.totalPages || 1) || 1,
+          totalDocs: Number(result.totalDocs || docs.length) || docs.length,
+          hasNextPage: Boolean(result.hasNextPage),
+          hasPrevPage: Boolean(result.hasPrevPage),
+          nextPage: result.nextPage ?? null,
+          prevPage: result.prevPage ?? null,
+        })
+        setMediaItems((currentItems) =>
+          options.append ? uniqueMediaItems([...currentItems, ...docs]) : docs,
+        )
+
+        if ((!selectedMedia || !options.append) && docs.length > 0) {
+          selectMedia(docs[0])
+        }
+      } catch (error) {
+        setMediaError(
+          error instanceof Error
+            ? error.message
+            : 'Không tải được thư viện ảnh.',
+        )
+      } finally {
+        setIsMediaLoading(false)
       }
-
-      const result = await response.json()
-      const docs = Array.isArray(result.docs) ? result.docs : []
-      setMediaItems(docs)
-
-      if (!selectedMedia && docs.length > 0) {
-        selectMedia(docs[0])
-      }
-    } catch (error) {
-      setMediaError(
-        error instanceof Error
-          ? error.message
-          : 'Không tải được thư viện ảnh.',
-      )
-    } finally {
-      setIsMediaLoading(false)
-    }
-  }, [selectMedia, selectedMedia])
+    },
+    [mediaSearch, selectMedia, selectedMedia],
+  )
 
   const openMediaPicker = useCallback(() => {
     setIsMediaPickerOpen(true)
@@ -230,7 +304,7 @@ export function TinyMCEHtmlEditor({ path, field }: TinyMCEHtmlEditorProps) {
     setMediaNotice(null)
 
     if (mediaItems.length === 0) {
-      void loadMediaItems()
+      void loadMediaItems(1)
     }
   }, [loadMediaItems, mediaItems.length])
 
@@ -538,14 +612,46 @@ export function TinyMCEHtmlEditor({ path, field }: TinyMCEHtmlEditorProps) {
             </div>
 
             <div className="payload-media-picker__tools">
-              <input
-                value={mediaSearch}
-                onChange={(event) => setMediaSearch(event.target.value)}
-                placeholder="Tìm theo tên file, alt, title, chú thích..."
-              />
-              <button type="button" onClick={loadMediaItems}>
-                Tải lại
-              </button>
+              <div className="payload-media-picker__search">
+                <input
+                  value={mediaSearch}
+                  onChange={(event) => setMediaSearch(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault()
+                      void loadMediaItems(1)
+                    }
+                  }}
+                  placeholder="Tìm theo tên file, alt, title, chú thích, mô tả..."
+                />
+                <button type="button" onClick={() => loadMediaItems(1)}>
+                  Tìm ảnh
+                </button>
+              </div>
+
+              <div className="payload-media-picker__pagination">
+                <span>
+                  Trang {mediaPagination.page}/{mediaPagination.totalPages} ·{' '}
+                  {mediaPagination.totalDocs} ảnh
+                </span>
+                <button
+                  type="button"
+                  onClick={() => loadMediaItems(mediaPagination.prevPage || mediaPagination.page - 1)}
+                  disabled={isMediaLoading || !mediaPagination.hasPrevPage}
+                >
+                  Trước
+                </button>
+                <button
+                  type="button"
+                  onClick={() => loadMediaItems(mediaPagination.nextPage || mediaPagination.page + 1)}
+                  disabled={isMediaLoading || !mediaPagination.hasNextPage}
+                >
+                  Sau
+                </button>
+                <button type="button" onClick={() => loadMediaItems(mediaPagination.page)}>
+                  Tải lại
+                </button>
+              </div>
             </div>
 
             {mediaNotice ? (
@@ -565,7 +671,7 @@ export function TinyMCEHtmlEditor({ path, field }: TinyMCEHtmlEditorProps) {
             <div className="payload-media-picker__body">
               {!isMediaLoading && !mediaError ? (
                 <div className="payload-media-picker__grid">
-                  {filteredMediaItems.map((item) => {
+                  {mediaItems.map((item) => {
                     const src = getMediaUrl(item)
                     const thumbnailSrc = getMediaThumbnailUrl(item)
                     const isSelected = selectedMedia?.id === item.id
@@ -597,10 +703,25 @@ export function TinyMCEHtmlEditor({ path, field }: TinyMCEHtmlEditorProps) {
                     )
                   })}
 
-                  {filteredMediaItems.length === 0 ? (
+                  {mediaItems.length === 0 ? (
                     <div className="payload-media-picker__state">
                       Không có ảnh phù hợp.
                     </div>
+                  ) : null}
+
+                  {mediaPagination.hasNextPage ? (
+                    <button
+                      type="button"
+                      className="payload-media-picker__load-more"
+                      onClick={() =>
+                        loadMediaItems(mediaPagination.nextPage || mediaPagination.page + 1, {
+                          append: true,
+                        })
+                      }
+                      disabled={isMediaLoading}
+                    >
+                      Tải thêm ảnh
+                    </button>
                   ) : null}
                 </div>
               ) : null}

@@ -1784,3 +1784,61 @@ body,
         grid-template-columns: 1fr auto;
     }
 }
+
+
+/* --- TinyMCE media picker server search pagination --- */
+.payload-media-picker__tools {
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.payload-media-picker__search {
+    display: flex;
+    flex: 1;
+    gap: 10px;
+    min-width: 280px;
+}
+
+.payload-media-picker__search input {
+    flex: 1;
+}
+
+.payload-media-picker__pagination {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.payload-media-picker__pagination span {
+    color: #4b5563;
+    font-size: 12px;
+    font-weight: 700;
+    margin-right: 4px;
+}
+
+.payload-media-picker__tools button:disabled,
+.payload-media-picker__load-more:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.payload-media-picker__load-more {
+    align-items: center;
+    border: 1px dashed #d1d5db;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #111827;
+    cursor: pointer;
+    display: flex;
+    font-size: 13px;
+    font-weight: 800;
+    justify-content: center;
+    min-height: 48px;
+    padding: 10px 12px;
+}
+
+.payload-media-picker__load-more:hover {
+    border-color: #111827;
+}
