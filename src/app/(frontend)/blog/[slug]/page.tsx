@@ -76,6 +76,20 @@ function getSiteUrl(): string {
   )
 }
 
+function getCleanPostTitle(title: unknown): string {
+  return String(title || '')
+    .replace(/\s*\|\s*(?:MF Paris|Marais de France)\s*$/gi, '')
+    .trim()
+}
+
+function getPostSeoTitle(title: unknown): string {
+  const cleanTitle = getCleanPostTitle(title)
+
+  return cleanTitle
+    ? `${cleanTitle} | MF Paris`
+    : 'Blog MF Paris'
+}
+
 async function getPostBySlug(slug: string) {
   const payload = await getPayload({
     config: configPromise,
@@ -667,7 +681,8 @@ export async function generateMetadata({
     }
   }
 
-  const title = `${post.title} | MF Paris`
+  const cleanTitle = getCleanPostTitle(post.title)
+  const title = getPostSeoTitle(post.title)
   const description =
     getPostDescription(post)
   const canonicalUrl = `/blog/${encodeURIComponent(
@@ -695,7 +710,7 @@ export async function generateMetadata({
         ? [
           {
             url: imageUrl,
-            alt: post.title,
+            alt: cleanTitle || post.title,
           },
         ]
         : undefined,
@@ -781,6 +796,7 @@ export default async function BlogPostPage({
   })
 
   const canonicalUrl = `/blog/${encodeURIComponent(slug)}`
+  const cleanPostTitle = getCleanPostTitle(post.title)
   const internalLinkingConfig = getInternalLinkingConfig(post)
   const linkedContent = await applyInternalLinksForRender({
     html: post.content,
@@ -943,7 +959,7 @@ export default async function BlogPostPage({
   const schemaGraph = buildBlogPostingSchemaGraph({
     page: {
       url: canonicalUrl,
-      name: post.title,
+      name: cleanPostTitle,
       description,
       type: 'WebPage',
       datePublished: post.createdAt,
@@ -951,7 +967,8 @@ export default async function BlogPostPage({
     },
     article: {
       url: canonicalUrl,
-      headline: post.title,
+      headline: cleanPostTitle,
+      name: cleanPostTitle,
       description,
       image: imageUrl,
       datePublished: post.createdAt,
