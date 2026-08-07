@@ -2,6 +2,7 @@ import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 import { internalLinkingFields } from '@/collections/fields/internalLinkingFields'
+import { fillShortDescriptionFromContent } from '@/collections/hooks/fillShortDescription'
 
 
 const DEFAULT_BLOG_AUTHOR_DATA = {
@@ -110,6 +111,12 @@ async function assignDefaultBlogAuthor({ data, originalDoc, req }: any) {
   }
 }
 
+const fillPostExcerpt = fillShortDescriptionFromContent({
+  sourceField: 'content',
+  targetField: 'excerpt',
+  maxLength: 240,
+})
+
 export const Posts: CollectionConfig = {
   slug: 'posts',
   admin: {
@@ -117,7 +124,7 @@ export const Posts: CollectionConfig = {
     group: 'Nội dung',
   },
   hooks: {
-    beforeValidate: [assignDefaultBlogAuthor],
+    beforeValidate: [assignDefaultBlogAuthor, fillPostExcerpt],
   },
   fields: [
     internalLinkingFields,

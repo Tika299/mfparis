@@ -11,6 +11,7 @@ import { productSeoLifecycleFields } from '@/collections/fields/productSeoLifecy
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 import { buildProductSearchKeywords } from '@/utilities/searchKeywords'
 import { internalLinkingFields } from '@/collections/fields/internalLinkingFields'
+import { fillShortDescriptionFromContent } from '@/collections/hooks/fillShortDescription'
 
 type EntityID = string | number
 
@@ -107,6 +108,12 @@ const syncVariantPrice: CollectionBeforeChangeHook = async ({ data }) => {
   return data
 }
 
+const fillProductShortDescription = fillShortDescriptionFromContent({
+  sourceField: 'description',
+  targetField: 'shortDescription',
+  maxLength: 240,
+})
+
 const revalidateProductTags = async () => {
   try {
     revalidateTag('products', 'max')
@@ -159,7 +166,7 @@ export const Products: CollectionConfig = {
         await revalidateProductTags()
       },
     ],
-    beforeChange: [syncProductSearchKeywords, syncVariantPrice],
+    beforeChange: [syncProductSearchKeywords, syncVariantPrice, fillProductShortDescription],
   },
 
   fields: [

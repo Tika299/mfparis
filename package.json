@@ -76,7 +76,9 @@
     "repair:content-image-urls:apply": "tsx src/scripts/repair-content-upload-image-urls.ts --yes",
     "repair:media-missing-file-links": "tsx src/scripts/repair-media-missing-file-links.ts",
     "repair:media-missing-file-links:apply": "tsx src/scripts/repair-media-missing-file-links.ts --yes",
-    "report:missing-media-files": "tsx src/scripts/report-missing-media-files.ts"
+    "report:missing-media-files": "tsx src/scripts/report-missing-media-files.ts",
+    "backfill:short-descriptions": "tsx src/scripts/backfill-short-descriptions.ts",
+    "backfill:short-descriptions:apply": "tsx src/scripts/backfill-short-descriptions.ts --yes"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.85.0",
