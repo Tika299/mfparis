@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react'
 
-type OnlyMode = 'all' | 'products' | 'posts'
+type OnlyMode = 'all' | 'products' | 'posts' | 'brands' | 'categories' | 'post-categories'
 type ExportFormat = 'xls' | 'csv'
 type ExportProfile = 'full' | 'google-sheets'
 
@@ -20,6 +20,9 @@ type ImportResult = {
         status: 'changed' | 'updated' | 'skipped' | 'failed'
       }>
       failed: number
+      mediaCreated?: number
+      mediaDetected?: number
+      mediaReused?: number
       scanned: number
       skipped: number
       updated: number
@@ -165,9 +168,12 @@ export function ContentExcelManager() {
                 value={exportOnly}
                 onChange={(event) => setExportOnly(event.target.value as OnlyMode)}
               >
-                <option value="all">Tất cả sản phẩm và bài viết</option>
+                <option value="all">Tất cả sản phẩm, bài viết, thương hiệu, danh mục</option>
                 <option value="products">Chỉ sản phẩm</option>
                 <option value="posts">Chỉ bài viết</option>
+                <option value="brands">Chỉ thương hiệu</option>
+                <option value="categories">Chỉ danh mục sản phẩm</option>
+                <option value="post-categories">Chỉ danh mục bài viết</option>
               </select>
             </label>
 
@@ -279,9 +285,12 @@ export function ContentExcelManager() {
                 value={importOnly}
                 onChange={(event) => setImportOnly(event.target.value as OnlyMode)}
               >
-                <option value="all">Sản phẩm và bài viết</option>
+                <option value="all">Tất cả sản phẩm, bài viết, thương hiệu, danh mục</option>
                 <option value="products">Chỉ sản phẩm</option>
                 <option value="posts">Chỉ bài viết</option>
+                <option value="brands">Chỉ thương hiệu</option>
+                <option value="categories">Chỉ danh mục sản phẩm</option>
+                <option value="post-categories">Chỉ danh mục bài viết</option>
               </select>
             </label>
 
@@ -324,7 +333,8 @@ export function ContentExcelManager() {
                   <h3 style={{ fontSize: 16, marginBottom: 8 }}>{collection}</h3>
                   <p style={{ color: '#555' }}>
                     Quét {result.scanned} dòng · thay đổi {result.changed} · cập nhật {result.updated} · bỏ qua{' '}
-                    {result.skipped} · lỗi {result.failed}
+                    {result.skipped} · lỗi {result.failed} · ảnh phát hiện {result.mediaDetected || 0} · tạo media{' '}
+                    {result.mediaCreated || 0} · dùng lại {result.mediaReused || 0}
                   </p>
                   {result.details.length > 0 ? (
                     <ul style={{ color: '#555', marginTop: 8 }}>

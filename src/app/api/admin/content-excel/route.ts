@@ -26,7 +26,16 @@ async function getAuthenticatedPayload(request: Request) {
 }
 
 function normalizeOnly(value: string | null): ContentExcelOnly {
-  if (value === 'products' || value === 'posts' || value === 'all') return value
+  if (
+    value === 'products' ||
+    value === 'posts' ||
+    value === 'brands' ||
+    value === 'categories' ||
+    value === 'post-categories' ||
+    value === 'all'
+  ) {
+    return value
+  }
 
   return 'all'
 }

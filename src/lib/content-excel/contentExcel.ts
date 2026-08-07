@@ -10,7 +10,12 @@ import {
   type WorkbookSheets,
 } from './workbook'
 
-export type ContentExcelCollection = 'products' | 'posts'
+export type ContentExcelCollection =
+  | 'products'
+  | 'posts'
+  | 'brands'
+  | 'categories'
+  | 'post-categories'
 export type ContentExcelOnly = ContentExcelCollection | 'all'
 export type ContentExcelExportFormat = 'xls' | 'csv'
 export type ContentExcelExportProfile = 'full' | 'google-sheets'
@@ -43,6 +48,36 @@ type ImportInput = {
 const PROTECTED_FIELDS = new Set(['__collection', 'id', 'createdAt', 'updatedAt'])
 const READONLY_FIELDS = new Set(['averageRating', 'reviewCount', 'searchKeywords'])
 
+const COLLECTIONS: ContentExcelCollection[] = [
+  'products',
+  'posts',
+  'brands',
+  'categories',
+  'post-categories',
+]
+
+const HTML_FIELDS: Record<ContentExcelCollection, string[]> = {
+  products: ['description'],
+  posts: ['content'],
+  brands: ['description'],
+  categories: ['description'],
+  'post-categories': ['description'],
+}
+
+const UPLOAD_FIELDS: Partial<Record<ContentExcelCollection, string[]>> = {
+  posts: ['thumbnail'],
+  brands: ['logo'],
+  categories: ['image'],
+}
+
+const ARRAY_UPLOAD_FIELDS: Partial<
+  Record<ContentExcelCollection, Record<string, string>>
+> = {
+  products: {
+    images: 'image',
+  },
+}
+
 export function parseCsvList(value: string | null | undefined) {
   return String(value || '')
     .split(',')
@@ -51,18 +86,23 @@ export function parseCsvList(value: string | null | undefined) {
 }
 
 export function getCollections(only: ContentExcelOnly = 'all'): ContentExcelCollection[] {
-  if (only === 'products') return ['products']
-  if (only === 'posts') return ['posts']
+  if (only !== 'all') return [only]
 
-  return ['products', 'posts']
+  return COLLECTIONS
 }
 
 function selectedIdsFor(input: ExportInput, collection: ContentExcelCollection) {
-  return collection === 'products' ? input.productIds || [] : input.postIds || []
+  if (collection === 'products') return input.productIds || []
+  if (collection === 'posts') return input.postIds || []
+
+  return []
 }
 
 function selectedSlugsFor(input: ExportInput, collection: ContentExcelCollection) {
-  return collection === 'products' ? input.productSlugs || [] : input.postSlugs || []
+  if (collection === 'products') return input.productSlugs || []
+  if (collection === 'posts') return input.postSlugs || []
+
+  return []
 }
 
 function whereFor(input: ExportInput, collection: ContentExcelCollection) {
@@ -122,6 +162,66 @@ function preferredHeaders(collection: ContentExcelCollection) {
     ]
   }
 
+  if (collection === 'posts') {
+    return [
+      '__collection',
+      'id',
+      'title',
+      'slug',
+      'wpId',
+      'sourceUrl',
+      'categories',
+      'authorProfile',
+      'thumbnail',
+      'excerpt',
+      'content',
+      'seo',
+      'faq',
+      'reviewer',
+      'viewCount',
+      'rating',
+      'createdAt',
+      'updatedAt',
+    ]
+  }
+
+  if (collection === 'brands') {
+    return [
+      '__collection',
+      'id',
+      'name',
+      'slug',
+      'wpId',
+      'sourceUrl',
+      'logo',
+      'description',
+      'isFeatured',
+      'importNotes',
+      'createdAt',
+      'updatedAt',
+    ]
+  }
+
+  if (collection === 'categories') {
+    return [
+      '__collection',
+      'id',
+      'name',
+      'slug',
+      'wpId',
+      'sourceUrl',
+      'parent',
+      'image',
+      'description',
+      'siloLabel',
+      'indexPolicy',
+      'canonicalTarget',
+      'importNotes',
+      'createdAt',
+      'updatedAt',
+    ]
+  }
+
   return [
     '__collection',
     'id',
@@ -129,16 +229,12 @@ function preferredHeaders(collection: ContentExcelCollection) {
     'slug',
     'wpId',
     'sourceUrl',
-    'categories',
-    'authorProfile',
-    'thumbnail',
-    'excerpt',
-    'content',
-    'seo',
-    'faq',
-    'reviewer',
-    'viewCount',
-    'rating',
+    'parent',
+    'description',
+    'siloLabel',
+    'indexPolicy',
+    'canonicalTarget',
+    'importNotes',
     'createdAt',
     'updatedAt',
   ]
@@ -168,6 +264,62 @@ function googleSheetsHeaders(collection: ContentExcelCollection, includeContent:
     ]
   }
 
+  if (collection === 'posts') {
+    return [
+      '__collection',
+      'id',
+      'title',
+      'slug',
+      'wpId',
+      'sourceUrl',
+      'categories',
+      'authorProfile',
+      'thumbnail',
+      'excerpt',
+      ...(includeContent ? ['content'] : []),
+      'seo',
+      'viewCount',
+      'rating',
+      'createdAt',
+      'updatedAt',
+    ]
+  }
+
+  if (collection === 'brands') {
+    return [
+      '__collection',
+      'id',
+      'name',
+      'slug',
+      'wpId',
+      'sourceUrl',
+      'logo',
+      ...(includeContent ? ['description'] : []),
+      'isFeatured',
+      'createdAt',
+      'updatedAt',
+    ]
+  }
+
+  if (collection === 'categories') {
+    return [
+      '__collection',
+      'id',
+      'name',
+      'slug',
+      'wpId',
+      'sourceUrl',
+      'parent',
+      'image',
+      ...(includeContent ? ['description'] : []),
+      'siloLabel',
+      'indexPolicy',
+      'canonicalTarget',
+      'createdAt',
+      'updatedAt',
+    ]
+  }
+
   return [
     '__collection',
     'id',
@@ -175,14 +327,11 @@ function googleSheetsHeaders(collection: ContentExcelCollection, includeContent:
     'slug',
     'wpId',
     'sourceUrl',
-    'categories',
-    'authorProfile',
-    'thumbnail',
-    'excerpt',
-    ...(includeContent ? ['content'] : []),
-    'seo',
-    'viewCount',
-    'rating',
+    'parent',
+    ...(includeContent ? ['description'] : []),
+    'siloLabel',
+    'indexPolicy',
+    'canonicalTarget',
     'createdAt',
     'updatedAt',
   ]
@@ -344,6 +493,417 @@ function shouldSkipImportField(field: string, includeReadOnly: boolean) {
   return false
 }
 
+function isHtmlField(collection: ContentExcelCollection, field: string) {
+  return (HTML_FIELDS[collection] || []).includes(field)
+}
+
+function isUploadField(collection: ContentExcelCollection, field: string) {
+  return (UPLOAD_FIELDS[collection] || []).includes(field)
+}
+
+function getArrayUploadChildField(collection: ContentExcelCollection, field: string) {
+  return ARRAY_UPLOAD_FIELDS[collection]?.[field] || null
+}
+
+function extractGoogleDriveId(url: string) {
+  const patterns = [
+    /drive\.google\.com\/file\/d\/([^/?#]+)/i,
+    /drive\.google\.com\/open\?id=([^&#]+)/i,
+    /drive\.google\.com\/uc\?[^#]*\bid=([^&#]+)/i,
+    /docs\.google\.com\/(?:uc|document|spreadsheets|presentation)\/d\/([^/?#]+)/i,
+  ]
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern)
+    if (match?.[1]) return decodeURIComponent(match[1])
+  }
+
+  return ''
+}
+
+function normalizeDownloadUrl(url: string) {
+  const driveId = extractGoogleDriveId(url)
+
+  if (driveId) {
+    return `https://drive.google.com/uc?export=download&id=${encodeURIComponent(driveId)}`
+  }
+
+  return url
+}
+
+function isImportableImageUrl(value: string) {
+  const trimmed = value.trim()
+
+  if (!/^https?:\/\//i.test(trimmed)) return false
+  if (/\/api\/media\/file\//i.test(trimmed)) return false
+  if (extractGoogleDriveId(trimmed)) return true
+
+  try {
+    const url = new URL(trimmed)
+    return /\.(?:avif|gif|jpe?g|png|webp|svg)$/i.test(url.pathname)
+  } catch {
+    return false
+  }
+}
+
+function splitUrlList(value: string) {
+  return String(value || '')
+    .split(/\r?\n|,/g)
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+function mimeToExtension(mimeType: string) {
+  if (mimeType.includes('avif')) return '.avif'
+  if (mimeType.includes('gif')) return '.gif'
+  if (mimeType.includes('jpeg') || mimeType.includes('jpg')) return '.jpg'
+  if (mimeType.includes('png')) return '.png'
+  if (mimeType.includes('svg')) return '.svg'
+  if (mimeType.includes('webp')) return '.webp'
+
+  return '.jpg'
+}
+
+function slugifyFilenamePart(value: string) {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[đĐ]/g, 'd')
+    .replace(/[^a-z0-9._-]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 96)
+}
+
+function titleFromFilename(filename: string) {
+  return filename
+    .replace(/\.[^.]+$/u, '')
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function getFilenameFromDisposition(value: string | null) {
+  if (!value) return ''
+
+  const utfMatch = value.match(/filename\*=UTF-8''([^;]+)/i)
+  if (utfMatch?.[1]) return decodeURIComponent(utfMatch[1].replace(/"/g, ''))
+
+  const match = value.match(/filename="?([^";]+)"?/i)
+  if (match?.[1]) return match[1]
+
+  return ''
+}
+
+function getFilenameFromUrl(url: string, mimeType: string) {
+  const driveId = extractGoogleDriveId(url)
+
+  if (driveId) {
+    return `drive-${driveId}${mimeToExtension(mimeType)}`
+  }
+
+  try {
+    const parsed = new URL(url)
+    const basename = parsed.pathname.split('/').filter(Boolean).pop() || ''
+
+    if (basename) return decodeURIComponent(basename)
+  } catch {
+    // keep fallback below
+  }
+
+  return `content-image-${Date.now()}${mimeToExtension(mimeType)}`
+}
+
+function normalizeFilename(filename: string, mimeType: string) {
+  const extension = /\.[a-z0-9]{2,5}$/i.test(filename)
+    ? filename.match(/\.[a-z0-9]{2,5}$/i)?.[0] || mimeToExtension(mimeType)
+    : mimeToExtension(mimeType)
+  const stem = filename.replace(/\.[a-z0-9]{2,5}$/i, '')
+  const safeStem = slugifyFilenamePart(stem) || 'content-image'
+
+  return `${safeStem}${extension.toLowerCase()}`
+}
+
+async function findExistingMedia(payload: Payload, sourceUrl: string) {
+  const result = await payload.find({
+    collection: 'media',
+    depth: 0,
+    limit: 1,
+    pagination: false,
+    overrideAccess: true,
+    where: {
+      sourceUrl: {
+        equals: sourceUrl,
+      },
+    },
+  })
+
+  return result.docs?.[0] as AnyRecord | undefined
+}
+
+async function importRemoteImage({
+  alt,
+  payload,
+  sourceUrl,
+}: {
+  alt: string
+  payload: Payload
+  sourceUrl: string
+}) {
+  const existing = await findExistingMedia(payload, sourceUrl)
+
+  if (existing?.id) {
+    return {
+      created: false,
+      id: existing.id,
+      url: existing.url || `/api/media/file/${existing.filename}`,
+    }
+  }
+
+  const downloadUrl = normalizeDownloadUrl(sourceUrl)
+  const response = await fetch(downloadUrl)
+
+  if (!response.ok) {
+    throw new Error(`Cannot download image ${sourceUrl}: HTTP ${response.status}`)
+  }
+
+  const contentType = response.headers.get('content-type') || 'image/jpeg'
+
+  if (!contentType.startsWith('image/')) {
+    throw new Error(`Downloaded file is not an image: ${sourceUrl}`)
+  }
+
+  const arrayBuffer = await response.arrayBuffer()
+  const buffer = Buffer.from(arrayBuffer)
+  const filename = normalizeFilename(
+    getFilenameFromDisposition(response.headers.get('content-disposition')) ||
+      getFilenameFromUrl(sourceUrl, contentType),
+    contentType,
+  )
+  const title = alt || titleFromFilename(filename) || filename
+
+  const media = (await payload.create({
+    collection: 'media',
+    overrideAccess: true,
+    data: {
+      alt: title,
+      title,
+      sourceFilename: filename,
+      sourceUrl,
+      importedFrom: 'manual',
+    },
+    file: {
+      data: buffer,
+      name: filename,
+      mimetype: contentType,
+      size: buffer.length,
+    },
+  })) as AnyRecord
+
+  return {
+    created: true,
+    id: media.id,
+    url: media.url || `/api/media/file/${media.filename || filename}`,
+  }
+}
+
+function getImageAltNearAttribute(html: string, index: number) {
+  const tagStart = html.lastIndexOf('<img', index)
+  const tagEnd = html.indexOf('>', index)
+
+  if (tagStart < 0 || tagEnd < index) {
+    return ''
+  }
+
+  const tag = html.slice(tagStart, tagEnd + 1)
+  const match = tag.match(/\balt\s*=\s*(?:"([^"]*)"|'([^']*)')/i)
+
+  return match?.[1] || match?.[2] || ''
+}
+
+async function transformHtmlImages({
+  dryRun,
+  html,
+  payload,
+  stats,
+}: {
+  dryRun: boolean
+  html: string
+  payload: Payload
+  stats: ImportMediaStats
+}) {
+  if (!html || !/<img\b/i.test(html)) {
+    return html
+  }
+
+  const replacements: Array<{ from: string; to: string }> = []
+  const attributePattern = /\b(src|data-src)\s*=\s*(["'])(https?:\/\/[^"']+)\2/gi
+  let match: RegExpExecArray | null
+
+  while ((match = attributePattern.exec(html))) {
+    const sourceUrl = match[3]
+
+    if (!isImportableImageUrl(sourceUrl)) continue
+
+    stats.mediaDetected += 1
+
+    if (dryRun) {
+      continue
+    }
+
+    const media = await importRemoteImage({
+      alt: getImageAltNearAttribute(html, match.index),
+      payload,
+      sourceUrl,
+    })
+
+    if (media.created) stats.mediaCreated += 1
+    else stats.mediaReused += 1
+
+    replacements.push({
+      from: match[0],
+      to: `${match[1]}=${match[2]}${media.url}${match[2]}`,
+    })
+  }
+
+  let nextHtml = html
+
+  for (const replacement of replacements) {
+    nextHtml = nextHtml.replace(replacement.from, replacement.to)
+  }
+
+  return nextHtml
+}
+
+type ImportMediaStats = {
+  mediaCreated: number
+  mediaDetected: number
+  mediaReused: number
+}
+
+async function transformUploadCell({
+  cell,
+  dryRun,
+  payload,
+  title,
+  stats,
+}: {
+  cell: string
+  dryRun: boolean
+  payload: Payload
+  title: string
+  stats: ImportMediaStats
+}) {
+  const value = String(cell || '').trim()
+
+  if (!isImportableImageUrl(value)) {
+    return null
+  }
+
+  stats.mediaDetected += 1
+
+  if (dryRun) {
+    return `__would_import_media__:${value}`
+  }
+
+  const media = await importRemoteImage({
+    alt: title,
+    payload,
+    sourceUrl: value,
+  })
+
+  if (media.created) stats.mediaCreated += 1
+  else stats.mediaReused += 1
+
+  return media.id
+}
+
+async function transformArrayUploadCell({
+  cell,
+  childField,
+  dryRun,
+  payload,
+  title,
+  stats,
+}: {
+  cell: string
+  childField: string
+  dryRun: boolean
+  payload: Payload
+  title: string
+  stats: ImportMediaStats
+}) {
+  const value = String(cell || '').trim()
+
+  if (!value) {
+    return []
+  }
+
+  if (looksLikeJson(value)) {
+    const parsed = JSON.parse(value)
+
+    if (!Array.isArray(parsed)) {
+      return parsed
+    }
+
+    const nextRows = []
+
+    for (const row of parsed) {
+      if (!row || typeof row !== 'object') {
+        nextRows.push(row)
+        continue
+      }
+
+      const source = String(row[childField] || '').trim()
+
+      if (!isImportableImageUrl(source)) {
+        nextRows.push(row)
+        continue
+      }
+
+      const mediaId = await transformUploadCell({
+        cell: source,
+        dryRun,
+        payload,
+        stats,
+        title,
+      })
+
+      nextRows.push({
+        ...row,
+        [childField]: mediaId,
+      })
+    }
+
+    return nextRows
+  }
+
+  const urls = splitUrlList(value).filter(isImportableImageUrl)
+
+  if (urls.length === 0) {
+    return null
+  }
+
+  const rows = []
+
+  for (const url of urls) {
+    const mediaId = await transformUploadCell({
+      cell: url,
+      dryRun,
+      payload,
+      stats,
+      title,
+    })
+
+    rows.push({
+      [childField]: mediaId,
+    })
+  }
+
+  return rows
+}
+
 async function importRows({
   payload,
   collection,
@@ -357,7 +917,17 @@ async function importRows({
   dryRun: boolean
   includeReadOnly: boolean
 }) {
-  const details: Array<{ id: string; fields: string[]; status: 'changed' | 'updated' | 'skipped' | 'failed'; error?: string }> = []
+  const details: Array<{
+    id: string
+    fields: string[]
+    status: 'changed' | 'updated' | 'skipped' | 'failed'
+    error?: string
+  }> = []
+  const mediaStats: ImportMediaStats = {
+    mediaCreated: 0,
+    mediaDetected: 0,
+    mediaReused: 0,
+  }
   let scanned = 0
   let changed = 0
   let updated = 0
@@ -382,12 +952,44 @@ async function importRows({
       })
       const originalRecord = original as AnyRecord
       const data: AnyRecord = {}
+      const rowTitle = row.title || row.name || originalRecord.title || originalRecord.name || ''
 
       for (const [field, cell] of Object.entries(row)) {
         if (shouldSkipImportField(field, includeReadOnly)) continue
         if (!(field in originalRecord)) continue
 
-        const nextValue = parseCellValue(cell, originalRecord[field])
+        const arrayUploadChildField = getArrayUploadChildField(collection, field)
+        let nextValue: unknown
+
+        if (isHtmlField(collection, field)) {
+          nextValue = await transformHtmlImages({
+            dryRun,
+            html: cell,
+            payload,
+            stats: mediaStats,
+          })
+        } else if (isUploadField(collection, field)) {
+          nextValue =
+            (await transformUploadCell({
+              cell,
+              dryRun,
+              payload,
+              stats: mediaStats,
+              title: rowTitle,
+            })) ?? parseCellValue(cell, originalRecord[field])
+        } else if (arrayUploadChildField) {
+          nextValue =
+            (await transformArrayUploadCell({
+              cell,
+              childField: arrayUploadChildField,
+              dryRun,
+              payload,
+              stats: mediaStats,
+              title: rowTitle,
+            })) ?? parseCellValue(cell, originalRecord[field])
+        } else {
+          nextValue = parseCellValue(cell, originalRecord[field])
+        }
 
         if (stableJson(nextValue) !== stableJson(originalRecord[field])) {
           data[field] = nextValue
@@ -432,6 +1034,7 @@ async function importRows({
     changed,
     details: details.slice(0, 100),
     failed,
+    ...mediaStats,
     scanned,
     skipped,
     updated,
@@ -459,7 +1062,7 @@ export async function importContentExcel(input: ImportInput) {
 }
 
 function rowsToSheets(rows: WorkbookRow[], only: ContentExcelOnly): WorkbookSheets {
-  if (only === 'products' || only === 'posts') {
+  if (only !== 'all') {
     return {
       [only]: rows,
     }
@@ -468,5 +1071,8 @@ function rowsToSheets(rows: WorkbookRow[], only: ContentExcelOnly): WorkbookShee
   return {
     products: rows.filter((row) => row.__collection === 'products'),
     posts: rows.filter((row) => row.__collection === 'posts'),
+    brands: rows.filter((row) => row.__collection === 'brands'),
+    categories: rows.filter((row) => row.__collection === 'categories'),
+    'post-categories': rows.filter((row) => row.__collection === 'post-categories'),
   }
 }
