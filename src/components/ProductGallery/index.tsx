@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react'
 import { cn } from '@/utilities'
