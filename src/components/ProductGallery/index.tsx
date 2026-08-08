@@ -61,24 +61,69 @@ function shouldBypassNextImage(src: string) {
   return src.startsWith('/api/media/file/')
 }
 
+const PRODUCT_VARIANT_SELECTED_EVENT = 'mfparis:product-variant-selected'
+
 type ProductGalleryImages = NonNullable<
   Product['images']
 >
 
 type ProductGalleryProps = Readonly<{
   images: ProductGalleryImages
+  variants?: NonNullable<Product['variants']>
 }>
 
-export const ProductGallery = ({ images }: ProductGalleryProps) => {
+export const ProductGallery = ({ images, variants = [] }: ProductGalleryProps) => {
   const [activeIndex, setActiveIndex] = useState(0)
 
   const validImages = useMemo(() => {
-    return Array.isArray(images)
+    const productImages = Array.isArray(images)
       ? images.filter((item) => Boolean(getImageUrl(item)))
       : []
-  }, [images])
+
+    const variantImages = Array.isArray(variants)
+      ? variants
+        .filter((variant) => variant?.isActive !== false)
+        .map((variant) => ({
+          image: variant.image,
+          variantId: variant.id ? String(variant.id) : '',
+          variantName: variant.name,
+        }))
+        .filter((item) => item.variantId && Boolean(getImageUrl(item)))
+      : []
+
+    return [...productImages, ...variantImages]
+  }, [images, variants])
 
   const totalImages = validImages.length
+
+  useEffect(() => {
+    setActiveIndex((currentIndex) =>
+      currentIndex >= totalImages ? 0 : currentIndex,
+    )
+  }, [totalImages])
+
+  useEffect(() => {
+    const handleVariantSelected = (event: Event) => {
+      const variantId = (event as CustomEvent<{ variantId?: string }>).detail
+        ?.variantId
+
+      if (!variantId) return
+
+      setActiveIndex((currentIndex) => {
+        const variantImageIndex = validImages.findIndex((item: any) => {
+          return item?.variantId === String(variantId)
+        })
+
+        return variantImageIndex >= 0 ? variantImageIndex : currentIndex
+      })
+    }
+
+    window.addEventListener(PRODUCT_VARIANT_SELECTED_EVENT, handleVariantSelected)
+
+    return () => {
+      window.removeEventListener(PRODUCT_VARIANT_SELECTED_EVENT, handleVariantSelected)
+    }
+  }, [validImages])
 
   const maxVisible = 5
   const visibleThumbnails = validImages.slice(0, maxVisible)
@@ -104,6 +149,7 @@ export const ProductGallery = ({ images }: ProductGalleryProps) => {
       <div className="group relative aspect-square w-full overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm">
         {activeImageUrl ? (
           <Image
+            key={activeImageUrl}
             src={activeImageUrl}
             alt={activeImageAlt}
             fill
