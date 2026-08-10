@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   CheckCircle2,
@@ -17,6 +17,8 @@ import { useCartStore } from '@/lib/store'
 type ProductPurchaseProps = {
   product: any
 }
+
+const PRODUCT_VARIANT_SELECTED_EVENT = 'mfparis:product-variant-selected'
 
 const getActiveVariants = (product: any) => {
   if (product?.productType !== 'variable') return []
@@ -37,12 +39,24 @@ const getUploadUrl = (upload: any) => {
 }
 
 const getProductImage = (product: any, selectedVariant?: any) => {
+  const variantImage = getUploadUrl(selectedVariant?.image)
+
+  if (variantImage) return variantImage
+
   const firstProductImage = product?.images?.[0]?.image
   const productImage = getUploadUrl(firstProductImage)
 
-  if (productImage) return productImage
+  return productImage
+}
 
-  return getUploadUrl(selectedVariant?.image)
+const dispatchVariantSelected = (variant: any) => {
+  if (typeof window === 'undefined' || !variant?.id) return
+
+  window.dispatchEvent(
+    new CustomEvent(PRODUCT_VARIANT_SELECTED_EVENT, {
+      detail: { variantId: String(variant.id) },
+    }),
+  )
 }
 
 export function ProductPurchase({ product }: ProductPurchaseProps) {
@@ -95,6 +109,12 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
 
   const isOutOfStock = stock <= 0
 
+  useEffect(() => {
+    if (isVariableProduct && selectedVariant?.id) {
+      dispatchVariantSelected(selectedVariant)
+    }
+  }, [isVariableProduct, selectedVariant])
+
   const decreaseQuantity = () => {
     setQuantity((current) => Math.max(1, current - 1))
   }
@@ -132,6 +152,7 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
     variants: variants.map((variant: any) => {
       const variantBasePrice = Number(variant?.basePrice || 0)
       const variantSalePrice = Number(variant?.salePrice || 0)
+      const variantImage = getProductImage(product, variant)
 
       return {
         id: variant.id,
@@ -141,7 +162,7 @@ export function ProductPurchase({ product }: ProductPurchaseProps) {
         salePrice: variantSalePrice,
         price: variantSalePrice > 0 ? variantSalePrice : variantBasePrice,
         stock: Number(variant?.stock || 0),
-        image,
+        image: variantImage,
       }
     }),
   } as any)

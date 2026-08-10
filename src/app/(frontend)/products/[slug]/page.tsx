@@ -2964,6 +2964,7 @@ export default async function ProductPage({
                 <div className="overflow-hidden rounded-2xl">
                   <ProductGallery
                     images={product.images ?? []}
+                    variants={product.variants ?? []}
                   />
                 </div>
               </div>
