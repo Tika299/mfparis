@@ -1016,11 +1016,11 @@ export default async function BlogPostPage({
       <div className="mx-auto max-w-[1240px] px-4 py-6">
         <nav
           aria-label="Breadcrumb"
-          className="mb-10 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-gray-400"
+          className="mb-10 flex min-w-0 items-center gap-2 overflow-hidden whitespace-nowrap text-[11px] font-bold uppercase tracking-widest text-gray-400"
         >
           <Link
             href="/"
-            className="hover:text-black"
+            className="flex-none hover:text-black"
           >
             Trang chủ
           </Link>
@@ -1028,22 +1028,33 @@ export default async function BlogPostPage({
           {blogBreadcrumbItems.map((item) => (
             <span
               key={item.url}
-              className="contents"
+              className="flex min-w-0 items-center gap-2"
             >
-              <ChevronRight size={10} />
+              <ChevronRight
+                size={10}
+                className="flex-none"
+              />
 
               <Link
                 href={item.url}
-                className="hover:text-black"
+                title={item.name}
+                className="block max-w-[84px] truncate hover:text-black sm:max-w-[180px] md:max-w-[240px]"
               >
                 {item.name}
               </Link>
             </span>
           ))}
 
-          <ChevronRight size={10} />
+          <ChevronRight
+            size={10}
+            className="flex-none"
+          />
 
-          <span className="max-w-[300px] truncate text-gray-900">
+          <span
+            aria-current="page"
+            title={post.title}
+            className="min-w-0 flex-1 truncate text-gray-900"
+          >
             {post.title}
           </span>
         </nav>
