@@ -30,8 +30,13 @@ const sourceOptions: Array<{ label: string; value: SourceType }> = [
   { label: 'Danh mục bài viết', value: 'post-categories' },
 ]
 
+const limitOptions = [100, 250, 500, 1000, 2000]
+
 export function InternalLinkSuggestions() {
   const [sourceType, setSourceType] = useState<SourceType>('all')
+  const [limit, setLimit] = useState(500)
+  const [includeExisting, setIncludeExisting] = useState(false)
+  const [enableOnCreate, setEnableOnCreate] = useState(false)
   const [loading, setLoading] = useState(false)
   const [creating, setCreating] = useState(false)
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
@@ -51,7 +56,12 @@ export function InternalLinkSuggestions() {
     setMessage('')
 
     try {
-      const res = await fetch(`/api/internal-links/preview?sourceType=${sourceType}&limit=100`)
+      const params = new URLSearchParams({
+        sourceType,
+        limit: String(limit),
+        includeExisting: includeExisting ? 'true' : 'false',
+      })
+      const res = await fetch('/api/internal-links/preview?' + params.toString())
       const data = await res.json()
 
       if (!res.ok) throw new Error(data?.error || 'Load failed')
@@ -80,7 +90,7 @@ export function InternalLinkSuggestions() {
         const res = await fetch('/api/internal-links/preview', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ suggestions: batch }),
+          body: JSON.stringify({ suggestions: batch, enabled: enableOnCreate }),
         })
 
         const data = await res.json()
@@ -90,7 +100,11 @@ export function InternalLinkSuggestions() {
         createdCount += Number(data.createdCount || 0)
       }
 
-      setMessage(`Đã tạo ${createdCount} rule. Rule mới đang tắt, bạn vào kiểm tra rồi bật.`)
+      setMessage(
+        enableOnCreate
+          ? 'Đã tạo và bật ' + createdCount + ' rule.'
+          : 'Đã tạo ' + createdCount + ' rule. Rule mới đang tắt để bạn kiểm tra trước khi bật.',
+      )
       await loadSuggestions()
     } catch {
       setMessage('Không thể tạo rule từ gợi ý.')
@@ -120,70 +134,119 @@ export function InternalLinkSuggestions() {
   }, [])
 
   return (
-    <main style={{ padding: 32, maxWidth: 1200 }}>
+    <main style={{ padding: 32, maxWidth: 1240 }}>
       <h1 style={{ marginBottom: 8 }}>Internal Link Suggestions</h1>
-      <p style={{ color: '#666', marginBottom: 24 }}>
-        Hệ thống tự gợi ý keyword và URL đích từ sản phẩm, thương hiệu, danh mục và bài viết.
+      <p style={{ color: '#667085', marginBottom: 24 }}>
+        Tự gợi ý keyword và URL đích từ sản phẩm, thương hiệu, danh mục và bài viết. Dùng để tạo rule nhanh giống plugin internal link của WordPress.
       </p>
 
-      <div
+      <section
         style={{
-          alignItems: 'center',
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 12,
-          marginBottom: 12,
+          background: '#fff',
+          border: '1px solid #e5e7eb',
+          borderRadius: 12,
+          boxShadow: '0 10px 30px rgba(15, 23, 42, 0.04)',
+          marginBottom: 18,
+          padding: 16,
         }}
       >
-        <select
-          value={sourceType}
-          onChange={(event) => setSourceType(event.target.value as SourceType)}
-          style={{ minWidth: 220, padding: 10 }}
+        <div
+          style={{
+            alignItems: 'center',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 12,
+          }}
         >
-          {sourceOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+          <select
+            value={sourceType}
+            onChange={(event) => setSourceType(event.target.value as SourceType)}
+            style={{ minWidth: 220, padding: 10 }}
+          >
+            {sourceOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
 
-        <button type="button" onClick={loadSuggestions} disabled={loading}>
-          {loading ? 'Đang quét...' : 'Quét gợi ý'}
-        </button>
+          <select
+            value={limit}
+            onChange={(event) => setLimit(Number(event.target.value))}
+            style={{ minWidth: 150, padding: 10 }}
+          >
+            {limitOptions.map((option) => (
+              <option key={option} value={option}>
+                Quét tối đa {option}
+              </option>
+            ))}
+          </select>
 
-        <button
-          type="button"
-          onClick={selectAllSuggestions}
-          disabled={loading || allSelected || suggestions.length === 0}
-        >
-          Chọn tất cả
-        </button>
+          <label style={{ alignItems: 'center', display: 'inline-flex', gap: 8 }}>
+            <input
+              type="checkbox"
+              checked={includeExisting}
+              onChange={(event) => setIncludeExisting(event.target.checked)}
+            />
+            Hiện rule đã có
+          </label>
 
-        <button
-          type="button"
-          onClick={clearSelectedSuggestions}
-          disabled={loading || selectedIds.length === 0}
-        >
-          Bỏ chọn
-        </button>
+          <label style={{ alignItems: 'center', display: 'inline-flex', gap: 8 }}>
+            <input
+              type="checkbox"
+              checked={enableOnCreate}
+              onChange={(event) => setEnableOnCreate(event.target.checked)}
+            />
+            Bật rule sau khi tạo
+          </label>
 
-        <button
-          type="button"
-          onClick={createRules}
-          disabled={creating || selectedSuggestions.length === 0}
-        >
-          {creating ? 'Đang tạo...' : `Tạo ${selectedSuggestions.length} rule`}
-        </button>
-      </div>
+          <button type="button" onClick={loadSuggestions} disabled={loading}>
+            {loading ? 'Đang quét...' : 'Quét gợi ý'}
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 14 }}>
+          <button
+            type="button"
+            onClick={selectAllSuggestions}
+            disabled={loading || allSelected || suggestions.length === 0}
+          >
+            Chọn tất cả
+          </button>
+
+          <button
+            type="button"
+            onClick={clearSelectedSuggestions}
+            disabled={loading || selectedIds.length === 0}
+          >
+            Bỏ chọn
+          </button>
+
+          <button
+            type="button"
+            onClick={createRules}
+            disabled={creating || selectedSuggestions.length === 0}
+            style={{
+              background: '#b72828',
+              border: '1px solid #b72828',
+              borderRadius: 8,
+              color: '#fff',
+              fontWeight: 700,
+              padding: '9px 14px',
+            }}
+          >
+            {creating ? 'Đang tạo...' : 'Tạo ' + selectedSuggestions.length + ' rule'}
+          </button>
+        </div>
+      </section>
 
       {suggestions.length > 0 ? (
-        <p style={{ color: '#666', marginBottom: 16 }}>
-          Đã chọn {selectedSuggestions.length}/{suggestions.length} gợi ý. Khi tạo nhiều rule, hệ
-          thống sẽ tự chia lô để tạo hết.
+        <p style={{ color: '#667085', marginBottom: 16 }}>
+          Đã chọn {selectedSuggestions.length}/{suggestions.length} gợi ý. Khi tạo nhiều rule, hệ thống tự chia lô để không quá tải.
         </p>
       ) : null}
 
-      {message ? <p style={{ color: '#b72828' }}>{message}</p> : null}
+      {message ? <p style={{ color: message.startsWith('Đã') ? '#067647' : '#b72828' }}>{message}</p> : null}
 
       <div style={{ display: 'grid', gap: 12 }}>
         {suggestions.map((item) => {
@@ -194,8 +257,8 @@ export function InternalLinkSuggestions() {
               key={item.id}
               style={{
                 background: checked ? '#fff7f7' : '#fff',
-                border: '1px solid #ddd',
-                borderRadius: 8,
+                border: checked ? '1px solid #d14343' : '1px solid #e5e7eb',
+                borderRadius: 10,
                 display: 'grid',
                 gap: 12,
                 gridTemplateColumns: '24px 1fr',
@@ -209,8 +272,15 @@ export function InternalLinkSuggestions() {
               />
 
               <div>
-                <div style={{ fontWeight: 700 }}>{item.sourceTitle}</div>
-                <div style={{ color: '#666', marginTop: 4 }}>{item.targetUrl}</div>
+                <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  <strong>{item.sourceTitle}</strong>
+                  {item.exists ? (
+                    <span style={{ background: '#eef4ff', borderRadius: 999, color: '#3538cd', fontSize: 12, padding: '3px 8px' }}>
+                      Đã có rule
+                    </span>
+                  ) : null}
+                </div>
+                <div style={{ color: '#475467', marginTop: 4 }}>{item.targetUrl}</div>
 
                 <div style={{ marginTop: 10 }}>
                   {item.keywords.map((keyword) => (
@@ -232,7 +302,7 @@ export function InternalLinkSuggestions() {
                 </div>
 
                 <div style={{ color: '#777', fontSize: 13 }}>
-                  {item.sourceType} · priority: {item.priority} · score: {item.score}
+                  {item.sourceType} · priority: {item.priority} · score: {item.score} · {item.reason}
                 </div>
               </div>
             </label>

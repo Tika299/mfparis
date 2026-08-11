@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+﻿import { NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 
 import configPromise from '@payload-config'
@@ -108,7 +108,7 @@ export async function GET(req: Request) {
             | InternalLinkSuggestionSource
             | 'all'
 
-        const limit = Number(url.searchParams.get('limit') || 80)
+        const limit = Math.min(Math.max(1, Number(url.searchParams.get('limit') || 500) || 500), 2000)
         const includeExisting = url.searchParams.get('includeExisting') === 'true'
 
         const suggestions = await suggestInternalLinkRules({
@@ -136,9 +136,11 @@ export async function PUT(req: Request) {
     try {
         const body = (await req.json()) as {
             suggestions?: InternalLinkSuggestion[]
+            enabled?: boolean
         }
 
         const suggestions = Array.isArray(body.suggestions) ? body.suggestions : []
+        const enabled = body.enabled === true
 
         if (suggestions.length === 0) {
             return NextResponse.json(
@@ -152,7 +154,7 @@ export async function PUT(req: Request) {
         const created = []
 
         for (const suggestion of suggestions.slice(0, 50)) {
-            const rule = await createInternalLinkRuleFromSuggestion(payload, suggestion)
+            const rule = await createInternalLinkRuleFromSuggestion(payload, suggestion, { enabled })
             created.push(rule)
         }
 

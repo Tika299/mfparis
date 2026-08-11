@@ -56,17 +56,29 @@ const STOPWORDS = new Set([
   'nhat',
   'review',
   'top',
+  'gia',
+  'mua',
+  'loai',
+  'nao',
+  'co',
+  'khong',
 ])
 
 const EXISTING_RULE_PAGE_SIZE = 500
-const SUGGESTION_PAGE_SIZE = 100
-const MAX_SUGGESTION_SCAN_PAGES = 80
+const SUGGESTION_PAGE_SIZE = 200
+const MAX_SUGGESTION_SCAN_PAGES = 250
+const MAX_KEYWORDS_PER_RULE = 8
+const ABSOLUTE_MAX_LIMIT = 2000
 
 function cleanText(value: unknown): string {
   return String(value ?? '')
     .replace(/<[^>]*>/g, ' ')
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&')
+    .replace(/&#038;/gi, '&')
+    .replace(/&#38;/gi, '&')
+    .replace(/&#8217;/gi, "'")
+    .replace(/&#8220;|&#8221;/gi, '"')
     .replace(/\s+/g, ' ')
     .trim()
 }
@@ -100,12 +112,12 @@ function unique(values: string[]): string[] {
 }
 
 function targetUrlFor(type: InternalLinkSuggestionSource, slug: string) {
-  if (type === 'brands') return `/brands/${slug}/`
-  if (type === 'categories') return `/categories/${slug}/`
-  if (type === 'products') return `/products/${slug}/`
-  if (type === 'posts') return `/blog/${slug}/`
+  if (type === 'brands') return '/brands/' + slug + '/'
+  if (type === 'categories') return '/categories/' + slug + '/'
+  if (type === 'products') return '/products/' + slug + '/'
+  if (type === 'posts') return '/blog/' + slug + '/'
 
-  return `/blog/category/${slug}/`
+  return '/blog/category/' + slug + '/'
 }
 
 function targetTypeFor(type: InternalLinkSuggestionSource): InternalLinkSuggestion['targetType'] {
@@ -136,8 +148,25 @@ function scoreFor(type: InternalLinkSuggestionSource) {
   if (type === 'categories') return 90
   if (type === 'brands') return 85
   if (type === 'products') return 70
+  if (type === 'posts') return 60
 
   return 55
+}
+
+function getSeoKeywords(doc: Record<string, unknown>): string[] {
+  if (!isRecord(doc.seo) || !Array.isArray(doc.seo.keywords)) return []
+
+  return doc.seo.keywords
+    .map((item) => (isRecord(item) ? cleanText(item.keyword) : ''))
+    .filter(Boolean)
+}
+
+function removeProductNoise(value: string): string {
+  return cleanText(value)
+    .replace(/\b(eau de parfum|eau de toilette|eau de cologne|extrait de parfum|edp|edt|edc|parfum)\b/gi, ' ')
+    .replace(/\b\d+\s?(ml|g|gram|viên|vien|chai|tuýp|tube|hộp|hop)\b/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 function makeKeywords(doc: Record<string, unknown>, type: InternalLinkSuggestionSource) {
@@ -146,32 +175,38 @@ function makeKeywords(doc: Record<string, unknown>, type: InternalLinkSuggestion
   const seoTitle = isRecord(doc.seo)
     ? cleanText(doc.seo.title || doc.seo.metaTitle)
     : cleanText(doc.seoTitle)
-  const seoKeywords =
-    isRecord(doc.seo) && Array.isArray(doc.seo.keywords)
-      ? doc.seo.keywords
-          .map((item) => (isRecord(item) ? cleanText(item.keyword) : ''))
-          .filter(Boolean)
-      : []
+  const seoKeywords = getSeoKeywords(doc)
 
   const keywords = [title, seoTitle, ...seoKeywords]
 
-  if (type === 'brands') keywords.push(`${title} chính hãng`)
-  if (type === 'categories') keywords.push(`${title} chính hãng`, `mua ${title}`)
+  if (slug && slug !== title) keywords.push(slug)
+
+  if (type === 'brands') {
+    keywords.push('thương hiệu ' + title, title + ' chính hãng')
+  }
+
+  if (type === 'categories') {
+    keywords.push(title + ' chính hãng', 'mua ' + title, 'các loại ' + title)
+  }
+
   if (type === 'products') {
-    keywords.push(
-      title
-        .replace(/\b(eau de parfum|eau de toilette|edp|edt|parfum)\b/gi, '')
-        .replace(/\b\d+\s?(ml|g)\b/gi, '')
-        .trim(),
-    )
+    const compactTitle = removeProductNoise(title)
+
+    if (compactTitle && compactTitle !== title) keywords.push(compactTitle)
     keywords.push(slug)
   }
 
-  return unique(keywords).filter(usefulKeyword).slice(0, 5)
+  if (type === 'posts') {
+    keywords.push(
+      title.replace(/^(review|top|đánh giá|danh sách|cách chọn)\s+/iu, '').trim(),
+    )
+  }
+
+  return unique(keywords).filter(usefulKeyword).slice(0, MAX_KEYWORDS_PER_RULE)
 }
 
 function ruleKey(targetUrl: string, keyword: string) {
-  return `${normalizeVietnameseText(targetUrl)}::${normalizeVietnameseText(keyword)}`
+  return normalizeVietnameseText(targetUrl) + '::' + normalizeVietnameseText(keyword)
 }
 
 async function loadExistingKeys(payload: Payload) {
@@ -233,7 +268,7 @@ function makeSuggestionFromDoc({
   if (exists && !includeExisting) return null
 
   return {
-    id: `${collection}:${sourceId}`,
+    id: collection + ':' + sourceId,
     sourceType: collection,
     sourceId,
     sourceTitle,
@@ -244,10 +279,10 @@ function makeSuggestionFromDoc({
     keywords: keywords.map((keyword, index) => ({
       keyword,
       matchType: index === 0 ? 'phrase' : 'contains',
-      weight: Math.max(1, 10 - index),
+      weight: Math.max(1, 20 - index * 2),
     })),
-    score: scoreFor(collection),
-    reason: 'Gợi ý tự động từ title, slug, SEO title và keyword hiện có.',
+    score: scoreFor(collection) + Math.min(10, keywords.length),
+    reason: 'Gợi ý tự động từ tên, slug, SEO title và keyword hiện có.',
     exists,
   }
 }
@@ -276,6 +311,7 @@ async function loadSuggestionsForCollection({
       limit: SUGGESTION_PAGE_SIZE,
       page,
       overrideAccess: true,
+      sort: '-updatedAt',
     })
 
     for (const doc of result.docs as Record<string, unknown>[]) {
@@ -303,7 +339,7 @@ async function loadSuggestionsForCollection({
 export async function suggestInternalLinkRules({
   payload,
   sourceType = 'all',
-  limit = 80,
+  limit = 500,
   includeExisting = false,
 }: {
   payload: Payload
@@ -311,11 +347,12 @@ export async function suggestInternalLinkRules({
   limit?: number
   includeExisting?: boolean
 }) {
+  const safeLimit = Math.min(Math.max(1, limit || 500), ABSOLUTE_MAX_LIMIT)
   const existingKeys = await loadExistingKeys(payload)
   const collections = sourceType === 'all' ? COLLECTIONS : [sourceType]
   const suggestions: InternalLinkSuggestion[] = []
   const perCollectionLimit =
-    sourceType === 'all' ? Math.max(1, Math.ceil(limit / collections.length)) : limit
+    sourceType === 'all' ? Math.max(1, Math.ceil(safeLimit / collections.length)) : safeLimit
 
   for (const collection of collections) {
     const collectionSuggestions = await loadSuggestionsForCollection({
@@ -332,7 +369,7 @@ export async function suggestInternalLinkRules({
   const sortedSuggestions = suggestions.sort((a, b) => b.score - a.score)
 
   if (sourceType !== 'all') {
-    return sortedSuggestions.slice(0, limit)
+    return sortedSuggestions.slice(0, safeLimit)
   }
 
   const balancedSuggestions = collections.flatMap((collection) =>
@@ -341,20 +378,21 @@ export async function suggestInternalLinkRules({
       .slice(0, perCollectionLimit),
   )
 
-  return balancedSuggestions.slice(0, limit)
+  return balancedSuggestions.slice(0, safeLimit)
 }
 
 export async function createInternalLinkRuleFromSuggestion(
   payload: Payload,
   suggestion: InternalLinkSuggestion,
+  options: { enabled?: boolean } = {},
 ) {
   return payload.create({
     collection: 'internal-link-rules' as any,
     depth: 0,
     overrideAccess: true,
     data: {
-      title: `Auto: ${suggestion.sourceTitle}`,
-      enabled: false,
+      title: 'Auto: ' + suggestion.sourceTitle,
+      enabled: options.enabled ?? false,
       priority: suggestion.priority,
       keywords: suggestion.keywords,
       targetType: suggestion.targetType,
