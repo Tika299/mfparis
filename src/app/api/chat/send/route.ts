@@ -1,12 +1,12 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
+import { getAuthenticatedAdminPayload } from '@/utilities/adminAuth'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
   try {
-    const payload = await getPayload({ config: configPromise })
     const body = await req.json()
 
     if (!body.sessionId || !body.sender || !body.content) {
@@ -17,6 +17,15 @@ export async function POST(req: Request) {
         { status: 400 },
       )
     }
+
+    const adminAuth = body.sender === 'admin' ? await getAuthenticatedAdminPayload(req) : null
+
+    if (adminAuth && 'error' in adminAuth) return adminAuth.error
+
+    const payload =
+      adminAuth && !('error' in adminAuth)
+        ? adminAuth.payload
+        : await getPayload({ config: configPromise })
 
     const msg = await payload.create({
       collection: 'messages',

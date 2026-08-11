@@ -1,6 +1,9 @@
 'use client'
 
+import { useAuth } from '@payloadcms/ui'
 import React, { useEffect, useMemo, useState } from 'react'
+
+import { AdminAuthRequired } from './AdminAuthRequired'
 
 type OnlyMode = string
 type ExportFormat = 'xls' | 'csv'
@@ -10,6 +13,31 @@ type CollectionOption = {
   label: string
   slug: string
 }
+
+const FALLBACK_COLLECTION_OPTIONS: CollectionOption[] = [
+  { label: 'Users', slug: 'users' },
+  { label: 'Media', slug: 'media' },
+  { label: 'Brands', slug: 'brands' },
+  { label: 'Categories', slug: 'categories' },
+  { label: 'Products', slug: 'products' },
+  { label: 'Orders', slug: 'orders' },
+  { label: 'Vouchers', slug: 'vouchers' },
+  { label: 'Attributes', slug: 'attributes' },
+  { label: 'Attribute Values', slug: 'attribute-values' },
+  { label: 'Carts', slug: 'carts' },
+  { label: 'Posts', slug: 'posts' },
+  { label: 'Blog Authors', slug: 'blog-authors' },
+  { label: 'Post Categories', slug: 'post-categories' },
+  { label: 'Blog Comments', slug: 'blog-comments' },
+  { label: 'Messages', slug: 'messages' },
+  { label: 'Chat Profiles', slug: 'chat-profiles' },
+  { label: 'Redirects', slug: 'redirects' },
+  { label: 'Fragrance Notes', slug: 'fragrance-notes' },
+  { label: 'Reviews', slug: 'reviews' },
+  { label: 'Voucher Redemptions', slug: 'voucher-redemptions' },
+  { label: 'Internal Link Rules', slug: 'internal-link-rules' },
+  { label: 'Internal Link Logs', slug: 'internal-link-logs' },
+]
 
 type ImportResult = {
   dryRun: boolean
@@ -75,7 +103,10 @@ function collectionLabel(option: CollectionOption) {
 }
 
 export function ContentExcelManager() {
-  const [collectionOptions, setCollectionOptions] = useState<CollectionOption[]>([])
+  const { user } = useAuth()
+  const [collectionOptions, setCollectionOptions] = useState<CollectionOption[]>(
+    FALLBACK_COLLECTION_OPTIONS,
+  )
   const [exportOnly, setExportOnly] = useState<OnlyMode>('all')
   const [exportFormat, setExportFormat] = useState<ExportFormat>('csv')
   const [exportProfile, setExportProfile] = useState<ExportProfile>('full')
@@ -94,6 +125,8 @@ export function ContentExcelManager() {
   const [importResult, setImportResult] = useState<ImportResult | null>(null)
 
   useEffect(() => {
+    if (!user) return
+
     let mounted = true
 
     async function loadCollections() {
@@ -107,7 +140,7 @@ export function ContentExcelManager() {
           setCollectionOptions(data.collections)
         }
       } catch {
-        if (mounted) setCollectionOptions([])
+        if (mounted) setCollectionOptions(FALLBACK_COLLECTION_OPTIONS)
       }
     }
 
@@ -116,7 +149,7 @@ export function ContentExcelManager() {
     return () => {
       mounted = false
     }
-  }, [])
+  }, [user])
 
   const exportUrl = useMemo(() => {
     const params = new URLSearchParams()
@@ -201,7 +234,8 @@ export function ContentExcelManager() {
   )
 
   return (
-    <main style={{ maxWidth: 1180, padding: 32 }}>
+    <AdminAuthRequired description="Bạn cần đăng nhập admin để xuất hoặc import dữ liệu Payload.">
+      <main style={{ maxWidth: 1180, padding: 32 }}>
       <h1 style={{ marginBottom: 8 }}>Xuất / nhập dữ liệu nội dung</h1>
       <p style={{ color: '#666', marginBottom: 24 }}>
         Công cụ này có thể xuất và import lại các collection đang tồn tại trong Payload. File
@@ -402,6 +436,7 @@ export function ContentExcelManager() {
           </section>
         ) : null}
       </div>
-    </main>
+      </main>
+    </AdminAuthRequired>
   )
 }

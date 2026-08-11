@@ -1,8 +1,10 @@
-import { getPayload } from 'payload'
-import configPromise from '@payload-config'
+import { getAuthenticatedAdminPayload } from '@/utilities/adminAuth'
 
-export async function GET() {
-  const payload = await getPayload({ config: configPromise })
+export async function GET(req: Request) {
+  const auth = await getAuthenticatedAdminPayload(req)
+  if ('error' in auth) return auth.error
+
+  const payload = auth.payload
 
   // Lấy 200 tin nhắn mới nhất
   const messages = await payload.find({

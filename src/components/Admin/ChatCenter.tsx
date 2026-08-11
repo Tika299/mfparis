@@ -1,8 +1,10 @@
 'use client'
+import { useAuth } from '@payloadcms/ui'
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { io } from 'socket.io-client'
 import { Send, User, Search, MessageSquare, ArrowLeft, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { AdminAuthRequired } from './AdminAuthRequired'
 
 // Nạp file SCSS của Admin
 import '../../app/(payload)/custom.scss'
@@ -15,6 +17,7 @@ const socket = io(socketURL, {
 })
 
 export const ChatCenter = () => {
+  const { user } = useAuth()
   // --- STATES ---
   const [sessions, setSessions] = useState<any[]>([])
   const [activeSid, setActiveSid] = useState('')
@@ -110,6 +113,8 @@ export const ChatCenter = () => {
 
   // 4. Socket Realtime
   useEffect(() => {
+    if (!user) return
+
     fetchSessions()
     socket.connect()
     socket.emit('join-room', 'admins')
@@ -151,7 +156,7 @@ export const ChatCenter = () => {
 
     socket.on('receive-msg', onReceiveMsg)
     return () => { socket.off('receive-msg'); socket.disconnect() }
-  }, [])
+  }, [user])
 
   // 5. Chọn khách hàng
   const selectSession = async (sid: string, name: string) => {
@@ -194,7 +199,8 @@ export const ChatCenter = () => {
   )
 
   return (
-    <div className="admin-chat-container">
+    <AdminAuthRequired description="Bạn cần đăng nhập admin để xem và trả lời tin nhắn khách hàng.">
+      <div className="admin-chat-container">
       <div className="admin-chat-wrapper">
 
         {/* SIDEBAR */}
@@ -288,6 +294,7 @@ export const ChatCenter = () => {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </AdminAuthRequired>
   )
 }

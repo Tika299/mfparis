@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getPayload } from 'payload'
 
-import configPromise from '@payload-config'
 import {
   exportContentExcel,
   importContentExcel,
@@ -11,20 +9,7 @@ import {
   type ContentExcelExportProfile,
   type ContentExcelOnly,
 } from '@/lib/content-excel/contentExcel'
-
-async function getAuthenticatedPayload(request: Request) {
-  const payload = await getPayload({ config: configPromise })
-  const authentication = await payload.auth({ headers: request.headers })
-
-  if (!authentication.user) {
-    return {
-      error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }),
-      payload,
-    }
-  }
-
-  return { payload }
-}
+import { getAuthenticatedAdminPayload } from '@/utilities/adminAuth'
 
 function normalizeOnly(value: string | null): ContentExcelOnly {
   return value?.trim() || 'all'
@@ -48,8 +33,8 @@ function timestampForFileName() {
 
 export async function GET(request: Request) {
   try {
-    const auth = await getAuthenticatedPayload(request)
-    if (auth.error) return auth.error
+    const auth = await getAuthenticatedAdminPayload(request)
+    if ('error' in auth) return auth.error
 
     const url = new URL(request.url)
 
@@ -100,8 +85,8 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const auth = await getAuthenticatedPayload(request)
-    if (auth.error) return auth.error
+    const auth = await getAuthenticatedAdminPayload(request)
+    if ('error' in auth) return auth.error
 
     const formData = await request.formData()
     const file = formData.get('file')

@@ -1,6 +1,9 @@
 'use client'
 
+import { useAuth } from '@payloadcms/ui'
 import React, { useEffect, useMemo, useState } from 'react'
+
+import { AdminAuthRequired } from './AdminAuthRequired'
 
 type SourceType = 'all' | 'brands' | 'categories' | 'products' | 'posts' | 'post-categories'
 
@@ -33,6 +36,7 @@ const sourceOptions: Array<{ label: string; value: SourceType }> = [
 const limitOptions = [100, 250, 500, 1000, 2000]
 
 export function InternalLinkSuggestions() {
+  const { user } = useAuth()
   const [sourceType, setSourceType] = useState<SourceType>('all')
   const [limit, setLimit] = useState(500)
   const [includeExisting, setIncludeExisting] = useState(false)
@@ -130,11 +134,14 @@ export function InternalLinkSuggestions() {
   }
 
   useEffect(() => {
+    if (!user) return
+
     void loadSuggestions()
-  }, [])
+  }, [user])
 
   return (
-    <main style={{ padding: 32, maxWidth: 1240 }}>
+    <AdminAuthRequired description="Bạn cần đăng nhập admin để quét gợi ý và tạo rule internal link.">
+      <main style={{ padding: 32, maxWidth: 1240 }}>
       <h1 style={{ marginBottom: 8 }}>Internal Link Suggestions</h1>
       <p style={{ color: '#667085', marginBottom: 24 }}>
         Tự gợi ý keyword và URL đích từ sản phẩm, thương hiệu, danh mục và bài viết. Dùng để tạo rule nhanh giống plugin internal link của WordPress.
@@ -309,6 +316,7 @@ export function InternalLinkSuggestions() {
           )
         })}
       </div>
-    </main>
+      </main>
+    </AdminAuthRequired>
   )
 }
