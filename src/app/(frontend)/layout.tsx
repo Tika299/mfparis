@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 
 export const revalidate = 300
 
@@ -11,6 +12,7 @@ import { FloatingContact } from '@/components/FloatingContact'
 import { Toaster } from 'sonner'
 import { SITE_ORIGIN } from '@/utilities/seo'
 import { ClientEnhancements } from '@/components/ClientEnhancements'
+import { RouteLoadingIndicator } from '@/components/RouteLoadingIndicator'
 
 const siteUrl =
   process.env.NEXT_PUBLIC_BASE_URL ||
@@ -62,6 +64,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="vi" suppressHydrationWarning className={`${beVietnam.variable} ${playfair.variable}`}>
       <body className="flex min-h-screen flex-col font-sans text-[#1a1a1a] antialiased">
         <ClientEnhancements />
+        <Suspense fallback={null}>
+          <RouteLoadingIndicator />
+        </Suspense>
         <Header />
         <main className="flex-grow">{children}</main>
         <Footer />
