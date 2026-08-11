@@ -1,10 +1,15 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
-type OnlyMode = 'all' | 'products' | 'posts' | 'brands' | 'categories' | 'post-categories'
+type OnlyMode = string
 type ExportFormat = 'xls' | 'csv'
 type ExportProfile = 'full' | 'google-sheets'
+
+type CollectionOption = {
+  label: string
+  slug: string
+}
 
 type ImportResult = {
   dryRun: boolean
@@ -32,7 +37,7 @@ type ImportResult = {
 }
 
 const selectStyle: React.CSSProperties = {
-  minWidth: 220,
+  minWidth: 260,
   padding: 10,
 }
 
@@ -51,6 +56,12 @@ const cardStyle: React.CSSProperties = {
   padding: 20,
 }
 
+const hintStyle: React.CSSProperties = {
+  color: '#666',
+  fontSize: 13,
+  marginTop: 6,
+}
+
 function splitList(value: string) {
   return value
     .split(',')
@@ -59,7 +70,12 @@ function splitList(value: string) {
     .join(',')
 }
 
+function collectionLabel(option: CollectionOption) {
+  return `${option.label} (${option.slug})`
+}
+
 export function ContentExcelManager() {
+  const [collectionOptions, setCollectionOptions] = useState<CollectionOption[]>([])
   const [exportOnly, setExportOnly] = useState<OnlyMode>('all')
   const [exportFormat, setExportFormat] = useState<ExportFormat>('csv')
   const [exportProfile, setExportProfile] = useState<ExportProfile>('full')
@@ -76,6 +92,31 @@ export function ContentExcelManager() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [importResult, setImportResult] = useState<ImportResult | null>(null)
+
+  useEffect(() => {
+    let mounted = true
+
+    async function loadCollections() {
+      try {
+        const response = await fetch('/api/admin/content-excel?mode=collections', {
+          cache: 'no-store',
+        })
+        const data = (await response.json()) as { collections?: CollectionOption[] }
+
+        if (mounted && Array.isArray(data.collections)) {
+          setCollectionOptions(data.collections)
+        }
+      } catch {
+        if (mounted) setCollectionOptions([])
+      }
+    }
+
+    void loadCollections()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   const exportUrl = useMemo(() => {
     const params = new URLSearchParams()
@@ -110,7 +151,7 @@ export function ContentExcelManager() {
 
   async function importExcel() {
     if (!file) {
-      setMessage('Bạn cần chọn file Excel trước.')
+      setMessage('Bạn cần chọn file trước.')
       return
     }
 
@@ -128,8 +169,8 @@ export function ContentExcelManager() {
       formData.set('includeReadOnly', includeReadOnly ? 'true' : 'false')
 
       const res = await fetch('/api/admin/content-excel', {
-        method: 'POST',
         body: formData,
+        method: 'POST',
       })
       const data = await res.json()
 
@@ -142,44 +183,52 @@ export function ContentExcelManager() {
           : 'Import hoàn tất. Dữ liệu đã được cập nhật.',
       )
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Không thể import Excel.')
+      setMessage(error instanceof Error ? error.message : 'Không thể import file.')
     } finally {
       setLoading(false)
     }
   }
 
+  const collectionOptionsMarkup = (
+    <>
+      <option value="all">Tất cả collection đang tồn tại</option>
+      {collectionOptions.map((option) => (
+        <option key={option.slug} value={option.slug}>
+          {collectionLabel(option)}
+        </option>
+      ))}
+    </>
+  )
+
   return (
     <main style={{ maxWidth: 1180, padding: 32 }}>
-      <h1 style={{ marginBottom: 8 }}>Xuất / nhập Excel nội dung</h1>
+      <h1 style={{ marginBottom: 8 }}>Xuất / nhập dữ liệu nội dung</h1>
       <p style={{ color: '#666', marginBottom: 24 }}>
-        Xuất sản phẩm và bài viết thành file Excel để chỉnh hàng loạt, sau đó upload lại để cập nhật
-        Payload. Khi deploy, file xuất sẽ được tải trực tiếp về máy bạn, không cần lưu cố định trên
-        server.
+        Công cụ này có thể xuất và import lại các collection đang tồn tại trong Payload. File
+        xuất ra tải trực tiếp về máy, không lưu cố định trên server.
       </p>
 
       <div style={{ display: 'grid', gap: 20 }}>
         <section style={cardStyle}>
-          <h2 style={{ fontSize: 20, marginBottom: 12 }}>Xuất Excel</h2>
+          <h2 style={{ fontSize: 20, marginBottom: 12 }}>Xuất dữ liệu</h2>
           <div style={{ display: 'grid', gap: 14 }}>
             <label>
-              <div style={{ fontWeight: 600, marginBottom: 6 }}>Loại dữ liệu</div>
+              <div style={{ fontWeight: 600, marginBottom: 6 }}>Collection cần xuất</div>
               <select
                 style={selectStyle}
                 value={exportOnly}
-                onChange={(event) => setExportOnly(event.target.value as OnlyMode)}
+                onChange={(event) => setExportOnly(event.target.value)}
               >
-                <option value="all">Tất cả sản phẩm, bài viết, thương hiệu, danh mục</option>
-                <option value="products">Chỉ sản phẩm</option>
-                <option value="posts">Chỉ bài viết</option>
-                <option value="brands">Chỉ thương hiệu</option>
-                <option value="categories">Chỉ danh mục sản phẩm</option>
-                <option value="post-categories">Chỉ danh mục bài viết</option>
+                {collectionOptionsMarkup}
               </select>
+              <div style={hintStyle}>
+                Chọn một collection cụ thể hoặc xuất toàn bộ collection có trong Payload.
+              </div>
             </label>
 
             <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
               <label>
-                <div style={{ fontWeight: 600, marginBottom: 6 }}>Dinh dang</div>
+                <div style={{ fontWeight: 600, marginBottom: 6 }}>Định dạng</div>
                 <select
                   style={selectStyle}
                   value={exportFormat}
@@ -191,20 +240,20 @@ export function ContentExcelManager() {
                     setIncludeContent(true)
                   }}
                 >
-                  <option value="csv">CSV day du</option>
-                  <option value="xls">Excel day du</option>
+                  <option value="csv">CSV đầy đủ</option>
+                  <option value="xls">Excel XML đầy đủ</option>
                 </select>
               </label>
 
               <label>
-                <div style={{ fontWeight: 600, marginBottom: 6 }}>Ho so xuat</div>
+                <div style={{ fontWeight: 600, marginBottom: 6 }}>Hồ sơ xuất</div>
                 <select
                   style={selectStyle}
                   value={exportProfile}
                   onChange={(event) => setExportProfile(event.target.value as ExportProfile)}
                 >
-                  <option value="full">Day du tat ca field</option>
-                  <option value="google-sheets">Google Sheets - cot hay sua</option>
+                  <option value="full">Đầy đủ tất cả field</option>
+                  <option value="google-sheets">Google Sheets - cột hay sửa</option>
                 </select>
               </label>
             </div>
@@ -215,7 +264,7 @@ export function ContentExcelManager() {
                 type="checkbox"
                 onChange={(event) => setIncludeContent(event.target.checked)}
               />
-              Kem noi dung dai/HTML.
+              Kèm nội dung dài/HTML.
             </label>
 
             <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
@@ -269,29 +318,28 @@ export function ContentExcelManager() {
 
             <div>
               <button type="button" onClick={downloadExcel}>
-                {exportFormat === 'csv' ? 'Tai CSV day du' : 'Tai file Excel'}
+                {exportFormat === 'csv' ? 'Tải CSV' : 'Tải file Excel'}
               </button>
             </div>
           </div>
         </section>
 
         <section style={cardStyle}>
-          <h2 style={{ fontSize: 20, marginBottom: 12 }}>Nhập lại từ Excel</h2>
+          <h2 style={{ fontSize: 20, marginBottom: 12 }}>Nhập lại dữ liệu</h2>
           <div style={{ display: 'grid', gap: 14 }}>
             <label>
-              <div style={{ fontWeight: 600, marginBottom: 6 }}>Loại dữ liệu cần import</div>
+              <div style={{ fontWeight: 600, marginBottom: 6 }}>Collection cần import</div>
               <select
                 style={selectStyle}
                 value={importOnly}
-                onChange={(event) => setImportOnly(event.target.value as OnlyMode)}
+                onChange={(event) => setImportOnly(event.target.value)}
               >
-                <option value="all">Tất cả sản phẩm, bài viết, thương hiệu, danh mục</option>
-                <option value="products">Chỉ sản phẩm</option>
-                <option value="posts">Chỉ bài viết</option>
-                <option value="brands">Chỉ thương hiệu</option>
-                <option value="categories">Chỉ danh mục sản phẩm</option>
-                <option value="post-categories">Chỉ danh mục bài viết</option>
+                {collectionOptionsMarkup}
               </select>
+              <div style={hintStyle}>
+                Với CSV xuất từ chế độ “tất cả”, hệ thống đọc cột __collection để biết dòng thuộc
+                collection nào.
+              </div>
             </label>
 
             <input
@@ -332,9 +380,10 @@ export function ContentExcelManager() {
                 <div key={collection}>
                   <h3 style={{ fontSize: 16, marginBottom: 8 }}>{collection}</h3>
                   <p style={{ color: '#555' }}>
-                    Quét {result.scanned} dòng · thay đổi {result.changed} · cập nhật {result.updated} · bỏ qua{' '}
-                    {result.skipped} · lỗi {result.failed} · ảnh phát hiện {result.mediaDetected || 0} · tạo media{' '}
-                    {result.mediaCreated || 0} · dùng lại {result.mediaReused || 0}
+                    Quét {result.scanned} dòng · thay đổi {result.changed} · cập nhật{' '}
+                    {result.updated} · bỏ qua {result.skipped} · lỗi {result.failed} · ảnh phát
+                    hiện {result.mediaDetected || 0} · tạo media {result.mediaCreated || 0} · dùng
+                    lại {result.mediaReused || 0}
                   </p>
                   {result.details.length > 0 ? (
                     <ul style={{ color: '#555', marginTop: 8 }}>

@@ -5,6 +5,7 @@ import configPromise from '@payload-config'
 import {
   exportContentExcel,
   importContentExcel,
+  listContentExcelCollections,
   parseCsvList,
   type ContentExcelExportFormat,
   type ContentExcelExportProfile,
@@ -26,18 +27,7 @@ async function getAuthenticatedPayload(request: Request) {
 }
 
 function normalizeOnly(value: string | null): ContentExcelOnly {
-  if (
-    value === 'products' ||
-    value === 'posts' ||
-    value === 'brands' ||
-    value === 'categories' ||
-    value === 'post-categories' ||
-    value === 'all'
-  ) {
-    return value
-  }
-
-  return 'all'
+  return value?.trim() || 'all'
 }
 
 function normalizeFormat(value: string | null): ContentExcelExportFormat {
@@ -62,6 +52,13 @@ export async function GET(request: Request) {
     if (auth.error) return auth.error
 
     const url = new URL(request.url)
+
+    if (url.searchParams.get('mode') === 'collections') {
+      return NextResponse.json({
+        collections: listContentExcelCollections(auth.payload),
+      })
+    }
+
     const only = normalizeOnly(url.searchParams.get('only'))
     const format = normalizeFormat(url.searchParams.get('format'))
     const profile = normalizeProfile(url.searchParams.get('profile'))

@@ -10,12 +10,7 @@ import {
   type WorkbookSheets,
 } from './workbook'
 
-export type ContentExcelCollection =
-  | 'products'
-  | 'posts'
-  | 'brands'
-  | 'categories'
-  | 'post-categories'
+export type ContentExcelCollection = string
 export type ContentExcelOnly = ContentExcelCollection | 'all'
 export type ContentExcelExportFormat = 'xls' | 'csv'
 export type ContentExcelExportProfile = 'full' | 'google-sheets'
@@ -48,7 +43,7 @@ type ImportInput = {
 const PROTECTED_FIELDS = new Set(['__collection', 'id', 'createdAt', 'updatedAt'])
 const READONLY_FIELDS = new Set(['averageRating', 'reviewCount', 'searchKeywords'])
 
-const COLLECTIONS: ContentExcelCollection[] = [
+const DEFAULT_COLLECTIONS: ContentExcelCollection[] = [
   'products',
   'posts',
   'brands',
@@ -56,26 +51,69 @@ const COLLECTIONS: ContentExcelCollection[] = [
   'post-categories',
 ]
 
-const HTML_FIELDS: Record<ContentExcelCollection, string[]> = {
+const EXCLUDED_COLLECTIONS = new Set([
+  'payload-jobs',
+  'payload-locked-documents',
+  'payload-migrations',
+  'payload-preferences',
+])
+
+const HTML_FIELDS: Record<string, string[]> = {
+  attributes: ['description'],
+  'attribute-values': ['description'],
   products: ['description'],
   posts: ['content'],
   brands: ['description'],
   categories: ['description'],
+  'fragrance-notes': ['description'],
+  media: ['description'],
   'post-categories': ['description'],
+  messages: ['content'],
 }
 
-const UPLOAD_FIELDS: Partial<Record<ContentExcelCollection, string[]>> = {
+const UPLOAD_FIELDS: Partial<Record<string, string[]>> = {
   posts: ['thumbnail'],
   brands: ['logo'],
   categories: ['image'],
+  'blog-authors': ['avatar'],
+  'attribute-values': ['image'],
+  'fragrance-notes': ['icon'],
 }
 
 const ARRAY_UPLOAD_FIELDS: Partial<
-  Record<ContentExcelCollection, Record<string, string>>
+  Record<string, Record<string, string>>
 > = {
   products: {
     images: 'image',
   },
+}
+
+function getPayloadCollectionEntries(payload?: Payload) {
+  const collections = (payload as any)?.collections
+
+  if (!collections || typeof collections !== 'object') {
+    return DEFAULT_COLLECTIONS.map((slug) => ({
+      label: slug,
+      slug,
+    }))
+  }
+
+  return Object.entries(collections)
+    .map(([slug, value]) => {
+      const config = (value as any)?.config
+      const resolvedSlug = String(config?.slug || slug)
+
+      return {
+        label: String(config?.labels?.plural || config?.label || resolvedSlug),
+        slug: resolvedSlug,
+      }
+    })
+    .filter((collection) => collection.slug && !EXCLUDED_COLLECTIONS.has(collection.slug))
+    .sort((a, b) => a.label.localeCompare(b.label, 'vi'))
+}
+
+export function listContentExcelCollections(payload: Payload) {
+  return getPayloadCollectionEntries(payload)
 }
 
 export function parseCsvList(value: string | null | undefined) {
@@ -85,10 +123,20 @@ export function parseCsvList(value: string | null | undefined) {
     .filter(Boolean)
 }
 
-export function getCollections(only: ContentExcelOnly = 'all'): ContentExcelCollection[] {
-  if (only !== 'all') return [only]
+export function getCollections(
+  only: ContentExcelOnly = 'all',
+  payload?: Payload,
+): ContentExcelCollection[] {
+  const collections = getPayloadCollectionEntries(payload).map((collection) => collection.slug)
 
-  return COLLECTIONS
+  if (only !== 'all') {
+    if (collections.includes(only)) return [only]
+    if (!payload && DEFAULT_COLLECTIONS.includes(only)) return [only]
+
+    return []
+  }
+
+  return collections.length > 0 ? collections : DEFAULT_COLLECTIONS
 }
 
 function selectedIdsFor(input: ExportInput, collection: ContentExcelCollection) {
@@ -391,7 +439,7 @@ async function fetchAllDocs(input: ExportInput, collection: ContentExcelCollecti
 
   while (true) {
     const result = await input.payload.find({
-      collection,
+      collection: collection as any,
       depth: 0,
       limit: pageSize,
       page,
@@ -418,14 +466,15 @@ export async function exportContentExcel(input: ExportInput) {
   const profile = input.profile || 'full'
   const includeContent = input.includeContent ?? profile === 'full'
 
-  for (const collection of getCollections(input.only)) {
+  const collections = getCollections(input.only, input.payload)
+
+  for (const collection of collections) {
     const docs = await fetchAllDocs(input, collection)
     sheets[collection] = buildRows(collection, docs, profile, includeContent)
     counts[collection] = docs.length
   }
 
   if (input.format === 'csv') {
-    const collections = getCollections(input.only)
     const rows =
       collections.length === 1
         ? sheets[collections[0]] || []
@@ -945,7 +994,7 @@ async function importRows({
 
     try {
       const original = await payload.findByID({
-        collection,
+        collection: collection as any,
         id,
         depth: 0,
         overrideAccess: true,
@@ -1008,7 +1057,7 @@ async function importRows({
 
       if (!dryRun) {
         await payload.update({
-          collection,
+          collection: collection as any,
           id,
           depth: 0,
           overrideAccess: true,
@@ -1044,11 +1093,11 @@ async function importRows({
 export async function importContentExcel(input: ImportInput) {
   const sheets =
     input.format === 'csv'
-      ? rowsToSheets(parseCsv(input.workbookXml), input.only || 'all')
+      ? rowsToSheets(parseCsv(input.workbookXml), input.only || 'all', input.payload)
       : parseExcelXmlWorkbook(input.workbookXml)
   const result: Record<string, Awaited<ReturnType<typeof importRows>>> = {}
 
-  for (const collection of getCollections(input.only)) {
+  for (const collection of getCollections(input.only, input.payload)) {
     result[collection] = await importRows({
       payload: input.payload,
       collection,
@@ -1061,18 +1110,16 @@ export async function importContentExcel(input: ImportInput) {
   return result
 }
 
-function rowsToSheets(rows: WorkbookRow[], only: ContentExcelOnly): WorkbookSheets {
+function rowsToSheets(rows: WorkbookRow[], only: ContentExcelOnly, payload?: Payload): WorkbookSheets {
   if (only !== 'all') {
     return {
       [only]: rows,
     }
   }
 
-  return {
-    products: rows.filter((row) => row.__collection === 'products'),
-    posts: rows.filter((row) => row.__collection === 'posts'),
-    brands: rows.filter((row) => row.__collection === 'brands'),
-    categories: rows.filter((row) => row.__collection === 'categories'),
-    'post-categories': rows.filter((row) => row.__collection === 'post-categories'),
-  }
+  return getCollections('all', payload).reduce<WorkbookSheets>((sheets, collection) => {
+    sheets[collection] = rows.filter((row) => row.__collection === collection)
+
+    return sheets
+  }, {})
 }
