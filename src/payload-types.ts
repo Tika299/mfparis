@@ -318,6 +318,59 @@ export interface Brand {
    */
   description?: string | null;
   isFeatured?: boolean | null;
+  /**
+   * Cau hinh metadata, social preview, robots, canonical, sitemap va schema cho entity nay.
+   */
+  seo?: {
+    /**
+     * Nen nam trong khoang 45-60 ky tu. De trong se tu dong lay theo tieu de.
+     */
+    metaTitle?: string | null;
+    /**
+     * Nen nam trong khoang 120-160 ky tu. De trong se tu dong lay mo ta ngan/noi dung.
+     */
+    metaDescription?: string | null;
+    /**
+     * Dung cho quy trinh bien tap/audit SEO noi bo, khong hien thi truc tiep tren frontend.
+     */
+    focusKeyword?: string | null;
+    /**
+     * Neu de trong, breadcrumb se dung ten/tieu de mac dinh.
+     */
+    breadcrumbLabel?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    /**
+     * Neu de trong se dung OpenGraph image hoac anh dai dien.
+     */
+    twitterImage?: (number | null) | Media;
+    robotsIndex?: ('index' | 'noindex') | null;
+    robotsFollow?: ('follow' | 'nofollow') | null;
+    /**
+     * Chi nhap khi URL canonical khac URL hien tai. Co the la duong dan tuong doi hoac URL day du.
+     */
+    canonicalOverride?: string | null;
+    sitemapInclude?: boolean | null;
+    /**
+     * Gia tri hop le tu 0 den 1. Vi du: 0.8.
+     */
+    sitemapPriority?: number | null;
+    sitemapChangeFrequency?: ('always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never') | null;
+    schemaType?: ('auto' | 'CollectionPage' | 'WebPage' | 'none') | null;
+    /**
+     * Chi dung khi can them schema rieng. Khong nhap Product/Article trung voi schema tu dong.
+     */
+    customJsonLd?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
   h1Override?: string | null;
   /**
    * Nội dung hien thi phia tren danh sach san pham.
@@ -500,6 +553,59 @@ export interface Product {
       }[]
     | null;
   /**
+   * Cau hinh metadata, social preview, robots, canonical, sitemap va schema cho entity nay.
+   */
+  seo?: {
+    /**
+     * Nen nam trong khoang 45-60 ky tu. De trong se tu dong lay theo tieu de.
+     */
+    metaTitle?: string | null;
+    /**
+     * Nen nam trong khoang 120-160 ky tu. De trong se tu dong lay mo ta ngan/noi dung.
+     */
+    metaDescription?: string | null;
+    /**
+     * Dung cho quy trinh bien tap/audit SEO noi bo, khong hien thi truc tiep tren frontend.
+     */
+    focusKeyword?: string | null;
+    /**
+     * Neu de trong, breadcrumb se dung ten/tieu de mac dinh.
+     */
+    breadcrumbLabel?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    /**
+     * Neu de trong se dung OpenGraph image hoac anh dai dien.
+     */
+    twitterImage?: (number | null) | Media;
+    robotsIndex?: ('index' | 'noindex') | null;
+    robotsFollow?: ('follow' | 'nofollow') | null;
+    /**
+     * Chi nhap khi URL canonical khac URL hien tai. Co the la duong dan tuong doi hoac URL day du.
+     */
+    canonicalOverride?: string | null;
+    sitemapInclude?: boolean | null;
+    /**
+     * Gia tri hop le tu 0 den 1. Vi du: 0.8.
+     */
+    sitemapPriority?: number | null;
+    sitemapChangeFrequency?: ('always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never') | null;
+    schemaType?: ('auto' | 'Product' | 'WebPage' | 'none') | null;
+    /**
+     * Chi dung khi can them schema rieng. Khong nhap Product/Article trung voi schema tu dong.
+     */
+    customJsonLd?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  /**
    * Tự động tạo từ tên sản phẩm, có thể chỉnh tay để tối ưu SEO.
    */
   slug: string;
@@ -573,6 +679,59 @@ export interface Category {
    */
   redirectTo?: string | null;
   siloNotes?: string | null;
+  /**
+   * Cau hinh metadata, social preview, robots, canonical, sitemap va schema cho entity nay.
+   */
+  seo?: {
+    /**
+     * Nen nam trong khoang 45-60 ky tu. De trong se tu dong lay theo tieu de.
+     */
+    metaTitle?: string | null;
+    /**
+     * Nen nam trong khoang 120-160 ky tu. De trong se tu dong lay mo ta ngan/noi dung.
+     */
+    metaDescription?: string | null;
+    /**
+     * Dung cho quy trinh bien tap/audit SEO noi bo, khong hien thi truc tiep tren frontend.
+     */
+    focusKeyword?: string | null;
+    /**
+     * Neu de trong, breadcrumb se dung ten/tieu de mac dinh.
+     */
+    breadcrumbLabel?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    /**
+     * Neu de trong se dung OpenGraph image hoac anh dai dien.
+     */
+    twitterImage?: (number | null) | Media;
+    robotsIndex?: ('index' | 'noindex') | null;
+    robotsFollow?: ('follow' | 'nofollow') | null;
+    /**
+     * Chi nhap khi URL canonical khac URL hien tai. Co the la duong dan tuong doi hoac URL day du.
+     */
+    canonicalOverride?: string | null;
+    sitemapInclude?: boolean | null;
+    /**
+     * Gia tri hop le tu 0 den 1. Vi du: 0.8.
+     */
+    sitemapPriority?: number | null;
+    sitemapChangeFrequency?: ('always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never') | null;
+    schemaType?: ('auto' | 'CollectionPage' | 'WebPage' | 'none') | null;
+    /**
+     * Chi dung khi can them schema rieng. Khong nhap Product/Article trung voi schema tu dong.
+     */
+    customJsonLd?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
   h1Override?: string | null;
   /**
    * Nội dung hien thi phia tren danh sach san pham.
@@ -873,13 +1032,44 @@ export interface Post {
     | null;
   excerpt?: string | null;
   seo?: {
+    /**
+     * Nếu nhập cả hậu tố MF Paris, frontend sẽ không tự nhân đôi hậu tố.
+     */
     metaTitle?: string | null;
     metaDescription?: string | null;
+    focusKeyword?: string | null;
+    breadcrumbLabel?: string | null;
     keywords?:
       | {
           keyword: string;
           id?: string | null;
         }[]
+      | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    twitterImage?: (number | null) | Media;
+    robotsIndex?: ('index' | 'noindex') | null;
+    robotsFollow?: ('follow' | 'nofollow') | null;
+    /**
+     * Chỉ nhập khi URL canonical khác URL hiện tại.
+     */
+    canonicalOverride?: string | null;
+    sitemapInclude?: boolean | null;
+    sitemapPriority?: number | null;
+    sitemapChangeFrequency?: ('daily' | 'weekly' | 'monthly' | 'yearly') | null;
+    schemaType?: ('auto' | 'BlogPosting' | 'WebPage' | 'none') | null;
+    /**
+     * Chỉ dùng khi cần thêm schema riêng. Không nhập Article trùng với schema tự động.
+     */
+    customJsonLd?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
       | null;
   };
   wpId?: number | null;
@@ -934,6 +1124,59 @@ export interface PostCategory {
    */
   redirectTo?: string | null;
   siloNotes?: string | null;
+  /**
+   * Cau hinh metadata, social preview, robots, canonical, sitemap va schema cho entity nay.
+   */
+  seo?: {
+    /**
+     * Nen nam trong khoang 45-60 ky tu. De trong se tu dong lay theo tieu de.
+     */
+    metaTitle?: string | null;
+    /**
+     * Nen nam trong khoang 120-160 ky tu. De trong se tu dong lay mo ta ngan/noi dung.
+     */
+    metaDescription?: string | null;
+    /**
+     * Dung cho quy trinh bien tap/audit SEO noi bo, khong hien thi truc tiep tren frontend.
+     */
+    focusKeyword?: string | null;
+    /**
+     * Neu de trong, breadcrumb se dung ten/tieu de mac dinh.
+     */
+    breadcrumbLabel?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    /**
+     * Neu de trong se dung OpenGraph image hoac anh dai dien.
+     */
+    twitterImage?: (number | null) | Media;
+    robotsIndex?: ('index' | 'noindex') | null;
+    robotsFollow?: ('follow' | 'nofollow') | null;
+    /**
+     * Chi nhap khi URL canonical khac URL hien tai. Co the la duong dan tuong doi hoac URL day du.
+     */
+    canonicalOverride?: string | null;
+    sitemapInclude?: boolean | null;
+    /**
+     * Gia tri hop le tu 0 den 1. Vi du: 0.8.
+     */
+    sitemapPriority?: number | null;
+    sitemapChangeFrequency?: ('always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never') | null;
+    schemaType?: ('auto' | 'CollectionPage' | 'WebPage' | 'none') | null;
+    /**
+     * Chi dung khi can them schema rieng. Khong nhap Product/Article trung voi schema tu dong.
+     */
+    customJsonLd?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
   h1Override?: string | null;
   /**
    * Nội dung hiển thị phía trên danh sách bài viết.
@@ -997,6 +1240,59 @@ export interface BlogAuthor {
    * Dùng khi bài viết chưa chọn tác giả riêng.
    */
   isDefault?: boolean | null;
+  /**
+   * Cau hinh metadata, social preview, robots, canonical, sitemap va schema cho entity nay.
+   */
+  seo?: {
+    /**
+     * Nen nam trong khoang 45-60 ky tu. De trong se tu dong lay theo tieu de.
+     */
+    metaTitle?: string | null;
+    /**
+     * Nen nam trong khoang 120-160 ky tu. De trong se tu dong lay mo ta ngan/noi dung.
+     */
+    metaDescription?: string | null;
+    /**
+     * Dung cho quy trinh bien tap/audit SEO noi bo, khong hien thi truc tiep tren frontend.
+     */
+    focusKeyword?: string | null;
+    /**
+     * Neu de trong, breadcrumb se dung ten/tieu de mac dinh.
+     */
+    breadcrumbLabel?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    /**
+     * Neu de trong se dung OpenGraph image hoac anh dai dien.
+     */
+    twitterImage?: (number | null) | Media;
+    robotsIndex?: ('index' | 'noindex') | null;
+    robotsFollow?: ('follow' | 'nofollow') | null;
+    /**
+     * Chi nhap khi URL canonical khac URL hien tai. Co the la duong dan tuong doi hoac URL day du.
+     */
+    canonicalOverride?: string | null;
+    sitemapInclude?: boolean | null;
+    /**
+     * Gia tri hop le tu 0 den 1. Vi du: 0.8.
+     */
+    sitemapPriority?: number | null;
+    sitemapChangeFrequency?: ('always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never') | null;
+    schemaType?: ('auto' | 'ProfilePage' | 'WebPage' | 'none') | null;
+    /**
+     * Chi dung khi can them schema rieng. Khong nhap Product/Article trung voi schema tu dong.
+     */
+    customJsonLd?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -1535,6 +1831,26 @@ export interface BrandsSelect<T extends boolean = true> {
   logo?: T;
   description?: T;
   isFeatured?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        breadcrumbLabel?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        twitterImage?: T;
+        robotsIndex?: T;
+        robotsFollow?: T;
+        canonicalOverride?: T;
+        sitemapInclude?: T;
+        sitemapPriority?: T;
+        sitemapChangeFrequency?: T;
+        schemaType?: T;
+        customJsonLd?: T;
+      };
   h1Override?: T;
   introHtml?: T;
   bottomContentHtml?: T;
@@ -1658,6 +1974,26 @@ export interface ProductsSelect<T extends boolean = true> {
         answer?: T;
         id?: T;
       };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        breadcrumbLabel?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        twitterImage?: T;
+        robotsIndex?: T;
+        robotsFollow?: T;
+        canonicalOverride?: T;
+        sitemapInclude?: T;
+        sitemapPriority?: T;
+        sitemapChangeFrequency?: T;
+        schemaType?: T;
+        customJsonLd?: T;
+      };
   slug?: T;
   averageRating?: T;
   reviewCount?: T;
@@ -1703,6 +2039,26 @@ export interface CategoriesSelect<T extends boolean = true> {
   redirectStatus?: T;
   redirectTo?: T;
   siloNotes?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        breadcrumbLabel?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        twitterImage?: T;
+        robotsIndex?: T;
+        robotsFollow?: T;
+        canonicalOverride?: T;
+        sitemapInclude?: T;
+        sitemapPriority?: T;
+        sitemapChangeFrequency?: T;
+        schemaType?: T;
+        customJsonLd?: T;
+      };
   h1Override?: T;
   introHtml?: T;
   bottomContentHtml?: T;
@@ -1834,12 +2190,26 @@ export interface PostsSelect<T extends boolean = true> {
     | {
         metaTitle?: T;
         metaDescription?: T;
+        focusKeyword?: T;
+        breadcrumbLabel?: T;
         keywords?:
           | T
           | {
               keyword?: T;
               id?: T;
             };
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        twitterImage?: T;
+        robotsIndex?: T;
+        robotsFollow?: T;
+        canonicalOverride?: T;
+        sitemapInclude?: T;
+        sitemapPriority?: T;
+        sitemapChangeFrequency?: T;
+        schemaType?: T;
+        customJsonLd?: T;
       };
   wpId?: T;
   sourceUrl?: T;
@@ -1865,6 +2235,26 @@ export interface BlogAuthorsSelect<T extends boolean = true> {
         id?: T;
       };
   isDefault?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        breadcrumbLabel?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        twitterImage?: T;
+        robotsIndex?: T;
+        robotsFollow?: T;
+        canonicalOverride?: T;
+        sitemapInclude?: T;
+        sitemapPriority?: T;
+        sitemapChangeFrequency?: T;
+        schemaType?: T;
+        customJsonLd?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1900,6 +2290,26 @@ export interface PostCategoriesSelect<T extends boolean = true> {
   redirectStatus?: T;
   redirectTo?: T;
   siloNotes?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        breadcrumbLabel?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        twitterImage?: T;
+        robotsIndex?: T;
+        robotsFollow?: T;
+        canonicalOverride?: T;
+        sitemapInclude?: T;
+        sitemapPriority?: T;
+        sitemapChangeFrequency?: T;
+        schemaType?: T;
+        customJsonLd?: T;
+      };
   h1Override?: T;
   introHtml?: T;
   bottomContentHtml?: T;

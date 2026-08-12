@@ -4,7 +4,7 @@ import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { trackCategorySlugHistory } from '@/collections/hooks/trackSlugHistory'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 import { siloSeoFields } from '@/collections/fields/siloSeoFields'
-import { landingSeoContentFields } from '@/collections/fields/seoFields'
+import { landingSeoContentFields, seoFields } from '@/collections/fields/seoFields'
 import { internalLinkingFields } from '@/collections/fields/internalLinkingFields'
 
 const revalidateCategoryTags = async () => {
@@ -74,6 +74,19 @@ export const Categories: CollectionConfig = {
     {
       type: 'tabs',
       tabs: [
+        {
+          label: 'SEO nâng cao',
+          fields: [
+            seoFields({
+              schemaTypeOptions: [
+                { label: 'Tự động theo danh mục sản phẩm', value: 'auto' },
+                { label: 'CollectionPage', value: 'CollectionPage' },
+                { label: 'WebPage', value: 'WebPage' },
+                { label: 'Không xuất schema riêng', value: 'none' },
+              ],
+            }),
+          ],
+        },
         {
           label: 'Nội dung SEO',
           fields: landingSeoContentFields,

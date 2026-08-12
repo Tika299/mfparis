@@ -121,13 +121,42 @@ function hasUsableSlug(
     return typeof value === 'string' && value.trim().length > 0
 }
 
+function shouldIncludeSeoPage(doc: {
+    seo?: Record<string, unknown> | null
+    seoStatus?: string | null
+    slug?: string | null
+}): boolean {
+    if (!hasUsableSlug(doc.slug)) {
+        return false
+    }
+
+    if (doc.seo?.sitemapInclude === false) {
+        return false
+    }
+
+    if (doc.seo?.robotsIndex === 'noindex') {
+        return false
+    }
+
+    if (doc.seoStatus === 'discontinued_keep_page') {
+        return false
+    }
+
+    return true
+}
+
 function shouldIncludeTaxonomyPage(doc: {
     redirectStatus?: string | null
+    seo?: Record<string, unknown> | null
     seoIndex?: string | null
     slug?: string | null
     taxonomyType?: string | null
 }): boolean {
     if (!hasUsableSlug(doc.slug)) {
+        return false
+    }
+
+    if (!shouldIncludeSeoPage(doc)) {
         return false
     }
 
@@ -185,9 +214,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             select: {
                 slug: true,
                 updatedAt: true,
-                seoIndex: true,
-                taxonomyType: true,
-                redirectStatus: true,
+                seo: true,
+                seoStatus: true,
             },
         }),
         payload.find({
@@ -199,6 +227,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             select: {
                 slug: true,
                 updatedAt: true,
+                seo: true,
+                seoIndex: true,
+                taxonomyType: true,
+                redirectStatus: true,
             },
         }),
         payload.find({
@@ -210,6 +242,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             select: {
                 slug: true,
                 updatedAt: true,
+                seo: true,
             },
         }),
         payload.find({
@@ -221,6 +254,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             select: {
                 slug: true,
                 updatedAt: true,
+                seo: true,
             },
         }),
         payload.find({
@@ -232,6 +266,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             select: {
                 slug: true,
                 updatedAt: true,
+                seo: true,
                 seoIndex: true,
                 taxonomyType: true,
                 redirectStatus: true,
@@ -247,7 +282,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
 
     const productEntries: MetadataRoute.Sitemap = productsRes.docs
-        .filter((product) => hasUsableSlug(product.slug))
+        .filter(shouldIncludeSeoPage)
         .map((product) => ({
             url: toAbsoluteUrl(`/products/${product.slug}`),
             lastModified: toValidLastModified(product.updatedAt),
@@ -265,7 +300,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }))
 
     const brandEntries: MetadataRoute.Sitemap = brandsRes.docs
-        .filter((brand) => hasUsableSlug(brand.slug))
+        .filter(shouldIncludeSeoPage)
         .map((brand) => ({
             url: toAbsoluteUrl(`/brands/${brand.slug}`),
             lastModified: toValidLastModified(brand.updatedAt),
@@ -274,7 +309,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }))
 
     const blogEntries: MetadataRoute.Sitemap = postsRes.docs
-        .filter((post) => hasUsableSlug(post.slug))
+        .filter(shouldIncludeSeoPage)
         .map((post) => ({
             url: toAbsoluteUrl(`/blog/${post.slug}`),
             lastModified: toValidLastModified(post.updatedAt),

@@ -8,6 +8,7 @@ import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { trackProductSlugHistory } from '@/collections/hooks/trackSlugHistory'
 import { ensureLegacyProductRedirectHook } from '@/collections/hooks/ensureLegacyProductRedirect'
 import { productSeoLifecycleFields } from '@/collections/fields/productSeoLifecycleFields'
+import { seoFields } from '@/collections/fields/seoFields'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 import { buildProductSearchKeywords } from '@/utilities/searchKeywords'
 import { internalLinkingFields } from '@/collections/fields/internalLinkingFields'
@@ -771,6 +772,14 @@ export const Products: CollectionConfig = {
                 },
               ],
             },
+            seoFields({
+              schemaTypeOptions: [
+                { label: 'Tự động theo sản phẩm', value: 'auto' },
+                { label: 'Product', value: 'Product' },
+                { label: 'WebPage', value: 'WebPage' },
+                { label: 'Không xuất schema riêng', value: 'none' },
+              ],
+            }),
           ],
         },
       ],

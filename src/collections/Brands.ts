@@ -2,7 +2,7 @@ import { revalidateTag } from 'next/cache'
 import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
-import { landingSeoContentFields } from '@/collections/fields/seoFields'
+import { landingSeoContentFields, seoFields } from '@/collections/fields/seoFields'
 import { internalLinkingFields } from '@/collections/fields/internalLinkingFields'
 
 const revalidateBrandTags = async () => {
@@ -71,6 +71,19 @@ export const Brands: CollectionConfig = {
     {
       type: 'tabs',
       tabs: [
+        {
+          label: 'SEO nâng cao',
+          fields: [
+            seoFields({
+              schemaTypeOptions: [
+                { label: 'Tự động theo trang thương hiệu', value: 'auto' },
+                { label: 'CollectionPage', value: 'CollectionPage' },
+                { label: 'WebPage', value: 'WebPage' },
+                { label: 'Không xuất schema riêng', value: 'none' },
+              ],
+            }),
+          ],
+        },
         {
           label: 'Nội dung SEO',
           fields: landingSeoContentFields,

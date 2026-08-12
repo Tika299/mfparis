@@ -15,6 +15,14 @@ import { htmlToPlainText, normalizeContentHtml } from '@/lib/html/contentHtml'
 import '@/styles/blog.css'
 import { applyInternalLinksForRender } from '@/lib/internal-links/applyInternalLinks'
 import { getInternalLinkingConfig } from '@/lib/internal-links/getInternalLinkingConfig'
+import {
+  getMetadataTitle,
+  getSeoCanonical,
+  getSeoFollowValue,
+  getSeoIndexValue,
+  getSeoMedia,
+  getSeoText,
+} from '@/utilities/metadataSeo'
 
 const POSTS_PER_PAGE = 9
 
@@ -46,6 +54,46 @@ type PostCategoryTreeItem = {
 type LandingFaqItem = {
   question?: string | null
   answer?: string | null
+}
+
+type RelationshipMedia =
+  | number
+  | {
+    url?: string | null
+  }
+  | null
+  | undefined
+
+function getSiteUrl(): string {
+  return (
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    'https://mfparis.vn'
+  )
+}
+
+function getMediaUrl(
+  media: RelationshipMedia,
+): string | undefined {
+  if (!media || typeof media !== 'object') {
+    return undefined
+  }
+
+  if (
+    typeof media.url !== 'string' ||
+    !media.url.trim()
+  ) {
+    return undefined
+  }
+
+  try {
+    return new URL(
+      media.url,
+      getSiteUrl(),
+    ).toString()
+  } catch {
+    return undefined
+  }
 }
 
 function getRelationshipID(value: RelationshipValue): string | null {
@@ -281,23 +329,35 @@ export async function generateMetadata({
     }
   }
 
-  const title = `${getCategoryDisplayName(category)} | Blog MF Paris`
-  const description = getCategoryDescription(category)
-  const canonical = `/blog/category/${encodeURIComponent(slug)}`
+  const fallbackTitle = `${getCategoryDisplayName(category)} | Blog MF Paris`
+  const title = getSeoText(category, 'metaTitle') || fallbackTitle
+  const description =
+    getSeoText(category, 'metaDescription') || getCategoryDescription(category)
+  const defaultCanonical = `/blog/category/${encodeURIComponent(slug)}`
+  const canonical = getSeoCanonical(category, defaultCanonical)
   const shouldNoindex = isNoindexCategory(category, currentPage)
+  const index = getSeoIndexValue(category, !shouldNoindex)
+  const follow = getSeoFollowValue(category)
+  const imageUrl =
+    getMediaUrl(getSeoMedia(category, 'ogImage') as RelationshipMedia) ||
+    getMediaUrl((category as any).ogImage) ||
+    getMediaUrl((category as any).thumbnail)
+  const twitterImageUrl =
+    getMediaUrl(getSeoMedia(category, 'twitterImage') as RelationshipMedia) ||
+    imageUrl
 
   return {
-    title,
+    title: getMetadataTitle(title),
     description,
     alternates: {
       canonical,
     },
     robots: {
-      index: !shouldNoindex,
-      follow: true,
+      index,
+      follow,
       googleBot: {
-        index: !shouldNoindex,
-        follow: true,
+        index,
+        follow,
         'max-image-preview': 'large',
         'max-snippet': -1,
         'max-video-preview': -1,
@@ -307,9 +367,23 @@ export async function generateMetadata({
       type: 'website',
       locale: 'vi_VN',
       siteName: 'MF Paris',
+      title: getSeoText(category, 'ogTitle') || title,
+      description: getSeoText(category, 'ogDescription') || description,
+      url: canonical,
+      images: imageUrl
+        ? [
+          {
+            url: imageUrl,
+            alt: getCategoryDisplayName(category),
+          },
+        ]
+        : undefined,
+    },
+    twitter: {
+      card: twitterImageUrl ? 'summary_large_image' : 'summary',
       title,
       description,
-      url: canonical,
+      images: twitterImageUrl ? [twitterImageUrl] : undefined,
     },
   }
 }

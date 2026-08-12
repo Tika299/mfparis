@@ -31,6 +31,14 @@ import '@/styles/prose.css'
 import '@/styles/carousel-overrides.css'
 import { applyInternalLinksForRender } from '@/lib/internal-links/applyInternalLinks'
 import { getInternalLinkingConfig } from '@/lib/internal-links/getInternalLinkingConfig'
+import {
+  getMetadataTitle,
+  getSeoCanonical,
+  getSeoFollowValue,
+  getSeoIndexValue,
+  getSeoMedia,
+  getSeoText,
+} from '@/utilities/metadataSeo'
 
 type BlogPostPageProps = {
   params: Promise<{
@@ -682,30 +690,47 @@ export async function generateMetadata({
   }
 
   const cleanTitle = getCleanPostTitle(post.title)
-  const title = getPostSeoTitle(post.title)
+  const title = getSeoText(post, 'metaTitle') || getPostSeoTitle(post.title)
   const description =
-    getPostDescription(post)
-  const canonicalUrl = `/blog/${encodeURIComponent(
+    getSeoText(post, 'metaDescription') || getPostDescription(post)
+  const defaultCanonicalUrl = `/blog/${encodeURIComponent(
     slug,
   )}`
-  const imageUrl = getMediaUrl(
-    (post as any).thumbnail,
-  )
+  const canonicalUrl = getSeoCanonical(post, defaultCanonicalUrl)
+  const imageUrl =
+    getMediaUrl(getSeoMedia(post, 'ogImage') as RelationshipMedia) ||
+    getMediaUrl((post as any).ogImage) ||
+    getMediaUrl((post as any).thumbnail)
+  const twitterImageUrl =
+    getMediaUrl(getSeoMedia(post, 'twitterImage') as RelationshipMedia) || imageUrl
+  const index = getSeoIndexValue(post, true)
+  const follow = getSeoFollowValue(post)
 
 
   return {
-    title,
+    title: getMetadataTitle(title),
     description,
     alternates: {
       canonical: canonicalUrl,
+    },
+    robots: {
+      index,
+      follow,
+      googleBot: {
+        index,
+        follow,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
     },
     openGraph: {
       type: 'article',
       locale: 'vi_VN',
       url: canonicalUrl,
       siteName: 'MF Paris',
-      title,
-      description,
+      title: getSeoText(post, 'ogTitle') || title,
+      description: getSeoText(post, 'ogDescription') || description,
       images: imageUrl
         ? [
           {
@@ -721,8 +746,8 @@ export async function generateMetadata({
         : 'summary',
       title,
       description,
-      images: imageUrl
-        ? [imageUrl]
+      images: twitterImageUrl
+        ? [twitterImageUrl]
         : undefined,
     },
   }

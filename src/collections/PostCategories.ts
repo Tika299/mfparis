@@ -2,7 +2,7 @@ import { CollectionConfig } from 'payload'
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
 import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 import { siloSeoFields } from '@/collections/fields/siloSeoFields'
-import { blogLandingSeoContentFields } from '@/collections/fields/seoFields'
+import { blogLandingSeoContentFields, seoFields } from '@/collections/fields/seoFields'
 import { internalLinkingFields } from '@/collections/fields/internalLinkingFields'
 
 export const PostCategories: CollectionConfig = {
@@ -54,6 +54,19 @@ export const PostCategories: CollectionConfig = {
     {
       type: 'tabs',
       tabs: [
+        {
+          label: 'SEO nâng cao',
+          fields: [
+            seoFields({
+              schemaTypeOptions: [
+                { label: 'Tự động theo danh mục blog', value: 'auto' },
+                { label: 'CollectionPage', value: 'CollectionPage' },
+                { label: 'WebPage', value: 'WebPage' },
+                { label: 'Không xuất schema riêng', value: 'none' },
+              ],
+            }),
+          ],
+        },
         {
           label: 'Nội dung SEO',
           fields: blogLandingSeoContentFields,

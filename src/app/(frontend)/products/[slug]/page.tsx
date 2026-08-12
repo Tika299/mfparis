@@ -44,6 +44,14 @@ import {
 } from '@/components/product/ProductReviews'
 import { applyInternalLinksForRender } from '@/lib/internal-links/applyInternalLinks'
 import { getInternalLinkingConfig } from '@/lib/internal-links/getInternalLinkingConfig'
+import {
+  getMetadataTitle,
+  getSeoCanonical,
+  getSeoFollowValue,
+  getSeoIndexValue,
+  getSeoMedia,
+  getSeoText,
+} from '@/utilities/metadataSeo'
 
 export const revalidate = 300
 export const dynamicParams = true
@@ -393,9 +401,20 @@ function getProductDescription(
 function getProductMetadataContent(
   product: Product,
 ): ProductMetadataContent {
+  const seoTitle = getPlainText(
+    getSeoText(product, 'metaTitle') ||
+    product.seoTitle,
+  )
+  const seoDescription = getPlainText(
+    getSeoText(product, 'metaDescription') ||
+    product.seoDescription,
+  )
+
   return {
-    title: `${product.title} Chính Hãng`,
-    description: getProductDescription(product),
+    title: seoTitle || `${product.title} Chính Hãng`,
+    description:
+      seoDescription ||
+      getProductDescription(product),
   }
 }
 
@@ -1943,17 +1962,30 @@ export async function generateMetadata({
   const metadataContent =
     getProductMetadataContent(product)
 
-  const canonicalUrl =
-    getProductCanonicalUrl(product.slug)
+  const canonicalUrl = getSeoCanonical(
+    product,
+    getProductCanonicalUrl(product.slug),
+  )
 
   const openGraphImage =
     getProductOpenGraphImageData(product)
+  const seoOpenGraphImageUrl =
+    getMediaUrl(getSeoMedia(product, 'ogImage'))
+  const twitterImageUrl =
+    getMediaUrl(getSeoMedia(product, 'twitterImage')) ||
+    seoOpenGraphImageUrl ||
+    openGraphImage?.url
 
   const shouldNoindex =
     seoStatus === 'discontinued_keep_page'
+  const index = getSeoIndexValue(
+    product,
+    !shouldNoindex,
+  )
+  const follow = getSeoFollowValue(product)
 
   return {
-    title: metadataContent.title,
+    title: getMetadataTitle(metadataContent.title),
     description: metadataContent.description,
 
     alternates: {
@@ -1961,11 +1993,11 @@ export async function generateMetadata({
     },
 
     robots: {
-      index: !shouldNoindex,
-      follow: true,
+      index,
+      follow,
       googleBot: {
-        index: !shouldNoindex,
-        follow: true,
+        index,
+        follow,
         'max-image-preview': 'large',
         'max-snippet': -1,
         'max-video-preview': -1,
@@ -1976,16 +2008,18 @@ export async function generateMetadata({
       type: 'website',
       locale: 'vi_VN',
       siteName: 'MF PARIS',
-      title: metadataContent.title,
-      description: metadataContent.description,
+      title: getSeoText(product, 'ogTitle') || metadataContent.title,
+      description:
+        getSeoText(product, 'ogDescription') ||
+        metadataContent.description,
       url: canonicalUrl,
-      images: openGraphImage
+      images: seoOpenGraphImageUrl || openGraphImage
         ? [
           {
-            url: openGraphImage.url,
+            url: seoOpenGraphImageUrl || openGraphImage?.url || '',
             alt: product.title,
-            width: openGraphImage.width,
-            height: openGraphImage.height,
+            width: openGraphImage?.width,
+            height: openGraphImage?.height,
           },
         ]
         : undefined,
@@ -1995,8 +2029,8 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: metadataContent.title,
       description: metadataContent.description,
-      images: openGraphImage
-        ? [openGraphImage.url]
+      images: twitterImageUrl
+        ? [twitterImageUrl]
         : undefined,
     },
   }

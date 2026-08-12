@@ -22,6 +22,14 @@ import {
 } from '@/lib/productSearchFilters'
 import { getInternalLinkingConfig } from '@/lib/internal-links/getInternalLinkingConfig'
 import { applyInternalLinksForRender } from '@/lib/internal-links/applyInternalLinks'
+import {
+  getMetadataTitle,
+  getSeoCanonical,
+  getSeoFollowValue,
+  getSeoIndexValue,
+  getSeoMedia,
+  getSeoText,
+} from '@/utilities/metadataSeo'
 
 const PRODUCTS_PER_PAGE = 20
 const DEFAULT_SORT = '-createdAt'
@@ -211,31 +219,40 @@ export async function generateMetadata({
     }
   }
 
-  const title = `${brand.name} Chính Hãng`
+  const fallbackTitle = `${brand.name} Chính Hãng`
+  const title = getSeoText(brand, 'metaTitle') || fallbackTitle
   const description =
-    getBrandDescription(brand)
-  const canonicalUrl = `/brands/${encodeURIComponent(
+    getSeoText(brand, 'metaDescription') || getBrandDescription(brand)
+  const defaultCanonicalUrl = `/brands/${encodeURIComponent(
     slug,
   )}`
+  const canonicalUrl = getSeoCanonical(brand, defaultCanonicalUrl)
   const imageUrl = getMediaUrl(
-    brand.logo,
+    (getSeoMedia(brand, 'ogImage') ||
+      (brand as any).ogImage ||
+      (brand as any).thumbnail ||
+      brand.logo) as RelationshipMedia,
   )
+  const twitterImageUrl =
+    getMediaUrl(getSeoMedia(brand, 'twitterImage') as RelationshipMedia) || imageUrl
   const shouldIndex = !hasAnyBrandListFilterParams(
     resolvedSearchParams,
   )
+  const index = getSeoIndexValue(brand, shouldIndex)
+  const follow = getSeoFollowValue(brand)
 
   return {
-    title,
+    title: getMetadataTitle(title),
     description,
     alternates: {
       canonical: canonicalUrl,
     },
     robots: {
-      index: shouldIndex,
-      follow: true,
+      index,
+      follow,
       googleBot: {
-        index: shouldIndex,
-        follow: true,
+        index,
+        follow,
         'max-image-preview': 'large',
         'max-snippet': -1,
         'max-video-preview': -1,
@@ -246,8 +263,8 @@ export async function generateMetadata({
       locale: 'vi_VN',
       url: canonicalUrl,
       siteName: 'MF Paris',
-      title,
-      description,
+      title: getSeoText(brand, 'ogTitle') || title,
+      description: getSeoText(brand, 'ogDescription') || description,
       images: imageUrl
         ? [
           {
@@ -263,8 +280,8 @@ export async function generateMetadata({
         : 'summary',
       title,
       description,
-      images: imageUrl
-        ? [imageUrl]
+      images: twitterImageUrl
+        ? [twitterImageUrl]
         : undefined,
     },
   }

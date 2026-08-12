@@ -307,10 +307,35 @@ export const Posts: CollectionConfig = {
     {
       name: 'seo',
       type: 'group',
-      label: 'Cấu hình SEO',
+      label: 'SEO nâng cao',
       fields: [
-        { name: 'metaTitle', type: 'text' },
-        { name: 'metaDescription', type: 'textarea' },
+        {
+          name: 'metaTitle',
+          type: 'text',
+          label: 'Meta title',
+          admin: {
+            description:
+              'Nếu nhập cả hậu tố MF Paris, frontend sẽ không tự nhân đôi hậu tố.',
+          },
+        },
+        {
+          name: 'metaDescription',
+          type: 'textarea',
+          label: 'Meta description',
+          admin: {
+            rows: 3,
+          },
+        },
+        {
+          name: 'focusKeyword',
+          type: 'text',
+          label: 'Từ khóa chính',
+        },
+        {
+          name: 'breadcrumbLabel',
+          type: 'text',
+          label: 'Nhãn breadcrumb',
+        },
         {
           name: 'keywords',
           type: 'array',
@@ -323,6 +348,128 @@ export const Posts: CollectionConfig = {
               label: 'Từ khóa',
             },
           ],
+        },
+        {
+          name: 'ogTitle',
+          type: 'text',
+          label: 'OpenGraph title',
+        },
+        {
+          name: 'ogDescription',
+          type: 'textarea',
+          label: 'OpenGraph description',
+          admin: {
+            rows: 3,
+          },
+        },
+        {
+          name: 'ogImage',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'OpenGraph image',
+        },
+        {
+          name: 'twitterImage',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Twitter/X image',
+        },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'robotsIndex',
+              type: 'select',
+              label: 'Index',
+              defaultValue: 'index',
+              options: [
+                { label: 'Index', value: 'index' },
+                { label: 'Noindex', value: 'noindex' },
+              ],
+              admin: {
+                width: '50%',
+              },
+            },
+            {
+              name: 'robotsFollow',
+              type: 'select',
+              label: 'Follow',
+              defaultValue: 'follow',
+              options: [
+                { label: 'Follow', value: 'follow' },
+                { label: 'Nofollow', value: 'nofollow' },
+              ],
+              admin: {
+                width: '50%',
+              },
+            },
+          ],
+        },
+        {
+          name: 'canonicalOverride',
+          type: 'text',
+          label: 'Canonical override',
+          admin: {
+            description:
+              'Chỉ nhập khi URL canonical khác URL hiện tại.',
+          },
+        },
+        {
+          name: 'sitemapInclude',
+          type: 'checkbox',
+          label: 'Đưa vào sitemap',
+          defaultValue: true,
+        },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'sitemapPriority',
+              type: 'number',
+              label: 'Sitemap priority',
+              min: 0,
+              max: 1,
+              admin: {
+                width: '50%',
+                step: 0.1,
+              },
+            },
+            {
+              name: 'sitemapChangeFrequency',
+              type: 'select',
+              label: 'Change frequency',
+              options: [
+                { label: 'Daily', value: 'daily' },
+                { label: 'Weekly', value: 'weekly' },
+                { label: 'Monthly', value: 'monthly' },
+                { label: 'Yearly', value: 'yearly' },
+              ],
+              admin: {
+                width: '50%',
+              },
+            },
+          ],
+        },
+        {
+          name: 'schemaType',
+          type: 'select',
+          label: 'Schema type',
+          defaultValue: 'auto',
+          options: [
+            { label: 'Tự động theo bài viết', value: 'auto' },
+            { label: 'BlogPosting', value: 'BlogPosting' },
+            { label: 'WebPage', value: 'WebPage' },
+            { label: 'Không xuất schema riêng', value: 'none' },
+          ],
+        },
+        {
+          name: 'customJsonLd',
+          type: 'json',
+          label: 'Custom JSON-LD',
+          admin: {
+            description:
+              'Chỉ dùng khi cần thêm schema riêng. Không nhập Article trùng với schema tự động.',
+          },
         },
       ],
     },

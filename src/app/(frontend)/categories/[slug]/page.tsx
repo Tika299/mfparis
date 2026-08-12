@@ -22,6 +22,14 @@ import {
 } from '@/lib/productSearchFilters'
 import { applyInternalLinksForRender } from '@/lib/internal-links/applyInternalLinks'
 import { getInternalLinkingConfig } from '@/lib/internal-links/getInternalLinkingConfig'
+import {
+  getMetadataTitle,
+  getSeoCanonical,
+  getSeoFollowValue,
+  getSeoIndexValue,
+  getSeoMedia,
+  getSeoText,
+} from '@/utilities/metadataSeo'
 
 const PRODUCTS_PER_PAGE = 20
 const DEFAULT_SORT = '-createdAt'
@@ -402,32 +410,41 @@ export async function generateMetadata({
     }
   }
 
-  const title = `${category.name} Chính Hãng`
+  const fallbackTitle = `${category.name} Chính Hãng`
+  const title = getSeoText(category, 'metaTitle') || fallbackTitle
   const description =
-    getCategoryDescription(category)
-  const canonicalUrl = `/categories/${encodeURIComponent(
+    getSeoText(category, 'metaDescription') || getCategoryDescription(category)
+  const defaultCanonicalUrl = `/categories/${encodeURIComponent(
     slug,
   )}`
+  const canonicalUrl = getSeoCanonical(category, defaultCanonicalUrl)
   const imageUrl = getMediaUrl(
-    category.image,
+    (getSeoMedia(category, 'ogImage') ||
+      (category as any).ogImage ||
+      (category as any).thumbnail ||
+      category.image) as RelationshipMedia,
   )
+  const twitterImageUrl =
+    getMediaUrl(getSeoMedia(category, 'twitterImage') as RelationshipMedia) || imageUrl
   const shouldIndex = shouldIndexCategoryPage(
     category,
     resolvedSearchParams,
   )
+  const index = getSeoIndexValue(category, shouldIndex)
+  const follow = getSeoFollowValue(category)
 
   return {
-    title,
+    title: getMetadataTitle(title),
     description,
     alternates: {
       canonical: canonicalUrl,
     },
     robots: {
-      index: shouldIndex,
-      follow: true,
+      index,
+      follow,
       googleBot: {
-        index: shouldIndex,
-        follow: true,
+        index,
+        follow,
         'max-image-preview': 'large',
         'max-snippet': -1,
         'max-video-preview': -1,
@@ -438,8 +455,8 @@ export async function generateMetadata({
       locale: 'vi_VN',
       url: canonicalUrl,
       siteName: 'MF Paris',
-      title,
-      description,
+      title: getSeoText(category, 'ogTitle') || title,
+      description: getSeoText(category, 'ogDescription') || description,
       images: imageUrl
         ? [
           {
@@ -455,8 +472,8 @@ export async function generateMetadata({
         : 'summary',
       title,
       description,
-      images: imageUrl
-        ? [imageUrl]
+      images: twitterImageUrl
+        ? [twitterImageUrl]
         : undefined,
     },
   }

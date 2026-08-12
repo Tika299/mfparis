@@ -7,6 +7,14 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { JsonLd } from '@/components/JsonLd'
 import { OptimizedImage } from '@/components/OptimizedImage'
+import {
+  getMetadataTitle,
+  getSeoCanonical,
+  getSeoFollowValue,
+  getSeoIndexValue,
+  getSeoMedia,
+  getSeoText,
+} from '@/utilities/metadataSeo'
 
 type AuthorPageProps = {
   params: Promise<{
@@ -114,38 +122,63 @@ export async function generateMetadata({
     }
   }
 
-  const title = compact(author.name, 'Tác giả MF Paris')
+  const authorName = compact(author.name, 'Tác giả MF Paris')
+  const fallbackTitle = authorName + ' | Tác giả MF Paris'
+  const title = getSeoText(author, 'metaTitle') || fallbackTitle
   const description =
+    getSeoText(author, 'metaDescription') ||
     compact(author.bio) ||
-    title + ' chia sẻ kiến thức nước hoa, mỹ phẩm và chăm sóc sắc đẹp tại MF Paris.'
-  const canonical = '/author/' + encodeURIComponent(slug) + '/'
-  const avatarUrl = getMediaUrl(author.avatar)
+    authorName + ' chia sẻ kiến thức nước hoa, mỹ phẩm và chăm sóc sắc đẹp tại MF Paris.'
+  const defaultCanonical = '/author/' + encodeURIComponent(slug) + '/'
+  const canonical = getSeoCanonical(author, defaultCanonical)
+  const avatarUrl =
+    getMediaUrl(getSeoMedia(author, 'ogImage')) || getMediaUrl(author.avatar)
+  const twitterImageUrl =
+    getMediaUrl(getSeoMedia(author, 'twitterImage')) || avatarUrl
+  const index = getSeoIndexValue(author, true)
+  const follow = getSeoFollowValue(author)
 
   return {
-    title: title + ' | Tác giả MF Paris',
+    title: getMetadataTitle(title),
     description,
     alternates: {
       canonical,
+    },
+    robots: {
+      index,
+      follow,
+      googleBot: {
+        index,
+        follow,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
     },
     openGraph: {
       type: 'profile',
       locale: 'vi_VN',
       url: canonical,
       siteName: 'MF Paris',
-      title: title + ' | Tác giả MF Paris',
-      description,
+      title: getSeoText(author, 'ogTitle') || title,
+      description: getSeoText(author, 'ogDescription') || description,
       images: avatarUrl
         ? [
             {
               url: avatarUrl,
-              alt: title,
+              alt: authorName,
             },
           ]
         : undefined,
     },
+    twitter: {
+      card: twitterImageUrl ? 'summary_large_image' : 'summary',
+      title,
+      description,
+      images: twitterImageUrl ? [twitterImageUrl] : undefined,
+    },
   }
 }
-
 export default async function AuthorPage({
   params,
 }: AuthorPageProps) {
@@ -379,3 +412,4 @@ export default async function AuthorPage({
     </main>
   )
 }
+

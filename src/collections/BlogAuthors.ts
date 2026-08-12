@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { beforeChangeSlug } from '../hooks/beforeChangeSlug'
+import { seoFields } from '@/collections/fields/seoFields'
 
 export const BlogAuthors: CollectionConfig = {
   slug: 'blog-authors',
@@ -96,5 +97,13 @@ export const BlogAuthors: CollectionConfig = {
           'D\u00f9ng khi b\u00e0i vi\u1ebft ch\u01b0a ch\u1ecdn t\u00e1c gi\u1ea3 ri\u00eang.',
       },
     },
+    seoFields({
+      schemaTypeOptions: [
+        { label: 'Tự động theo trang tác giả', value: 'auto' },
+        { label: 'ProfilePage', value: 'ProfilePage' },
+        { label: 'WebPage', value: 'WebPage' },
+        { label: 'Không xuất schema riêng', value: 'none' },
+      ],
+    }),
   ],
 }
