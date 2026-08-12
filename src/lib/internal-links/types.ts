@@ -65,6 +65,8 @@ export type InternalLinkSkipReason =
     | 'no_rules'
     | 'empty_html'
     | 'excluded_keyword'
+    | 'generic_anchor'
+    | 'product_name_fragment'
 
 export type InternalLinkSkippedItem = {
     keyword?: string

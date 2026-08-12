@@ -30,6 +30,19 @@ const BLOCKED_TAGS = new Set([
     'label',
     'iframe',
     'noscript',
+    'nav',
+    'header',
+    'footer',
+    'form',
+    'strong',
+    'b',
+    'em',
+    'i',
+    'figcaption',
+    'caption',
+    'summary',
+    'details',
+    'svg',
     'h1',
     'h2',
     'h3',
@@ -38,13 +51,135 @@ const BLOCKED_TAGS = new Set([
     'h6',
 ])
 
+const BLOCKED_CLASS_TOKENS = new Set([
+    'breadcrumb',
+    'breadcrumbs',
+    'toc',
+    'table-of-contents',
+    'product-title',
+    'product-name',
+    'product-card',
+    'post-title',
+    'post-card',
+    'entry-title',
+    'page-title',
+    'card-title',
+    'menu',
+    'nav',
+    'button',
+    'btn',
+    'wp-block-button',
+])
+
+const GENERIC_ANCHOR_PHRASES = new Set([
+    'san pham',
+    'thuong hieu',
+    'danh muc',
+    'bai viet',
+    'nuoc hoa',
+    'my pham',
+    'cham soc da',
+    'hang phap',
+    'chinh hang',
+    'cao cap',
+    'tot nhat',
+    'nen mua',
+    'tai day',
+    'xem them',
+    'chi tiet',
+    'click vao day',
+    'san pham nay',
+    'dong nay',
+    'loai nay',
+    'chai nay',
+    'mui nay',
+    'tham khao',
+    'doc tiep',
+])
+
+const GENERIC_ANCHOR_WORDS = new Set([
+    'san',
+    'pham',
+    'thuong',
+    'hieu',
+    'danh',
+    'muc',
+    'bai',
+    'viet',
+    'nuoc',
+    'hoa',
+    'my',
+    'chinh',
+    'hang',
+    'cao',
+    'cap',
+    'tot',
+    'nhat',
+    'mua',
+    'gia',
+    'review',
+    'xem',
+    'them',
+    'tai',
+    'day',
+    'chi',
+    'tiet',
+])
+
+const PRODUCT_CONTEXT_HINTS = new Set([
+    'edp',
+    'edt',
+    'edc',
+    'eau',
+    'parfum',
+    'perfume',
+    'toilette',
+    'cologne',
+    'extrait',
+    'intense',
+    'absolu',
+    'elixir',
+    'le',
+    'la',
+    'pour',
+    'homme',
+    'femme',
+    'black',
+    'blue',
+    'bleu',
+    'sauvage',
+    'opium',
+    'effaclar',
+    'sebiaclear',
+    'gel',
+    'cream',
+    'serum',
+    'spf',
+    'ml',
+    '100ml',
+    '50ml',
+])
+
+const BRAND_INTENT_BEFORE_ENDINGS = [
+    'thuong hieu',
+    'brand',
+    'nha mot',
+    'cua',
+    'tu',
+    'den tu',
+    'dna cua',
+    'phong cach cua',
+    'cac dong',
+    'nhom',
+]
+
 const priorityScore: Record<string, number> = {
-    primary_keyword: 100,
-    keyword_main: 100,
-    category: 80,
-    brand: 70,
-    product: 60,
-    post: 50,
+    primary_keyword: 110,
+    keyword_main: 110,
+    product: 100,
+    brand: 85,
+    category: 75,
+    post: 65,
 }
 
 const MAX_SKIPPED_ITEMS = 100
@@ -119,6 +254,29 @@ function isText(node: Node): node is Text {
     return node.type === 'text'
 }
 
+function getClassTokens(element: Element): string[] {
+    const className = element.attribs?.class
+
+    if (typeof className !== 'string') return []
+
+    return className
+        .split(/\s+/)
+        .map((item) => item.trim().toLowerCase())
+        .filter(Boolean)
+}
+
+function hasBlockedClass(element: Element): boolean {
+    for (const token of getClassTokens(element)) {
+        if (BLOCKED_CLASS_TOKENS.has(token)) return true
+        if (token.includes('breadcrumb')) return true
+        if (token.includes('product-card')) return true
+        if (token.includes('post-card')) return true
+        if (token.includes('related')) return true
+    }
+
+    return false
+}
+
 function getBlockedReason(node: Node): InternalLinkSkippedItem['reason'] | null {
     let current = node.parent
 
@@ -128,7 +286,7 @@ function getBlockedReason(node: Node): InternalLinkSkippedItem['reason'] | null 
 
             if (tagName === 'a') return 'existing_link'
             if (/^h[1-6]$/.test(tagName)) return 'heading'
-            if (BLOCKED_TAGS.has(tagName)) return 'blocked_tag'
+            if (BLOCKED_TAGS.has(tagName) || hasBlockedClass(current)) return 'blocked_tag'
         }
 
         current = current.parent
@@ -300,7 +458,20 @@ function normalizedIndexToRawIndex(
     return rawTextLength
 }
 
-function findBestMatch(text: string, candidates: CompiledKeyword[]): MatchResult | null {
+function normalizeTextWithSpaces(value: string): string {
+    return Array.from(value)
+        .map((char) => normalizeCharForMatch(char))
+        .join('')
+        .replace(/[^a-z0-9]+/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+}
+
+function findBestMatch(
+    text: string,
+    candidates: CompiledKeyword[],
+    isAllowed?: (match: MatchResult) => boolean,
+): MatchResult | null {
     const map = buildNormalizedIndexMap(text)
     const normalizedText = map.normalized
 
@@ -323,28 +494,99 @@ function findBestMatch(text: string, candidates: CompiledKeyword[]): MatchResult
                 continue
             }
 
-            const score = candidate.score * 1000 + candidate.normalizedKeyword.length
+            const rawStart = normalizedIndexToRawIndex(map, index, text.length)
+            const rawEnd = normalizedIndexToRawIndex(map, end, text.length)
 
-            if (score > bestScore) {
-                const rawStart = normalizedIndexToRawIndex(map, index, text.length)
-                const rawEnd = normalizedIndexToRawIndex(map, end, text.length)
+            if (rawStart >= 0 && rawEnd > rawStart) {
+                const match: MatchResult = {
+                    candidate,
+                    start: rawStart,
+                    end: rawEnd,
+                }
 
-                if (rawStart >= 0 && rawEnd > rawStart) {
-                    best = {
-                        candidate,
-                        start: rawStart,
-                        end: rawEnd,
-                    }
+                if (isAllowed && !isAllowed(match)) {
+                    searchFrom = index + 1
+                    continue
+                }
 
+                const score = candidate.score * 1000 + candidate.normalizedKeyword.length
+
+                if (score > bestScore) {
+                    best = match
                     bestScore = score
                 }
             }
 
-            break
+            searchFrom = index + 1
         }
     }
 
     return best
+}
+
+function isGenericAnchorText(anchorText: string): boolean {
+    const normalized = normalizeTextWithSpaces(anchorText)
+    const words = normalized.split(' ').filter(Boolean)
+
+    if (!normalized || normalized.length < 3) return true
+    if (GENERIC_ANCHOR_PHRASES.has(normalized)) return true
+    if (words.length <= 2 && words.every((word) => GENERIC_ANCHOR_WORDS.has(word))) return true
+
+    return false
+}
+
+function hasBrandIntent(before: string): boolean {
+    const normalizedBefore = normalizeTextWithSpaces(before)
+
+    return BRAND_INTENT_BEFORE_ENDINGS.some((ending) => normalizedBefore.endsWith(ending))
+}
+
+function hasProductNameContinuation(rawAfter: string): boolean {
+    const tokens = rawAfter
+        .trim()
+        .split(/\s+/)
+        .slice(0, 5)
+        .map((token) => token.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ''))
+        .filter(Boolean)
+
+    if (tokens.length < 2) return false
+
+    const titleLikeCount = tokens.filter((token) => /^[A-Z0-9À-Ỵ]/.test(token)).length
+
+    return titleLikeCount >= 2
+}
+
+function isLikelyProductNameFragment(
+    rawText: string,
+    match: MatchResult,
+): boolean {
+    const priority = match.candidate.rule.priority
+
+    if (priority !== 'brand' && priority !== 'category') return false
+
+    const before = rawText.slice(Math.max(0, match.start - 70), match.start)
+    const after = rawText.slice(match.end, Math.min(rawText.length, match.end + 100))
+
+    if (priority === 'brand' && hasBrandIntent(before)) return false
+
+    const afterWords = normalizeTextWithSpaces(after).split(' ').filter(Boolean).slice(0, 8)
+
+    if (afterWords.some((word) => PRODUCT_CONTEXT_HINTS.has(word))) return true
+    if (priority === 'brand' && hasProductNameContinuation(after)) return true
+
+    return false
+}
+
+function getAnchorSkipReason(
+    rawText: string,
+    match: MatchResult,
+): InternalLinkSkippedItem['reason'] | null {
+    const anchorText = rawText.slice(match.start, match.end)
+
+    if (isGenericAnchorText(anchorText)) return 'generic_anchor'
+    if (isLikelyProductNameFragment(rawText, match)) return 'product_name_fragment'
+
+    return null
 }
 
 function replaceTextNode(
@@ -371,6 +613,7 @@ function replaceTextNode(
     }
 
     const link = new Element('a', {
+        class: 'internal-link',
         href: targetUrl,
     })
 
@@ -572,7 +815,25 @@ export function applyInternalLinksToHtml(
 
         if (!filteredCandidates.length) return
 
-        const match = findBestMatch(textNode.data, filteredCandidates)
+        const match = findBestMatch(textNode.data, filteredCandidates, (possibleMatch) => {
+            const reason = getAnchorSkipReason(textNode.data, possibleMatch)
+
+            if (reason) {
+                pushSkipped(skipped, {
+                    keyword: possibleMatch.candidate.keyword,
+                    anchorText: textNode.data.slice(possibleMatch.start, possibleMatch.end),
+                    targetUrl: possibleMatch.candidate.targetUrl,
+                    ruleId: possibleMatch.candidate.rule.id,
+                    ruleTitle: possibleMatch.candidate.rule.title,
+                    reason,
+                    textPreview: textNode.data.slice(0, 160),
+                })
+
+                return false
+            }
+
+            return true
+        })
 
         if (!match) return
 

@@ -49,6 +49,8 @@
     "audit:broken-images": "tsx src/scripts/audit-broken-images.ts",
     "audit:internal-links": "tsx src/scripts/audit-internal-links.ts",
     "audit:internal-links:repair": "tsx src/scripts/audit-internal-links.ts --repair --yes",
+    "repair:internal-link-anchors": "tsx src/scripts/repair-internal-link-anchors.ts",
+    "repair:internal-link-anchors:apply": "tsx src/scripts/repair-internal-link-anchors.ts --yes",
     "audit:broken-images:not-in-media": "tsx src/scripts/filter-broken-images-not-in-media.ts",
     "repair:product-brands": "tsx src/scripts/repair-product-brands.ts",
     "backfill:product-search-keywords": "tsx src/scripts/backfill-product-search-keywords.ts",
