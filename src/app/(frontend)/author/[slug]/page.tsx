@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import type { Where } from 'payload'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ChevronRight, Mail, PenLine, Sparkles, UserRound } from 'lucide-react'
@@ -79,10 +80,19 @@ async function getAuthor(slug: string) {
 
 async function getAuthorPosts(author: any) {
   const payload = await getPayload({ config: configPromise })
-  const where = {
-    authorProfile: {
-      equals: author.id,
-    },
+  const where: Where = {
+    and: [
+      {
+        authorProfile: {
+          equals: author.id,
+        },
+      },
+      {
+        status: {
+          equals: 'published',
+        },
+      },
+    ],
   }
 
   const posts = await payload.find({

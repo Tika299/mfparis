@@ -82,6 +82,11 @@ export async function GET() {
             limit: 40,
             overrideAccess: true,
             sort: '-updatedAt',
+            where: {
+                status: {
+                    equals: 'published',
+                },
+            },
             select: {
                 title: true,
                 slug: true,

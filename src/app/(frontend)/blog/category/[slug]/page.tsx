@@ -441,7 +441,16 @@ export default async function BlogCategoryPage({
     page: currentPage,
     sort: '-createdAt',
     overrideAccess: true,
-    where: buildCategoryContainsWhere(categoryScopeIDs),
+    where: {
+      and: [
+        {
+          status: {
+            equals: 'published',
+          },
+        },
+        buildCategoryContainsWhere(categoryScopeIDs),
+      ],
+    },
   })
 
   if (currentPage > 1 && posts.docs.length === 0) {

@@ -37,6 +37,13 @@ export async function POST(request: Request) {
     overrideAccess: true,
   })
 
+  if ((post as any).status !== 'published') {
+    return NextResponse.json(
+      { error: 'Post not found' },
+      { status: 404 },
+    )
+  }
+
   const viewCount =
     Math.max(0, Number((post as any).viewCount) || 0) + 1
 

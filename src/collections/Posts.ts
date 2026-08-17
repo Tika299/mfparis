@@ -149,6 +149,28 @@ export const Posts: CollectionConfig = {
       },
     },
     {
+      name: 'status',
+      type: 'select',
+      label: 'Trạng thái',
+      defaultValue: 'draft',
+      index: true,
+      options: [
+        {
+          label: 'Nháp',
+          value: 'draft',
+        },
+        {
+          label: 'Đã xuất bản',
+          value: 'published',
+        },
+      ],
+      admin: {
+        position: 'sidebar',
+        description:
+          'Chỉ bài viết đã xuất bản mới hiển thị ngoài website.',
+      },
+    },
+    {
       name: 'thumbnail',
       type: 'upload',
       relationTo: 'media',

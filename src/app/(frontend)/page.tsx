@@ -213,6 +213,11 @@ export default async function HomePage() {
       depth: 2,
       sort: '-createdAt',
       limit: 12,
+      where: {
+        status: {
+          equals: 'published',
+        },
+      },
     }),
   ])
 

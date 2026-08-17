@@ -106,9 +106,18 @@ async function getPostBySlug(slug: string) {
   const result = await payload.find({
     collection: 'posts',
     where: {
-      slug: {
-        equals: slug,
-      },
+      and: [
+        {
+          slug: {
+            equals: slug,
+          },
+        },
+        {
+          status: {
+            equals: 'published',
+          },
+        },
+      ],
     },
     limit: 1,
     pagination: false,
@@ -763,7 +772,20 @@ export default async function BlogPostPage({
 
   const result = await payload.find({
     collection: 'posts',
-    where: { slug: { equals: slug } },
+    where: {
+      and: [
+        {
+          slug: {
+            equals: slug,
+          },
+        },
+        {
+          status: {
+            equals: 'published',
+          },
+        },
+      ],
+    },
     depth: 2,
   })
 
@@ -878,9 +900,18 @@ export default async function BlogPostPage({
     : undefined
   const blogBreadcrumbItems = getPostBreadcrumbItems(post)
   let relatedPostsWhere: Where = {
-    slug: {
-      not_equals: slug,
-    },
+    and: [
+      {
+        slug: {
+          not_equals: slug,
+        },
+      },
+      {
+        status: {
+          equals: 'published',
+        },
+      },
+    ],
   }
 
   if (categoryIds.length > 0) {
@@ -889,6 +920,11 @@ export default async function BlogPostPage({
         {
           slug: {
             not_equals: slug,
+          },
+        },
+        {
+          status: {
+            equals: 'published',
           },
         },
         {
@@ -906,7 +942,18 @@ export default async function BlogPostPage({
         limit: 5,
         sort: '-createdAt',
         where: {
-          slug: { not_equals: slug },
+          and: [
+            {
+              slug: {
+                not_equals: slug,
+              },
+            },
+            {
+              status: {
+                equals: 'published',
+              },
+            },
+          ],
         },
       }),
       payload.find({
@@ -949,6 +996,11 @@ export default async function BlogPostPage({
               },
             },
             {
+              status: {
+                equals: 'published',
+              },
+            },
+            {
               createdAt: {
                 less_than: post.createdAt,
               },
@@ -966,6 +1018,11 @@ export default async function BlogPostPage({
             {
               slug: {
                 not_equals: slug,
+              },
+            },
+            {
+              status: {
+                equals: 'published',
               },
             },
             {

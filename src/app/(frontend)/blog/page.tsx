@@ -104,7 +104,13 @@ export default async function BlogPage({ searchParams }: PageProps) {
     : null
   const selectedCategory =
     selectedCategoryResult?.docs?.[0] ?? null
-  const whereConditions: any[] = []
+  const whereConditions: any[] = [
+    {
+      status: {
+        equals: 'published',
+      },
+    },
+  ]
 
   if (q) {
     whereConditions.push({

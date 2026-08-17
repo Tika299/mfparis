@@ -84,12 +84,19 @@ export async function POST(request: Request) {
   })
 
   try {
-    await payload.findByID({
+    const post = await payload.findByID({
       collection: 'posts',
       depth: 0,
       id: postId,
       overrideAccess: true,
     })
+
+    if ((post as any).status !== 'published') {
+      return NextResponse.json(
+        { error: 'Không tìm thấy bài viết.' },
+        { status: 404 },
+      )
+    }
   } catch {
     return NextResponse.json(
       { error: 'Kh\u00f4ng t\u00ecm th\u1ea5y b\u00e0i vi\u1ebft.' },

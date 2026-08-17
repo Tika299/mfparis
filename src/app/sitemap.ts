@@ -251,10 +251,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             limit: 10000,
             pagination: false,
             overrideAccess: true,
+            where: {
+                status: {
+                    equals: 'published',
+                },
+            },
             select: {
                 slug: true,
                 updatedAt: true,
                 seo: true,
+                status: true,
             },
         }),
         payload.find({

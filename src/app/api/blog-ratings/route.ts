@@ -48,6 +48,13 @@ export async function POST(request: Request) {
     overrideAccess: true,
   })
 
+  if ((post as any).status !== 'published') {
+    return NextResponse.json(
+      { error: 'Post not found' },
+      { status: 404 },
+    )
+  }
+
   const currentRating = (post as any).rating || {}
   const total =
     Math.max(0, Number(currentRating.total) || 0) + rating
