@@ -6,6 +6,10 @@ import { useEffect, useRef, useState } from 'react'
 const ROUTE_LOADING_MIN_VISIBLE_MS = 280
 const ROUTE_LOADING_TIMEOUT_MS = 8000
 
+function getLocationKey(url: URL): string {
+  return `${url.pathname}${url.search}`
+}
+
 function isModifiedClick(event: MouseEvent): boolean {
   return event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0
 }
@@ -56,9 +60,44 @@ function isSameInternalLocation(nextUrl: string | URL | null | undefined): boole
   if (url.origin !== window.location.origin) return true
 
   const current = window.location.pathname + window.location.search
-  const next = url.pathname + url.search
+  const next = getLocationKey(url)
 
   return current === next
+}
+
+function shouldScrollToTopForNavigation(nextUrl: string | URL | null | undefined): boolean {
+  if (!nextUrl) return false
+
+  let url: URL
+
+  try {
+    url = new URL(String(nextUrl), window.location.href)
+  } catch {
+    return false
+  }
+
+  if (url.origin !== window.location.origin) return false
+
+  const currentPathname = window.location.pathname
+
+  if (url.pathname !== currentPathname) {
+    return true
+  }
+
+  const currentParams = new URLSearchParams(window.location.search)
+  const nextParams = url.searchParams
+
+  return currentParams.get('page') !== nextParams.get('page')
+}
+
+function scrollToPageTop() {
+  if (window.scrollY <= 0) return
+
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: 'auto',
+  })
 }
 
 export function RouteLoadingIndicator() {
@@ -81,7 +120,11 @@ export function RouteLoadingIndicator() {
     timeoutRef.current = null
   }
 
-  const start = () => {
+  const start = (nextUrl?: string | URL | null) => {
+    if (shouldScrollToTopForNavigation(nextUrl)) {
+      scrollToPageTop()
+    }
+
     clearTimers()
     startedAtRef.current = Date.now()
     setVisible(true)
@@ -132,7 +175,7 @@ export function RouteLoadingIndicator() {
 
     window.history.pushState = function pushStateWithLoading(...args) {
       if (!isSameInternalLocation(args[2])) {
-        start()
+        start(args[2])
       }
 
       return originalPushState.apply(this, args)
@@ -140,7 +183,7 @@ export function RouteLoadingIndicator() {
 
     window.history.replaceState = function replaceStateWithLoading(...args) {
       if (!isSameInternalLocation(args[2])) {
-        start()
+        start(args[2])
       }
 
       return originalReplaceState.apply(this, args)
@@ -154,7 +197,7 @@ export function RouteLoadingIndicator() {
 
       if (!anchor || shouldIgnoreAnchor(anchor)) return
 
-      start()
+      start(anchor.href)
     }
 
     const onPopState = () => {
