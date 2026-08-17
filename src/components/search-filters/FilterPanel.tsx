@@ -21,6 +21,9 @@ type FilterPanelProps = {
   isPending: boolean
   hasActiveFilters: boolean
   resultCount?: number
+  showBrand?: boolean
+  showCategory?: boolean
+  showPrice?: boolean
   onBrandChange: (slug: string | null) => void
   onCategoryChange: (slug: string | null) => void
   onSortChange: (value: string) => void
@@ -44,6 +47,9 @@ export const FilterPanel = ({
   isPending,
   hasActiveFilters,
   resultCount,
+  showBrand = true,
+  showCategory = true,
+  showPrice = true,
   onBrandChange,
   onCategoryChange,
   onSortChange,
@@ -86,30 +92,36 @@ export const FilterPanel = ({
 
         <SortFilter value={activeSort} onChange={onSortChange} />
 
-        <PriceFilter
-          range={range}
-          onRangeChange={onRangeChange}
-          onRangeCommit={onRangeCommit}
-        />
+        {showPrice && (
+          <PriceFilter
+            range={range}
+            onRangeChange={onRangeChange}
+            onRangeCommit={onRangeCommit}
+          />
+        )}
 
-        <FilterOptionList
-          title="Danh mục"
-          placeholder="Chọn danh mục"
-          items={categories}
-          activeSlug={activeCategory}
-          emptyMessage="Chưa có danh mục"
-          showGridButton
-          onSelect={onCategoryChange}
-        />
+        {showCategory && (
+          <FilterOptionList
+            title="Danh mục"
+            placeholder="Chọn danh mục"
+            items={categories}
+            activeSlug={activeCategory}
+            emptyMessage="Chưa có danh mục"
+            showGridButton
+            onSelect={onCategoryChange}
+          />
+        )}
 
-        <FilterOptionList
-          title="Thương hiệu"
-          placeholder="Chọn thương hiệu"
-          items={brands}
-          activeSlug={activeBrand}
-          emptyMessage="Chưa có thương hiệu"
-          onSelect={onBrandChange}
-        />
+        {showBrand && (
+          <FilterOptionList
+            title="Thương hiệu"
+            placeholder="Chọn thương hiệu"
+            items={brands}
+            activeSlug={activeBrand}
+            emptyMessage="Chưa có thương hiệu"
+            onSelect={onBrandChange}
+          />
+        )}
 
         {facets.map((facet) => (
           <FilterOptionList

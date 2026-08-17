@@ -17,6 +17,14 @@ export type FilterFacetGroup = {
 
 export type PriceRange = [number, number]
 
+export type CoreFilterKey =
+    | 'brand'
+    | 'category'
+    | 'price'
+    | 'availability'
+    | 'sale'
+    | 'rating'
+
 export type SearchFiltersVariant =
     | 'responsive'
     | 'sidebar'
@@ -47,6 +55,7 @@ export type SearchFiltersProps = {
     brands: FilterItem[]
     categories?: FilterItem[]
     facets?: FilterFacetGroup[]
+    enabledCoreFilters?: CoreFilterKey[]
     resultCount?: number
     variant?: SearchFiltersVariant
     sticky?: boolean

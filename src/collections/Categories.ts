@@ -70,6 +70,127 @@ export const Categories: CollectionConfig = {
       relationTo: 'categories',
       label: 'Danh muc cha',
     },
+    {
+      name: 'filterProfile',
+      type: 'group',
+      label: 'Bo loc danh muc',
+      admin: {
+        description:
+          'Dieu khien bo loc hien tren trang danh muc san pham. Neu chua cau hinh, he thong se tu chon theo ten/slug danh muc.',
+      },
+      fields: [
+        {
+          name: 'preset',
+          type: 'select',
+          label: 'Kieu bo loc',
+          defaultValue: 'auto',
+          options: [
+            { label: 'Tu dong theo danh muc', value: 'auto' },
+            { label: 'Nuoc hoa', value: 'fragrance' },
+            { label: 'Skincare / duoc my pham', value: 'skincare' },
+            { label: 'Trang diem', value: 'makeup' },
+            { label: 'Thuc pham chuc nang / suc khoe', value: 'health' },
+            { label: 'Cham soc toc', value: 'hair' },
+            { label: 'Cham soc co the', value: 'body' },
+            { label: 'Toi gian', value: 'minimal' },
+            { label: 'Tuy chinh thu cong', value: 'custom' },
+          ],
+        },
+        {
+          name: 'inheritParentProfile',
+          type: 'checkbox',
+          label: 'Ke thua cau hinh tu danh muc cha',
+          defaultValue: true,
+          admin: {
+            description:
+              'Neu bat va danh muc hien tai chua co facet tuy chinh, he thong co the dung ho so bo loc cua danh muc cha.',
+          },
+        },
+        {
+          name: 'coreFilters',
+          type: 'group',
+          label: 'Bo loc co ban',
+          fields: [
+            {
+              name: 'brand',
+              type: 'checkbox',
+              label: 'Thuong hieu',
+              defaultValue: true,
+            },
+            {
+              name: 'category',
+              type: 'checkbox',
+              label: 'Danh muc',
+              defaultValue: true,
+            },
+            {
+              name: 'price',
+              type: 'checkbox',
+              label: 'Gia',
+              defaultValue: true,
+            },
+            {
+              name: 'availability',
+              type: 'checkbox',
+              label: 'Tinh trang hang',
+              defaultValue: true,
+            },
+            {
+              name: 'sale',
+              type: 'checkbox',
+              label: 'Uu dai',
+              defaultValue: true,
+            },
+            {
+              name: 'rating',
+              type: 'checkbox',
+              label: 'Danh gia',
+              defaultValue: true,
+            },
+          ],
+        },
+        {
+          name: 'showFragranceNotes',
+          type: 'checkbox',
+          label: 'Hien bo loc tang huong',
+          defaultValue: false,
+          admin: {
+            description:
+              'Dung cho danh muc nuoc hoa hoac danh muc co san pham can loc theo note huong.',
+          },
+        },
+        {
+          name: 'facetKeys',
+          type: 'array',
+          label: 'Facet tuy chinh',
+          labels: {
+            singular: 'Facet',
+            plural: 'Facet',
+          },
+          admin: {
+            description:
+              'Dung khi muon chi dinh chinh xac facet hien thi. Vi du: attr_loai-da, attr_nhom-huong, attr_dung-tich, note.',
+          },
+          fields: [
+            {
+              name: 'key',
+              type: 'text',
+              label: 'Facet key',
+              required: true,
+            },
+            {
+              name: 'label',
+              type: 'text',
+              label: 'Ghi chu',
+              admin: {
+                description:
+                  'Chi de admin de nho y nghia facet; giao dien van dung ten facet that.',
+              },
+            },
+          ],
+        },
+      ],
+    },
     ...siloSeoFields({ kind: 'product' }),
     {
       type: 'tabs',

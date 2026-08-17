@@ -15,6 +15,7 @@ import { SITE_ORIGIN } from '@/utilities/seo'
 import { ExpandableContent } from '@/components/ExpandableContent'
 import { SafeHtmlContent } from '@/components/SafeHtmlContent'
 import { htmlToPlainText, normalizeContentHtml } from '@/lib/html/contentHtml'
+import { resolveCategoryFilterArchitecture } from '@/lib/categoryFilterArchitecture'
 import { buildCollectionPageSchemaGraph } from '@/lib/structured-data'
 import {
   appendAdvancedProductWhereConditions,
@@ -698,6 +699,12 @@ export default async function CategoryPage({
   const totalDocs =
     productsRes.totalDocs || 0
 
+  const filterArchitecture = resolveCategoryFilterArchitecture(currentCategory)
+  const enabledFacetKeys = new Set(filterArchitecture.facetKeys)
+  const categoryFilterFacets = filterOptions.facets.filter((facet) =>
+    enabledFacetKeys.has(facet.key),
+  )
+
   const hasDescription = Boolean(
     normalizeContentHtml(currentCategory.description),
   )
@@ -851,7 +858,8 @@ export default async function CategoryPage({
           <SearchFilters
             brands={filterOptions.brands}
             categories={filterOptions.categories}
-            facets={filterOptions.facets}
+            facets={categoryFilterFacets}
+            enabledCoreFilters={filterArchitecture.coreFilters}
             variant="horizontal"
             sticky={false}
             routeContext={
@@ -867,7 +875,8 @@ export default async function CategoryPage({
               <SearchFilters
                 brands={filterOptions.brands}
                 categories={filterOptions.categories}
-                facets={filterOptions.facets}
+                facets={categoryFilterFacets}
+                enabledCoreFilters={filterArchitecture.coreFilters}
                 variant="sidebar"
                 sticky={false}
                 routeContext={
@@ -1044,7 +1053,8 @@ export default async function CategoryPage({
         <SearchFilters
           brands={filterOptions.brands}
           categories={filterOptions.categories}
-          facets={filterOptions.facets}
+          facets={categoryFilterFacets}
+          enabledCoreFilters={filterArchitecture.coreFilters}
           variant="mobile-fab"
           routeContext={
             filterRouteContext

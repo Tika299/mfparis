@@ -33,7 +33,12 @@ import {
 
 import { useFilterNavigation } from './useFilterNavigation'
 
-import type { FilterFacetGroup, PriceRange, SearchFiltersProps } from './search-filters.types'
+import type {
+  CoreFilterKey,
+  FilterFacetGroup,
+  PriceRange,
+  SearchFiltersProps,
+} from './search-filters.types'
 
 import './search-filters.css'
 
@@ -84,10 +89,20 @@ const builtInFacets: FilterFacetGroup[] = [
   },
 ]
 
+const DEFAULT_CORE_FILTERS: CoreFilterKey[] = [
+  'brand',
+  'category',
+  'price',
+  'availability',
+  'sale',
+  'rating',
+]
+
 export const SearchFilters = ({
   brands,
   categories = [],
   facets = [],
+  enabledCoreFilters = DEFAULT_CORE_FILTERS,
   resultCount,
   variant = 'responsive',
   sticky = true,
@@ -95,12 +110,19 @@ export const SearchFilters = ({
 }: SearchFiltersProps) => {
   const [sheetOpen, setSheetOpen] = useState(false)
 
+  const enabledCoreFilterSet = useMemo(
+    () => new Set<CoreFilterKey>(enabledCoreFilters),
+    [enabledCoreFilters],
+  )
+
   const allFacets = useMemo(
     () => [
-      ...builtInFacets,
+      ...builtInFacets.filter((facet) =>
+        enabledCoreFilterSet.has(facet.key as CoreFilterKey),
+      ),
       ...facets.filter((facet) => facet.items.length > 0),
     ],
-    [facets],
+    [enabledCoreFilterSet, facets],
   )
 
   const {
@@ -176,6 +198,9 @@ export const SearchFilters = ({
       isPending={isPending}
       hasActiveFilters={hasActiveFilters}
       resultCount={resultCount}
+      showBrand={enabledCoreFilterSet.has('brand')}
+      showCategory={enabledCoreFilterSet.has('category')}
+      showPrice={enabledCoreFilterSet.has('price')}
       onBrandChange={(slug) => updateFilters({ brand: slug })}
       onCategoryChange={(slug) => updateFilters({ category: slug })}
       onSortChange={(value) => {
