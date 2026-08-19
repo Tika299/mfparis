@@ -214,12 +214,6 @@ export function RouteLoadingIndicator() {
       start(anchor.href)
     }
 
-    const onPointerDown = (event: PointerEvent) => {
-      if (event.defaultPrevented || isModifiedClick(event)) return
-
-      startFromEventTarget(event.target)
-    }
-
     const onClick = (event: MouseEvent) => {
       if (event.defaultPrevented || isModifiedClick(event)) return
 
@@ -230,14 +224,12 @@ export function RouteLoadingIndicator() {
       start()
     }
 
-    document.addEventListener('pointerdown', onPointerDown, true)
     document.addEventListener('click', onClick, true)
     window.addEventListener('popstate', onPopState)
 
     return () => {
       window.history.pushState = originalPushState
       window.history.replaceState = originalReplaceState
-      document.removeEventListener('pointerdown', onPointerDown, true)
       document.removeEventListener('click', onClick, true)
       window.removeEventListener('popstate', onPopState)
       clearTimers()
