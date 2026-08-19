@@ -93,11 +93,27 @@ function shouldScrollToTopForNavigation(nextUrl: string | URL | null | undefined
 function scrollToPageTop() {
   if (window.scrollY <= 0) return
 
-  window.scrollTo({
-    top: 0,
-    left: 0,
-    behavior: 'auto',
-  })
+  const html = document.documentElement
+  const body = document.body
+  const previousHtmlScrollBehavior = html.style.scrollBehavior
+  const previousBodyScrollBehavior = body.style.scrollBehavior
+
+  html.style.scrollBehavior = 'auto'
+  body.style.scrollBehavior = 'auto'
+
+  const jumpToTop = () => {
+    window.scrollTo(0, 0)
+    html.scrollTop = 0
+    body.scrollTop = 0
+  }
+
+  jumpToTop()
+  window.requestAnimationFrame(jumpToTop)
+
+  window.setTimeout(() => {
+    html.style.scrollBehavior = previousHtmlScrollBehavior
+    body.style.scrollBehavior = previousBodyScrollBehavior
+  }, 80)
 }
 
 export function RouteLoadingIndicator() {
@@ -189,27 +205,39 @@ export function RouteLoadingIndicator() {
       return originalReplaceState.apply(this, args)
     }
 
-    const onClick = (event: MouseEvent) => {
-      if (event.defaultPrevented || isModifiedClick(event)) return
-
-      const target = event.target instanceof Element ? event.target : null
-      const anchor = target?.closest('a')
+    const startFromEventTarget = (target: EventTarget | null) => {
+      const element = target instanceof Element ? target : null
+      const anchor = element?.closest('a')
 
       if (!anchor || shouldIgnoreAnchor(anchor)) return
 
       start(anchor.href)
     }
 
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.defaultPrevented || isModifiedClick(event)) return
+
+      startFromEventTarget(event.target)
+    }
+
+    const onClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || isModifiedClick(event)) return
+
+      startFromEventTarget(event.target)
+    }
+
     const onPopState = () => {
       start()
     }
 
+    document.addEventListener('pointerdown', onPointerDown, true)
     document.addEventListener('click', onClick, true)
     window.addEventListener('popstate', onPopState)
 
     return () => {
       window.history.pushState = originalPushState
       window.history.replaceState = originalReplaceState
+      document.removeEventListener('pointerdown', onPointerDown, true)
       document.removeEventListener('click', onClick, true)
       window.removeEventListener('popstate', onPopState)
       clearTimers()
