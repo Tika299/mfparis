@@ -21,33 +21,20 @@ const AI_SEARCH_USER_AGENTS = [
     'GPTBot',
 ] as const satisfies readonly string[]
 
-function createPrivateDisallowRules(routes: readonly string[]): string[] {
-    return routes.flatMap((route) => [
-        `${route}$`,
-        `${route}?*`,
-        `${route}/*`,
-    ])
-}
-
 export default function robots(): MetadataRoute.Robots {
-    const privateDisallowRules = createPrivateDisallowRules(
-        PRIVATE_ROUTE_SEGMENTS,
-    )
-
     return {
         rules: [
             {
                 userAgent: [...AI_SEARCH_USER_AGENTS],
                 allow: '/',
-                disallow: privateDisallowRules,
+                disallow: [...PRIVATE_ROUTE_SEGMENTS],
             },
             {
                 userAgent: '*',
                 allow: '/',
-                disallow: privateDisallowRules,
+                disallow: [...PRIVATE_ROUTE_SEGMENTS],
             },
         ],
         sitemap: `${SITE_ORIGIN}/sitemap.xml`,
-        host: SITE_ORIGIN,
     }
 }
