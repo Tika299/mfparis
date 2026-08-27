@@ -10,7 +10,15 @@ type VoucherType = 'fixed' | 'percent'
 type ValidateVoucherRequest = Readonly<{
     code: string
     subtotalAmount: number
+    paymentMethod?: string | null
 }>
+
+function isCodPaymentMethod(value: unknown): boolean {
+    return (
+        typeof value === 'string' &&
+        value.trim().toLowerCase() === 'cod'
+    )
+}
 
 function isRecord(
     value: unknown,
@@ -121,6 +129,16 @@ async function readRequestBody(
         }
     }
 
+    if (isCodPaymentMethod(body.paymentMethod)) {
+        return {
+            success: false,
+            response: jsonError(
+                'Voucher không áp dụng cho phương thức thanh toán khi nhận hàng (COD).',
+                400,
+            ),
+        }
+    }
+
     if (typeof body.code !== 'string') {
         return {
             success: false,
@@ -179,6 +197,10 @@ async function readRequestBody(
             code,
             subtotalAmount:
                 Math.floor(subtotalAmount),
+            paymentMethod:
+                typeof body.paymentMethod === 'string'
+                    ? body.paymentMethod
+                    : null,
         },
     }
 }

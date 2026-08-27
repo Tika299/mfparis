@@ -1372,6 +1372,14 @@ export async function POST(
     input.email ??
     authenticatedEmail
 
+  if (input.paymentMethod === 'cod' && input.voucherCode) {
+    return jsonError(
+      'Voucher không áp dụng cho phương thức thanh toán khi nhận hàng (COD).',
+      400,
+      'COD_VOUCHER_NOT_ALLOWED',
+    )
+  }
+
   let lastTransactionError:
     unknown = null
 

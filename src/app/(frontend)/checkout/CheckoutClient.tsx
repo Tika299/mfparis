@@ -83,6 +83,21 @@ export default function CheckoutPage({
         useState<CartItem[]>([])
     const [paymentMethod, setPaymentMethod] =
         useState<PaymentMethod>(initialPaymentMethod)
+    const isCodPayment = paymentMethod === 'cod'
+
+    const handlePaymentMethodChange = (value: string) => {
+        const nextPaymentMethod = value as PaymentMethod
+
+        setPaymentMethod(nextPaymentMethod)
+
+        if (nextPaymentMethod === 'cod') {
+            setVoucherData(null)
+            setVoucherCode('')
+            toast.info(
+                'Voucher không áp dụng cho thanh toán khi nhận hàng (COD).',
+            )
+        }
+    }
     const [deliveryMethod, setDeliveryMethod] =
         useState<DeliveryMethod>('home_delivery')
 
@@ -105,7 +120,9 @@ export default function CheckoutPage({
         0,
     )
 
-    const discountAmount = Number(voucherData?.discountAmount || 0)
+    const discountAmount = isCodPayment
+        ? 0
+        : Number(voucherData?.discountAmount || 0)
 
     const normalizedDeliveryMethod =
         normalizeDeliveryMethod(deliveryMethod)
@@ -428,8 +445,9 @@ export default function CheckoutPage({
                 paymentMethod,
 
                 voucherCode:
-                    voucherData?.voucher
-                        ?.code ?? null,
+                    !isCodPayment && voucherData?.voucher?.code
+                        ? voucherData.voucher.code
+                        : null,
 
                 shippingFee,
                 totalAmount: finalTotalPrice,
@@ -550,6 +568,14 @@ export default function CheckoutPage({
     // Áp dụng voucher code
     const handleApplyVoucher = async () => {
         try {
+            if (isCodPayment) {
+                setVoucherData(null)
+                setVoucherCode('')
+                toast.error(
+                    'Voucher không áp dụng cho thanh toán khi nhận hàng (COD).',
+                )
+                return
+            }
             if (!voucherCode.trim()) {
                 toast.error('Vui lòng nhập mã voucher')
                 return
@@ -565,6 +591,7 @@ export default function CheckoutPage({
                 body: JSON.stringify({
                     code: voucherCode,
                     subtotalAmount,
+                    paymentMethod,
                 }),
             })
 
@@ -703,7 +730,11 @@ export default function CheckoutPage({
 
                         <section className="bg-white rounded-[2rem] p-8 md:p-10 shadow-sm border border-gray-50">
                             <h2 className="text-xl font-bold text-gray-900 mb-8">Phương thức thanh toán</h2>
-                            <RadioGroup value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as PaymentMethod)} className="space-y-4">
+                            <RadioGroup
+                                value={paymentMethod}
+                                onValueChange={handlePaymentMethodChange}
+                                className="space-y-4"
+                            >
                                 <div
                                     className={`rounded-2xl border-2 transition-all ${paymentMethod === 'bank_transfer'
                                         ? 'border-[#b72828] bg-red-50/30'
@@ -869,18 +900,23 @@ export default function CheckoutPage({
                                     <div className="flex gap-2">
                                         <Input
                                             value={voucherCode}
+                                            disabled={isCodPayment}
                                             onChange={(event) => {
                                                 setVoucherCode(event.target.value.toUpperCase())
                                                 setVoucherData(null)
                                             }}
-                                            placeholder="Nhập mã giảm giá"
+                                            placeholder={
+                                                isCodPayment
+                                                    ? 'COD không áp dụng voucher'
+                                                    : 'Nhập mã giảm giá'
+                                            }
                                             className="h-11 rounded-xl bg-white text-sm font-bold uppercase"
                                         />
 
                                         <Button
                                             type="button"
                                             onClick={handleApplyVoucher}
-                                            disabled={applyingVoucher || loading}
+                                            disabled={isCodPayment || applyingVoucher || loading}
                                             className="h-11 shrink-0 rounded-xl bg-black px-4 text-[11px] font-black uppercase"
                                         >
                                             {applyingVoucher ? 'Đang áp dụng' : 'Áp dụng'}
