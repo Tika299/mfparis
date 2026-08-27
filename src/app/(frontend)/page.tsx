@@ -7,7 +7,6 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import {
   Award,
-  ChevronRight,
   RotateCcw,
   ShieldCheck,
   Truck,
@@ -123,6 +122,31 @@ export default async function HomePage() {
     },
   } as const
 
+  const categoryListSelect = {
+    id: true,
+    name: true,
+    slug: true,
+    image: true,
+  } as const
+
+  const brandListSelect = {
+    id: true,
+    name: true,
+    slug: true,
+    logo: true,
+  } as const
+
+  const postListSelect = {
+    id: true,
+    title: true,
+    slug: true,
+    excerpt: true,
+    thumbnail: true,
+    categories: true,
+    createdAt: true,
+    updatedAt: true,
+  } as const
+
   const [
     settings,
     flashSaleRes,
@@ -196,23 +220,26 @@ export default async function HomePage() {
 
     payload.find({
       collection: 'categories',
-      depth: 2,
+      depth: 1,
+      select: categoryListSelect,
       sort: 'name',
-      limit: 20,
+      limit: 12,
     }),
 
     payload.find({
       collection: 'brands',
-      depth: 2,
+      depth: 1,
+      select: brandListSelect,
       sort: 'name',
-      limit: 24,
+      limit: 16,
     }),
 
     payload.find({
       collection: 'posts',
-      depth: 2,
+      depth: 1,
+      select: postListSelect,
       sort: '-createdAt',
-      limit: 12,
+      limit: 6,
       where: {
         status: {
           equals: 'published',
@@ -335,10 +362,6 @@ function PolicySection() {
         {policies.map(
           (item, index) => {
             const Icon = item.icon
-
-            const isLast =
-              index ===
-              policies.length - 1
 
             const hasDesktopDivider =
               index < policies.length - 1

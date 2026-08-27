@@ -657,6 +657,41 @@ export interface Category {
   slug: string;
   parent?: (number | null) | Category;
   /**
+   * Dieu khien bo loc hien tren trang danh muc san pham. Neu chua cau hinh, he thong se tu chon theo ten/slug danh muc.
+   */
+  filterProfile?: {
+    preset?: ('auto' | 'fragrance' | 'skincare' | 'makeup' | 'health' | 'hair' | 'body' | 'minimal' | 'custom') | null;
+    /**
+     * Neu bat va danh muc hien tai chua co facet tuy chinh, he thong co the dung ho so bo loc cua danh muc cha.
+     */
+    inheritParentProfile?: boolean | null;
+    coreFilters?: {
+      brand?: boolean | null;
+      category?: boolean | null;
+      price?: boolean | null;
+      availability?: boolean | null;
+      sale?: boolean | null;
+      rating?: boolean | null;
+    };
+    /**
+     * Dung cho danh muc nuoc hoa hoac danh muc co san pham can loc theo note huong.
+     */
+    showFragranceNotes?: boolean | null;
+    /**
+     * Dung khi muon chi dinh chinh xac facet hien thi. Vi du: attr_loai-da, attr_nhom-huong, attr_dung-tich, note.
+     */
+    facetKeys?:
+      | {
+          key: string;
+          /**
+           * Chi de admin de nho y nghia facet; giao dien van dung ten facet that.
+           */
+          label?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
    * Dùng để đổi nhãn trên frontend/admin mà vẫn có thể giữ slug cũ.
    */
   displayName?: string | null;
@@ -995,6 +1030,10 @@ export interface Post {
    * Tự động tạo từ tên, có thể chỉnh sửa thủ công để tối ưu SEO
    */
   slug: string;
+  /**
+   * Chỉ bài viết đã xuất bản mới hiển thị ngoài website.
+   */
+  status?: ('draft' | 'published') | null;
   thumbnail: number | Media;
   categories?: (number | PostCategory)[] | null;
   /**
@@ -2028,6 +2067,30 @@ export interface CategoriesSelect<T extends boolean = true> {
   description?: T;
   slug?: T;
   parent?: T;
+  filterProfile?:
+    | T
+    | {
+        preset?: T;
+        inheritParentProfile?: T;
+        coreFilters?:
+          | T
+          | {
+              brand?: T;
+              category?: T;
+              price?: T;
+              availability?: T;
+              sale?: T;
+              rating?: T;
+            };
+        showFragranceNotes?: T;
+        facetKeys?:
+          | T
+          | {
+              key?: T;
+              label?: T;
+              id?: T;
+            };
+      };
   displayName?: T;
   taxonomyType?: T;
   seoIndex?: T;
@@ -2157,6 +2220,7 @@ export interface PostsSelect<T extends boolean = true> {
       };
   title?: T;
   slug?: T;
+  status?: T;
   thumbnail?: T;
   categories?: T;
   authorProfile?: T;
