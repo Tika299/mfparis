@@ -199,6 +199,13 @@ const namedHtmlEntities: Record<string, string> = {
   Yacute: '\u00dd',
   yuml: '\u00ff',
   Yuml: '\u0178',
+  deg: '°',
+  plusmn: '±',
+  sup1: '¹',
+  sup2: '²',
+  sup3: '³',
+  micro: 'µ',
+  middot: '·',
 }
 
 export function normalizeBrokenHtmlEntities(value: string): string {

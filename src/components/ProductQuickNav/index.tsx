@@ -265,6 +265,13 @@ export function ProductRichTextContent({
             <nav className="space-y-1">
               {tocItems.map((item) => {
                 const isActive = activeId === item.id
+                const level = item.level ?? 2
+                const indentClass =
+                  level === 4
+                    ? 'ml-8 text-[13px]'
+                    : level === 3
+                      ? 'ml-4 text-[14px]'
+                      : 'text-[15px]'
 
                 return (
                   <button
@@ -273,8 +280,8 @@ export function ProductRichTextContent({
                     onClick={() => handleTocClick(item.id)}
                     className={
                       isActive
-                        ? 'block w-full rounded-xl bg-white px-4 py-4 text-left text-[15px] font-bold leading-6 text-gray-950 shadow-sm'
-                        : 'block w-full rounded-xl px-4 py-4 text-left text-[15px] font-medium leading-6 text-gray-500 transition hover:bg-white hover:text-gray-950'
+                        ? `block w-full rounded-xl bg-white px-4 py-4 text-left font-bold leading-6 text-gray-950 shadow-sm ${indentClass}`
+                        : `block w-full rounded-xl px-4 py-4 text-left font-medium leading-6 text-gray-500 transition hover:bg-white hover:text-gray-950 ${indentClass}`
                     }
                   >
                     {item.text}
@@ -301,8 +308,8 @@ export function ProductRichTextContent({
                   onClick={() => handleTocClick(item.id)}
                   className={
                     isActive
-                      ? 'shrink-0 rounded-full bg-[#b72828] px-4 py-2 text-xs font-bold text-white'
-                      : 'shrink-0 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-600'
+                      ? 'max-w-[240px] shrink-0 truncate rounded-full bg-[#b72828] px-4 py-2 text-xs font-bold text-white'
+                      : 'max-w-[240px] shrink-0 truncate rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-600'
                   }
                 >
                   {item.text}
