@@ -8,6 +8,7 @@ import { addHeadingIds } from '@/lib/html/contentHtml'
 type TocItem = {
   id: string
   text: string
+  level: 2 | 3 | 4
 }
 
 type BlogRichTextContentProps = {
@@ -169,19 +170,31 @@ export function BlogMobileTocButton({ tocItems }: BlogTocNavProps) {
             </div>
 
             <nav className="overflow-y-auto px-3 py-3">
-              {tocItems.map((item, index) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => selectHeading(item.id)}
-                  className="flex w-full gap-3 rounded-2xl px-3 py-3 text-left text-sm leading-6 text-gray-700 transition hover:bg-red-50 hover:text-[#E54D2E]"
-                >
-                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[11px] font-black text-gray-500">
-                    {index + 1}
-                  </span>
-                  <span className="font-semibold">{item.text}</span>
-                </button>
-              ))}
+              {tocItems.map((item, index) => {
+                const level = item.level ?? 2
+                const indentClass =
+                  level === 4
+                    ? 'pl-10'
+                    : level === 3
+                      ? 'pl-6'
+                      : 'pl-3'
+
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => selectHeading(item.id)}
+                    className={`flex w-full gap-3 rounded-2xl py-3 pr-3 text-left leading-6 text-gray-700 transition hover:bg-red-50 hover:text-[#E54D2E] ${indentClass}`}
+                  >
+                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[11px] font-black text-gray-500">
+                      {level === 2 ? index + 1 : level === 3 ? '•' : '–'}
+                    </span>
+                    <span className={level === 2 ? 'text-sm font-bold' : 'text-[13px] font-semibold'}>
+                      {item.text}
+                    </span>
+                  </button>
+                )
+              })}
             </nav>
           </div>
         </div>
@@ -193,22 +206,33 @@ export function BlogMobileTocButton({ tocItems }: BlogTocNavProps) {
 export function BlogTocNav({ tocItems }: BlogTocNavProps) {
   return (
     <nav className="space-y-2">
-      {tocItems.map((item, index) => (
-        <button
-          key={item.id}
-          type="button"
-          onClick={() => {
-            window.dispatchEvent(
-              new CustomEvent(BLOG_TOC_SCROLL_EVENT, {
-                detail: { id: item.id },
-              }),
-            )
-          }}
-          className="block w-full rounded-xl px-3 py-2 text-left text-sm leading-6 text-gray-700 transition hover:bg-gray-50 hover:text-primary"
-        >
-          {index + 1}. {item.text}
-        </button>
-      ))}
+      {tocItems.map((item, index) => {
+        const level = item.level ?? 2
+        const indentClass =
+          level === 4
+            ? 'pl-9 text-[12px] text-gray-500'
+            : level === 3
+              ? 'pl-6 text-[13px] text-gray-600'
+              : 'pl-3 text-sm text-gray-700'
+
+        return (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => {
+              window.dispatchEvent(
+                new CustomEvent(BLOG_TOC_SCROLL_EVENT, {
+                  detail: { id: item.id },
+                }),
+              )
+            }}
+            className={`block w-full rounded-xl py-2 pr-3 text-left leading-6 transition hover:bg-gray-50 hover:text-primary ${indentClass}`}
+          >
+            {level === 2 ? `${index + 1}. ` : level === 3 ? '• ' : '– '}
+            {item.text}
+          </button>
+        )
+      })}
     </nav>
   )
 }

@@ -158,6 +158,7 @@ export function htmlToPlainText(value: unknown): string {
 export type HtmlHeading = {
   id: string
   text: string
+  level: 2 | 3 | 4
 }
 
 function slugify(text: string): string {
@@ -177,7 +178,7 @@ export function extractHtmlHeadings(value: unknown): HtmlHeading[] {
   const used = new Map<string, number>()
   const items: HtmlHeading[] = []
 
-  html.replace(/<h2(?:\s[^>]*)?>([\s\S]*?)<\/h2>/gi, (_match, rawText) => {
+  html.replace(/<h([2-4])(?:\s[^>]*)?>([\s\S]*?)<\/h\1>/gi, (_match, rawLevel, rawText) => {
     const text = decodeHtmlEntities(
       String(rawText)
         .replace(/<[^>]*>/g, ' ')
@@ -189,6 +190,7 @@ export function extractHtmlHeadings(value: unknown): HtmlHeading[] {
       return ''
     }
 
+    const level = Number(rawLevel) as 2 | 3 | 4
     const baseId = slugify(text) || 'section'
     const count = used.get(baseId) || 0
 
@@ -197,6 +199,7 @@ export function extractHtmlHeadings(value: unknown): HtmlHeading[] {
     items.push({
       id: count === 0 ? baseId : `${baseId}-${count + 1}`,
       text,
+      level,
     })
 
     return ''
@@ -209,8 +212,8 @@ export function addHeadingIds(value: unknown, headings: HtmlHeading[]): string {
   let index = 0
 
   return normalizeContentHtml(value).replace(
-    /<h2(\s[^>]*)?>/gi,
-    (match, attrs = '') => {
+    /<h([2-4])(\s[^>]*)?>/gi,
+    (match, rawLevel, attrs = '') => {
       const heading = headings[index]
       index += 1
 
@@ -218,7 +221,7 @@ export function addHeadingIds(value: unknown, headings: HtmlHeading[]): string {
         return match
       }
 
-      return `<h2${attrs} id="${escapeAttribute(heading.id)}">`
+      return `<h${rawLevel}${attrs} id="${escapeAttribute(heading.id)}">`
     },
   )
 }
