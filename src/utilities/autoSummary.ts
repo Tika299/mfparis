@@ -1,44 +1,30 @@
-const htmlEntityMap: Record<string, string> = {
-  amp: '&',
-  apos: "'",
-  copy: '(c)',
-  gt: '>',
-  hellip: '...',
-  laquo: '"',
-  ldquo: '"',
-  lrm: '',
-  lt: '<',
-  nbsp: ' ',
-  ndash: '-',
-  mdash: '-',
-  quot: '"',
-  raquo: '"',
-  rdquo: '"',
-  reg: '(R)',
-  rlm: '',
-  rsquo: "'",
-  lsquo: "'",
-  trade: 'TM',
-}
+import { decodeHtmlEntities } from '@/lib/html/sanitizeWordPressHtml'
 
-function decodeHtmlEntity(entity: string): string {
-  const value = entity.slice(1, -1)
+function decodeSummaryEntities(value: string): string {
+  let decoded = value
 
-  if (value.startsWith('#x') || value.startsWith('#X')) {
-    const code = Number.parseInt(value.slice(2), 16)
-    return Number.isFinite(code) ? String.fromCodePoint(code) : entity
+  for (let index = 0; index < 4; index += 1) {
+    const next = decodeHtmlEntities(decoded)
+
+    if (next === decoded) {
+      break
+    }
+
+    decoded = next
   }
 
-  if (value.startsWith('#')) {
-    const code = Number.parseInt(value.slice(1), 10)
-    return Number.isFinite(code) ? String.fromCodePoint(code) : entity
-  }
-
-  return htmlEntityMap[value.toLowerCase()] || entity
+  return decoded
 }
 
-export function decodeBasicHtmlEntities(value: string): string {
-  return value.replace(/&(?:#x?[0-9a-f]+|[a-z][a-z0-9]+);/giu, decodeHtmlEntity)
+function normalizeSummaryText(value: string): string {
+  return decodeSummaryEntities(value)
+    .replace(/\u00a0/gu, ' ')
+    .replace(/[\u0000-\u001f\u007f]/gu, ' ')
+    .replace(/[“”„«»]/gu, '"')
+    .replace(/[‘’‚]/gu, "'")
+    .replace(/[–—]/gu, '-')
+    .replace(/\s+/gu, ' ')
+    .trim()
 }
 
 export function stripHtmlToText(value: unknown): string {
@@ -46,7 +32,7 @@ export function stripHtmlToText(value: unknown): string {
     return ''
   }
 
-  return decodeBasicHtmlEntities(value)
+  return normalizeSummaryText(value)
     .replace(/<script\b[^>]*>[\s\S]*?<\/script>/giu, ' ')
     .replace(/<style\b[^>]*>[\s\S]*?<\/style>/giu, ' ')
     .replace(/<noscript\b[^>]*>[\s\S]*?<\/noscript>/giu, ' ')
