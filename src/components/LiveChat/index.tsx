@@ -96,6 +96,20 @@ export const LiveChat = () => {
   const prevScrollHeightRef =
     useRef(0)
 
+  const preserveScrollAfterPrependRef = useRef(false)
+
+  const scrollToLatestMessage = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    const element = scrollRef.current
+    if (!element) return
+
+    requestAnimationFrame(() => {
+      element.scrollTo({
+        top: element.scrollHeight,
+        behavior,
+      })
+    })
+  }, [])
+
   const isOpenRef = useRef(false)
 
   const socketRef =
@@ -114,6 +128,13 @@ export const LiveChat = () => {
   useEffect(() => {
     profileRef.current = profile
   }, [profile])
+
+  useEffect(() => {
+    if (!isOpen || step !== 'chat' || messages.length === 0) return
+    if (preserveScrollAfterPrependRef.current) return
+
+    scrollToLatestMessage()
+  }, [isOpen, messages.length, scrollToLatestMessage, step])
 
   const bindSocketListeners = useCallback(
     (socket: LiveChatSocket) => {
@@ -218,24 +239,30 @@ export const LiveChat = () => {
           : []
 
         if (isLoadMore) {
-          if (scrollRef.current) {
-            prevScrollHeightRef.current =
-              scrollRef.current.scrollHeight
+          const currentRef = scrollRef.current
+
+          if (currentRef) {
+            prevScrollHeightRef.current = currentRef.scrollHeight
+            preserveScrollAfterPrependRef.current = true
           }
 
           setMessages((prev) => [
             ...newMsgs,
             ...prev,
           ])
-        } else {
-          setMessages(newMsgs)
 
           setTimeout(() => {
-            if (scrollRef.current) {
-              scrollRef.current.scrollTop =
-                scrollRef.current.scrollHeight
+            if (currentRef) {
+              currentRef.scrollTop =
+                currentRef.scrollHeight -
+                prevScrollHeightRef.current
             }
-          }, 100)
+
+            preserveScrollAfterPrependRef.current = false
+          }, 50)
+        } else {
+          setMessages(newMsgs)
+          scrollToLatestMessage('auto')
         }
 
         setHasMore(Boolean(data.hasNextPage))
@@ -247,7 +274,7 @@ export const LiveChat = () => {
         setIsLoadingMore(false)
       }
     },
-    [],
+    [scrollToLatestMessage],
   )
 
   const handleScroll = () => {
@@ -266,14 +293,6 @@ export const LiveChat = () => {
         page,
         true,
       )
-
-      const currentRef = scrollRef.current
-
-      setTimeout(() => {
-        currentRef.scrollTop =
-          currentRef.scrollHeight -
-          prevScrollHeightRef.current
-      }, 50)
     }
   }
 
@@ -316,28 +335,6 @@ export const LiveChat = () => {
     }
   }, [connectSocketForProfile, loadHistory])
 
-  useEffect(() => {
-    if (
-      isOpen &&
-      unreadCount > 0 &&
-      profile?.id
-    ) {
-      setUnreadCount(0)
-
-      fetch('/api/chat/mark-read', {
-        method: 'POST',
-        headers: {
-          'Content-Type':
-            'application/json',
-        },
-        body: JSON.stringify({
-          sessionId: profile.id,
-          sender: 'customer',
-        }),
-      }).catch(() => { })
-    }
-  }, [isOpen, profile, unreadCount])
-
   const handleOpenChat = async () => {
     const nextIsOpen = !isOpen
     setIsOpen(nextIsOpen)
@@ -347,6 +344,22 @@ export const LiveChat = () => {
         await connectSocketForProfile(
           profile.id,
         )
+
+        if (unreadCount > 0) {
+          setUnreadCount(0)
+
+          fetch('/api/chat/mark-read', {
+            method: 'POST',
+            headers: {
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify({
+              sessionId: profile.id,
+              sender: 'customer',
+            }),
+          }).catch(() => { })
+        }
       } else {
         await ensureSocket()
       }

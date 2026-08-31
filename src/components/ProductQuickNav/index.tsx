@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ChevronUp, List } from 'lucide-react'
+import { ChevronDown, ChevronUp, List } from 'lucide-react'
 import { ExpandableContent } from '@/components/ExpandableContent'
 import {
   Sheet,
@@ -24,6 +24,38 @@ type ProductHtmlContentProps = {
   description?: unknown
   expandable?: boolean
   maxHeight?: number
+}
+
+type TocItem = {
+  id: string
+  text: string
+  level: 2 | 3 | 4
+}
+
+type TocGroup = {
+  parent: TocItem
+  children: TocItem[]
+}
+
+function buildTocGroups(tocItems: TocItem[]): TocGroup[] {
+  const groups: TocGroup[] = []
+  let currentGroup: TocGroup | null = null
+
+  for (const item of tocItems) {
+    if (item.level === 2 || !currentGroup) {
+      currentGroup = {
+        parent: item,
+        children: [],
+      }
+
+      groups.push(currentGroup)
+      continue
+    }
+
+    currentGroup.children.push(item)
+  }
+
+  return groups
 }
 
 const PRODUCT_CONTENT_SCROLL_EVENT = 'product-content-scroll-to-heading'
@@ -160,6 +192,15 @@ export function ProductRichTextContent({
   const [contentExpanded, setContentExpanded] = useState(false)
 
   const tocItems = useMemo(() => extractHtmlHeadings(description), [description])
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({})
+  const tocGroups = useMemo(() => buildTocGroups(tocItems), [tocItems])
+
+  const toggleSection = (id: string) => {
+    setCollapsedSections((current) => ({
+      ...current,
+      [id]: !current[id],
+    }))
+  }
   const html = useMemo(
     () => addHeadingIds(description, tocItems),
     [description, tocItems],
@@ -263,29 +304,65 @@ export function ProductRichTextContent({
         <aside className="hidden border-r border-gray-100 bg-[#F1F3F5] lg:sticky lg:top-24 lg:block lg:max-h-[calc(100dvh-7rem)] lg:self-start lg:overflow-y-auto">
           <div className="p-3">
             <nav className="space-y-1">
-              {tocItems.map((item) => {
-                const isActive = activeId === item.id
-                const level = item.level ?? 2
-                const indentClass =
-                  level === 4
-                    ? 'ml-8 text-[13px]'
-                    : level === 3
-                      ? 'ml-4 text-[14px]'
-                      : 'text-[15px]'
+              {tocGroups.map((group) => {
+                const isCollapsed = Boolean(collapsedSections[group.parent.id])
+                const isActive = activeId === group.parent.id
+                const hasChildren = group.children.length > 0
 
                 return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => handleTocClick(item.id)}
-                    className={
-                      isActive
-                        ? `block w-full rounded-xl bg-white px-4 py-4 text-left font-bold leading-6 text-gray-950 shadow-sm ${indentClass}`
-                        : `block w-full rounded-xl px-4 py-4 text-left font-medium leading-6 text-gray-500 transition hover:bg-white hover:text-gray-950 ${indentClass}`
-                    }
-                  >
-                    {item.text}
-                  </button>
+                  <div key={group.parent.id}>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => handleTocClick(group.parent.id)}
+                        className={
+                          isActive
+                            ? 'block min-w-0 flex-1 rounded-xl bg-white px-4 py-4 text-left text-[15px] font-bold leading-6 text-gray-950 shadow-sm'
+                            : 'block min-w-0 flex-1 rounded-xl px-4 py-4 text-left text-[15px] font-medium leading-6 text-gray-500 transition hover:bg-white hover:text-gray-950'
+                        }
+                      >
+                        {group.parent.text}
+                      </button>
+
+                      {hasChildren ? (
+                        <button
+                          type="button"
+                          onClick={() => toggleSection(group.parent.id)}
+                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-white hover:text-gray-900"
+                        >
+                          <ChevronDown
+                            size={15}
+                            className={`transition-transform ${isCollapsed ? '-rotate-90' : ''}`}
+                          />
+                        </button>
+                      ) : null}
+                    </div>
+
+                    {!isCollapsed ? (
+                      <div className="mt-1 space-y-1">
+                        {group.children.map((child) => {
+                          const childActive = activeId === child.id
+                          const indentClass = child.level === 4 ? 'ml-8' : 'ml-4'
+
+                          return (
+                            <button
+                              key={child.id}
+                              type="button"
+                              onClick={() => handleTocClick(child.id)}
+                              className={
+                                childActive
+                                  ? `block w-[calc(100%-1rem)] rounded-xl bg-white px-4 py-3 text-left text-[13px] font-bold leading-5 text-gray-950 shadow-sm ${indentClass}`
+                                  : `block w-[calc(100%-1rem)] rounded-xl px-4 py-3 text-left text-[13px] font-medium leading-5 text-gray-500 transition hover:bg-white hover:text-gray-950 ${indentClass}`
+                              }
+                            >
+                              {child.level === 4 ? '– ' : '• '}
+                              {child.text}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    ) : null}
+                  </div>
                 )
               })}
             </nav>

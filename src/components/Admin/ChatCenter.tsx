@@ -1,6 +1,6 @@
 'use client'
 import { useAuth } from '@payloadcms/ui'
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { io } from 'socket.io-client'
 import { Send, User, Search, MessageSquare, ArrowLeft, Loader2 } from 'lucide-react'
 import Link from 'next/link'
@@ -37,11 +37,31 @@ export const ChatCenter = () => {
   const scrollRef = useRef<HTMLDivElement>(null)
   const activeSidRef = useRef('')
   const prevScrollHeightRef = useRef(0)
+  const preserveScrollAfterPrependRef = useRef(false)
+
+  const scrollToLatestMessage = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    const element = scrollRef.current
+    if (!element) return
+
+    requestAnimationFrame(() => {
+      element.scrollTo({
+        top: element.scrollHeight,
+        behavior,
+      })
+    })
+  }, [])
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     activeSidRef.current = activeSid
   }, [activeSid])
+
+  useEffect(() => {
+    if (!activeSid || messages.length === 0) return
+    if (preserveScrollAfterPrependRef.current) return
+
+    scrollToLatestMessage()
+  }, [activeSid, messages.length, scrollToLatestMessage])
 
   useEffect(() => {
     audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3')
@@ -55,7 +75,7 @@ export const ChatCenter = () => {
       const res = await fetch('/api/chat/sessions', { cache: 'no-store' })
       const data = await res.json()
       setSessions(Array.isArray(data) ? data : [])
-    } catch (error) {
+    } catch (_error) {
       console.error('Lỗi nạp danh sách inbox')
     }
   }
@@ -69,31 +89,39 @@ export const ChatCenter = () => {
       const res = await fetch(`/api/chat/history?sid=${sid}&page=${pageNum}`)
       const data = await res.json()
 
-      // Đảo ngược mảng vì API trả về tin mới nhất lên đầu (-createdAt)
       const newMsgs = Array.isArray(data.docs) ? [...data.docs].reverse() : []
 
       if (isLoadMore) {
-        // Lưu lại chiều cao trước khi thêm tin cũ
-        if (scrollRef.current) prevScrollHeightRef.current = scrollRef.current.scrollHeight
+        const currentRef = scrollRef.current
+
+        if (currentRef) {
+          prevScrollHeightRef.current = currentRef.scrollHeight
+          preserveScrollAfterPrependRef.current = true
+        }
 
         setMessages(prev => [...newMsgs, ...prev])
+
+        setTimeout(() => {
+          if (currentRef) {
+            currentRef.scrollTop = currentRef.scrollHeight - prevScrollHeightRef.current
+          }
+
+          preserveScrollAfterPrependRef.current = false
+        }, 50)
       } else {
         setMessages(newMsgs)
-        // Cuộn xuống đáy ở lần đầu chọn khách
-        setTimeout(() => {
-          if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-        }, 100)
+        scrollToLatestMessage('auto')
       }
 
       setHasMore(data.hasNextPage)
       setPage(data.nextPage || pageNum)
-    } catch (error) {
-      console.error("Lỗi tải lịch sử")
+    } catch (_error) {
+      console.error('Lỗi tải lịch sử')
     } finally {
       setIsLoadingMessages(false)
       setIsLoadingMore(false)
     }
-  }, [])
+  }, [scrollToLatestMessage])
 
   // 3. Xử lý cuộn để tải tin cũ
   const handleScroll = () => {
@@ -102,12 +130,6 @@ export const ChatCenter = () => {
     // Nếu cuộn lên sát đỉnh (cách 10px)
     if (scrollRef.current.scrollTop < 10) {
       loadMessages(activeSid, page, true)
-
-      // Giữ vị trí mắt người dùng sau khi nạp thêm tin
-      const currentRef = scrollRef.current
-      setTimeout(() => {
-        currentRef.scrollTop = currentRef.scrollHeight - prevScrollHeightRef.current
-      }, 50)
     }
   }
 
@@ -201,99 +223,99 @@ export const ChatCenter = () => {
   return (
     <AdminAuthRequired description="Bạn cần đăng nhập admin để xem và trả lời tin nhắn khách hàng.">
       <div className="admin-chat-container">
-      <div className="admin-chat-wrapper">
+        <div className="admin-chat-wrapper">
 
-        {/* SIDEBAR */}
-        <div className="admin-chat-sidebar">
-          <div className="sidebar-header">
-            <div className="sidebar-top" style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-              <Link href="/admin" className="back-btn"><ArrowLeft size={18} /></Link>
-              <h2 className="sidebar-title" style={{ marginLeft: 10, marginBottom: 0 }}>Hộp thư hỗ trợ</h2>
-            </div>
-            <div className="sidebar-search">
-              <Search className="search-icon" size={16} />
-              <input
-                placeholder="Tìm khách hàng..."
-                className="search-input"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="session-list">
-            {filteredSessions.map((s, i) => (
-              <div
-                key={`${s.sessionId}-${i}`}
-                onClick={() => selectSession(s.sessionId, s.customerName)}
-                className={`session-item ${activeSid === s.sessionId ? 'is-active' : ''} ${s.unreadCount > 0 ? 'is-unread' : ''}`}
-              >
-                <div className="avatar-circle">{s.customerName?.[0]?.toUpperCase()}</div>
-                <div className="session-info">
-                  <div className="session-top">
-                    <span className="session-name">{s.customerName}</span>
-                    <span className="session-time">
-                      {new Date(s.updatedAt || new Date()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                  <div className="session-bottom">
-                    <p className="session-last-msg">{s.lastMessage}</p>
-                    {s.unreadCount > 0 && <span className="unread-dot"></span>}
-                  </div>
-                </div>
+          {/* SIDEBAR */}
+          <div className="admin-chat-sidebar">
+            <div className="sidebar-header">
+              <div className="sidebar-top" style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+                <Link href="/admin" className="back-btn"><ArrowLeft size={18} /></Link>
+                <h2 className="sidebar-title" style={{ marginLeft: 10, marginBottom: 0 }}>Hộp thư hỗ trợ</h2>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* MAIN CHAT */}
-        <div className="admin-chat-main">
-          {activeSid ? (
-            <>
-              <div className="chat-header">
-                <div className="chat-header-info">
-                  <div className="header-avatar"><User size={20} /></div>
-                  <div>
-                    <h3 className="header-name">{activeName}</h3>
-                    <div className="status-indicator"><span className="dot"></span> Trực tuyến</div>
-                  </div>
-                </div>
+              <div className="sidebar-search">
+                <Search className="search-icon" size={16} />
+                <input
+                  placeholder="Tìm khách hàng..."
+                  className="search-input"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                />
               </div>
+            </div>
 
-              <div ref={scrollRef} onScroll={handleScroll} className="chat-messages-area">
-                {isLoadingMore && <div className="loading-more"><Loader2 className="animate-spin" size={16} /> Tải thêm tin nhắn...</div>}
-
-                {messages.map((m, i) => (
-                  <div key={m.id || i} className={`message-row ${m.sender === 'admin' ? 'is-admin' : 'is-customer'}`}>
-                    <div className="message-bubble">
-                      <div className="message-text">{m.content}</div>
-                      <div className="message-meta">{new Date(m.createdAt || new Date()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+            <div className="session-list">
+              {filteredSessions.map((s, i) => (
+                <div
+                  key={`${s.sessionId}-${i}`}
+                  onClick={() => selectSession(s.sessionId, s.customerName)}
+                  className={`session-item ${activeSid === s.sessionId ? 'is-active' : ''} ${s.unreadCount > 0 ? 'is-unread' : ''}`}
+                >
+                  <div className="avatar-circle">{s.customerName?.[0]?.toUpperCase()}</div>
+                  <div className="session-info">
+                    <div className="session-top">
+                      <span className="session-name">{s.customerName}</span>
+                      <span className="session-time">
+                        {new Date(s.updatedAt || new Date()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    <div className="session-bottom">
+                      <p className="session-last-msg">{s.lastMessage}</p>
+                      {s.unreadCount > 0 && <span className="unread-dot"></span>}
                     </div>
                   </div>
-                ))}
-              </div>
-
-              <div className="chat-input-footer">
-                <div className="input-box-wrapper">
-                  <input
-                    className="chat-input"
-                    value={input}
-                    onChange={e => setInput(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && handleSend()}
-                    placeholder="Nhập phản hồi..."
-                  />
-                  <button onClick={handleSend} className="send-btn"><Send size={18} /></button>
                 </div>
-              </div>
-            </>
-          ) : (
-            <div className="chat-empty-state">
-              <div className="empty-icon-circle"><MessageSquare size={48} /></div>
-              <p>Chọn một khách hàng để bắt đầu tư vấn</p>
+              ))}
             </div>
-          )}
+          </div>
+
+          {/* MAIN CHAT */}
+          <div className="admin-chat-main">
+            {activeSid ? (
+              <>
+                <div className="chat-header">
+                  <div className="chat-header-info">
+                    <div className="header-avatar"><User size={20} /></div>
+                    <div>
+                      <h3 className="header-name">{activeName}</h3>
+                      <div className="status-indicator"><span className="dot"></span> Trực tuyến</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div ref={scrollRef} onScroll={handleScroll} className="chat-messages-area">
+                  {isLoadingMore && <div className="loading-more"><Loader2 className="animate-spin" size={16} /> Tải thêm tin nhắn...</div>}
+
+                  {messages.map((m, i) => (
+                    <div key={m.id || i} className={`message-row ${m.sender === 'admin' ? 'is-admin' : 'is-customer'}`}>
+                      <div className="message-bubble">
+                        <div className="message-text">{m.content}</div>
+                        <div className="message-meta">{new Date(m.createdAt || new Date()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="chat-input-footer">
+                  <div className="input-box-wrapper">
+                    <input
+                      className="chat-input"
+                      value={input}
+                      onChange={e => setInput(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleSend()}
+                      placeholder="Nhập phản hồi..."
+                    />
+                    <button onClick={handleSend} className="send-btn"><Send size={18} /></button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="chat-empty-state">
+                <div className="empty-icon-circle"><MessageSquare size={48} /></div>
+                <p>Chọn một khách hàng để bắt đầu tư vấn</p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
       </div>
     </AdminAuthRequired>
   )

@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ListTree, X } from 'lucide-react'
+import { ChevronDown, ListTree, X } from 'lucide-react'
 import { ExpandableContent } from '@/components/ExpandableContent'
 import { addHeadingIds } from '@/lib/html/contentHtml'
 
@@ -9,6 +9,44 @@ type TocItem = {
   id: string
   text: string
   level: 2 | 3 | 4
+}
+
+type TocGroup = {
+  parent: TocItem
+  children: TocItem[]
+}
+
+function buildTocGroups(tocItems: TocItem[]): TocGroup[] {
+  const groups: TocGroup[] = []
+  let currentGroup: TocGroup | null = null
+
+  for (const item of tocItems) {
+    if (item.level === 2 || !currentGroup) {
+      currentGroup = {
+        parent: item,
+        children: [],
+      }
+
+      groups.push(currentGroup)
+      continue
+    }
+
+    currentGroup.children.push(item)
+  }
+
+  return groups
+}
+
+function getTocChildIndentClass(level: 2 | 3 | 4): string {
+  if (level === 4) {
+    return 'ml-10 text-[12px]'
+  }
+
+  if (level === 3) {
+    return 'ml-6 text-[13px]'
+  }
+
+  return ''
 }
 
 type BlogRichTextContentProps = {
@@ -95,6 +133,15 @@ export function BlogRichTextContent({
 
 export function BlogMobileTocButton({ tocItems }: BlogTocNavProps) {
   const [open, setOpen] = useState(false)
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({})
+  const tocGroups = useMemo(() => buildTocGroups(tocItems), [tocItems])
+
+  const toggleSection = (id: string) => {
+    setCollapsedSections((current) => ({
+      ...current,
+      [id]: !current[id],
+    }))
+  }
 
   useEffect(() => {
     if (!open) return
@@ -170,29 +217,55 @@ export function BlogMobileTocButton({ tocItems }: BlogTocNavProps) {
             </div>
 
             <nav className="overflow-y-auto px-3 py-3">
-              {tocItems.map((item, index) => {
-                const level = item.level ?? 2
-                const indentClass =
-                  level === 4
-                    ? 'pl-10'
-                    : level === 3
-                      ? 'pl-6'
-                      : 'pl-3'
+              {tocGroups.map((group, groupIndex) => {
+                const isCollapsed = Boolean(collapsedSections[group.parent.id])
+                const hasChildren = group.children.length > 0
 
                 return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => selectHeading(item.id)}
-                    className={`flex w-full gap-3 rounded-2xl py-3 pr-3 text-left leading-6 text-gray-700 transition hover:bg-red-50 hover:text-[#E54D2E] ${indentClass}`}
-                  >
-                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[11px] font-black text-gray-500">
-                      {level === 2 ? index + 1 : level === 3 ? '•' : '–'}
-                    </span>
-                    <span className={level === 2 ? 'text-sm font-bold' : 'text-[13px] font-semibold'}>
-                      {item.text}
-                    </span>
-                  </button>
+                  <div key={group.parent.id} className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => selectHeading(group.parent.id)}
+                        className="flex min-w-0 flex-1 gap-3 rounded-2xl px-3 py-3 text-left text-sm leading-6 text-gray-800 transition hover:bg-red-50 hover:text-[#E54D2E]"
+                      >
+                        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[11px] font-black text-gray-500">
+                          {groupIndex + 1}
+                        </span>
+                        <span className="font-bold">{group.parent.text}</span>
+                      </button>
+
+                      {hasChildren ? (
+                        <button
+                          type="button"
+                          onClick={() => toggleSection(group.parent.id)}
+                          aria-label={isCollapsed ? 'Mở mục con' : 'Đóng mục con'}
+                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-50 text-gray-500 transition hover:bg-red-50 hover:text-[#E54D2E]"
+                        >
+                          <ChevronDown
+                            size={16}
+                            className={`transition-transform ${isCollapsed ? '-rotate-90' : 'rotate-0'}`}
+                          />
+                        </button>
+                      ) : null}
+                    </div>
+
+                    {!isCollapsed ? (
+                      <div className="space-y-1">
+                        {group.children.map((child) => (
+                          <button
+                            key={child.id}
+                            type="button"
+                            onClick={() => selectHeading(child.id)}
+                            className={`block w-full rounded-xl px-3 py-2 text-left font-semibold leading-5 text-gray-600 transition hover:bg-red-50 hover:text-[#E54D2E] ${getTocChildIndentClass(child.level)}`}
+                          >
+                            {child.level === 4 ? '– ' : '• '}
+                            {child.text}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
                 )
               })}
             </nav>
@@ -204,33 +277,72 @@ export function BlogMobileTocButton({ tocItems }: BlogTocNavProps) {
 }
 
 export function BlogTocNav({ tocItems }: BlogTocNavProps) {
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({})
+  const tocGroups = useMemo(() => buildTocGroups(tocItems), [tocItems])
+
+  const toggleSection = (id: string) => {
+    setCollapsedSections((current) => ({
+      ...current,
+      [id]: !current[id],
+    }))
+  }
+
+  const selectHeading = (id: string) => {
+    window.dispatchEvent(
+      new CustomEvent(BLOG_TOC_SCROLL_EVENT, {
+        detail: { id },
+      }),
+    )
+  }
+
   return (
     <nav className="space-y-2">
-      {tocItems.map((item, index) => {
-        const level = item.level ?? 2
-        const indentClass =
-          level === 4
-            ? 'pl-9 text-[12px] text-gray-500'
-            : level === 3
-              ? 'pl-6 text-[13px] text-gray-600'
-              : 'pl-3 text-sm text-gray-700'
+      {tocGroups.map((group, groupIndex) => {
+        const isCollapsed = Boolean(collapsedSections[group.parent.id])
+        const hasChildren = group.children.length > 0
 
         return (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => {
-              window.dispatchEvent(
-                new CustomEvent(BLOG_TOC_SCROLL_EVENT, {
-                  detail: { id: item.id },
-                }),
-              )
-            }}
-            className={`block w-full rounded-xl py-2 pr-3 text-left leading-6 transition hover:bg-gray-50 hover:text-primary ${indentClass}`}
-          >
-            {level === 2 ? `${index + 1}. ` : level === 3 ? '• ' : '– '}
-            {item.text}
-          </button>
+          <div key={group.parent.id} className="space-y-1">
+            <div className="flex items-start gap-1">
+              <button
+                type="button"
+                onClick={() => selectHeading(group.parent.id)}
+                className="block min-w-0 flex-1 rounded-xl px-3 py-2 text-left text-sm font-bold leading-6 text-gray-800 transition hover:bg-gray-50 hover:text-primary"
+              >
+                {groupIndex + 1}. {group.parent.text}
+              </button>
+
+              {hasChildren ? (
+                <button
+                  type="button"
+                  onClick={() => toggleSection(group.parent.id)}
+                  aria-label={isCollapsed ? 'Mở mục con' : 'Đóng mục con'}
+                  className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-50 hover:text-primary"
+                >
+                  <ChevronDown
+                    size={15}
+                    className={`transition-transform ${isCollapsed ? '-rotate-90' : 'rotate-0'}`}
+                  />
+                </button>
+              ) : null}
+            </div>
+
+            {!isCollapsed ? (
+              <div className="space-y-1">
+                {group.children.map((child) => (
+                  <button
+                    key={child.id}
+                    type="button"
+                    onClick={() => selectHeading(child.id)}
+                    className={`block w-full rounded-xl py-2 pr-3 text-left font-semibold leading-5 text-gray-500 transition hover:bg-gray-50 hover:text-primary ${getTocChildIndentClass(child.level)}`}
+                  >
+                    {child.level === 4 ? '– ' : '• '}
+                    {child.text}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
         )
       })}
     </nav>
