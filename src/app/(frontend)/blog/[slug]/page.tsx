@@ -39,6 +39,7 @@ import {
   getSeoMedia,
   getSeoText,
 } from '@/utilities/metadataSeo'
+export const revalidate = 300
 
 type BlogPostPageProps = {
   params: Promise<{
@@ -121,7 +122,7 @@ async function getPostBySlug(slug: string) {
     },
     limit: 1,
     pagination: false,
-    depth: 2,
+    depth: 1,
   })
 
   return result.docs[0] ?? null
@@ -786,7 +787,7 @@ export default async function BlogPostPage({
         },
       ],
     },
-    depth: 2,
+    depth: 1,
   })
 
   const post: any = result.docs[0]
@@ -935,27 +936,8 @@ export default async function BlogPostPage({
       ],
     }
   }
-  const [featuredPosts, relatedPosts, blogComments, previousPosts, nextPosts] =
+  const [relatedPosts, blogComments, previousPosts, nextPosts] =
     await Promise.all([
-      payload.find({
-        collection: 'posts',
-        limit: 5,
-        sort: '-createdAt',
-        where: {
-          and: [
-            {
-              slug: {
-                not_equals: slug,
-              },
-            },
-            {
-              status: {
-                equals: 'published',
-              },
-            },
-          ],
-        },
-      }),
       payload.find({
         collection: 'posts',
         limit: categoryIds.length > 0 ? 16 : 8,
