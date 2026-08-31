@@ -4,7 +4,16 @@ import { SITE_ORIGIN } from '@/utilities/seo'
 
 const PRIVATE_ROUTE_SEGMENTS = [
     '/admin',
-    '/api',
+    '/api/admin',
+    '/api/cart',
+    '/api/chat',
+    '/api/create-order',
+    '/api/graphql',
+    '/api/graphql-playground',
+    '/api/internal',
+    '/api/payments',
+    '/api/store',
+    '/api/vouchers',
     '/cart',
     '/checkout',
     '/fundiin',
