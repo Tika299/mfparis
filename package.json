@@ -34,6 +34,8 @@
     "import:wp:products:no-media": "tsx src/scripts/import-wp-data.ts --only=products --skip-media",
     "import:wp:products:update": "tsx src/scripts/import-wp-data.ts --only=products --update",
     "import:wp:all": "tsx src/scripts/import-wp-data.ts --only=all",
+    "import:product-reviews": "tsx src/scripts/import-product-reviews.ts",
+    "import:product-reviews:apply": "tsx src/scripts/import-product-reviews.ts --yes",
     "import:missing-media": "tsx src/scripts/import-missing-media-from-list.ts",
     "import:internal-links:wp": "tsx src/scripts/import-internal-link-rules-from-wp.ts",
     "clear:products": "tsx src/scripts/clear-imported-data.ts",
