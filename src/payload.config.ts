@@ -28,6 +28,7 @@ import { BlogComments } from '@/collections/BlogComments'
 import { BlogAuthors } from '@/collections/BlogAuthors'
 import { InternalLinkRules } from '@/collections/InternalLinkRules'
 import { InternalLinkLogs } from '@/collections/InternalLinkLogs'
+import { ProductFilterGroups } from '@/collections/ProductFilterGroups'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -114,6 +115,7 @@ export default buildConfig({
     VoucherRedemptions,
     InternalLinkRules,
     InternalLinkLogs,
+    ProductFilterGroups,
   ],
   globals: [SiteSettings, AboutPage],
   secret: process.env.PAYLOAD_SECRET || '',

@@ -90,6 +90,7 @@ export interface Config {
     'voucher-redemptions': VoucherRedemption;
     'internal-link-rules': InternalLinkRule;
     'internal-link-logs': InternalLinkLog;
+    'product-filter-groups': ProductFilterGroup;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -119,6 +120,7 @@ export interface Config {
     'voucher-redemptions': VoucherRedemptionsSelect<false> | VoucherRedemptionsSelect<true>;
     'internal-link-rules': InternalLinkRulesSelect<false> | InternalLinkRulesSelect<true>;
     'internal-link-logs': InternalLinkLogsSelect<false> | InternalLinkLogsSelect<true>;
+    'product-filter-groups': ProductFilterGroupsSelect<false> | ProductFilterGroupsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -196,12 +198,12 @@ export interface User {
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
-  | {
-    id: string;
-    createdAt?: string | null;
-    expiresAt: string;
-  }[]
-  | null;
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
   password?: string | null;
   collection: 'users';
 }
@@ -301,11 +303,11 @@ export interface Brand {
     disableAutoLinks?: boolean | null;
     maxLinksOverride?: number | null;
     excludeKeywords?:
-    | {
-      keyword: string;
-      id?: string | null;
-    }[]
-    | null;
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
   };
   name: string;
   /**
@@ -362,14 +364,14 @@ export interface Brand {
      * Chi dung khi can them schema rieng. Khong nhap Product/Article trung voi schema tu dong.
      */
     customJsonLd?:
-    | {
-      [k: string]: unknown;
-    }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   h1Override?: string | null;
   /**
@@ -381,22 +383,22 @@ export interface Brand {
    */
   bottomContentHtml?: string | null;
   faq?:
-  | {
-    question: string;
-    answer: string;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
   featuredProducts?: (number | Product)[] | null;
   indexableFacets?:
-  | {
-    key: string;
-    value: string;
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        key: string;
+        value: string;
+        metaTitle?: string | null;
+        metaDescription?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   noindexWhenEmpty?: boolean | null;
   canonicalToParent?: boolean | null;
   thumbnail?: (number | null) | Media;
@@ -417,11 +419,11 @@ export interface Product {
     disableAutoLinks?: boolean | null;
     maxLinksOverride?: number | null;
     excludeKeywords?:
-    | {
-      keyword: string;
-      id?: string | null;
-    }[]
-    | null;
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
   };
   /**
    * Quyết định cách trang chi tiết sản phẩm được render, index và chuyển hướng.
@@ -456,11 +458,11 @@ export interface Product {
    * Ảnh sản phẩm nên dùng tỉ lệ 1:1 để hiển thị đẹp.
    */
   images?:
-  | {
-    image: number | Media;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Hiển thị ở phần đầu trang sản phẩm.
    */
@@ -469,28 +471,28 @@ export interface Product {
    * Dùng cho dung tích, xuất xứ, nhóm hương, loại da, nồng độ...
    */
   specifications?:
-  | {
-    label: string;
-    value: string;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        label: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Dữ liệu dùng cho bộ lọc danh mục, tìm kiếm và so sánh sản phẩm.
    */
   productAttributes?:
-  | {
-    attribute: number | Attribute;
-    values?: (number | AttributeValue)[] | null;
-    /**
-     * Dùng khi sản phẩm có giá trị riêng, ví dụ độ lưu hương 7 giờ.
-     */
-    numericValue?: number | null;
-    booleanValue?: boolean | null;
-    textValue?: string | null;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        attribute: number | Attribute;
+        values?: (number | AttributeValue)[] | null;
+        /**
+         * Dùng khi sản phẩm có giá trị riêng, ví dụ độ lưu hương 7 giờ.
+         */
+        numericValue?: number | null;
+        booleanValue?: boolean | null;
+        textValue?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   fragranceProfile?: {
     /**
      * Chọn các nốt hương xuất hiện đầu tiên sau khi xịt.
@@ -517,23 +519,23 @@ export interface Product {
    * Dùng cho các biến thể như 30ml, 50ml, 100ml, fullbox, tester, màu sắc, quy cách...
    */
   variants?:
-  | {
-    name: string;
-    sku?: string | null;
-    wpVariationId?: number | null;
-    isDefault?: boolean | null;
-    /**
-     * Ví dụ: 50ml, màu đỏ, fullbox hoặc tester.
-     */
-    optionValues?: (number | AttributeValue)[] | null;
-    basePrice: number;
-    salePrice?: number | null;
-    stock?: number | null;
-    image?: (number | null) | Media;
-    isActive?: boolean | null;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        name: string;
+        sku?: string | null;
+        wpVariationId?: number | null;
+        isDefault?: boolean | null;
+        /**
+         * Ví dụ: 50ml, màu đỏ, fullbox hoặc tester.
+         */
+        optionValues?: (number | AttributeValue)[] | null;
+        basePrice: number;
+        salePrice?: number | null;
+        stock?: number | null;
+        image?: (number | null) | Media;
+        isActive?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Nội dung chi tiet san pham luu dang HTML. Co the soan truc quan, dan noi dung tu WordPress hoac chinh ma HTML.
    */
@@ -546,12 +548,12 @@ export interface Product {
    * Chi nhap cau hoi/cau tra loi that su hien thi tren trang san pham.
    */
   faq?:
-  | {
-    question: string;
-    answer: string;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Cau hinh metadata, social preview, robots, canonical, sitemap va schema cho entity nay.
    */
@@ -596,14 +598,14 @@ export interface Product {
      * Chi dung khi can them schema rieng. Khong nhap Product/Article trung voi schema tu dong.
      */
     customJsonLd?:
-    | {
-      [k: string]: unknown;
-    }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   /**
    * Tự động tạo từ tên sản phẩm, có thể chỉnh tay để tối ưu SEO.
@@ -639,11 +641,11 @@ export interface Category {
     disableAutoLinks?: boolean | null;
     maxLinksOverride?: number | null;
     excludeKeywords?:
-    | {
-      keyword: string;
-      id?: string | null;
-    }[]
-    | null;
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
   };
   name: string;
   image?: (number | null) | Media;
@@ -681,15 +683,15 @@ export interface Category {
      * Dung khi muon chi dinh chinh xac facet hien thi. Vi du: attr_loai-da, attr_nhom-huong, attr_dung-tich, note.
      */
     facetKeys?:
-    | {
-      key: string;
-      /**
-       * Chi de admin de nho y nghia facet; giao dien van dung ten facet that.
-       */
-      label?: string | null;
-      id?: string | null;
-    }[]
-    | null;
+      | {
+          key: string;
+          /**
+           * Chi de admin de nho y nghia facet; giao dien van dung ten facet that.
+           */
+          label?: string | null;
+          id?: string | null;
+        }[]
+      | null;
   };
   /**
    * Dùng để đổi nhãn trên frontend/admin mà vẫn có thể giữ slug cũ.
@@ -758,14 +760,14 @@ export interface Category {
      * Chi dung khi can them schema rieng. Khong nhap Product/Article trung voi schema tu dong.
      */
     customJsonLd?:
-    | {
-      [k: string]: unknown;
-    }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   h1Override?: string | null;
   /**
@@ -777,22 +779,22 @@ export interface Category {
    */
   bottomContentHtml?: string | null;
   faq?:
-  | {
-    question: string;
-    answer: string;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
   featuredProducts?: (number | Product)[] | null;
   indexableFacets?:
-  | {
-    key: string;
-    value: string;
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        key: string;
+        value: string;
+        metaTitle?: string | null;
+        metaDescription?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   noindexWhenEmpty?: boolean | null;
   canonicalToParent?: boolean | null;
   thumbnail?: (number | null) | Media;
@@ -868,21 +870,21 @@ export interface AttributeValue {
    * Hỗ trợ tìm kiếm/import: woody, gỗ, hương gỗ.
    */
   aliases?:
-  | {
-    alias: string;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        alias: string;
+        id?: string | null;
+      }[]
+    | null;
   colorHex?: string | null;
   image?: (number | null) | Media;
   sortOrder?: number | null;
   metadata?:
-  | {
-    key: string;
-    value: string;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        key: string;
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
   isActive?: boolean | null;
   wooTermId?: number | null;
   wooTaxonomySlug?: string | null;
@@ -932,20 +934,20 @@ export interface Order {
   };
   deliveryMethod?: ('home_delivery' | 'store_pickup') | null;
   items?:
-  | {
-    product: number | Product;
-    /**
-     * ID của biến thể trong products.variants tại thời điểm mua.
-     */
-    variantId?: string | null;
-    productTitleSnapshot: string;
-    variantNameSnapshot?: string | null;
-    skuSnapshot?: string | null;
-    quantity: number;
-    priceAtPurchase: number;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        product: number | Product;
+        /**
+         * ID của biến thể trong products.variants tại thời điểm mua.
+         */
+        variantId?: string | null;
+        productTitleSnapshot: string;
+        variantNameSnapshot?: string | null;
+        skuSnapshot?: string | null;
+        quantity: number;
+        priceAtPurchase: number;
+        id?: string | null;
+      }[]
+    | null;
   totalAmount: number;
   paymentMethod?: ('cod' | 'bank_transfer' | 'fundiin') | null;
   paymentStatus?: ('unpaid' | 'pending' | 'paid' | 'failed' | 'refunded') | null;
@@ -1019,11 +1021,11 @@ export interface Post {
     disableAutoLinks?: boolean | null;
     maxLinksOverride?: number | null;
     excludeKeywords?:
-    | {
-      keyword: string;
-      id?: string | null;
-    }[]
-    | null;
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
   };
   title: string;
   /**
@@ -1063,12 +1065,12 @@ export interface Post {
    * Các câu hỏi này sẽ hiển thị ở frontend và được xuất vào FAQPage schema.
    */
   faq?:
-  | {
-    question: string;
-    answer: string;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
   excerpt?: string | null;
   seo?: {
     /**
@@ -1079,11 +1081,11 @@ export interface Post {
     focusKeyword?: string | null;
     breadcrumbLabel?: string | null;
     keywords?:
-    | {
-      keyword: string;
-      id?: string | null;
-    }[]
-    | null;
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
     ogTitle?: string | null;
     ogDescription?: string | null;
     ogImage?: (number | null) | Media;
@@ -1102,14 +1104,14 @@ export interface Post {
      * Chỉ dùng khi cần thêm schema riêng. Không nhập Article trùng với schema tự động.
      */
     customJsonLd?:
-    | {
-      [k: string]: unknown;
-    }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   wpId?: number | null;
   sourceUrl?: string | null;
@@ -1127,11 +1129,11 @@ export interface PostCategory {
     disableAutoLinks?: boolean | null;
     maxLinksOverride?: number | null;
     excludeKeywords?:
-    | {
-      keyword: string;
-      id?: string | null;
-    }[]
-    | null;
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
   };
   title: string;
   slug: string;
@@ -1207,14 +1209,14 @@ export interface PostCategory {
      * Chi dung khi can them schema rieng. Khong nhap Product/Article trung voi schema tu dong.
      */
     customJsonLd?:
-    | {
-      [k: string]: unknown;
-    }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   h1Override?: string | null;
   /**
@@ -1226,20 +1228,20 @@ export interface PostCategory {
    */
   bottomContentHtml?: string | null;
   faq?:
-  | {
-    question: string;
-    answer: string;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
   featuredPosts?: (number | Post)[] | null;
   internalLinks?:
-  | {
-    label: string;
-    url: string;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        label: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
   noindexWhenEmpty?: boolean | null;
   thumbnail?: (number | null) | Media;
   ogImage?: (number | null) | Media;
@@ -1270,11 +1272,11 @@ export interface BlogAuthor {
    */
   url?: string | null;
   sameAs?:
-  | {
-    url: string;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Dùng khi bài viết chưa chọn tác giả riêng.
    */
@@ -1323,14 +1325,14 @@ export interface BlogAuthor {
      * Chi dung khi can them schema rieng. Khong nhap Product/Article trung voi schema tu dong.
      */
     customJsonLd?:
-    | {
-      [k: string]: unknown;
-    }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -1367,12 +1369,12 @@ export interface ChatProfile {
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
-  | {
-    id: string;
-    createdAt?: string | null;
-    expiresAt: string;
-  }[]
-  | null;
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
   password?: string | null;
   collection: 'chat-profiles';
 }
@@ -1413,22 +1415,22 @@ export interface Cart {
   guestId?: string | null;
   status: 'active' | 'abandoned' | 'converted' | 'merged' | 'expired';
   items?:
-  | {
-    product: number | Product;
-    /**
-     * ID row trong products.variants; bắt buộc với variable product.
-     */
-    variantId?: string | null;
-    quantity: number;
-    productTitleSnapshot?: string | null;
-    variantNameSnapshot?: string | null;
-    skuSnapshot?: string | null;
-    unitPriceSnapshot?: number | null;
-    stockSnapshot?: number | null;
-    lineTotal?: number | null;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        product: number | Product;
+        /**
+         * ID row trong products.variants; bắt buộc với variable product.
+         */
+        variantId?: string | null;
+        quantity: number;
+        productTitleSnapshot?: string | null;
+        variantNameSnapshot?: string | null;
+        skuSnapshot?: string | null;
+        unitPriceSnapshot?: number | null;
+        stockSnapshot?: number | null;
+        lineTotal?: number | null;
+        id?: string | null;
+      }[]
+    | null;
   voucher?: (number | null) | Voucher;
   subtotalAmount?: number | null;
   discountAmount?: number | null;
@@ -1573,6 +1575,30 @@ export interface InternalLinkLog {
   createdAt: string;
 }
 /**
+ * Cấu hình bộ lọc hiển thị ở trang sản phẩm, danh mục và thương hiệu.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-filter-groups".
+ */
+export interface ProductFilterGroup {
+  id: number;
+  label: string;
+  /**
+   * Ví dụ: attribute_phong-cach sẽ tạo URL dạng ?attribute_phong-cach=thanh-lich
+   */
+  queryKey: string;
+  enabled?: boolean | null;
+  sortOrder?: number | null;
+  sourceType: 'brand' | 'category' | 'attribute' | 'fragrance-note' | 'price';
+  attribute?: (number | null) | Attribute;
+  displayType: 'checkbox' | 'radio' | 'select' | 'chips' | 'range';
+  showOn?: ('products' | 'categories' | 'brands' | 'search')[] | null;
+  maxOptions?: number | null;
+  collapsedByDefault?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -1580,14 +1606,14 @@ export interface PayloadKv {
   id: number;
   key: string;
   data:
-  | {
-    [k: string]: unknown;
-  }
-  | unknown[]
-  | string
-  | number
-  | boolean
-  | null;
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1596,104 +1622,108 @@ export interface PayloadKv {
 export interface PayloadLockedDocument {
   id: number;
   document?:
-  | ({
-    relationTo: 'users';
-    value: number | User;
-  } | null)
-  | ({
-    relationTo: 'media';
-    value: number | Media;
-  } | null)
-  | ({
-    relationTo: 'brands';
-    value: number | Brand;
-  } | null)
-  | ({
-    relationTo: 'products';
-    value: number | Product;
-  } | null)
-  | ({
-    relationTo: 'categories';
-    value: number | Category;
-  } | null)
-  | ({
-    relationTo: 'orders';
-    value: number | Order;
-  } | null)
-  | ({
-    relationTo: 'posts';
-    value: number | Post;
-  } | null)
-  | ({
-    relationTo: 'blog-authors';
-    value: number | BlogAuthor;
-  } | null)
-  | ({
-    relationTo: 'post-categories';
-    value: number | PostCategory;
-  } | null)
-  | ({
-    relationTo: 'messages';
-    value: number | Message;
-  } | null)
-  | ({
-    relationTo: 'chat-profiles';
-    value: number | ChatProfile;
-  } | null)
-  | ({
-    relationTo: 'vouchers';
-    value: number | Voucher;
-  } | null)
-  | ({
-    relationTo: 'redirects';
-    value: number | Redirect;
-  } | null)
-  | ({
-    relationTo: 'attributes';
-    value: number | Attribute;
-  } | null)
-  | ({
-    relationTo: 'attribute-values';
-    value: number | AttributeValue;
-  } | null)
-  | ({
-    relationTo: 'carts';
-    value: number | Cart;
-  } | null)
-  | ({
-    relationTo: 'fragrance-notes';
-    value: number | FragranceNote;
-  } | null)
-  | ({
-    relationTo: 'reviews';
-    value: number | Review;
-  } | null)
-  | ({
-    relationTo: 'blog-comments';
-    value: number | BlogComment;
-  } | null)
-  | ({
-    relationTo: 'voucher-redemptions';
-    value: number | VoucherRedemption;
-  } | null)
-  | ({
-    relationTo: 'internal-link-rules';
-    value: number | InternalLinkRule;
-  } | null)
-  | ({
-    relationTo: 'internal-link-logs';
-    value: number | InternalLinkLog;
-  } | null);
+    | ({
+        relationTo: 'users';
+        value: number | User;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'brands';
+        value: number | Brand;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'blog-authors';
+        value: number | BlogAuthor;
+      } | null)
+    | ({
+        relationTo: 'post-categories';
+        value: number | PostCategory;
+      } | null)
+    | ({
+        relationTo: 'messages';
+        value: number | Message;
+      } | null)
+    | ({
+        relationTo: 'chat-profiles';
+        value: number | ChatProfile;
+      } | null)
+    | ({
+        relationTo: 'vouchers';
+        value: number | Voucher;
+      } | null)
+    | ({
+        relationTo: 'redirects';
+        value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'attributes';
+        value: number | Attribute;
+      } | null)
+    | ({
+        relationTo: 'attribute-values';
+        value: number | AttributeValue;
+      } | null)
+    | ({
+        relationTo: 'carts';
+        value: number | Cart;
+      } | null)
+    | ({
+        relationTo: 'fragrance-notes';
+        value: number | FragranceNote;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: number | Review;
+      } | null)
+    | ({
+        relationTo: 'blog-comments';
+        value: number | BlogComment;
+      } | null)
+    | ({
+        relationTo: 'voucher-redemptions';
+        value: number | VoucherRedemption;
+      } | null)
+    | ({
+        relationTo: 'internal-link-rules';
+        value: number | InternalLinkRule;
+      } | null)
+    | ({
+        relationTo: 'internal-link-logs';
+        value: number | InternalLinkLog;
+      } | null)
+    | ({
+        relationTo: 'product-filter-groups';
+        value: number | ProductFilterGroup;
+      } | null);
   globalSlug?: string | null;
   user:
-  | {
-    relationTo: 'users';
-    value: number | User;
-  }
-  | {
-    relationTo: 'chat-profiles';
-    value: number | ChatProfile;
-  };
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'chat-profiles';
+        value: number | ChatProfile;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -1704,24 +1734,24 @@ export interface PayloadLockedDocument {
 export interface PayloadPreference {
   id: number;
   user:
-  | {
-    relationTo: 'users';
-    value: number | User;
-  }
-  | {
-    relationTo: 'chat-profiles';
-    value: number | ChatProfile;
-  };
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'chat-profiles';
+        value: number | ChatProfile;
+      };
   key?: string | null;
   value?:
-  | {
-    [k: string]: unknown;
-  }
-  | unknown[]
-  | string
-  | number
-  | boolean
-  | null;
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1751,12 +1781,12 @@ export interface UsersSelect<T extends boolean = true> {
   loginAttempts?: T;
   lockUntil?: T;
   sessions?:
-  | T
-  | {
-    id?: T;
-    createdAt?: T;
-    expiresAt?: T;
-  };
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1784,69 +1814,69 @@ export interface MediaSelect<T extends boolean = true> {
   focalX?: T;
   focalY?: T;
   sizes?:
-  | T
-  | {
-    thumbnail?:
     | T
     | {
-      url?: T;
-      width?: T;
-      height?: T;
-      mimeType?: T;
-      filesize?: T;
-      filename?: T;
-    };
-    card?:
-    | T
-    | {
-      url?: T;
-      width?: T;
-      height?: T;
-      mimeType?: T;
-      filesize?: T;
-      filename?: T;
-    };
-    blogCard?:
-    | T
-    | {
-      url?: T;
-      width?: T;
-      height?: T;
-      mimeType?: T;
-      filesize?: T;
-      filename?: T;
-    };
-    heroMobile?:
-    | T
-    | {
-      url?: T;
-      width?: T;
-      height?: T;
-      mimeType?: T;
-      filesize?: T;
-      filename?: T;
-    };
-    heroTablet?:
-    | T
-    | {
-      url?: T;
-      width?: T;
-      height?: T;
-      mimeType?: T;
-      filesize?: T;
-      filename?: T;
-    };
-    heroDesktop?:
-    | T
-    | {
-      url?: T;
-      width?: T;
-      height?: T;
-      mimeType?: T;
-      filesize?: T;
-      filename?: T;
-    };
-  };
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        blogCard?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        heroMobile?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        heroTablet?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        heroDesktop?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1854,62 +1884,62 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface BrandsSelect<T extends boolean = true> {
   internalLinking?:
-  | T
-  | {
-    disableAutoLinks?: T;
-    maxLinksOverride?: T;
-    excludeKeywords?:
     | T
     | {
-      keyword?: T;
-      id?: T;
-    };
-  };
+        disableAutoLinks?: T;
+        maxLinksOverride?: T;
+        excludeKeywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+      };
   name?: T;
   slug?: T;
   logo?: T;
   description?: T;
   isFeatured?: T;
   seo?:
-  | T
-  | {
-    metaTitle?: T;
-    metaDescription?: T;
-    focusKeyword?: T;
-    breadcrumbLabel?: T;
-    ogTitle?: T;
-    ogDescription?: T;
-    ogImage?: T;
-    twitterImage?: T;
-    robotsIndex?: T;
-    robotsFollow?: T;
-    canonicalOverride?: T;
-    sitemapInclude?: T;
-    sitemapPriority?: T;
-    sitemapChangeFrequency?: T;
-    schemaType?: T;
-    customJsonLd?: T;
-  };
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        breadcrumbLabel?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        twitterImage?: T;
+        robotsIndex?: T;
+        robotsFollow?: T;
+        canonicalOverride?: T;
+        sitemapInclude?: T;
+        sitemapPriority?: T;
+        sitemapChangeFrequency?: T;
+        schemaType?: T;
+        customJsonLd?: T;
+      };
   h1Override?: T;
   introHtml?: T;
   bottomContentHtml?: T;
   faq?:
-  | T
-  | {
-    question?: T;
-    answer?: T;
-    id?: T;
-  };
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
   featuredProducts?: T;
   indexableFacets?:
-  | T
-  | {
-    key?: T;
-    value?: T;
-    metaTitle?: T;
-    metaDescription?: T;
-    id?: T;
-  };
+    | T
+    | {
+        key?: T;
+        value?: T;
+        metaTitle?: T;
+        metaDescription?: T;
+        id?: T;
+      };
   noindexWhenEmpty?: T;
   canonicalToParent?: T;
   thumbnail?: T;
@@ -1926,17 +1956,17 @@ export interface BrandsSelect<T extends boolean = true> {
  */
 export interface ProductsSelect<T extends boolean = true> {
   internalLinking?:
-  | T
-  | {
-    disableAutoLinks?: T;
-    maxLinksOverride?: T;
-    excludeKeywords?:
     | T
     | {
-      keyword?: T;
-      id?: T;
-    };
-  };
+        disableAutoLinks?: T;
+        maxLinksOverride?: T;
+        excludeKeywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+      };
   seoStatus?: T;
   relatedProduct?: T;
   title?: T;
@@ -1947,92 +1977,92 @@ export interface ProductsSelect<T extends boolean = true> {
   categories?: T;
   productType?: T;
   price?:
-  | T
-  | {
-    basePrice?: T;
-    salePrice?: T;
-    stock?: T;
-  };
+    | T
+    | {
+        basePrice?: T;
+        salePrice?: T;
+        stock?: T;
+      };
   images?:
-  | T
-  | {
-    image?: T;
-    id?: T;
-  };
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
   shortDescription?: T;
   specifications?:
-  | T
-  | {
-    label?: T;
-    value?: T;
-    id?: T;
-  };
+    | T
+    | {
+        label?: T;
+        value?: T;
+        id?: T;
+      };
   productAttributes?:
-  | T
-  | {
-    attribute?: T;
-    values?: T;
-    numericValue?: T;
-    booleanValue?: T;
-    textValue?: T;
-    id?: T;
-  };
+    | T
+    | {
+        attribute?: T;
+        values?: T;
+        numericValue?: T;
+        booleanValue?: T;
+        textValue?: T;
+        id?: T;
+      };
   fragranceProfile?:
-  | T
-  | {
-    topNotes?: T;
-    middleNotes?: T;
-    baseNotes?: T;
-    longevityScore?: T;
-    sillageScore?: T;
-  };
+    | T
+    | {
+        topNotes?: T;
+        middleNotes?: T;
+        baseNotes?: T;
+        longevityScore?: T;
+        sillageScore?: T;
+      };
   variants?:
-  | T
-  | {
-    name?: T;
-    sku?: T;
-    wpVariationId?: T;
-    isDefault?: T;
-    optionValues?: T;
-    basePrice?: T;
-    salePrice?: T;
-    stock?: T;
-    image?: T;
-    isActive?: T;
-    id?: T;
-  };
+    | T
+    | {
+        name?: T;
+        sku?: T;
+        wpVariationId?: T;
+        isDefault?: T;
+        optionValues?: T;
+        basePrice?: T;
+        salePrice?: T;
+        stock?: T;
+        image?: T;
+        isActive?: T;
+        id?: T;
+      };
   description?: T;
   isCombo?: T;
   comboItems?: T;
   seoTitle?: T;
   seoDescription?: T;
   faq?:
-  | T
-  | {
-    question?: T;
-    answer?: T;
-    id?: T;
-  };
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
   seo?:
-  | T
-  | {
-    metaTitle?: T;
-    metaDescription?: T;
-    focusKeyword?: T;
-    breadcrumbLabel?: T;
-    ogTitle?: T;
-    ogDescription?: T;
-    ogImage?: T;
-    twitterImage?: T;
-    robotsIndex?: T;
-    robotsFollow?: T;
-    canonicalOverride?: T;
-    sitemapInclude?: T;
-    sitemapPriority?: T;
-    sitemapChangeFrequency?: T;
-    schemaType?: T;
-    customJsonLd?: T;
-  };
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        breadcrumbLabel?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        twitterImage?: T;
+        robotsIndex?: T;
+        robotsFollow?: T;
+        canonicalOverride?: T;
+        sitemapInclude?: T;
+        sitemapPriority?: T;
+        sitemapChangeFrequency?: T;
+        schemaType?: T;
+        customJsonLd?: T;
+      };
   slug?: T;
   averageRating?: T;
   reviewCount?: T;
@@ -2051,46 +2081,46 @@ export interface ProductsSelect<T extends boolean = true> {
  */
 export interface CategoriesSelect<T extends boolean = true> {
   internalLinking?:
-  | T
-  | {
-    disableAutoLinks?: T;
-    maxLinksOverride?: T;
-    excludeKeywords?:
     | T
     | {
-      keyword?: T;
-      id?: T;
-    };
-  };
+        disableAutoLinks?: T;
+        maxLinksOverride?: T;
+        excludeKeywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+      };
   name?: T;
   image?: T;
   description?: T;
   slug?: T;
   parent?: T;
   filterProfile?:
-  | T
-  | {
-    preset?: T;
-    inheritParentProfile?: T;
-    coreFilters?:
     | T
     | {
-      brand?: T;
-      category?: T;
-      price?: T;
-      availability?: T;
-      sale?: T;
-      rating?: T;
-    };
-    showFragranceNotes?: T;
-    facetKeys?:
-    | T
-    | {
-      key?: T;
-      label?: T;
-      id?: T;
-    };
-  };
+        preset?: T;
+        inheritParentProfile?: T;
+        coreFilters?:
+          | T
+          | {
+              brand?: T;
+              category?: T;
+              price?: T;
+              availability?: T;
+              sale?: T;
+              rating?: T;
+            };
+        showFragranceNotes?: T;
+        facetKeys?:
+          | T
+          | {
+              key?: T;
+              label?: T;
+              id?: T;
+            };
+      };
   displayName?: T;
   taxonomyType?: T;
   seoIndex?: T;
@@ -2103,45 +2133,45 @@ export interface CategoriesSelect<T extends boolean = true> {
   redirectTo?: T;
   siloNotes?: T;
   seo?:
-  | T
-  | {
-    metaTitle?: T;
-    metaDescription?: T;
-    focusKeyword?: T;
-    breadcrumbLabel?: T;
-    ogTitle?: T;
-    ogDescription?: T;
-    ogImage?: T;
-    twitterImage?: T;
-    robotsIndex?: T;
-    robotsFollow?: T;
-    canonicalOverride?: T;
-    sitemapInclude?: T;
-    sitemapPriority?: T;
-    sitemapChangeFrequency?: T;
-    schemaType?: T;
-    customJsonLd?: T;
-  };
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        breadcrumbLabel?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        twitterImage?: T;
+        robotsIndex?: T;
+        robotsFollow?: T;
+        canonicalOverride?: T;
+        sitemapInclude?: T;
+        sitemapPriority?: T;
+        sitemapChangeFrequency?: T;
+        schemaType?: T;
+        customJsonLd?: T;
+      };
   h1Override?: T;
   introHtml?: T;
   bottomContentHtml?: T;
   faq?:
-  | T
-  | {
-    question?: T;
-    answer?: T;
-    id?: T;
-  };
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
   featuredProducts?: T;
   indexableFacets?:
-  | T
-  | {
-    key?: T;
-    value?: T;
-    metaTitle?: T;
-    metaDescription?: T;
-    id?: T;
-  };
+    | T
+    | {
+        key?: T;
+        value?: T;
+        metaTitle?: T;
+        metaDescription?: T;
+        id?: T;
+      };
   noindexWhenEmpty?: T;
   canonicalToParent?: T;
   thumbnail?: T;
@@ -2159,40 +2189,40 @@ export interface CategoriesSelect<T extends boolean = true> {
 export interface OrdersSelect<T extends boolean = true> {
   customer?: T;
   customerInfo?:
-  | T
-  | {
-    fullName?: T;
-    phone?: T;
-    email?: T;
-    address?: T;
-    province?: T;
-    district?: T;
-    ward?: T;
-  };
+    | T
+    | {
+        fullName?: T;
+        phone?: T;
+        email?: T;
+        address?: T;
+        province?: T;
+        district?: T;
+        ward?: T;
+      };
   deliveryMethod?: T;
   items?:
-  | T
-  | {
-    product?: T;
-    variantId?: T;
-    productTitleSnapshot?: T;
-    variantNameSnapshot?: T;
-    skuSnapshot?: T;
-    quantity?: T;
-    priceAtPurchase?: T;
-    id?: T;
-  };
+    | T
+    | {
+        product?: T;
+        variantId?: T;
+        productTitleSnapshot?: T;
+        variantNameSnapshot?: T;
+        skuSnapshot?: T;
+        quantity?: T;
+        priceAtPurchase?: T;
+        id?: T;
+      };
   totalAmount?: T;
   paymentMethod?: T;
   paymentStatus?: T;
   status?: T;
   fundiin?:
-  | T
-  | {
-    transactionId?: T;
-    paymentStatus?: T;
-    orderToken?: T;
-  };
+    | T
+    | {
+        transactionId?: T;
+        paymentStatus?: T;
+        orderToken?: T;
+      };
   subtotalAmount?: T;
   discountAmount?: T;
   shippingFee?: T;
@@ -2207,17 +2237,17 @@ export interface OrdersSelect<T extends boolean = true> {
  */
 export interface PostsSelect<T extends boolean = true> {
   internalLinking?:
-  | T
-  | {
-    disableAutoLinks?: T;
-    maxLinksOverride?: T;
-    excludeKeywords?:
     | T
     | {
-      keyword?: T;
-      id?: T;
-    };
-  };
+        disableAutoLinks?: T;
+        maxLinksOverride?: T;
+        excludeKeywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+      };
   title?: T;
   slug?: T;
   status?: T;
@@ -2225,56 +2255,56 @@ export interface PostsSelect<T extends boolean = true> {
   categories?: T;
   authorProfile?: T;
   reviewer?:
-  | T
-  | {
-    name?: T;
-    title?: T;
-    url?: T;
-    reviewedAt?: T;
-  };
-  viewCount?: T;
-  rating?:
-  | T
-  | {
-    average?: T;
-    count?: T;
-    total?: T;
-  };
-  content?: T;
-  faq?:
-  | T
-  | {
-    question?: T;
-    answer?: T;
-    id?: T;
-  };
-  excerpt?: T;
-  seo?:
-  | T
-  | {
-    metaTitle?: T;
-    metaDescription?: T;
-    focusKeyword?: T;
-    breadcrumbLabel?: T;
-    keywords?:
     | T
     | {
-      keyword?: T;
-      id?: T;
-    };
-    ogTitle?: T;
-    ogDescription?: T;
-    ogImage?: T;
-    twitterImage?: T;
-    robotsIndex?: T;
-    robotsFollow?: T;
-    canonicalOverride?: T;
-    sitemapInclude?: T;
-    sitemapPriority?: T;
-    sitemapChangeFrequency?: T;
-    schemaType?: T;
-    customJsonLd?: T;
-  };
+        name?: T;
+        title?: T;
+        url?: T;
+        reviewedAt?: T;
+      };
+  viewCount?: T;
+  rating?:
+    | T
+    | {
+        average?: T;
+        count?: T;
+        total?: T;
+      };
+  content?: T;
+  faq?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  excerpt?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        breadcrumbLabel?: T;
+        keywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        twitterImage?: T;
+        robotsIndex?: T;
+        robotsFollow?: T;
+        canonicalOverride?: T;
+        sitemapInclude?: T;
+        sitemapPriority?: T;
+        sitemapChangeFrequency?: T;
+        schemaType?: T;
+        customJsonLd?: T;
+      };
   wpId?: T;
   sourceUrl?: T;
   importNotes?: T;
@@ -2293,32 +2323,32 @@ export interface BlogAuthorsSelect<T extends boolean = true> {
   bio?: T;
   url?: T;
   sameAs?:
-  | T
-  | {
-    url?: T;
-    id?: T;
-  };
+    | T
+    | {
+        url?: T;
+        id?: T;
+      };
   isDefault?: T;
   seo?:
-  | T
-  | {
-    metaTitle?: T;
-    metaDescription?: T;
-    focusKeyword?: T;
-    breadcrumbLabel?: T;
-    ogTitle?: T;
-    ogDescription?: T;
-    ogImage?: T;
-    twitterImage?: T;
-    robotsIndex?: T;
-    robotsFollow?: T;
-    canonicalOverride?: T;
-    sitemapInclude?: T;
-    sitemapPriority?: T;
-    sitemapChangeFrequency?: T;
-    schemaType?: T;
-    customJsonLd?: T;
-  };
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        breadcrumbLabel?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        twitterImage?: T;
+        robotsIndex?: T;
+        robotsFollow?: T;
+        canonicalOverride?: T;
+        sitemapInclude?: T;
+        sitemapPriority?: T;
+        sitemapChangeFrequency?: T;
+        schemaType?: T;
+        customJsonLd?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2328,17 +2358,17 @@ export interface BlogAuthorsSelect<T extends boolean = true> {
  */
 export interface PostCategoriesSelect<T extends boolean = true> {
   internalLinking?:
-  | T
-  | {
-    disableAutoLinks?: T;
-    maxLinksOverride?: T;
-    excludeKeywords?:
     | T
     | {
-      keyword?: T;
-      id?: T;
-    };
-  };
+        disableAutoLinks?: T;
+        maxLinksOverride?: T;
+        excludeKeywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+      };
   title?: T;
   slug?: T;
   description?: T;
@@ -2355,43 +2385,43 @@ export interface PostCategoriesSelect<T extends boolean = true> {
   redirectTo?: T;
   siloNotes?: T;
   seo?:
-  | T
-  | {
-    metaTitle?: T;
-    metaDescription?: T;
-    focusKeyword?: T;
-    breadcrumbLabel?: T;
-    ogTitle?: T;
-    ogDescription?: T;
-    ogImage?: T;
-    twitterImage?: T;
-    robotsIndex?: T;
-    robotsFollow?: T;
-    canonicalOverride?: T;
-    sitemapInclude?: T;
-    sitemapPriority?: T;
-    sitemapChangeFrequency?: T;
-    schemaType?: T;
-    customJsonLd?: T;
-  };
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        focusKeyword?: T;
+        breadcrumbLabel?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        twitterImage?: T;
+        robotsIndex?: T;
+        robotsFollow?: T;
+        canonicalOverride?: T;
+        sitemapInclude?: T;
+        sitemapPriority?: T;
+        sitemapChangeFrequency?: T;
+        schemaType?: T;
+        customJsonLd?: T;
+      };
   h1Override?: T;
   introHtml?: T;
   bottomContentHtml?: T;
   faq?:
-  | T
-  | {
-    question?: T;
-    answer?: T;
-    id?: T;
-  };
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
   featuredPosts?: T;
   internalLinks?:
-  | T
-  | {
-    label?: T;
-    url?: T;
-    id?: T;
-  };
+    | T
+    | {
+        label?: T;
+        url?: T;
+        id?: T;
+      };
   noindexWhenEmpty?: T;
   thumbnail?: T;
   ogImage?: T;
@@ -2431,12 +2461,12 @@ export interface ChatProfilesSelect<T extends boolean = true> {
   loginAttempts?: T;
   lockUntil?: T;
   sessions?:
-  | T
-  | {
-    id?: T;
-    createdAt?: T;
-    expiresAt?: T;
-  };
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2490,12 +2520,12 @@ export interface AttributesSelect<T extends boolean = true> {
   allowsMultiple?: T;
   displayStyle?: T;
   validation?:
-  | T
-  | {
-    min?: T;
-    max?: T;
-    step?: T;
-  };
+    | T
+    | {
+        min?: T;
+        max?: T;
+        step?: T;
+      };
   isActive?: T;
   wooAttributeId?: T;
   wooTaxonomySlug?: T;
@@ -2514,21 +2544,21 @@ export interface AttributeValuesSelect<T extends boolean = true> {
   numericValue?: T;
   booleanValue?: T;
   aliases?:
-  | T
-  | {
-    alias?: T;
-    id?: T;
-  };
+    | T
+    | {
+        alias?: T;
+        id?: T;
+      };
   colorHex?: T;
   image?: T;
   sortOrder?: T;
   metadata?:
-  | T
-  | {
-    key?: T;
-    value?: T;
-    id?: T;
-  };
+    | T
+    | {
+        key?: T;
+        value?: T;
+        id?: T;
+      };
   isActive?: T;
   wooTermId?: T;
   wooTaxonomySlug?: T;
@@ -2544,19 +2574,19 @@ export interface CartsSelect<T extends boolean = true> {
   guestId?: T;
   status?: T;
   items?:
-  | T
-  | {
-    product?: T;
-    variantId?: T;
-    quantity?: T;
-    productTitleSnapshot?: T;
-    variantNameSnapshot?: T;
-    skuSnapshot?: T;
-    unitPriceSnapshot?: T;
-    stockSnapshot?: T;
-    lineTotal?: T;
-    id?: T;
-  };
+    | T
+    | {
+        product?: T;
+        variantId?: T;
+        quantity?: T;
+        productTitleSnapshot?: T;
+        variantNameSnapshot?: T;
+        skuSnapshot?: T;
+        unitPriceSnapshot?: T;
+        stockSnapshot?: T;
+        lineTotal?: T;
+        id?: T;
+      };
   voucher?: T;
   subtotalAmount?: T;
   discountAmount?: T;
@@ -2636,13 +2666,13 @@ export interface InternalLinkRulesSelect<T extends boolean = true> {
   enabled?: T;
   priority?: T;
   keywords?:
-  | T
-  | {
-    keyword?: T;
-    matchType?: T;
-    weight?: T;
-    id?: T;
-  };
+    | T
+    | {
+        keyword?: T;
+        matchType?: T;
+        weight?: T;
+        id?: T;
+      };
   targetType?: T;
   targetUrl?: T;
   scope?: T;
@@ -2676,6 +2706,24 @@ export interface InternalLinkLogsSelect<T extends boolean = true> {
   lastTextPreview?: T;
   lastRunId?: T;
   lastCheckedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-filter-groups_select".
+ */
+export interface ProductFilterGroupsSelect<T extends boolean = true> {
+  label?: T;
+  queryKey?: T;
+  enabled?: T;
+  sortOrder?: T;
+  sourceType?: T;
+  attribute?: T;
+  displayType?: T;
+  showOn?: T;
+  maxOptions?: T;
+  collapsedByDefault?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2726,39 +2774,39 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface SiteSetting {
   id: number;
   heroSliders?:
-  | {
-    imageDesktop: number | Media;
-    imageTablet: number | Media;
-    imageMobile: number | Media;
-    link?: string | null;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        imageDesktop: number | Media;
+        imageTablet: number | Media;
+        imageMobile: number | Media;
+        link?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   header?: {
     logo?: (number | null) | Media;
     navItems?:
-    | {
-      label: string;
-      link: string;
-      /**
-       * Chỉ là nhãn nhóm trong menu, frontend render bằng div/span để không ảnh hưởng cấu trúc heading SEO.
-       */
-      megaGroups?:
       | {
-        title: string;
-        links?:
-        | {
           label: string;
           link: string;
+          /**
+           * Chỉ là nhãn nhóm trong menu, frontend render bằng div/span để không ảnh hưởng cấu trúc heading SEO.
+           */
+          megaGroups?:
+            | {
+                title: string;
+                links?:
+                  | {
+                      label: string;
+                      link: string;
+                      id?: string | null;
+                    }[]
+                  | null;
+                id?: string | null;
+              }[]
+            | null;
           id?: string | null;
         }[]
-        | null;
-        id?: string | null;
-      }[]
       | null;
-      id?: string | null;
-    }[]
-    | null;
   };
   contact?: {
     phone?: string | null;
@@ -2781,30 +2829,30 @@ export interface SiteSetting {
     workingHours?: string | null;
     chatUrl?: string | null;
     social?:
-    | {
-      icon: 'facebook' | 'instagram' | 'youtube' | 'tiktok' | 'zalo';
-      name: string;
-      url: string;
-      id?: string | null;
-    }[]
-    | null;
+      | {
+          icon: 'facebook' | 'instagram' | 'youtube' | 'tiktok' | 'zalo';
+          name: string;
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
     /**
      * Các link ở cột footer Về chúng tôi. Tiêu đề cột chỉ hiển thị bằng div, không dùng thẻ heading.
      */
     aboutLinks?:
-    | {
-      label: string;
-      link: string;
-      id?: string | null;
-    }[]
-    | null;
+      | {
+          label: string;
+          link: string;
+          id?: string | null;
+        }[]
+      | null;
     policyLinks?:
-    | {
-      label: string;
-      link: string;
-      id?: string | null;
-    }[]
-    | null;
+      | {
+          label: string;
+          link: string;
+          id?: string | null;
+        }[]
+      | null;
   };
   flashSale?: {
     enabled?: boolean | null;
@@ -2840,12 +2888,12 @@ export interface AboutPage {
     image?: (number | null) | Media;
     productImage?: (number | null) | Media;
     stats?:
-    | {
-      value?: string | null;
-      label?: string | null;
-      id?: string | null;
-    }[]
-    | null;
+      | {
+          value?: string | null;
+          label?: string | null;
+          id?: string | null;
+        }[]
+      | null;
   };
   story?: {
     eyebrow?: string | null;
@@ -2870,28 +2918,28 @@ export interface AboutPage {
     ctaLabel?: string | null;
     ctaHref?: string | null;
     cards?:
-    | {
-      image?: (number | null) | Media;
-      title?: string | null;
-      description?: string | null;
-      id?: string | null;
-    }[]
-    | null;
+      | {
+          image?: (number | null) | Media;
+          title?: string | null;
+          description?: string | null;
+          id?: string | null;
+        }[]
+      | null;
   };
   serviceHighlights?:
-  | {
-    title?: string | null;
-    description?: string | null;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        title?: string | null;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   values?:
-  | {
-    title?: string | null;
-    description?: string | null;
-    id?: string | null;
-  }[]
-  | null;
+    | {
+        title?: string | null;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   showroom?: {
     image?: (number | null) | Media;
     heading?: string | null;
@@ -2911,107 +2959,107 @@ export interface AboutPage {
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
   heroSliders?:
-  | T
-  | {
-    imageDesktop?: T;
-    imageTablet?: T;
-    imageMobile?: T;
-    link?: T;
-    id?: T;
-  };
-  header?:
-  | T
-  | {
-    logo?: T;
-    navItems?:
     | T
     | {
-      label?: T;
-      link?: T;
-      megaGroups?:
-      | T
-      | {
-        title?: T;
-        links?:
-        | T
-        | {
-          label?: T;
-          link?: T;
-          id?: T;
-        };
+        imageDesktop?: T;
+        imageTablet?: T;
+        imageMobile?: T;
+        link?: T;
         id?: T;
       };
-      id?: T;
-    };
-  };
+  header?:
+    | T
+    | {
+        logo?: T;
+        navItems?:
+          | T
+          | {
+              label?: T;
+              link?: T;
+              megaGroups?:
+                | T
+                | {
+                    title?: T;
+                    links?:
+                      | T
+                      | {
+                          label?: T;
+                          link?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                  };
+              id?: T;
+            };
+      };
   contact?:
-  | T
-  | {
-    phone?: T;
-    email?: T;
-    zalo?: T;
-    zaloLink?: T;
-    address?: T;
-    facebookUrl?: T;
-    googleMapUrl?: T;
-  };
+    | T
+    | {
+        phone?: T;
+        email?: T;
+        zalo?: T;
+        zaloLink?: T;
+        address?: T;
+        facebookUrl?: T;
+        googleMapUrl?: T;
+      };
   payment?:
-  | T
-  | {
-    bankName?: T;
-    bankAccountName?: T;
-    bankAccountNumber?: T;
-    bankBranch?: T;
-    bankQrImage?: T;
-  };
+    | T
+    | {
+        bankName?: T;
+        bankAccountName?: T;
+        bankAccountNumber?: T;
+        bankBranch?: T;
+        bankQrImage?: T;
+      };
   footer?:
-  | T
-  | {
-    description?: T;
-    workingHours?: T;
-    chatUrl?: T;
-    social?:
     | T
     | {
-      icon?: T;
-      name?: T;
-      url?: T;
-      id?: T;
-    };
-    aboutLinks?:
-    | T
-    | {
-      label?: T;
-      link?: T;
-      id?: T;
-    };
-    policyLinks?:
-    | T
-    | {
-      label?: T;
-      link?: T;
-      id?: T;
-    };
-  };
+        description?: T;
+        workingHours?: T;
+        chatUrl?: T;
+        social?:
+          | T
+          | {
+              icon?: T;
+              name?: T;
+              url?: T;
+              id?: T;
+            };
+        aboutLinks?:
+          | T
+          | {
+              label?: T;
+              link?: T;
+              id?: T;
+            };
+        policyLinks?:
+          | T
+          | {
+              label?: T;
+              link?: T;
+              id?: T;
+            };
+      };
   flashSale?:
-  | T
-  | {
-    enabled?: T;
-    endTime?: T;
-    vouchers?: T;
-  };
+    | T
+    | {
+        enabled?: T;
+        endTime?: T;
+        vouchers?: T;
+      };
   internalLinking?:
-  | T
-  | {
-    enabled?: T;
-    previewOnly?: T;
-    maxLinksPerPost?: T;
-    maxLinksPerProduct?: T;
-    maxLinksPerLanding?: T;
-    maxLinksPerParagraph?: T;
-    maxSameTargetUrl?: T;
-    maxSameAnchor?: T;
-  };
+    | T
+    | {
+        enabled?: T;
+        previewOnly?: T;
+        maxLinksPerPost?: T;
+        maxLinksPerProduct?: T;
+        maxLinksPerLanding?: T;
+        maxLinksPerParagraph?: T;
+        maxSameTargetUrl?: T;
+        maxSameAnchor?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -3022,76 +3070,76 @@ export interface SiteSettingsSelect<T extends boolean = true> {
  */
 export interface AboutPageSelect<T extends boolean = true> {
   hero?:
-  | T
-  | {
-    eyebrow?: T;
-    title?: T;
-    subtitle?: T;
-    image?: T;
-    productImage?: T;
-    stats?:
     | T
     | {
-      value?: T;
-      label?: T;
-      id?: T;
-    };
-  };
+        eyebrow?: T;
+        title?: T;
+        subtitle?: T;
+        image?: T;
+        productImage?: T;
+        stats?:
+          | T
+          | {
+              value?: T;
+              label?: T;
+              id?: T;
+            };
+      };
   story?:
-  | T
-  | {
-    eyebrow?: T;
-    heading?: T;
-    summary?: T;
-    signature?: T;
-    content?: T;
-    image?: T;
-    videoUrl?: T;
-    videoTitle?: T;
-  };
-  difference?:
-  | T
-  | {
-    eyebrow?: T;
-    heading?: T;
-    intro?: T;
-    ctaLabel?: T;
-    ctaHref?: T;
-    cards?:
     | T
     | {
-      image?: T;
-      title?: T;
-      description?: T;
-      id?: T;
-    };
-  };
+        eyebrow?: T;
+        heading?: T;
+        summary?: T;
+        signature?: T;
+        content?: T;
+        image?: T;
+        videoUrl?: T;
+        videoTitle?: T;
+      };
+  difference?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+        ctaLabel?: T;
+        ctaHref?: T;
+        cards?:
+          | T
+          | {
+              image?: T;
+              title?: T;
+              description?: T;
+              id?: T;
+            };
+      };
   serviceHighlights?:
-  | T
-  | {
-    title?: T;
-    description?: T;
-    id?: T;
-  };
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
+      };
   values?:
-  | T
-  | {
-    title?: T;
-    description?: T;
-    id?: T;
-  };
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
+      };
   showroom?:
-  | T
-  | {
-    image?: T;
-    heading?: T;
-    ctaLabel?: T;
-    ctaHref?: T;
-    locationTitle?: T;
-    locationText?: T;
-    channelsTitle?: T;
-    channelsText?: T;
-  };
+    | T
+    | {
+        image?: T;
+        heading?: T;
+        ctaLabel?: T;
+        ctaHref?: T;
+        locationTitle?: T;
+        locationText?: T;
+        channelsTitle?: T;
+        channelsText?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -3116,5 +3164,5 @@ export interface Auth {
 
 
 declare module 'payload' {
-  export interface GeneratedTypes extends Config { }
+  export interface GeneratedTypes extends Config {}
 }
