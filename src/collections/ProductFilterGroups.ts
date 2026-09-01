@@ -1,17 +1,7 @@
 import type { Access, CollectionConfig } from 'payload'
 
-const STAFF_ROLES = new Set(['admin', 'manager', 'editor'])
-
 const staffOnly: Access = ({ req }) => {
-    const user = req.user as { role?: string; roles?: string[] } | null | undefined
-
-    if (!user) return false
-    if (typeof user.role === 'string' && STAFF_ROLES.has(user.role)) return true
-    if (Array.isArray(user.roles)) {
-        return user.roles.some((role) => STAFF_ROLES.has(role))
-    }
-
-    return false
+    return Boolean(req.user)
 }
 
 export const ProductFilterGroups: CollectionConfig = {
