@@ -148,9 +148,9 @@ export function appendAdvancedProductWhereConditions(
   searchParams: ProductSearchParams,
 ): void {
   for (const entry of getAttributeFilterEntries(searchParams)) {
-    addAnyStringFilterCondition(
+    addStringFilterCondition(
       conditions,
-      ['productAttributes.values.slug', 'specifications.value'],
+      'productAttributes.values.slug',
       entry.values,
     )
   }
@@ -158,9 +158,9 @@ export function appendAdvancedProductWhereConditions(
   const rewrittenAttributeValue = getFirstSearchParam(searchParams, 'value')
 
   if (getFirstSearchParam(searchParams, 'attribute') && rewrittenAttributeValue) {
-    addAnyStringFilterCondition(
+    addStringFilterCondition(
       conditions,
-      ['productAttributes.values.slug', 'specifications.value'],
+      'productAttributes.values.slug',
       [rewrittenAttributeValue],
     )
   }

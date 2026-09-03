@@ -375,27 +375,24 @@ function buildProductsWhere({
   )
 
   /*
-   * Theo schema hiện tại của MF PARIS, các thuộc tính sản phẩm
-   * được lưu trong specifications.value.
-   *
-   * Mỗi nhóm facet được đặt trong một điều kiện AND riêng:
-   * sản phẩm phải thỏa volume, scent và gender khi chúng cùng xuất hiện.
-   */
+  * Product attributes are the canonical source for product filters.
+  * specifications is kept only for display on product detail pages.
+  */
   addStringFilterCondition(
     conditions,
-    'specifications.value',
+    'productAttributes.values.slug',
     volumeValues,
   )
 
   addStringFilterCondition(
     conditions,
-    'specifications.value',
+    'productAttributes.values.slug',
     scentValues,
   )
 
   addStringFilterCondition(
     conditions,
-    'specifications.value',
+    'productAttributes.values.slug',
     genderValues,
   )
 
@@ -885,11 +882,11 @@ export default async function AllProductsPage({
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
           <aside className="hidden lg:block lg:w-[250px] lg:shrink-0">
             <div className="lc-card rounded-2xl bg-white shadow-sm">
-                <SearchFilters
-                  brands={filterOptions.brands}
-                  categories={filterOptions.categories}
-                  facets={filterOptions.facets}
-                  variant="sidebar"
+              <SearchFilters
+                brands={filterOptions.brands}
+                categories={filterOptions.categories}
+                facets={filterOptions.facets}
+                variant="sidebar"
                 sticky={false}
                 routeContext={{
                   type: 'listing',
