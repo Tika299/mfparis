@@ -727,7 +727,7 @@ async function importRemoteImage({
   const buffer = Buffer.from(arrayBuffer)
   const filename = normalizeFilename(
     getFilenameFromDisposition(response.headers.get('content-disposition')) ||
-      getFilenameFromUrl(sourceUrl, contentType),
+    getFilenameFromUrl(sourceUrl, contentType),
     contentType,
   )
   const title = alt || titleFromFilename(filename) || filename
@@ -953,6 +953,70 @@ async function transformArrayUploadCell({
   return rows
 }
 
+function collectNamedFields(fields: unknown[], names: Set<string>) {
+  for (const field of fields) {
+    if (!field || typeof field !== 'object') continue
+
+    const record = field as AnyRecord
+
+    if (typeof record.name === 'string') {
+      names.add(record.name)
+    }
+
+    if (Array.isArray(record.fields)) {
+      collectNamedFields(record.fields, names)
+    }
+
+    if (Array.isArray(record.tabs)) {
+      for (const tab of record.tabs) {
+        if (tab && typeof tab === 'object' && Array.isArray((tab as AnyRecord).fields)) {
+          collectNamedFields((tab as AnyRecord).fields, names)
+        }
+      }
+    }
+  }
+}
+
+function getImportableFieldNames(payload: Payload, collection: ContentExcelCollection) {
+  const names = new Set<string>()
+  const config = (payload as AnyRecord).collections as AnyRecord | undefined
+  const collectionConfig = config?.[collection] as AnyRecord | undefined
+  const fields = (collectionConfig?.config as AnyRecord | undefined)?.fields
+
+  if (Array.isArray(fields)) {
+    collectNamedFields(fields, names)
+  }
+
+  return names
+}
+
+async function findExistingRowBySlug({
+  payload,
+  collection,
+  slug,
+}: {
+  payload: Payload
+  collection: ContentExcelCollection
+  slug: string
+}) {
+  if (!slug.trim()) return null
+
+  const result = await payload.find({
+    collection: collection as any,
+    depth: 0,
+    limit: 1,
+    overrideAccess: true,
+    pagination: false,
+    where: {
+      slug: {
+        equals: slug.trim(),
+      },
+    },
+  })
+
+  return (result.docs[0] as AnyRecord | undefined) || null
+}
+
 async function importRows({
   payload,
   collection,
@@ -969,7 +1033,7 @@ async function importRows({
   const details: Array<{
     id: string
     fields: string[]
-    status: 'changed' | 'updated' | 'skipped' | 'failed'
+    status: 'changed' | 'created' | 'updated' | 'skipped' | 'failed'
     error?: string
   }> = []
   const mediaStats: ImportMediaStats = {
@@ -977,37 +1041,47 @@ async function importRows({
     mediaDetected: 0,
     mediaReused: 0,
   }
+  const importableFieldNames = getImportableFieldNames(payload, collection)
   let scanned = 0
   let changed = 0
+  let created = 0
   let updated = 0
   let skipped = 0
   let failed = 0
 
   for (const row of rows) {
     scanned += 1
-    const id = row.id
-
-    if (!id) {
-      skipped += 1
-      continue
-    }
+    const id = String(row.id || '').trim()
+    const slug = String(row.slug || '').trim()
 
     try {
-      const original = await payload.findByID({
-        collection: collection as any,
-        id,
-        depth: 0,
-        overrideAccess: true,
-      })
-      const originalRecord = original as AnyRecord
+      let originalRecord: AnyRecord | null = null
+
+      if (id) {
+        originalRecord = (await payload.findByID({
+          collection: collection as any,
+          id,
+          depth: 0,
+          overrideAccess: true,
+        })) as AnyRecord
+      } else if (slug) {
+        originalRecord = await findExistingRowBySlug({
+          payload,
+          collection,
+          slug,
+        })
+      }
+
       const data: AnyRecord = {}
-      const rowTitle = row.title || row.name || originalRecord.title || originalRecord.name || ''
+      const targetId = String(originalRecord?.id || id || slug || scanned)
+      const rowTitle = row.title || row.name || originalRecord?.title || originalRecord?.name || ''
 
       for (const [field, cell] of Object.entries(row)) {
         if (shouldSkipImportField(field, includeReadOnly)) continue
-        if (!(field in originalRecord)) continue
+        if (importableFieldNames.size > 0 && !importableFieldNames.has(field)) continue
 
         const arrayUploadChildField = getArrayUploadChildField(collection, field)
+        const originalValue = originalRecord?.[field]
         let nextValue: unknown
 
         if (isHtmlField(collection, field)) {
@@ -1025,7 +1099,7 @@ async function importRows({
               payload,
               stats: mediaStats,
               title: rowTitle,
-            })) ?? parseCellValue(cell, originalRecord[field])
+            })) ?? parseCellValue(cell, originalValue)
         } else if (arrayUploadChildField) {
           nextValue =
             (await transformArrayUploadCell({
@@ -1035,12 +1109,16 @@ async function importRows({
               payload,
               stats: mediaStats,
               title: rowTitle,
-            })) ?? parseCellValue(cell, originalRecord[field])
+            })) ?? parseCellValue(cell, originalValue)
         } else {
-          nextValue = parseCellValue(cell, originalRecord[field])
+          nextValue = parseCellValue(cell, originalValue)
         }
 
-        if (stableJson(nextValue) !== stableJson(originalRecord[field])) {
+        if (originalRecord) {
+          if (stableJson(nextValue) !== stableJson(originalValue)) {
+            data[field] = nextValue
+          }
+        } else if (String(cell ?? '').trim() !== '') {
           data[field] = nextValue
         }
       }
@@ -1049,29 +1127,46 @@ async function importRows({
 
       if (fields.length === 0) {
         skipped += 1
-        details.push({ id, fields: [], status: 'skipped' })
+        details.push({ id: targetId, fields: [], status: 'skipped' })
         continue
       }
 
       changed += 1
 
-      if (!dryRun) {
+      if (dryRun) {
+        details.push({ id: targetId, fields, status: 'changed' })
+        continue
+      }
+
+      if (originalRecord?.id) {
         await payload.update({
           collection: collection as any,
-          id,
+          id: originalRecord.id,
           depth: 0,
           overrideAccess: true,
           data,
         })
         updated += 1
-        details.push({ id, fields, status: 'updated' })
+        details.push({ id: targetId, fields, status: 'updated' })
       } else {
-        details.push({ id, fields, status: 'changed' })
+        const doc = (await payload.create({
+          collection: collection as any,
+          depth: 0,
+          overrideAccess: true,
+          data,
+        })) as AnyRecord
+
+        created += 1
+        details.push({
+          id: String(doc.id || targetId),
+          fields,
+          status: 'created',
+        })
       }
     } catch (error) {
       failed += 1
       details.push({
-        id,
+        id: id || slug || String(scanned),
         fields: [],
         status: 'failed',
         error: error instanceof Error ? error.message : String(error),
@@ -1081,6 +1176,7 @@ async function importRows({
 
   return {
     changed,
+    created,
     details: details.slice(0, 100),
     failed,
     ...mediaStats,
