@@ -505,27 +505,29 @@ function looksLikeJson(value: string) {
 
 function parseCellValue(cell: string, originalValue: unknown) {
   const value = cell ?? ''
+  const trimmed = value.trim()
+  const normalized = trimmed.toLowerCase()
 
   if (Array.isArray(originalValue) || (originalValue && typeof originalValue === 'object')) {
-    if (!value.trim()) return Array.isArray(originalValue) ? [] : null
+    if (!trimmed) return Array.isArray(originalValue) ? [] : null
     return JSON.parse(value)
   }
 
   if (typeof originalValue === 'number') {
-    if (!value.trim()) return null
+    if (!trimmed) return null
     const numberValue = Number(value)
     if (!Number.isFinite(numberValue)) throw new Error('Gia tri khong phai number: ' + value)
     return numberValue
   }
 
   if (typeof originalValue === 'boolean') {
-    return ['true', '1', 'yes', 'y', 'on'].includes(value.trim().toLowerCase())
+    return ['true', '1', 'yes', 'y', 'on'].includes(normalized)
   }
 
   if (originalValue === null || originalValue === undefined) {
     if (looksLikeJson(value)) return JSON.parse(value)
-    if (value === 'true') return true
-    if (value === 'false') return false
+    if (['true', '1', 'yes', 'y', 'on'].includes(normalized)) return true
+    if (['false', '0', 'no', 'n', 'off'].includes(normalized)) return false
   }
 
   return value
@@ -1017,6 +1019,109 @@ async function findExistingRowBySlug({
   return (result.docs[0] as AnyRecord | undefined) || null
 }
 
+type ImportableFieldInfo = {
+  hasMany: boolean
+  type?: string
+}
+
+function collectImportableFields(fields: unknown[], map: Map<string, ImportableFieldInfo>) {
+  for (const field of fields) {
+    if (!field || typeof field !== 'object') continue
+
+    const record = field as AnyRecord
+
+    if (typeof record.name === 'string') {
+      map.set(record.name, {
+        hasMany: Boolean(record.hasMany),
+        type: typeof record.type === 'string' ? record.type : undefined,
+      })
+    }
+
+    if (Array.isArray(record.fields)) {
+      collectImportableFields(record.fields, map)
+    }
+
+    if (Array.isArray(record.tabs)) {
+      for (const tab of record.tabs) {
+        if (tab && typeof tab === 'object' && Array.isArray((tab as AnyRecord).fields)) {
+          collectImportableFields((tab as AnyRecord).fields, map)
+        }
+      }
+    }
+  }
+}
+
+function getImportableFields(payload: Payload, collection: ContentExcelCollection) {
+  const map = new Map<string, ImportableFieldInfo>()
+  const config = (payload as AnyRecord).collections as AnyRecord | undefined
+  const collectionConfig = config?.[collection] as AnyRecord | undefined
+  const fields = (collectionConfig?.config as AnyRecord | undefined)?.fields
+
+  if (Array.isArray(fields)) {
+    collectImportableFields(fields, map)
+  }
+
+  return map
+}
+
+function parseRelationshipId(value: unknown) {
+  const trimmed = String(value ?? '').trim()
+
+  if (!trimmed) return null
+  if (/^\d+$/.test(trimmed)) return Number(trimmed)
+
+  return trimmed
+}
+
+function parseRelationshipCell(cell: string, fieldInfo: ImportableFieldInfo) {
+  const value = String(cell || '').trim()
+
+  if (!value) return fieldInfo.hasMany ? [] : null
+
+  if (looksLikeJson(value)) {
+    const parsed = JSON.parse(value)
+
+    if (Array.isArray(parsed)) {
+      return parsed.map(parseRelationshipId).filter((item) => item !== null)
+    }
+
+    if (parsed && typeof parsed === 'object' && 'id' in parsed) {
+      return parseRelationshipId((parsed as AnyRecord).id)
+    }
+
+    return parseRelationshipId(parsed)
+  }
+
+  if (fieldInfo.hasMany) {
+    return value
+      .split(/\r?\n|;|,/g)
+      .map(parseRelationshipId)
+      .filter((item) => item !== null)
+  }
+
+  return parseRelationshipId(value)
+}
+
+function parseCheckboxCell(cell: string) {
+  const normalized = String(cell || '').trim().toLowerCase()
+
+  return ['true', '1', 'yes', 'y', 'on'].includes(normalized)
+}
+
+function parseNumberCell(cell: string) {
+  const value = String(cell || '').trim()
+
+  if (!value) return null
+
+  const numberValue = Number(value)
+
+  if (!Number.isFinite(numberValue)) {
+    throw new Error('Gia tri khong phai number: ' + value)
+  }
+
+  return numberValue
+}
+
 async function importRows({
   payload,
   collection,
@@ -1041,7 +1146,7 @@ async function importRows({
     mediaDetected: 0,
     mediaReused: 0,
   }
-  const importableFieldNames = getImportableFieldNames(payload, collection)
+  const importableFields = getImportableFields(payload, collection)
   let scanned = 0
   let changed = 0
   let created = 0
@@ -1078,7 +1183,10 @@ async function importRows({
 
       for (const [field, cell] of Object.entries(row)) {
         if (shouldSkipImportField(field, includeReadOnly)) continue
-        if (importableFieldNames.size > 0 && !importableFieldNames.has(field)) continue
+
+        const fieldInfo = importableFields.get(field)
+
+        if (importableFields.size > 0 && !fieldInfo) continue
 
         const arrayUploadChildField = getArrayUploadChildField(collection, field)
         const originalValue = originalRecord?.[field]
@@ -1110,6 +1218,12 @@ async function importRows({
               stats: mediaStats,
               title: rowTitle,
             })) ?? parseCellValue(cell, originalValue)
+        } else if (fieldInfo?.type === 'relationship') {
+          nextValue = parseRelationshipCell(cell, fieldInfo)
+        } else if (fieldInfo?.type === 'checkbox') {
+          nextValue = parseCheckboxCell(cell)
+        } else if (fieldInfo?.type === 'number') {
+          nextValue = parseNumberCell(cell)
         } else {
           nextValue = parseCellValue(cell, originalValue)
         }
