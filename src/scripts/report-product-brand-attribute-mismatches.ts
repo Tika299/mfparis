@@ -173,9 +173,30 @@ async function main() {
                 .map((item) => item.id)
                 .filter(Boolean)
 
-            const isMatch =
-                mainBrand.id &&
-                attributeBrandIDs.some((id) => String(id) === String(mainBrand.id))
+            function normalizeCompareText(value: unknown) {
+                return String(value ?? '')
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/đ/g, 'd')
+                    .replace(/Đ/g, 'D')
+                    .toLowerCase()
+                    .replace(/&/g, 'and')
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '')
+            }
+
+            const mainBrandKeys = new Set(
+                [mainBrand.slug, mainBrand.name]
+                    .map(normalizeCompareText)
+                    .filter(Boolean),
+            )
+
+            const attributeBrandKeys = attributeBrandLabels.flatMap((item) => [
+                normalizeCompareText(item.slug),
+                normalizeCompareText(item.name),
+            ])
+
+            const isMatch = attributeBrandKeys.some((key) => mainBrandKeys.has(key))
 
             if (isMatch) {
                 matched += 1
