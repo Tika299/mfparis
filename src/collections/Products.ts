@@ -741,8 +741,7 @@ export const Products: CollectionConfig = {
               type: 'text',
               label: 'SEO Title cũ',
               admin: {
-                description: 'Field cũ từ import. Sẽ được migrate sang SEO > Meta title.',
-                readOnly: true,
+                hidden: true,
               },
             },
             {
@@ -750,9 +749,7 @@ export const Products: CollectionConfig = {
               type: 'textarea',
               label: 'Meta Description cũ',
               admin: {
-                rows: 4,
-                description: 'Field cũ từ import. Sẽ được migrate sang SEO > Meta description.',
-                readOnly: true,
+                hidden: true,
               },
             },
             {
