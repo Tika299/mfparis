@@ -347,7 +347,7 @@ export const Products: CollectionConfig = {
               type: 'array',
               label: 'Thông số tùy chỉnh',
               admin: {
-                description: 'Dùng cho dung tích, xuất xứ, nhóm hương, loại da, nồng độ...',
+                description: 'Chỉ dùng để hiển thị thông số tự do trên trang sản phẩm. Không dùng cho bộ lọc, tìm kiếm hoặc so sánh.',
               },
               fields: [
                 {
@@ -739,14 +739,20 @@ export const Products: CollectionConfig = {
             {
               name: 'seoTitle',
               type: 'text',
-              label: 'SEO Title',
+              label: 'SEO Title cũ',
+              admin: {
+                description: 'Field cũ từ import. Sẽ được migrate sang SEO > Meta title.',
+                readOnly: true,
+              },
             },
             {
               name: 'seoDescription',
               type: 'textarea',
-              label: 'Meta Description',
+              label: 'Meta Description cũ',
               admin: {
                 rows: 4,
+                description: 'Field cũ từ import. Sẽ được migrate sang SEO > Meta description.',
+                readOnly: true,
               },
             },
             {
