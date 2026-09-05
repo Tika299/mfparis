@@ -2,10 +2,14 @@ import { unstable_cache } from 'next/cache'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import Link from 'next/link'
-import { ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react'
-import { OptimizedImage } from '@/components/OptimizedImage'
+import { ChevronRight, LayoutGrid } from 'lucide-react'
 import { JsonLd } from '@/components/JsonLd'
 import { buildCollectionPageSchemaGraph } from '@/lib/structured-data'
+import {
+    getCategoryChildren,
+    getRelationshipID,
+    type CategoryTreeItem,
+} from '@/lib/categoryTree'
 
 export const metadata = {
     metadataBase: new URL(
@@ -20,35 +24,6 @@ type PageProps = {
     searchParams?: Promise<{
         page?: string
     }>
-}
-
-type RelationshipValue =
-    | string
-    | number
-    | {
-        id?: string | number | null
-    }
-    | null
-    | undefined
-
-function getRelationshipID(value: RelationshipValue): string | number | null {
-    if (typeof value === 'string' || typeof value === 'number') {
-        return value
-    }
-
-    if (
-        value &&
-        typeof value === 'object' &&
-        ('id' in value)
-    ) {
-        const id = value.id
-
-        if (typeof id === 'string' || typeof id === 'number') {
-            return id
-        }
-    }
-
-    return null
 }
 
 function getAncestorCategoryIDs(
@@ -108,9 +83,13 @@ const getCachedCategoriesPageData = unstable_cache(
                     depth: 1,
                     pagination: false,
                     overrideAccess: true,
+                    sort: 'name',
                     select: {
                         id: true,
+                        name: true,
+                        slug: true,
                         parent: true,
+                        image: true,
                     },
                 }),
             ])
@@ -161,6 +140,12 @@ const getCachedCategoriesPageData = unstable_cache(
             }
         }
 
+        const allCategoriesWithProductCount = allCategoriesRes.docs.map((category: any) => ({
+            ...category,
+            productCount:
+                productCountByCategory.get(String(category.id)) ?? 0,
+        }))
+
         return {
             ...categoriesRes,
             docs: categoriesRes.docs.map((category: any) => ({
@@ -168,6 +153,7 @@ const getCachedCategoriesPageData = unstable_cache(
                 productCount:
                     productCountByCategory.get(String(category.id)) ?? 0,
             })),
+            allCategories: allCategoriesWithProductCount,
         }
     },
     ['all-categories-page-data-v1'],
@@ -193,25 +179,14 @@ export default async function AllCategoriesPage({
             limit,
         )
 
-    const totalPages = categoriesRes.totalPages || 1
+    const allCategories = (categoriesRes as any).allCategories as CategoryTreeItem[]
 
-    const getPageHref = (page: number) => {
-        return page <= 1
-            ? '/categories'
-            : `/categories?page=${page}`
-    }
+    const rootCategories = allCategories
+        .filter((category) => !getRelationshipID(category.parent))
+        .sort((left, right) =>
+            String(left.name || '').localeCompare(String(right.name || ''), 'vi'),
+        )
 
-    const getPageNumbers = () => {
-        const pages: number[] = []
-        const start = Math.max(1, currentPage - 2)
-        const end = Math.min(totalPages, currentPage + 2)
-
-        for (let i = start; i <= end; i++) {
-            pages.push(i)
-        }
-
-        return pages
-    }
     const schemaGraph = buildCollectionPageSchemaGraph({
         page: {
             url: currentPage > 1 ? `/categories?page=${currentPage}` : '/categories',
@@ -278,120 +253,106 @@ export default async function AllCategoriesPage({
                     </p>
                 </header>
 
-                {/* GRID DANH MỤC 1:1 */}
-                {categoriesRes.docs.length > 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
-                        {categoriesRes.docs.map((cat: any) => {
+                {/* CÂY DANH MỤC */}
+                {rootCategories.length > 0 ? (
+                    <div className="space-y-6">
+                        {rootCategories.map((rootCategory) => {
+                            const children = getCategoryChildren(rootCategory.id, allCategories)
+
                             return (
-                                <Link
-                                    href={`/categories/${cat.slug}`}
-                                    key={cat.id}
-                                    className="group relative flex flex-col bg-white rounded-[2rem] overflow-hidden shadow-sm border border-white hover:shadow-xl transition-all duration-500"
+                                <section
+                                    key={rootCategory.id}
+                                    className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm md:p-6"
                                 >
-                                    <div className="relative aspect-square w-full overflow-hidden bg-gray-50">
-                                        <OptimizedImage
-                                            media={cat.image}
-                                            size="card"
-                                            alt={cat.name}
-                                            className="group-hover:scale-110 transition-transform duration-1000 ease-in-out"
-                                        />
+                                    <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:flex-row md:items-end md:justify-between">
+                                        <div>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#b72828]">
+                                                Nhóm danh mục
+                                            </p>
 
-                                        <div className="absolute inset-0 bg-black/5 group-hover:bg-black/20 transition-colors duration-500" />
-                                    </div>
+                                            <h2 className="mt-1 text-xl font-black text-gray-950 md:text-2xl">
+                                                <Link
+                                                    href={`/categories/${rootCategory.slug}`}
+                                                    className="transition hover:text-[#b72828]"
+                                                >
+                                                    {rootCategory.name}
+                                                </Link>
+                                            </h2>
 
-                                    <div className="p-6 text-center space-y-2">
-                                        <h3 className="text-lg font-bold text-black group-hover:text-[#b72828] transition-colors duration-300 font-sans uppercase tracking-tight">
-                                            {cat.name}
-                                        </h3>
-
-                                        <div className="flex items-center justify-center gap-2">
-                                            <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">
-                                                View Collection
-                                            </span>
-                                            <ChevronRight
-                                                size={10}
-                                                className="text-[#b72828] group-hover:translate-x-1 transition-transform"
-                                            />
+                                            {'productCount' in rootCategory ? (
+                                                <p className="mt-1 text-xs font-semibold text-gray-500">
+                                                    {Number((rootCategory as any).productCount || 0).toLocaleString('vi-VN')}{' '}
+                                                    sản phẩm
+                                                </p>
+                                            ) : null}
                                         </div>
+
+                                        <Link
+                                            href={`/categories/${rootCategory.slug}`}
+                                            className="inline-flex items-center gap-1 text-xs font-bold text-gray-500 transition hover:text-[#b72828]"
+                                        >
+                                            Xem nhóm này
+                                            <ChevronRight size={14} />
+                                        </Link>
                                     </div>
 
-                                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-[#b72828] group-hover:w-full transition-all duration-500"></div>
-                                </Link>
+                                    {children.length > 0 ? (
+                                        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                            {children.map((child) => {
+                                                const grandchildren = getCategoryChildren(
+                                                    child.id,
+                                                    allCategories,
+                                                ).slice(0, 5)
+
+                                                return (
+                                                    <Link
+                                                        key={child.id}
+                                                        href={`/categories/${child.slug}`}
+                                                        className="rounded-xl border border-gray-100 bg-gray-50 p-4 transition hover:border-[#f0b3ad] hover:bg-[#fff8f7]"
+                                                    >
+                                                        <h3 className="text-sm font-black text-gray-900">
+                                                            {child.name}
+                                                        </h3>
+
+                                                        {'productCount' in child ? (
+                                                            <p className="mt-1 text-[11px] font-semibold text-gray-500">
+                                                                {Number((child as any).productCount || 0).toLocaleString('vi-VN')}{' '}
+                                                                sản phẩm
+                                                            </p>
+                                                        ) : null}
+
+                                                        {grandchildren.length > 0 ? (
+                                                            <div className="mt-3 flex flex-wrap gap-1.5">
+                                                                {grandchildren.map((grandchild) => (
+                                                                    <span
+                                                                        key={grandchild.id}
+                                                                        className="max-w-full truncate rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-600"
+                                                                    >
+                                                                        {grandchild.name}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        ) : null}
+                                                    </Link>
+                                                )
+                                            })}
+                                        </div>
+                                    ) : (
+                                        <p className="mt-4 text-sm text-gray-500">
+                                            Chưa có danh mục con.
+                                        </p>
+                                    )}
+                                </section>
                             )
                         })}
                     </div>
                 ) : (
-                    <div className="bg-white rounded-[2rem] p-10 text-center text-gray-500">
+                    <div className="rounded-2xl bg-white p-10 text-center text-gray-500">
                         Chưa có danh mục nào.
                     </div>
                 )}
 
                 {/* PHÂN TRANG */}
-                {totalPages > 1 && (
-                    <div className="mt-14 flex flex-wrap items-center justify-center gap-2">
-                        {currentPage > 1 && (
-                            <Link
-                                href={getPageHref(currentPage - 1)}
-                                className="h-11 px-4 rounded-full bg-white border border-gray-200 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-600 hover:bg-black hover:text-white transition-all"
-                            >
-                                <ChevronLeft size={14} />
-                                Trước
-                            </Link>
-                        )}
-
-                        {currentPage > 3 && (
-                            <>
-                                <Link
-                                    href={getPageHref(1)}
-                                    className="w-11 h-11 rounded-full bg-white border border-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 hover:bg-black hover:text-white transition-all"
-                                >
-                                    1
-                                </Link>
-                                <span className="px-2 text-gray-400">
-                                    ...
-                                </span>
-                            </>
-                        )}
-
-                        {getPageNumbers().map((page) => (
-                            <Link
-                                key={page}
-                                href={getPageHref(page)}
-                                className={
-                                    page === currentPage
-                                        ? 'w-11 h-11 rounded-full bg-[#b72828] text-white flex items-center justify-center text-sm font-black shadow-lg'
-                                        : 'w-11 h-11 rounded-full bg-white border border-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 hover:bg-black hover:text-white transition-all'
-                                }
-                            >
-                                {page}
-                            </Link>
-                        ))}
-
-                        {currentPage < totalPages - 2 && (
-                            <>
-                                <span className="px-2 text-gray-400">
-                                    ...
-                                </span>
-                                <Link
-                                    href={getPageHref(totalPages)}
-                                    className="w-11 h-11 rounded-full bg-white border border-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 hover:bg-black hover:text-white transition-all"
-                                >
-                                    {totalPages}
-                                </Link>
-                            </>
-                        )}
-
-                        {currentPage < totalPages && (
-                            <Link
-                                href={getPageHref(currentPage + 1)}
-                                className="h-11 px-4 rounded-full bg-white border border-gray-200 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-600 hover:bg-black hover:text-white transition-all"
-                            >
-                                Sau
-                                <ChevronRight size={14} />
-                            </Link>
-                        )}
-                    </div>
-                )}
 
                 {/* FOOTER TRANG DANH MỤC */}
                 <div className="mt-20 p-10 bg-white rounded-[3rem] border border-white shadow-sm text-center space-y-6">

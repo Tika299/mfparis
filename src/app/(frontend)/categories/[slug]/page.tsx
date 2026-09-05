@@ -31,6 +31,14 @@ import {
   getSeoMedia,
   getSeoText,
 } from '@/utilities/metadataSeo'
+import {
+  getCategoryAncestors,
+  getCategoryChildren,
+  getCategoryDescendantIDs,
+  getCategorySiblings,
+  type CategoryTreeItem,
+} from '@/lib/categoryTree'
+import { CategoryFamilyNav } from '@/components/CategoryFamilyNav'
 
 const PRODUCTS_PER_PAGE = 20
 const DEFAULT_SORT = '-createdAt'
@@ -66,22 +74,6 @@ type RelationshipMedia =
   | null
   | undefined
 
-type RelationshipValue =
-  | string
-  | number
-  | {
-    id?: string | number | null
-  }
-  | null
-  | undefined
-
-type CategoryTreeItem = {
-  id: string | number
-  name?: string | null
-  slug?: string | null
-  parent?: RelationshipValue
-}
-
 type LandingFaqItem = {
   question?: string | null
   answer?: string | null
@@ -93,63 +85,6 @@ function getSiteUrl(): string {
     process.env.NEXT_PUBLIC_SITE_URL ||
     SITE_ORIGIN
   )
-}
-
-function getRelationshipID(value: RelationshipValue): string | number | null {
-  if (typeof value === 'string' || typeof value === 'number') {
-    return value
-  }
-
-  if (
-    value &&
-    typeof value === 'object' &&
-    'id' in value
-  ) {
-    const id = value.id
-
-    if (typeof id === 'string' || typeof id === 'number') {
-      return id
-    }
-  }
-
-  return null
-}
-
-function getCategoryScopeIDs(
-  rootCategoryID: string | number,
-  categories: CategoryTreeItem[],
-) {
-  const rootID = String(rootCategoryID)
-  const childrenByParentID = new Map<string, string[]>()
-
-  for (const category of categories) {
-    const parentID = getRelationshipID(category.parent)
-
-    if (parentID === null) {
-      continue
-    }
-
-    const key = String(parentID)
-    const children = childrenByParentID.get(key) ?? []
-    children.push(String(category.id))
-    childrenByParentID.set(key, children)
-  }
-
-  const result = new Set<string>([rootID])
-  const queue = [...(childrenByParentID.get(rootID) ?? [])]
-
-  while (queue.length > 0) {
-    const categoryID = queue.shift()
-
-    if (!categoryID || result.has(categoryID)) {
-      continue
-    }
-
-    result.add(categoryID)
-    queue.push(...(childrenByParentID.get(categoryID) ?? []))
-  }
-
-  return Array.from(result)
 }
 
 function buildCategoryContainsWhere(categoryIDs: string[]): Where {
@@ -194,56 +129,6 @@ function getLandingFaqItems(value: unknown): { question: string; answer: string 
     .filter((item) => item.question && item.answer)
 }
 
-function buildCategoryBreadcrumb(
-  currentCategory: any,
-  categories: CategoryTreeItem[],
-) {
-  const byID = new Map<string, CategoryTreeItem>()
-
-  for (const category of categories) {
-    byID.set(String(category.id), category)
-  }
-
-  const chain: CategoryTreeItem[] = []
-  let parentID = getRelationshipID(currentCategory.parent)
-  const visited = new Set<string>()
-
-  while (parentID !== null) {
-    const key = String(parentID)
-
-    if (visited.has(key)) {
-      break
-    }
-
-    visited.add(key)
-    const parent = byID.get(key)
-
-    if (!parent) {
-      break
-    }
-
-    chain.unshift(parent)
-    parentID = getRelationshipID(parent.parent)
-  }
-
-  return [
-    {
-      name: 'Trang chủ',
-      url: '/',
-    },
-    ...chain
-      .filter((category) => category.name && category.slug)
-      .map((category) => ({
-        name: String(category.name),
-        url: `/categories/${category.slug}`,
-      })),
-    {
-      name: getCategoryDisplayName(currentCategory),
-      url: `/categories/${currentCategory.slug}`,
-    },
-  ]
-}
-
 async function getCategoryBySlug(slug: string) {
   const payload = await getPayload({
     config: configPromise,
@@ -262,50 +147,6 @@ async function getCategoryBySlug(slug: string) {
   })
 
   return categoryRes.docs[0] ?? null
-}
-
-function extractPlainTextFromRichText(
-  value: unknown,
-): string {
-  if (!value || typeof value !== 'object') {
-    return ''
-  }
-
-  const visit = (node: unknown): string[] => {
-    if (!node || typeof node !== 'object') {
-      return []
-    }
-
-    const record = node as Record<
-      string,
-      unknown
-    >
-
-    const parts: string[] = []
-
-    if (typeof record.text === 'string') {
-      const text = record.text.trim()
-
-      if (text) {
-        parts.push(text)
-      }
-    }
-
-    if (Array.isArray(record.children)) {
-      for (const child of record.children) {
-        parts.push(...visit(child))
-      }
-    }
-
-    return parts
-  }
-
-  const text = visit(value)
-    .join(' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-
-  return text
 }
 
 function truncateText(
@@ -480,31 +321,6 @@ export async function generateMetadata({
   }
 }
 
-function hasRichTextContent(content: unknown): boolean {
-  if (
-    !content ||
-    typeof content !== 'object' ||
-    !('root' in content)
-  ) {
-    return false
-  }
-
-  const root = content.root
-
-  if (
-    !root ||
-    typeof root !== 'object' ||
-    !('children' in root)
-  ) {
-    return false
-  }
-
-  return (
-    Array.isArray(root.children) &&
-    root.children.length > 0
-  )
-}
-
 function normalizePage(value?: string): number {
   const parsedPage = Number(value)
 
@@ -600,12 +416,30 @@ export default async function CategoryPage({
       name: true,
       slug: true,
       parent: true,
+      image: true,
     },
   })
 
-  const categoryScopeIDs = getCategoryScopeIDs(
+  const allCategories = allCategoriesRes.docs as CategoryTreeItem[]
+
+  const categoryScopeIDs = getCategoryDescendantIDs(
     currentCategory.id,
-    allCategoriesRes.docs as CategoryTreeItem[],
+    allCategories,
+  )
+
+  const childCategories = getCategoryChildren(
+    currentCategory.id,
+    allCategories,
+  )
+
+  const siblingCategories = getCategorySiblings(
+    currentCategory,
+    allCategories,
+  )
+
+  const ancestorCategories = getCategoryAncestors(
+    currentCategory,
+    allCategories,
   )
 
   /*
@@ -701,6 +535,9 @@ export default async function CategoryPage({
 
   const filterArchitecture = resolveCategoryFilterArchitecture(currentCategory)
   const enabledFacetKeys = new Set(filterArchitecture.facetKeys)
+  const categoryPageCoreFilters = filterArchitecture.coreFilters.filter(
+    (key) => key !== 'category',
+  )
   const categoryFilterFacets = filterOptions.facets.filter((facet) =>
     enabledFacetKeys.has(facet.key),
   )
@@ -708,16 +545,27 @@ export default async function CategoryPage({
   const hasDescription = Boolean(
     normalizeContentHtml(currentCategory.description),
   )
-  const introHtml = normalizeContentHtml(currentCategory.introHtml)
   const bottomContentHtml = normalizeContentHtml(
     currentCategory.bottomContentHtml,
   )
   const faqItems = getLandingFaqItems(currentCategory.faq)
   const categoryDisplayName = getCategoryDisplayName(currentCategory)
-  const breadcrumb = buildCategoryBreadcrumb(
-    currentCategory,
-    allCategoriesRes.docs as CategoryTreeItem[],
-  )
+  const breadcrumb = [
+    {
+      name: 'Trang chủ',
+      url: '/',
+    },
+    ...ancestorCategories
+      .filter((category) => category.name && category.slug)
+      .map((category) => ({
+        name: String(category.name),
+        url: `/categories/${category.slug}`,
+      })),
+    {
+      name: categoryDisplayName,
+      url: `/categories/${currentCategory.slug}`,
+    },
+  ]
 
   const categoryUrl = `/categories/${encodeURIComponent(slug)}`
 
@@ -853,13 +701,20 @@ export default async function CategoryPage({
       </div>
 
       <div className="container-ux mt-4 md:mt-6 lg:mt-8">
+        <CategoryFamilyNav
+          currentCategory={currentCategory}
+          childCategories={childCategories}
+          siblingCategories={siblingCategories}
+          ancestorCategories={ancestorCategories}
+          allCategories={allCategories}
+        />
         {/* Tablet */}
         <div className="sticky top-28 z-40 mb-5 hidden md:block lg:hidden">
           <SearchFilters
             brands={filterOptions.brands}
             categories={filterOptions.categories}
             facets={categoryFilterFacets}
-            enabledCoreFilters={filterArchitecture.coreFilters}
+            enabledCoreFilters={categoryPageCoreFilters}
             variant="horizontal"
             sticky={false}
             routeContext={
@@ -876,7 +731,7 @@ export default async function CategoryPage({
                 brands={filterOptions.brands}
                 categories={filterOptions.categories}
                 facets={categoryFilterFacets}
-                enabledCoreFilters={filterArchitecture.coreFilters}
+                enabledCoreFilters={categoryPageCoreFilters}
                 variant="sidebar"
                 sticky={false}
                 routeContext={
@@ -1054,7 +909,7 @@ export default async function CategoryPage({
           brands={filterOptions.brands}
           categories={filterOptions.categories}
           facets={categoryFilterFacets}
-          enabledCoreFilters={filterArchitecture.coreFilters}
+          enabledCoreFilters={categoryPageCoreFilters}
           variant="mobile-fab"
           routeContext={
             filterRouteContext
