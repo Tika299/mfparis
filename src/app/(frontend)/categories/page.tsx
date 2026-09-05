@@ -6,10 +6,10 @@ import { ChevronRight, LayoutGrid } from 'lucide-react'
 import { JsonLd } from '@/components/JsonLd'
 import { buildCollectionPageSchemaGraph } from '@/lib/structured-data'
 import {
-    getCategoryChildren,
     getRelationshipID,
     type CategoryTreeItem,
 } from '@/lib/categoryTree'
+import { CategoryTreeList } from '@/components/CategoryTreeList'
 
 export const metadata = {
     metadataBase: new URL(
@@ -255,97 +255,10 @@ export default async function AllCategoriesPage({
 
                 {/* CÂY DANH MỤC */}
                 {rootCategories.length > 0 ? (
-                    <div className="space-y-6">
-                        {rootCategories.map((rootCategory) => {
-                            const children = getCategoryChildren(rootCategory.id, allCategories)
-
-                            return (
-                                <section
-                                    key={rootCategory.id}
-                                    className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm md:p-6"
-                                >
-                                    <div className="flex flex-col gap-2 border-b border-gray-100 pb-4 md:flex-row md:items-end md:justify-between">
-                                        <div>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#b72828]">
-                                                Nhóm danh mục
-                                            </p>
-
-                                            <h2 className="mt-1 text-xl font-black text-gray-950 md:text-2xl">
-                                                <Link
-                                                    href={`/categories/${rootCategory.slug}`}
-                                                    className="transition hover:text-[#b72828]"
-                                                >
-                                                    {rootCategory.name}
-                                                </Link>
-                                            </h2>
-
-                                            {'productCount' in rootCategory ? (
-                                                <p className="mt-1 text-xs font-semibold text-gray-500">
-                                                    {Number((rootCategory as any).productCount || 0).toLocaleString('vi-VN')}{' '}
-                                                    sản phẩm
-                                                </p>
-                                            ) : null}
-                                        </div>
-
-                                        <Link
-                                            href={`/categories/${rootCategory.slug}`}
-                                            className="inline-flex items-center gap-1 text-xs font-bold text-gray-500 transition hover:text-[#b72828]"
-                                        >
-                                            Xem nhóm này
-                                            <ChevronRight size={14} />
-                                        </Link>
-                                    </div>
-
-                                    {children.length > 0 ? (
-                                        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                                            {children.map((child) => {
-                                                const grandchildren = getCategoryChildren(
-                                                    child.id,
-                                                    allCategories,
-                                                ).slice(0, 5)
-
-                                                return (
-                                                    <Link
-                                                        key={child.id}
-                                                        href={`/categories/${child.slug}`}
-                                                        className="rounded-xl border border-gray-100 bg-gray-50 p-4 transition hover:border-[#f0b3ad] hover:bg-[#fff8f7]"
-                                                    >
-                                                        <h3 className="text-sm font-black text-gray-900">
-                                                            {child.name}
-                                                        </h3>
-
-                                                        {'productCount' in child ? (
-                                                            <p className="mt-1 text-[11px] font-semibold text-gray-500">
-                                                                {Number((child as any).productCount || 0).toLocaleString('vi-VN')}{' '}
-                                                                sản phẩm
-                                                            </p>
-                                                        ) : null}
-
-                                                        {grandchildren.length > 0 ? (
-                                                            <div className="mt-3 flex flex-wrap gap-1.5">
-                                                                {grandchildren.map((grandchild) => (
-                                                                    <span
-                                                                        key={grandchild.id}
-                                                                        className="max-w-full truncate rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-600"
-                                                                    >
-                                                                        {grandchild.name}
-                                                                    </span>
-                                                                ))}
-                                                            </div>
-                                                        ) : null}
-                                                    </Link>
-                                                )
-                                            })}
-                                        </div>
-                                    ) : (
-                                        <p className="mt-4 text-sm text-gray-500">
-                                            Chưa có danh mục con.
-                                        </p>
-                                    )}
-                                </section>
-                            )
-                        })}
-                    </div>
+                    <CategoryTreeList
+                        rootCategories={rootCategories}
+                        allCategories={allCategories}
+                    />
                 ) : (
                     <div className="rounded-2xl bg-white p-10 text-center text-gray-500">
                         Chưa có danh mục nào.
