@@ -32,8 +32,8 @@ export function CategoryFamilyNav({
     ancestorCategories,
     allCategories,
 }: CategoryFamilyNavProps) {
-    const [sectionOpen, setSectionOpen] = useState(true)
-    const [collapsedIds, setCollapsedIds] = useState<Record<string, boolean>>({})
+    const [sectionOpen, setSectionOpen] = useState(false)
+    const [openedIds, setOpenedIds] = useState<Record<string, boolean>>({})
 
     const hasChildren = childCategories.length > 0
     const parentCategory = ancestorCategories[ancestorCategories.length - 1]
@@ -51,7 +51,7 @@ export function CategoryFamilyNav({
     const toggleCategory = (id: string | number) => {
         const key = String(id)
 
-        setCollapsedIds((current) => ({
+        setOpenedIds((current) => ({
             ...current,
             [key]: !current[key],
         }))
@@ -103,7 +103,7 @@ export function CategoryFamilyNav({
                     {relatedCategories.map((category) => {
                         const grandchildren = getCategoryChildren(category.id, allCategories)
                         const isCurrent = String(category.id) === String(currentCategory.id)
-                        const isCollapsed = Boolean(collapsedIds[String(category.id)])
+                        const isOpen = Boolean(openedIds[String(category.id)])
                         const hasGrandchildren = grandchildren.length > 0
 
                         return (
@@ -129,17 +129,15 @@ export function CategoryFamilyNav({
                                             type="button"
                                             onClick={() => toggleCategory(category.id)}
                                             aria-label={
-                                                isCollapsed ? 'Mở danh mục con' : 'Đóng danh mục con'
+                                                !isOpen ? 'Mở danh mục con' : 'Đóng danh mục con'
                                             }
-                                            aria-expanded={!isCollapsed}
+                                            aria-expanded={isOpen}
                                             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-50 text-gray-500 transition hover:text-[#b72828]"
                                         >
                                             <ChevronDown
                                                 size={15}
                                                 className={
-                                                    isCollapsed
-                                                        ? '-rotate-90 transition-transform'
-                                                        : 'transition-transform'
+                                                    isOpen ? 'transition-transform' : '-rotate-90 transition-transform'
                                                 }
                                             />
                                         </button>
@@ -151,7 +149,7 @@ export function CategoryFamilyNav({
                                     )}
                                 </div>
 
-                                {hasGrandchildren && !isCollapsed ? (
+                                {hasGrandchildren && isOpen ? (
                                     <div className="mt-3 flex flex-wrap gap-1.5">
                                         {grandchildren.map((child) => (
                                             <Link

@@ -26,12 +26,12 @@ export function CategoryTreeList({
     rootCategories,
     allCategories,
 }: CategoryTreeListProps) {
-    const [collapsedIds, setCollapsedIds] = useState<Record<string, boolean>>({})
+    const [openedIds, setOpenedIds] = useState<Record<string, boolean>>({})
 
     const toggleCategory = (id: string | number) => {
         const key = String(id)
 
-        setCollapsedIds((current) => ({
+        setOpenedIds((current) => ({
             ...current,
             [key]: !current[key],
         }))
@@ -41,7 +41,7 @@ export function CategoryTreeList({
         <div className="space-y-6">
             {rootCategories.map((rootCategory) => {
                 const children = getCategoryChildren(rootCategory.id, allCategories)
-                const isCollapsed = Boolean(collapsedIds[String(rootCategory.id)])
+                const isOpen = Boolean(openedIds[String(rootCategory.id)])
                 const hasChildren = children.length > 0
 
                 return (
@@ -54,15 +54,13 @@ export function CategoryTreeList({
                                 type="button"
                                 onClick={() => toggleCategory(rootCategory.id)}
                                 className="group flex min-w-0 flex-1 items-center gap-3 text-left"
-                                aria-expanded={!isCollapsed}
+                                aria-expanded={isOpen}
                             >
                                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#fff5f4] text-[#b72828]">
                                     <ChevronDown
                                         size={18}
                                         className={
-                                            isCollapsed
-                                                ? '-rotate-90 transition-transform'
-                                                : 'transition-transform'
+                                            isOpen ? 'transition-transform' : '-rotate-90 transition-transform'
                                         }
                                     />
                                 </span>
@@ -92,7 +90,7 @@ export function CategoryTreeList({
                             </Link>
                         </div>
 
-                        {!isCollapsed ? (
+                        {isOpen ? (
                             hasChildren ? (
                                 <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                                     {children.map((child) => {
@@ -100,9 +98,7 @@ export function CategoryTreeList({
                                             child.id,
                                             allCategories,
                                         )
-                                        const isChildCollapsed = Boolean(
-                                            collapsedIds[String(child.id)],
-                                        )
+                                        const isChildOpen = Boolean(openedIds[String(child.id)])
                                         const hasGrandchildren = grandchildren.length > 0
 
                                         return (
@@ -130,26 +126,24 @@ export function CategoryTreeList({
                                                             type="button"
                                                             onClick={() => toggleCategory(child.id)}
                                                             aria-label={
-                                                                isChildCollapsed
+                                                                isChildOpen
                                                                     ? 'Mở danh mục con'
                                                                     : 'Đóng danh mục con'
                                                             }
-                                                            aria-expanded={!isChildCollapsed}
+                                                            aria-expanded={isChildOpen}
                                                             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-gray-500 transition hover:text-[#b72828]"
                                                         >
                                                             <ChevronDown
                                                                 size={15}
                                                                 className={
-                                                                    isChildCollapsed
-                                                                        ? '-rotate-90 transition-transform'
-                                                                        : 'transition-transform'
+                                                                    isChildOpen ? 'transition-transform' : '-rotate-90 transition-transform'
                                                                 }
                                                             />
                                                         </button>
                                                     ) : null}
                                                 </div>
 
-                                                {hasGrandchildren && !isChildCollapsed ? (
+                                                {hasGrandchildren && isChildOpen ? (
                                                     <div className="mt-3 flex flex-wrap gap-1.5">
                                                         {grandchildren.map((grandchild) => (
                                                             <Link
