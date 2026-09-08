@@ -59,12 +59,10 @@ export const FilterOptionList = ({
                   <span className="filter-chip__check" aria-hidden="true">
                     {active ? <Check /> : null}
                   </span>
-                  <span className="filter-chip__label">{item.name}</span>
-                  {typeof item.count === 'number' ? (
-                    <span className="filter-chip__count">
-                      {item.count.toLocaleString('vi-VN')}
-                    </span>
-                  ) : null}
+
+                  <span className="filter-chip__label">
+                    {item.name}
+                  </span>
                 </button>
               )
             })}
@@ -91,9 +89,6 @@ export const FilterOptionList = ({
         {items.map((item) => (
           <option key={item.id} value={item.slug}>
             {item.name}
-            {typeof item.count === 'number'
-              ? ` (${item.count.toLocaleString('vi-VN')})`
-              : ''}
           </option>
         ))}
       </select>
