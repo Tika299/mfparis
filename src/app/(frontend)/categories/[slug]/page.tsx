@@ -555,6 +555,10 @@ export default async function CategoryPage({
       name: 'Trang chủ',
       url: '/',
     },
+    {
+      name: 'Danh mục',
+      url: '/categories',
+    },
     ...ancestorCategories
       .filter((category) => category.name && category.slug)
       .map((category) => ({
@@ -687,6 +691,42 @@ export default async function CategoryPage({
       <JsonLd data={schemaGraph} />
       <div className="border-b border-gray-100 bg-white">
         <div className="container-ux py-5 md:py-7 lg:py-9">
+          <nav aria-label="Breadcrumb" className="mb-4 overflow-x-auto">
+            <ol className="flex min-w-max items-center gap-2 text-xs text-gray-500 md:text-sm">
+              {breadcrumb.map((item, index) => {
+                const isCurrent = index === breadcrumb.length - 1
+
+                return (
+                  <li
+                    key={item.url}
+                    className="flex shrink-0 items-center gap-2"
+                  >
+                    {index > 0 ? (
+                      <span aria-hidden="true" className="text-gray-300">
+                        /
+                      </span>
+                    ) : null}
+
+                    {isCurrent ? (
+                      <span
+                        aria-current="page"
+                        className="font-semibold text-gray-900"
+                      >
+                        {item.name}
+                      </span>
+                    ) : (
+                      <Link
+                        href={item.url}
+                        className="transition-colors hover:text-[#b72828]"
+                      >
+                        {item.name}
+                      </Link>
+                    )}
+                  </li>
+                )
+              })}
+            </ol>
+          </nav>
           <h1 className="text-2xl font-black uppercase tracking-wide md:text-3xl lg:text-4xl">
             {categoryDisplayName}
           </h1>
