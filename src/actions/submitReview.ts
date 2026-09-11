@@ -8,6 +8,7 @@ type ClientEntityID = string | number
 
 export type SubmitReviewInput = {
     productId: ClientEntityID
+    reviewerName?: string
     rating: number
     comment: string
     userId?: ClientEntityID | null
@@ -15,6 +16,7 @@ export type SubmitReviewInput = {
 
 type ReviewField =
     | 'productId'
+    | 'reviewerName'
     | 'rating'
     | 'comment'
     | 'userId'
@@ -100,6 +102,7 @@ function validateInput(
     input: SubmitReviewInput,
 ): {
     productId: number | null
+    reviewerName: string | null
     rating: number | null
     comment: string
     submittedUserId: number | null
@@ -114,6 +117,16 @@ function validateInput(
     if (productId === null) {
         fieldErrors.productId =
             'ID sản phẩm không hợp lệ.'
+    }
+
+    const reviewerName =
+        typeof input.reviewerName === 'string'
+            ? input.reviewerName.trim()
+            : ''
+
+    if (reviewerName.length > 100) {
+        fieldErrors.reviewerName =
+            'Tên người đánh giá không được vượt quá 100 ký tự.'
     }
 
     const rating =
@@ -163,6 +176,7 @@ function validateInput(
 
     return {
         productId,
+        reviewerName,
         rating,
         comment,
         submittedUserId,
@@ -175,6 +189,7 @@ export async function submitReview(
 ): Promise<SubmitReviewResult> {
     const {
         productId,
+        reviewerName,
         rating,
         comment,
         submittedUserId,
@@ -297,7 +312,7 @@ export async function submitReview(
                  * string | number không gán được cho number | Product.
                  */
                 product: productId,
-
+                reviewerName: reviewerName || undefined,
                 rating,
                 comment: comment || undefined,
 

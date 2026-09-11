@@ -173,7 +173,14 @@ async function importReviews() {
                 })
                 continue
             }
-
+            const reviewerName = getRowValue(row, [
+                'reviewerName',
+                'reviewer_name',
+                'name',
+                'customerName',
+                'customer_name',
+                'author',
+            ])
             const rating = normalizeRating(getRowValue(row, ['rating', 'stars', 'score']))
             const comment = getRowValue(row, ['comment', 'review', 'content'])
             const status = normalizeStatus(getRowValue(row, ['status']))
@@ -192,6 +199,7 @@ async function importReviews() {
             const createdAt = getRowValue(row, ['createdAt', 'date', 'created_at'])
             const reviewData: AnyRecord = {
                 product: product.id,
+                reviewerName: reviewerName || undefined,
                 rating,
                 comment,
             }

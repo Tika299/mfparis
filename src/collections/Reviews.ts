@@ -12,8 +12,8 @@ type EntityID = string | number
 type RelationshipValue =
   | EntityID
   | {
-      id: EntityID
-    }
+    id: EntityID
+  }
 
 type ReviewStatus = 'pending' | 'approved' | 'rejected'
 
@@ -26,6 +26,7 @@ type ReviewDocument = {
   status: ReviewStatus
   createdAt?: string
   updatedAt?: string
+  reviewerName?: string | null
 }
 
 /**
@@ -305,6 +306,7 @@ export const Reviews: CollectionConfig = {
     useAsTitle: 'comment',
     defaultColumns: [
       'product',
+      'reviewerName',
       'user',
       'rating',
       'status',
@@ -377,6 +379,19 @@ export const Reviews: CollectionConfig = {
         allowCreate: false,
         description:
           'Tự động lấy từ người đang đăng nhập. Để trống nếu khách gửi ẩn danh.',
+      },
+    },
+    {
+      name: 'reviewerName',
+      label: 'Tên người đánh giá',
+      type: 'text',
+      required: false,
+      maxLength: 100,
+      index: true,
+      admin: {
+        placeholder: 'Khách hàng ẩn danh',
+        description:
+          'Tên hiển thị của khách. Nếu để trống, giao diện sẽ hiển thị Khách hàng ẩn danh.',
       },
     },
     {

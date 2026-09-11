@@ -35,6 +35,7 @@ type ReviewUser =
 
 export type ProductReviewItem = {
     id: EntityID
+    reviewerName?: string | null
     rating: number
     comment?: string | null
     createdAt?: string | null
@@ -71,33 +72,30 @@ function clampRating(value: number): number {
 }
 
 function getReviewerName(
+    reviewerName: string | null | undefined,
     user: ReviewUser | undefined,
 ): string {
+    const submittedName = reviewerName?.trim()
+
+    if (submittedName) {
+        return submittedName
+    }
+
     if (!user || typeof user !== 'object') {
         return 'Khách hàng ẩn danh'
     }
 
     const displayName = user.displayName?.trim()
-
-    if (displayName) {
-        return displayName
-    }
+    if (displayName) return displayName
 
     const name = user.name?.trim()
-
-    if (name) {
-        return name
-    }
+    if (name) return name
 
     const fullName = [
         user.firstName?.trim(),
         user.lastName?.trim(),
     ]
-        .filter(
-            (value): value is string =>
-                typeof value === 'string' &&
-                value.length > 0,
-        )
+        .filter(Boolean)
         .join(' ')
 
     return fullName || 'Khách hàng ẩn danh'
@@ -240,6 +238,7 @@ export function ProductReviews({
     reviews,
     className,
 }: ProductReviewsProps) {
+    const [reviewerName, setReviewerName] = useState('')
     const [rating, setRating] = useState(0)
     const [comment, setComment] = useState('')
     const [isSubmitting, setIsSubmitting] =
@@ -321,6 +320,7 @@ export function ProductReviews({
             const result: SubmitReviewResult =
                 await submitReview({
                     productId,
+                    reviewerName: reviewerName.trim(),
                     rating,
                     comment: normalizedComment,
                     userId,
@@ -337,6 +337,7 @@ export function ProductReviews({
                 'Đánh giá của bạn đã được gửi và đang chờ duyệt',
             )
 
+            setReviewerName('')
             setRating(0)
             setComment('')
         } catch (error: unknown) {
@@ -441,6 +442,33 @@ export function ProductReviews({
                             Đánh giá sẽ được kiểm duyệt trước
                             khi hiển thị công khai.
                         </p>
+
+                        <div>
+                            <label
+                                htmlFor="reviewer-name"
+                                className="mb-2 block text-sm font-bold text-gray-900"
+                            >
+                                Tên hiển thị
+                                <span className="ml-1 font-normal text-gray-400">
+                                    (không bắt buộc)
+                                </span>
+                            </label>
+
+                            <input
+                                id="reviewer-name"
+                                type="text"
+                                value={reviewerName}
+                                maxLength={100}
+                                disabled={isSubmitting}
+                                autoComplete="name"
+                                placeholder="Để trống nếu muốn đánh giá ẩn danh"
+                                onChange={(event) => {
+                                    setReviewerName(event.target.value)
+                                    setFormError(null)
+                                }}
+                                className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3.5 text-sm text-gray-950 outline-none transition placeholder:text-gray-400 focus:border-[#B72828] focus:ring-4 focus:ring-[#B72828]/10"
+                            />
+                        </div>
 
                         <form
                             onSubmit={handleSubmit}
@@ -591,8 +619,10 @@ export function ProductReviews({
                     {reviews.length > 0 ? (
                         <div className="divide-y divide-gray-100">
                             {reviews.map((review) => {
-                                const reviewerName =
-                                    getReviewerName(review.user)
+                                const reviewerName = getReviewerName(
+                                    review.reviewerName,
+                                    review.user,
+                                )
 
                                 const reviewDate =
                                     formatReviewDate(

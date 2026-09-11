@@ -1493,6 +1493,7 @@ function toProductReviewItem(
 
   return {
     id,
+    reviewerName: getOptionalString(value.reviewerName),
     rating,
     comment: getOptionalString(
       value.comment,
@@ -1540,6 +1541,7 @@ const getApprovedReviews = cache(
           depth: 1,
           overrideAccess: false,
           select: {
+            reviewerName: true,
             rating: true,
             comment: true,
             user: true,
@@ -1558,7 +1560,7 @@ const getApprovedReviews = cache(
           )
       },
       [
-        'mfparis-approved-reviews-v1',
+        'mfparis-approved-reviews-v2',
         String(productID),
       ],
       {

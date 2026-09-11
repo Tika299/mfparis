@@ -468,7 +468,7 @@ export interface Product {
    */
   shortDescription?: string | null;
   /**
-   * Dùng cho dung tích, xuất xứ, nhóm hương, loại da, nồng độ...
+   * Chỉ dùng để hiển thị thông số tự do trên trang sản phẩm. Không dùng cho bộ lọc, tìm kiếm hoặc so sánh.
    */
   specifications?:
     | {
@@ -1456,6 +1456,10 @@ export interface Review {
    * Tự động lấy từ người đang đăng nhập. Để trống nếu khách gửi ẩn danh.
    */
   user?: (number | null) | User;
+  /**
+   * Tên hiển thị của khách. Nếu để trống, giao diện sẽ hiển thị Khách hàng ẩn danh.
+   */
+  reviewerName?: string | null;
   /**
    * Điểm đánh giá từ 1 đến 5 sao.
    */
@@ -2618,6 +2622,7 @@ export interface FragranceNotesSelect<T extends boolean = true> {
 export interface ReviewsSelect<T extends boolean = true> {
   product?: T;
   user?: T;
+  reviewerName?: T;
   rating?: T;
   comment?: T;
   status?: T;
