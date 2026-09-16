@@ -37,12 +37,16 @@ export async function applyInternalLinksForRender({
             config: configPromise,
         }))
 
+    const startedAt = performance.now()
+
     const [settings, rules] = await Promise.all([
         getSiteSettings(),
         loadActiveInternalLinkRules(resolvedPayload),
     ])
 
-    return applyInternalLinksToHtml({
+    const loadedAt = performance.now()
+
+    const result = applyInternalLinksToHtml({
         html,
         currentUrl,
         scope,
@@ -55,4 +59,17 @@ export async function applyInternalLinksForRender({
         maxLinksOverride,
         excludeKeywords,
     } satisfies ApplyInternalLinksInput)
+
+    const finishedAt = performance.now()
+
+    console.log('[INTERNAL LINK PERF]', JSON.stringify({
+        url: currentUrl,
+        rules: rules.length,
+        htmlCharacters: typeof html === 'string' ? html.length : null,
+        loadMs: Math.round(loadedAt - startedAt),
+        injectMs: Math.round(finishedAt - loadedAt),
+        totalMs: Math.round(finishedAt - startedAt),
+    }))
+
+    return result
 }
