@@ -99,31 +99,40 @@ function getPostSeoTitle(title: unknown): string {
     : 'Blog MF Paris'
 }
 
+async function measure<T>(
+  label: string,
+  operation: () => Promise<T>,
+): Promise<T> {
+  const startedAt = performance.now()
+
+  try {
+    return await operation()
+  } finally {
+    console.log(
+      `[BLOG PERF] ${label}: ${Math.round(performance.now() - startedAt)}ms`,
+    )
+  }
+}
+
 async function getPostBySlug(slug: string) {
   const payload = await getPayload({
     config: configPromise,
   })
 
-  const result = await payload.find({
-    collection: 'posts',
-    where: {
-      and: [
-        {
-          slug: {
-            equals: slug,
-          },
-        },
-        {
-          status: {
-            equals: 'published',
-          },
-        },
-      ],
-    },
-    limit: 1,
-    pagination: false,
-    depth: 1,
-  })
+  const result = await measure('post query', () =>
+    payload.find({
+      collection: 'posts',
+      where: {
+        and: [
+          { slug: { equals: slug } },
+          { status: { equals: 'published' } },
+        ],
+      },
+      limit: 1,
+      pagination: false,
+      depth: 1,
+    }),
+  )
 
   return result.docs[0] ?? null
 }
@@ -846,30 +855,34 @@ export default async function BlogPostPage({
   const canonicalUrl = `/blog/${encodeURIComponent(slug)}`
   const cleanPostTitle = getCleanPostTitle(post.title)
   const internalLinkingConfig = getInternalLinkingConfig(post)
-  const linkedContent = await applyInternalLinksForRender({
-    html: post.content,
-    currentUrl: canonicalUrl,
-    scope: 'posts',
-    payload,
-    ...internalLinkingConfig,
-  })
+  const linkedContent = await measure('internal links', () =>
+    applyInternalLinksForRender({
+      html: post.content,
+      currentUrl: canonicalUrl,
+      scope: 'posts',
+      payload,
+      ...internalLinkingConfig,
+    }),
+  )
   const description = getPostDescription(post)
   const imageUrl = getMediaUrl(post.thumbnail)
   const postPlainText = htmlToPlainText(post.content)
   const wordCount = postPlainText.split(/\s+/u).filter(Boolean).length
   const readingMinutes = getReadingMinutes(wordCount)
   const faqItems = getPostFaqItems(post)
-  const defaultAuthorResult = await payload.find({
-    collection: 'blog-authors' as any,
-    depth: 2,
-    limit: 1,
-    sort: '-updatedAt',
-    where: {
-      isDefault: {
-        equals: true,
+  const defaultAuthorResult = await measure('default author', () =>
+    payload.find({
+      collection: 'blog-authors' as any,
+      depth: 2,
+      limit: 1,
+      sort: '-updatedAt',
+      where: {
+        isDefault: {
+          equals: true,
+        },
       },
-    },
-  })
+    }),
+  )
   const siteFallbackAuthor: BlogPersonInfo = {
     name: 'Marais de France',
     title: 'MF Paris Editorial',
@@ -937,85 +950,86 @@ export default async function BlogPostPage({
     }
   }
   const [relatedPosts, blogComments, previousPosts, nextPosts] =
-    await Promise.all([
-      payload.find({
-        collection: 'posts',
-        limit: categoryIds.length > 0 ? 16 : 8,
-        depth: 1,
-        sort: '-createdAt',
-        where: relatedPostsWhere,
-      }),
-      payload.find({
-        collection: 'blog-comments' as any,
-        depth: 0,
-        limit: 30,
-        sort: '-createdAt',
-        where: {
-          and: [
-            {
-              post: {
-                equals: post.id,
+    await measure('related/comments/previous/next', () =>
+      Promise.all([
+        payload.find({
+          collection: 'posts',
+          limit: categoryIds.length > 0 ? 16 : 8,
+          depth: 1,
+          sort: '-createdAt',
+          where: relatedPostsWhere,
+        }),
+        payload.find({
+          collection: 'blog-comments' as any,
+          depth: 0,
+          limit: 30,
+          sort: '-createdAt',
+          where: {
+            and: [
+              {
+                post: {
+                  equals: post.id,
+                },
               },
-            },
-            {
-              status: {
-                equals: 'approved',
+              {
+                status: {
+                  equals: 'approved',
+                },
               },
-            },
-          ],
-        },
-      }),
-      payload.find({
-        collection: 'posts',
-        depth: 1,
-        limit: 1,
-        sort: '-createdAt',
-        where: {
-          and: [
-            {
-              slug: {
-                not_equals: slug,
+            ],
+          },
+        }),
+        payload.find({
+          collection: 'posts',
+          depth: 1,
+          limit: 1,
+          sort: '-createdAt',
+          where: {
+            and: [
+              {
+                slug: {
+                  not_equals: slug,
+                },
               },
-            },
-            {
-              status: {
-                equals: 'published',
+              {
+                status: {
+                  equals: 'published',
+                },
               },
-            },
-            {
-              createdAt: {
-                less_than: post.createdAt,
+              {
+                createdAt: {
+                  less_than: post.createdAt,
+                },
               },
-            },
-          ],
-        },
-      }),
-      payload.find({
-        collection: 'posts',
-        depth: 1,
-        limit: 1,
-        sort: 'createdAt',
-        where: {
-          and: [
-            {
-              slug: {
-                not_equals: slug,
+            ],
+          },
+        }),
+        payload.find({
+          collection: 'posts',
+          depth: 1,
+          limit: 1,
+          sort: 'createdAt',
+          where: {
+            and: [
+              {
+                slug: {
+                  not_equals: slug,
+                },
               },
-            },
-            {
-              status: {
-                equals: 'published',
+              {
+                status: {
+                  equals: 'published',
+                },
               },
-            },
-            {
-              createdAt: {
-                greater_than: post.createdAt,
+              {
+                createdAt: {
+                  greater_than: post.createdAt,
+                },
               },
-            },
-          ],
-        },
-      }),
-    ])
+            ],
+          },
+        }),
+      ]))
   const relatedPostDocs = relatedPosts.docs.slice(0, 4)
   const previousPost = previousPosts.docs[0]
   const nextPost = nextPosts.docs[0]
