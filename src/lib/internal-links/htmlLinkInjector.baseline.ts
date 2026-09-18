@@ -185,7 +185,6 @@ const priorityScore: Record<string, number> = {
 const MAX_SKIPPED_ITEMS = 100
 
 type CompiledKeyword = {
-    anchorKey: string
     rule: InternalLinkRule
     keyword: string
     normalizedKeyword: string
@@ -358,11 +357,11 @@ function compileRules(
 
             if (!keyword || !targetUrl) continue
 
-            const normalizedKeyword = buildNormalizedIndexMap(keyword).normalized.trim()
+            const normalizedKeyword = normalizeVietnameseText(keyword)
 
             if (!normalizedKeyword) continue
 
-            if (excluded.has(normalizeVietnameseText(keyword))) {
+            if (excluded.has(normalizedKeyword)) {
                 pushSkipped(skipped, {
                     keyword,
                     targetUrl,
@@ -378,7 +377,6 @@ function compileRules(
                 rule,
                 keyword,
                 normalizedKeyword,
-                anchorKey: normalizeVietnameseText(keyword),
                 targetUrl,
                 matchType: String(item.matchType || 'exact'),
                 score: (priorityScore[rule.priority || 'post'] || 0) + Number(item.weight || 1),
@@ -396,8 +394,8 @@ function compileRules(
 
 function normalizeCharForMatch(char: string): string {
     return char
-        .replace(/đ/g, 'd')
-        .replace(/Đ/g, 'd')
+        .replace(/─æ/g, 'd')
+        .replace(/─É/g, 'd')
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
@@ -553,7 +551,7 @@ function hasProductNameContinuation(rawAfter: string): boolean {
 
     if (tokens.length < 2) return false
 
-    const titleLikeCount = tokens.filter((token) => /^[A-Z0-9À-Ỵ]/.test(token)).length
+    const titleLikeCount = tokens.filter((token) => /^[A-Z0-9├Ç-ß╗┤]/.test(token)).length
 
     return titleLikeCount >= 2
 }
@@ -643,29 +641,22 @@ function replaceTextNode(
     return anchorText
 }
 
-function walkTextNodes(
-    node: Node,
-    callback: (node: Text) => boolean | void,
-): boolean {
+function walkTextNodes(node: Node, callback: (node: Text) => void): void {
     if (isText(node)) {
-        return callback(node) !== false
+        callback(node)
+        return
     }
 
     if ('children' in node && Array.isArray(node.children)) {
         for (const child of [...node.children]) {
-            if (!walkTextNodes(child as Node, callback)) {
-                return false
-            }
+            walkTextNodes(child as Node, callback)
         }
     }
-
-    return true
 }
 
 export function applyInternalLinksToHtml(
     input: ApplyInternalLinksInput,
 ): ApplyInternalLinksResult {
-    const collectDiagnostics = input.collectDiagnostics === true
     const skipped: InternalLinkSkippedItem[] = []
     const html = normalizeContentHtml(input.html || '')
 
@@ -701,9 +692,6 @@ export function applyInternalLinksToHtml(
 
     walkTextNodes(document as unknown as Node, (textNode) => {
         if (insertions.length >= maxLinks) {
-            if (!collectDiagnostics || skipped.length >= MAX_SKIPPED_ITEMS) {
-                return false
-            }
             const possibleMatch = findBestMatch(textNode.data, candidates)
 
             if (possibleMatch) {
@@ -726,9 +714,6 @@ export function applyInternalLinksToHtml(
         const blockedReason = getBlockedReason(textNode)
 
         if (blockedReason) {
-            if (!collectDiagnostics || skipped.length >= MAX_SKIPPED_ITEMS) {
-                return
-            }
             const possibleMatch = findBestMatch(textNode.data, candidates)
 
             if (possibleMatch) {
@@ -753,9 +738,6 @@ export function applyInternalLinksToHtml(
             const maxPerParagraph = input.settings?.maxLinksPerParagraph ?? 1
 
             if (count >= maxPerParagraph) {
-                if (!collectDiagnostics || skipped.length >= MAX_SKIPPED_ITEMS) {
-                    return
-                }
                 const possibleMatch = findBestMatch(textNode.data, candidates)
 
                 if (possibleMatch) {
@@ -779,37 +761,33 @@ export function applyInternalLinksToHtml(
             const maxTarget = input.settings?.maxSameTargetUrl ?? 2
 
             if (targetUsed >= maxTarget) {
-                if (collectDiagnostics && skipped.length < MAX_SKIPPED_ITEMS) {
-                    pushSkipped(skipped, {
-                        keyword: candidate.keyword,
-                        anchorText: candidate.keyword,
-                        targetUrl: candidate.targetUrl,
-                        ruleId: candidate.rule.id,
-                        ruleTitle: candidate.rule.title,
-                        reason: 'max_target_reached',
-                        textPreview: textNode.data.slice(0, 160),
-                    })
-                }
+                pushSkipped(skipped, {
+                    keyword: candidate.keyword,
+                    anchorText: candidate.keyword,
+                    targetUrl: candidate.targetUrl,
+                    ruleId: candidate.rule.id,
+                    ruleTitle: candidate.rule.title,
+                    reason: 'max_target_reached',
+                    textPreview: textNode.data.slice(0, 160),
+                })
 
                 return false
             }
 
-            const normalizedAnchor = candidate.anchorKey
+            const normalizedAnchor = normalizeVietnameseText(candidate.keyword)
             const anchorUsed = anchorCount.get(normalizedAnchor) || 0
             const maxAnchor = input.settings?.maxSameAnchor ?? 1
 
             if (anchorUsed >= maxAnchor) {
-                if (collectDiagnostics && skipped.length < MAX_SKIPPED_ITEMS) {
-                    pushSkipped(skipped, {
-                        keyword: candidate.keyword,
-                        anchorText: candidate.keyword,
-                        targetUrl: candidate.targetUrl,
-                        ruleId: candidate.rule.id,
-                        ruleTitle: candidate.rule.title,
-                        reason: 'max_anchor_reached',
-                        textPreview: textNode.data.slice(0, 160),
-                    })
-                }
+                pushSkipped(skipped, {
+                    keyword: candidate.keyword,
+                    anchorText: candidate.keyword,
+                    targetUrl: candidate.targetUrl,
+                    ruleId: candidate.rule.id,
+                    ruleTitle: candidate.rule.title,
+                    reason: 'max_anchor_reached',
+                    textPreview: textNode.data.slice(0, 160),
+                })
 
                 return false
             }
@@ -819,17 +797,15 @@ export function applyInternalLinksToHtml(
             const maxRuleCount = candidate.rule.maxInsertionsPerPage ?? maxLinks
 
             if (currentRuleCount >= maxRuleCount) {
-                if (collectDiagnostics && skipped.length < MAX_SKIPPED_ITEMS) {
-                    pushSkipped(skipped, {
-                        keyword: candidate.keyword,
-                        anchorText: candidate.keyword,
-                        targetUrl: candidate.targetUrl,
-                        ruleId: candidate.rule.id,
-                        ruleTitle: candidate.rule.title,
-                        reason: 'max_links_reached',
-                        textPreview: textNode.data.slice(0, 160),
-                    })
-                }
+                pushSkipped(skipped, {
+                    keyword: candidate.keyword,
+                    anchorText: candidate.keyword,
+                    targetUrl: candidate.targetUrl,
+                    ruleId: candidate.rule.id,
+                    ruleTitle: candidate.rule.title,
+                    reason: 'max_links_reached',
+                    textPreview: textNode.data.slice(0, 160),
+                })
 
                 return false
             }
@@ -843,17 +819,15 @@ export function applyInternalLinksToHtml(
             const reason = getAnchorSkipReason(textNode.data, possibleMatch)
 
             if (reason) {
-                if (collectDiagnostics && skipped.length < MAX_SKIPPED_ITEMS) {
-                    pushSkipped(skipped, {
-                        keyword: possibleMatch.candidate.keyword,
-                        anchorText: textNode.data.slice(possibleMatch.start, possibleMatch.end),
-                        targetUrl: possibleMatch.candidate.targetUrl,
-                        ruleId: possibleMatch.candidate.rule.id,
-                        ruleTitle: possibleMatch.candidate.rule.title,
-                        reason,
-                        textPreview: textNode.data.slice(0, 160),
-                    })
-                }
+                pushSkipped(skipped, {
+                    keyword: possibleMatch.candidate.keyword,
+                    anchorText: textNode.data.slice(possibleMatch.start, possibleMatch.end),
+                    targetUrl: possibleMatch.candidate.targetUrl,
+                    ruleId: possibleMatch.candidate.rule.id,
+                    ruleTitle: possibleMatch.candidate.rule.title,
+                    reason,
+                    textPreview: textNode.data.slice(0, 160),
+                })
 
                 return false
             }
@@ -884,7 +858,7 @@ export function applyInternalLinksToHtml(
             (targetCount.get(match.candidate.targetUrl) || 0) + 1,
         )
 
-        const normalizedAnchor = match.candidate.anchorKey
+        const normalizedAnchor = normalizeVietnameseText(match.candidate.keyword)
 
         anchorCount.set(normalizedAnchor, (anchorCount.get(normalizedAnchor) || 0) + 1)
 

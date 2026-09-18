@@ -47,6 +47,7 @@ export async function applyInternalLinksForRender({
     const loadedAt = performance.now()
 
     const result = applyInternalLinksToHtml({
+        collectDiagnostics: forcePreview === true,
         html,
         currentUrl,
         scope,

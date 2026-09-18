@@ -41,6 +41,7 @@ export type InternalLinkSettings = {
 }
 
 export type ApplyInternalLinksInput = {
+    collectDiagnostics?: boolean
     html: unknown
     currentUrl: string
     scope: InternalLinkScope
