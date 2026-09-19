@@ -122,6 +122,7 @@ export function RouteLoadingIndicator() {
   const [visible, setVisible] = useState(false)
   const [progress, setProgress] = useState(0)
   const startedAtRef = useRef(0)
+  const loadingRef = useRef(false)
   const hideTimerRef = useRef<number | null>(null)
   const progressTimerRef = useRef<number | null>(null)
   const timeoutRef = useRef<number | null>(null)
@@ -142,6 +143,7 @@ export function RouteLoadingIndicator() {
     }
 
     clearTimers()
+    loadingRef.current = true
     startedAtRef.current = Date.now()
     setVisible(true)
     setProgress(12)
@@ -157,6 +159,7 @@ export function RouteLoadingIndicator() {
     }, 180)
 
     timeoutRef.current = window.setTimeout(() => {
+      loadingRef.current = false
       setVisible(false)
       setProgress(0)
       clearTimers()
@@ -164,7 +167,7 @@ export function RouteLoadingIndicator() {
   }
 
   const finish = () => {
-    if (!visible) return
+    if (!loadingRef.current) return
 
     if (progressTimerRef.current) {
       window.clearInterval(progressTimerRef.current)
@@ -179,6 +182,7 @@ export function RouteLoadingIndicator() {
     if (hideTimerRef.current) window.clearTimeout(hideTimerRef.current)
 
     hideTimerRef.current = window.setTimeout(() => {
+      loadingRef.current = false
       setVisible(false)
       setProgress(0)
       clearTimers()
