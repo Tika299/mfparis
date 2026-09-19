@@ -1,7 +1,22 @@
 import type { CollectionConfig } from 'payload'
+import { invalidateInternalLinkCache } from '../lib/internal-links/invalidateInternalLinkCache'
 
 export const InternalLinkRules: CollectionConfig = {
     slug: 'internal-link-rules',
+    hooks: {
+        afterChange: [
+            ({ doc }) => {
+                invalidateInternalLinkCache('internal-link-rules')
+                return doc
+            },
+        ],
+        afterDelete: [
+            ({ doc }) => {
+                invalidateInternalLinkCache('internal-link-rules')
+                return doc
+            },
+        ],
+    },
     admin: {
         useAsTitle: 'title',
         group: 'SEO',

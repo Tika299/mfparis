@@ -1,7 +1,16 @@
 import { GlobalConfig } from 'payload'
+import { invalidateInternalLinkCache } from '../lib/internal-links/invalidateInternalLinkCache'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
+  hooks: {
+    afterChange: [
+      ({ doc }) => {
+        invalidateInternalLinkCache('site-settings')
+        return doc
+      },
+    ],
+  },
   fields: [
     {
       name: 'heroSliders',
