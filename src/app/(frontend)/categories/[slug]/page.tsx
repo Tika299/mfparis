@@ -524,7 +524,9 @@ export default async function CategoryPage({
       },
     }),
 
-    getProductFilterOptions(),
+    getProductFilterOptions(
+      [...new Set(categoryScopeIDs.map(String))].sort(),
+    ),
   ])
 
   const totalPages =

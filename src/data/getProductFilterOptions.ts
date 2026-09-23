@@ -10,8 +10,6 @@ const BRANDS_CACHE_TAG = 'brands'
 const CATEGORIES_CACHE_TAG = 'categories'
 const ATTRIBUTES_CACHE_TAG = 'attributes'
 
-const MAX_DYNAMIC_FACET_VALUES = 18
-
 type RelationshipID = string | number
 type FacetCountMap = Record<string, number>
 
@@ -53,7 +51,7 @@ function relationshipIDs(values: unknown): RelationshipID[] {
 }
 
 export const getProductFilterOptions = unstable_cache(
-  async (): Promise<{
+  async (categoryIDs: string[] = []): Promise<{
     brands: FilterItem[]
     categories: FilterItem[]
     facets: FilterFacetGroup[]
@@ -99,7 +97,7 @@ export const getProductFilterOptions = unstable_cache(
       }),
       payload.find({
         collection: 'attribute-values',
-        depth: 1,
+        depth: 0,
         pagination: false,
         overrideAccess: true,
         sort: 'sortOrder',
@@ -127,9 +125,12 @@ export const getProductFilterOptions = unstable_cache(
         pagination: false,
         overrideAccess: true,
         where: {
-          status: {
-            equals: 'published',
-          },
+          and: [
+            { status: { equals: 'published' } },
+            ...(categoryIDs.length > 0
+              ? [{ categories: { in: categoryIDs } }]
+              : []),
+          ],
         },
         select: {
           brand: true,
@@ -240,7 +241,6 @@ export const getProductFilterOptions = unstable_cache(
             const countDiff = (right.count ?? 0) - (left.count ?? 0)
             return countDiff || left.name.localeCompare(right.name, 'vi')
           })
-          .slice(0, MAX_DYNAMIC_FACET_VALUES)
 
         return {
           key: `attr_${attribute.slug}`,
@@ -266,7 +266,6 @@ export const getProductFilterOptions = unstable_cache(
         const countDiff = (right.count ?? 0) - (left.count ?? 0)
         return countDiff || left.name.localeCompare(right.name, 'vi')
       })
-      .slice(0, MAX_DYNAMIC_FACET_VALUES)
 
     const facets: FilterFacetGroup[] = [
       ...attributeFacets,
@@ -287,7 +286,7 @@ export const getProductFilterOptions = unstable_cache(
       facets,
     }
   },
-  ['mfparis-product-filter-options-v4'],
+  ['mfparis-product-filter-options-v5-category-scope'],
   {
     revalidate: 300,
     tags: [
