@@ -63,14 +63,16 @@ export async function applyInternalLinksForRender({
 
     const finishedAt = performance.now()
 
-    console.log('[INTERNAL LINK PERF]', JSON.stringify({
-        url: currentUrl,
-        rules: rules.length,
-        htmlCharacters: typeof html === 'string' ? html.length : null,
-        loadMs: Math.round(loadedAt - startedAt),
-        injectMs: Math.round(finishedAt - loadedAt),
-        totalMs: Math.round(finishedAt - startedAt),
-    }))
+    if (process.env.DEBUG_INTERNAL_LINK_PERF === 'true') {
+        console.log('[INTERNAL LINK PERF]', JSON.stringify({
+            url: currentUrl,
+            rules: rules.length,
+            htmlCharacters: typeof html === 'string' ? html.length : null,
+            loadMs: Math.round(loadedAt - startedAt),
+            injectMs: Math.round(finishedAt - loadedAt),
+            totalMs: Math.round(finishedAt - startedAt),
+        }))
+    }
 
     return result
 }
