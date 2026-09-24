@@ -5,6 +5,7 @@ import {
   type CollectionBeforeValidateHook,
   type CollectionConfig,
 } from 'payload'
+import { revalidateFilterOptions } from './hooks/revalidateFilterOptions'
 
 type EntityID = string | number
 
@@ -428,6 +429,12 @@ export const AttributeValues: CollectionConfig = {
   hooks: {
     beforeValidate: [normalizeValue],
     beforeChange: [validateValue],
+    afterChange: [
+      () => { revalidateFilterOptions() },
+    ],
+    afterDelete: [
+      () => { revalidateFilterOptions() },
+    ],
   },
 
   fields: [

@@ -1,4 +1,5 @@
 import type { Access, CollectionConfig } from 'payload'
+import { revalidateFilterOptions } from './hooks/revalidateFilterOptions'
 
 const staffOnly: Access = ({ req }) => {
     return Boolean(req.user)
@@ -22,6 +23,14 @@ export const ProductFilterGroups: CollectionConfig = {
         create: staffOnly,
         update: staffOnly,
         delete: staffOnly,
+    },
+    hooks: {
+        afterChange: [
+            () => { revalidateFilterOptions() },
+        ],
+        afterDelete: [
+            () => { revalidateFilterOptions() },
+        ],
     },
     fields: [
         {

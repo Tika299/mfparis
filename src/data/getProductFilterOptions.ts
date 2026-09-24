@@ -12,6 +12,7 @@ const ATTRIBUTES_CACHE_TAG = 'attributes'
 
 type RelationshipID = string | number
 type FacetCountMap = Record<string, number>
+type FilterSurface = 'products' | 'categories' | 'brands' | 'search'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -50,8 +51,85 @@ function relationshipIDs(values: unknown): RelationshipID[] {
     .filter((id): id is RelationshipID => id !== null)
 }
 
+const getFilterReferenceData = unstable_cache(
+  async () => {
+    const payload = await getPayload({ config: configPromise })
+    return Promise.all([
+      payload.find({
+        collection: 'brands', depth: 0, pagination: false,
+        overrideAccess: true, sort: 'name',
+        select: { name: true, slug: true },
+      }),
+      payload.find({
+        collection: 'categories', depth: 0, pagination: false,
+        overrideAccess: true, sort: 'name',
+        select: { name: true, slug: true },
+      }),
+      payload.find({
+        collection: 'attributes', depth: 0, pagination: false,
+        overrideAccess: true, sort: 'sortOrder',
+        where: {
+          and: [
+            { isActive: { equals: true } },
+            { filterable: { equals: true } },
+          ]
+        },
+        select: {
+          name: true, slug: true, allowsMultiple: true, description: true,
+        },
+      }),
+      payload.find({
+        collection: 'attribute-values', depth: 0, pagination: false,
+        overrideAccess: true, sort: 'sortOrder',
+        where: { isActive: { equals: true } },
+        select: { attribute: true, label: true, slug: true },
+      }),
+      payload.find({
+        collection: 'fragrance-notes', depth: 0, pagination: false,
+        overrideAccess: true, sort: 'name',
+        where: { isActive: { equals: true } },
+        select: { name: true, slug: true },
+      }),
+      payload.find({
+        collection: 'product-filter-groups',
+        depth: 0,
+        pagination: false,
+        overrideAccess: true,
+        sort: 'sortOrder',
+        select: {
+          label: true,
+          queryKey: true,
+          enabled: true,
+          sortOrder: true,
+          sourceType: true,
+          attribute: true,
+          displayType: true,
+          showOn: true,
+          maxOptions: true,
+          collapsedByDefault: true,
+        },
+      }),
+    ])
+  },
+  ['mfparis-filter-reference-v2-groups'],
+  {
+    revalidate: 300,
+    tags: [
+      'brands',
+      'categories',
+      'attributes',
+      'attribute-values',
+      'fragrance-notes',
+      'product-filter-groups',
+    ],
+  },
+)
+
 export const getProductFilterOptions = unstable_cache(
-  async (categoryIDs: string[] = []): Promise<{
+  async (
+    categoryIDs: string[] = [],
+    surface: FilterSurface = 'products',
+  ): Promise<{
     brands: FilterItem[]
     categories: FilterItem[]
     facets: FilterFacetGroup[]
@@ -61,64 +139,11 @@ export const getProductFilterOptions = unstable_cache(
     })
 
     const [
-      brandsResult,
-      categoriesResult,
-      attributesResult,
-      attributeValuesResult,
-      fragranceNotesResult,
+      [brandsResult, categoriesResult, attributesResult,
+        attributeValuesResult, fragranceNotesResult, filterGroupsResult],
       productRelationsResult,
     ] = await Promise.all([
-      payload.find({
-        collection: 'brands',
-        depth: 0,
-        pagination: false,
-        overrideAccess: true,
-        sort: 'name',
-      }),
-      payload.find({
-        collection: 'categories',
-        depth: 0,
-        pagination: false,
-        overrideAccess: true,
-        sort: 'name',
-      }),
-      payload.find({
-        collection: 'attributes',
-        depth: 0,
-        pagination: false,
-        overrideAccess: true,
-        sort: 'sortOrder',
-        where: {
-          and: [
-            { isActive: { equals: true } },
-            { filterable: { equals: true } },
-          ],
-        },
-      }),
-      payload.find({
-        collection: 'attribute-values',
-        depth: 0,
-        pagination: false,
-        overrideAccess: true,
-        sort: 'sortOrder',
-        where: {
-          isActive: {
-            equals: true,
-          },
-        },
-      }),
-      payload.find({
-        collection: 'fragrance-notes',
-        depth: 0,
-        pagination: false,
-        overrideAccess: true,
-        sort: 'name',
-        where: {
-          isActive: {
-            equals: true,
-          },
-        },
-      }),
+      getFilterReferenceData(),
       payload.find({
         collection: 'products',
         depth: 0,
@@ -192,12 +217,16 @@ export const getProductFilterOptions = unstable_cache(
       }
     }
 
-    const brands: FilterItem[] = brandsResult.docs.map((brand) => ({
-      id: brand.id,
-      name: brand.name,
-      slug: brand.slug,
-      count: brandCounts[String(brand.id)] ?? 0,
-    }))
+    const brands: FilterItem[] = brandsResult.docs
+      .map((brand) => ({
+        id: brand.id,
+        name: brand.name,
+        slug: brand.slug,
+        count: brandCounts[String(brand.id)] ?? 0,
+      }))
+      .filter((brand) =>
+        categoryIDs.length === 0 || brand.count > 0,
+      )
 
     const categories: FilterItem[] = categoriesResult.docs.map((category) => ({
       id: category.id,
@@ -234,8 +263,29 @@ export const getProductFilterOptions = unstable_cache(
       attributeValuesByAttribute.set(key, nextValues)
     }
 
+    type Group = (typeof filterGroupsResult.docs)[number]
+    const groupsByAttribute = new Map<string, Group>()
+
+    for (const group of filterGroupsResult.docs) {
+      if (group.sourceType !== 'attribute') continue
+      const id = getRelationshipID(group.attribute)
+      if (id === null) continue
+      const key = String(id)
+      if (!groupsByAttribute.has(key)) groupsByAttribute.set(key, group)
+    }
+
     const attributeFacets: FilterFacetGroup[] = attributesResult.docs
+      .filter((attribute) => {
+        const group = groupsByAttribute.get(String(attribute.id))
+        if (!group) return true
+        return group.enabled === true && group.showOn?.includes(surface) === true
+      })
+      .sort((a, b) =>
+        (groupsByAttribute.get(String(a.id))?.sortOrder ?? 100) -
+        (groupsByAttribute.get(String(b.id))?.sortOrder ?? 100),
+      )
       .map((attribute) => {
+        const group = groupsByAttribute.get(String(attribute.id))
         const items = (attributeValuesByAttribute.get(String(attribute.id)) ?? [])
           .sort((left, right) => {
             const countDiff = (right.count ?? 0) - (left.count ?? 0)
@@ -244,11 +294,12 @@ export const getProductFilterOptions = unstable_cache(
 
         return {
           key: `attr_${attribute.slug}`,
-          title: attribute.name,
+          title: group?.label || attribute.name,
           placeholder: `Chọn ${attribute.name.toLocaleLowerCase('vi')}`,
           emptyMessage: `Chưa có ${attribute.name.toLocaleLowerCase('vi')}`,
           multiple: attribute.allowsMultiple !== false,
           description: attribute.description || undefined,
+          collapsedByDefault: group?.collapsedByDefault ?? true,
           items,
         }
       })
@@ -286,7 +337,7 @@ export const getProductFilterOptions = unstable_cache(
       facets,
     }
   },
-  ['mfparis-product-filter-options-v5-category-scope'],
+  ['mfparis-product-filter-options-v9-collapsed'],
   {
     revalidate: 300,
     tags: [
@@ -294,6 +345,9 @@ export const getProductFilterOptions = unstable_cache(
       BRANDS_CACHE_TAG,
       CATEGORIES_CACHE_TAG,
       ATTRIBUTES_CACHE_TAG,
+      'attribute-values',
+      'fragrance-notes',
+      'product-filter-groups',
     ],
   },
 )

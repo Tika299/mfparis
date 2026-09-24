@@ -2,6 +2,7 @@ import type {
     CollectionConfig,
     FieldHook,
 } from 'payload'
+import { revalidateFilterOptions } from './hooks/revalidateFilterOptions'
 
 function isRecord(
     value: unknown,
@@ -69,6 +70,15 @@ export const FragranceNotes: CollectionConfig = {
 
     access: {
         read: () => true,
+    },
+
+    hooks: {
+        afterChange: [
+            () => { revalidateFilterOptions() },
+        ],
+        afterDelete: [
+            () => { revalidateFilterOptions() },
+        ],
     },
 
     fields: [

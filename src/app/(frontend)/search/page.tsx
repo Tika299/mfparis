@@ -255,7 +255,7 @@ export default async function SearchPage({
         },
       },
     }),
-    getProductFilterOptions(),
+    getProductFilterOptions([], 'search'),
   ])
 
   if (

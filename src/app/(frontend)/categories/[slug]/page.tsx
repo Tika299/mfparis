@@ -526,6 +526,7 @@ export default async function CategoryPage({
 
     getProductFilterOptions(
       [...new Set(categoryScopeIDs.map(String))].sort(),
+      'categories',
     ),
   ])
 

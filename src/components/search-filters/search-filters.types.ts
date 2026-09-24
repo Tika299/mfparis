@@ -13,6 +13,7 @@ export type FilterFacetGroup = {
     emptyMessage?: string
     multiple?: boolean
     description?: string
+    collapsedByDefault?: boolean
 }
 
 export type PriceRange = [number, number]

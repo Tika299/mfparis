@@ -134,6 +134,7 @@ export const FilterPanel = ({
             emptyMessage={facet.emptyMessage ?? 'Chưa có lựa chọn'}
             multiple={facet.multiple ?? true}
             description={facet.description}
+            collapsedByDefault={facet.collapsedByDefault ?? true}
             onSelect={(slug) => onFacetChange(facet.key, slug)}
             onToggle={(slug) => onFacetToggle(facet.key, slug)}
           />
