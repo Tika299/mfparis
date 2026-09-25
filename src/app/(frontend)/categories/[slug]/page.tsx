@@ -40,6 +40,7 @@ import {
 } from '@/lib/categoryTree'
 import { CategoryFamilyNav } from '@/components/CategoryFamilyNav'
 import { cache, Suspense } from 'react'
+import type { ComponentProps } from 'react'
 
 const PRODUCTS_PER_PAGE = 20
 const DEFAULT_SORT = '-createdAt'
@@ -397,6 +398,34 @@ async function measureCategoryTask<T>(
   }
 }
 
+type DeferredCategoryFiltersProps = Omit<
+  ComponentProps<typeof SearchFilters>,
+  'brands' | 'categories' | 'facets'
+> & {
+  optionsPromise: ReturnType<typeof getProductFilterOptions>
+  facetKeys: string[]
+}
+
+async function DeferredCategoryFilters({
+  optionsPromise,
+  facetKeys,
+  ...props
+}: DeferredCategoryFiltersProps) {
+  const options = await optionsPromise
+  const enabledKeys = new Set(facetKeys)
+
+  return (
+    <SearchFilters
+      {...props}
+      brands={options.brands}
+      categories={options.categories}
+      facets={options.facets.filter((facet) =>
+        enabledKeys.has(facet.key),
+      )}
+    />
+  )
+}
+
 export default async function CategoryPage({
   params,
   searchParams,
@@ -513,50 +542,57 @@ export default async function CategoryPage({
     and: andConditions,
   }
 
-  const [
-    productsRes,
-    filterOptions,
-  ] = await Promise.all([
-    measureCategoryTask(slug, 'products', () => payload.find({
-      collection: 'products',
-      where: whereQueries,
-      sort,
-      limit: PRODUCTS_PER_PAGE,
-      page: currentPage,
-      depth: 1,
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        sku: true,
-        brand: true,
-        price: true,
-        images: true,
-        averageRating: true,
-        reviewCount: true,
-        status: true,
-        productType: true,
-        variants: {
-          id: true,
-          name: true,
-          sku: true,
-          basePrice: true,
-          salePrice: true,
-          stock: true,
-          isActive: true,
-          isDefault: true,
-          image: true,
-        },
-      },
-    })),
-
-    measureCategoryTask(slug, 'filter-options', () =>
+  const filterOptionsPromise = measureCategoryTask(
+    slug,
+    'filter-options',
+    () =>
       getProductFilterOptions(
         [...new Set(categoryScopeIDs.map(String))].sort(),
         'categories',
       ),
-    ),
-  ])
+  )
+
+  // Prevent an unhandled rejection while products are pending.
+  // The original promise still propagates errors to the consumer.
+  void filterOptionsPromise.catch(() => { })
+
+  const productsRes = await measureCategoryTask(
+    slug,
+    'products',
+    () =>
+      payload.find({
+        collection: 'products',
+        where: whereQueries,
+        sort,
+        limit: PRODUCTS_PER_PAGE,
+        page: currentPage,
+        depth: 1,
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          sku: true,
+          brand: true,
+          price: true,
+          images: true,
+          averageRating: true,
+          reviewCount: true,
+          status: true,
+          productType: true,
+          variants: {
+            id: true,
+            name: true,
+            sku: true,
+            basePrice: true,
+            salePrice: true,
+            stock: true,
+            isActive: true,
+            isDefault: true,
+            image: true,
+          },
+        },
+      }),
+  )
 
   const totalPages =
     productsRes.totalPages || 1
@@ -565,12 +601,8 @@ export default async function CategoryPage({
     productsRes.totalDocs || 0
 
   const filterArchitecture = resolveCategoryFilterArchitecture(currentCategory)
-  const enabledFacetKeys = new Set(filterArchitecture.facetKeys)
   const categoryPageCoreFilters = filterArchitecture.coreFilters.filter(
     (key) => key !== 'category',
-  )
-  const categoryFilterFacets = filterOptions.facets.filter((facet) =>
-    enabledFacetKeys.has(facet.key),
   )
 
   const hasDescription = Boolean(
@@ -766,34 +798,42 @@ export default async function CategoryPage({
         />
         {/* Tablet */}
         <div className="sticky top-28 z-40 mb-5 hidden md:block lg:hidden">
-          <SearchFilters
-            brands={filterOptions.brands}
-            categories={filterOptions.categories}
-            facets={categoryFilterFacets}
-            enabledCoreFilters={categoryPageCoreFilters}
-            variant="horizontal"
-            sticky={false}
-            routeContext={
-              filterRouteContext
-            }
-          />
+          <Suspense fallback={
+            <div role="status" className="min-h-12 bg-white p-3 text-sm text-gray-500">
+              Đang tải bộ lọc…
+            </div>
+          }>
+            <DeferredCategoryFilters
+              optionsPromise={filterOptionsPromise}
+              facetKeys={filterArchitecture.facetKeys}
+              enabledCoreFilters={categoryPageCoreFilters}
+              variant="horizontal"
+              sticky={false}
+              routeContext={
+                filterRouteContext
+              }
+            /></Suspense>
         </div>
 
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-8">
           {/* Desktop */}
           <aside className="hidden lg:sticky lg:top-24 lg:block lg:max-h-[calc(100dvh-7rem)] lg:w-[250px] lg:shrink-0 lg:self-start lg:overflow-y-auto">
             <div className="lc-card rounded-2xl">
-              <SearchFilters
-                brands={filterOptions.brands}
-                categories={filterOptions.categories}
-                facets={categoryFilterFacets}
-                enabledCoreFilters={categoryPageCoreFilters}
-                variant="sidebar"
-                sticky={false}
-                routeContext={
-                  filterRouteContext
-                }
-              />
+              <Suspense fallback={
+                <div role="status" className="min-h-12 bg-white p-3 text-sm text-gray-500">
+                  Đang tải bộ lọc…
+                </div>
+              }>
+                <DeferredCategoryFilters
+                  optionsPromise={filterOptionsPromise}
+                  facetKeys={filterArchitecture.facetKeys}
+                  enabledCoreFilters={categoryPageCoreFilters}
+                  variant="sidebar"
+                  sticky={false}
+                  routeContext={
+                    filterRouteContext
+                  }
+                /></Suspense>
             </div>
           </aside>
 
@@ -912,15 +952,17 @@ export default async function CategoryPage({
                   </h2>
 
                   <div className="category-description prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
-                    <Suspense key={`description:${categoryUrl}`} fallback={null}>
-                      <LinkedCategoryHtml
-                        html={currentCategory.description}
-                        currentUrl={categoryUrl}
-                        scope="categories"
-                        payload={payload}
-                        {...internalLinkingConfig}
-                      />
-                    </Suspense>
+                    <ExpandableContent maxHeight={500}>
+                      <Suspense key={`description:${categoryUrl}`} fallback={null}>
+                        <LinkedCategoryHtml
+                          html={currentCategory.description}
+                          currentUrl={categoryUrl}
+                          scope="categories"
+                          payload={payload}
+                          {...internalLinkingConfig}
+                        />
+                      </Suspense>
+                    </ExpandableContent>
                   </div>
                 </section>
               )}
@@ -970,16 +1012,21 @@ export default async function CategoryPage({
 
       {/* Mobile */}
       <div className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 md:hidden">
-        <SearchFilters
-          brands={filterOptions.brands}
-          categories={filterOptions.categories}
-          facets={categoryFilterFacets}
-          enabledCoreFilters={categoryPageCoreFilters}
-          variant="mobile-fab"
-          routeContext={
-            filterRouteContext
-          }
-        />
+        <Suspense fallback={
+          <div role="status" className="min-h-12 bg-white p-3 text-sm text-gray-500">
+            Đang tải bộ lọc…
+          </div>
+        }>
+          <DeferredCategoryFilters
+            optionsPromise={filterOptionsPromise}
+            facetKeys={filterArchitecture.facetKeys}
+            enabledCoreFilters={categoryPageCoreFilters}
+            variant="mobile-fab"
+            routeContext={
+              filterRouteContext
+            }
+          />
+        </Suspense>
       </div>
     </div>
   )
