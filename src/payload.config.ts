@@ -125,6 +125,7 @@ export default buildConfig({
   db: postgresAdapter(
     {
       pool: { connectionString: process.env.DATABASE_URL, },
+      push: false,
       transactionOptions: { isolationLevel: 'serializable', },
     }
   ),

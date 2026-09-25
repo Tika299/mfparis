@@ -55,6 +55,7 @@ type ProductCardProps = Readonly<{
   showRating?: boolean
   showAddToCart?: boolean
   className?: string
+  imagePriority?: boolean
 }>
 
 function getActiveVariants(
@@ -201,6 +202,7 @@ function getRankClassName(
 
 export const ProductCard = ({
   product,
+  imagePriority = false,
   mode = 'standard',
   rank,
   description,
@@ -451,6 +453,7 @@ export const ProductCard = ({
               media={displayMedia}
               size="card"
               alt={product.title}
+              priority={imagePriority}
               sizes="(max-width: 767px) 50vw, (max-width: 1279px) 33.33vw, 33.33vw"
               className="h-full w-full [&_img]:object-contain"
             />

@@ -788,14 +788,13 @@ export default async function CategoryPage({
             {productsRes.docs.length > 0 ? (
               <>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
-                  {productsRes.docs.map(
-                    (product) => (
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                      />
-                    ),
-                  )}
+                  {productsRes.docs.map((product, index) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      imagePriority={index === 0}
+                    />
+                  ))}
                 </div>
 
                 {totalPages > 1 && (
