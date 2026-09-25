@@ -1,6 +1,6 @@
 ﻿import type { Metadata } from 'next'
 import type { Where } from 'payload'
-
+import { wrapBlogTables } from '@/lib/html/wrapBlogTables'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { notFound } from 'next/navigation'
@@ -1210,7 +1210,7 @@ export default async function BlogPostPage({
               <BlogMobileTocButton tocItems={tocItems} />
 
               <BlogRichTextContent
-                content={linkedContent.html}
+                content={wrapBlogTables(linkedContent.html)}
                 tocItems={tocItems}
                 maxHeight={500}
               />
