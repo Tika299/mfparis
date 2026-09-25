@@ -253,6 +253,8 @@ export default async function SearchPage({
           isDefault: true,
           image: true,
         },
+        createdAt: true,
+        displayLocation: true,
       },
     }),
     getProductFilterOptions([], 'search'),

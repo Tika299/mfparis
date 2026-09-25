@@ -99,6 +99,8 @@ export async function getWishlistProducts(
                 isDefault: true,
                 image: true,
             },
+            createdAt: true,
+            displayLocation: true,
         },
         limit: normalizedIds.length,
         overrideAccess: true,

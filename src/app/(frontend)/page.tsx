@@ -120,6 +120,8 @@ export default async function HomePage() {
       isDefault: true,
       image: true,
     },
+    createdAt: true,
+    displayLocation: true,
   } as const
 
   const categoryListSelect = {

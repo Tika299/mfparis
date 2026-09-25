@@ -103,6 +103,8 @@ const getCachedProducts = unstable_cache(
         averageRating: true,
         reviewCount: true,
         status: true,
+        createdAt: true,
+        displayLocation: true,
       },
     })
   },

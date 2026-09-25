@@ -590,6 +590,8 @@ export default async function CategoryPage({
             isDefault: true,
             image: true,
           },
+          createdAt: true,
+          displayLocation: true,
         },
       }),
   )

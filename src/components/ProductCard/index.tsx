@@ -37,6 +37,8 @@ export type ProductCardProduct = Readonly<{
   status?: Product['status']
   productType?: Product['productType'] | null
   variants?: Product['variants']
+  createdAt?: Product['createdAt']
+  displayLocation?: Product['displayLocation']
 }>
 
 export type ProductCardMode =
@@ -185,26 +187,10 @@ function formatReviewCount(
   return count.toLocaleString('vi-VN')
 }
 
-function getRankClassName(
-  rank: number,
-): string {
-  switch (rank) {
-    case 1:
-      return 'bg-[#e95c0c] text-white'
-    case 2:
-      return 'bg-[#cfd0d2] text-white'
-    case 3:
-      return 'bg-[#f28b00] text-white'
-    default:
-      return ''
-  }
-}
-
 export const ProductCard = ({
   product,
   imagePriority = false,
   mode = 'standard',
-  rank,
   description,
   badgeText,
   showRating: showRatingProp,
@@ -338,27 +324,31 @@ export const ProductCard = ({
   const showBrand =
     mode !== 'combo'
 
-  const shouldShowDiscountBadge =
-    mode === 'flash' &&
+  const shouldShowDiscountBadge = isSale
+  const createdTime = Date.parse(product.createdAt ?? '')
+  const ageMs = Date.now() - createdTime
+  const isNew =
+    Number.isFinite(createdTime) &&
+    ageMs >= 0 &&
+    ageMs < 30 * 24 * 60 * 60 * 1000
+
+  const badges = [
+    product.displayLocation?.includes('best-seller')
+      ? { key: 'best', label: 'Bán chạy', color: 'bg-emerald-700' }
+      : null,
+    isNew
+      ? { key: 'new', label: 'Mới', color: 'bg-sky-700' }
+      : null,
     isSale
-
-  const shouldShowNewBadge =
-    mode === 'new'
-
-  const shouldShowComboBadge =
+      ? { key: 'sale', label: `-${discountPercent}%`, color: 'bg-[#c40008]' }
+      : null,
     mode === 'combo'
-
-  const shouldShowRankBadge =
-    mode === 'bestSeller' &&
-    typeof rank === 'number' &&
-    rank >= 1 &&
-    rank <= 3
+      ? { key: 'combo', label: badgeText ?? 'Combo', color: 'bg-neutral-800' }
+      : null,
+  ].filter((badge) => badge !== null)
 
   const isFlashMode =
     mode === 'flash'
-
-  const productCardSizes =
-    '(min-width: 1536px) 23vw, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 48vw'
 
   const displayTitle =
     mode === 'flash'
@@ -395,34 +385,19 @@ export const ProductCard = ({
       )}
     >
       <div className="relative aspect-[1/1] w-full overflow-hidden bg-white">
-        {shouldShowDiscountBadge ? (
-          <span className="absolute left-2 top-2 z-20 flex min-h-7 items-center justify-center rounded-[7px] bg-[#c40008] px-2 text-[10px] font-bold uppercase text-white shadow-sm sm:left-2.5 sm:top-2.5 sm:text-[11px] lg:left-4 lg:top-4 lg:min-h-8 lg:px-3 lg:text-[12px]">
-            -{discountPercent}%
-          </span>
-        ) : null}
-
-        {shouldShowNewBadge ? (
-          <span className="absolute left-2 top-2 z-20 flex min-h-7 items-center justify-center rounded-[7px] bg-[#c40008] px-2 text-[10px] font-bold uppercase text-white shadow-sm sm:left-2.5 sm:top-2.5 sm:text-[11px] lg:left-4 lg:top-4 lg:min-h-8 lg:px-3 lg:text-[12px]">
-            {badgeText ?? 'Mới'}
-          </span>
-        ) : null}
-
-        {shouldShowComboBadge ? (
-          <span className="absolute left-2 top-2 z-20 flex min-h-7 items-center justify-center rounded-[7px] bg-[#c40008] px-2 text-[10px] font-bold uppercase text-white shadow-sm sm:left-2.5 sm:top-2.5 sm:text-[11px] lg:left-4 lg:top-4 lg:min-h-8 lg:px-3 lg:text-[12px]">
-            {badgeText ?? 'Combo'}
-          </span>
-        ) : null}
-
-        {shouldShowRankBadge ? (
-          <span
-            className={cn(
-              'absolute left-2 top-2 z-20 flex h-9 min-w-9 items-center justify-center rounded-[9px] px-2 text-[15px] font-bold shadow-sm sm:left-2.5 sm:top-2.5 sm:h-10 sm:min-w-10 sm:text-[17px] lg:left-4 lg:top-4 lg:h-12 lg:min-w-12 lg:text-[20px]',
-              getRankClassName(rank),
-            )}
-          >
-            {rank}
-          </span>
-        ) : null}
+        <div className="pointer-events-none absolute left-2 top-2 z-30 flex max-w-[calc(100%-3.5rem)] flex-col items-start gap-1">
+          {badges.map((badge) => (
+            <span
+              key={badge.key}
+              className={cn(
+                'max-w-full rounded px-2 py-1 text-[10px] font-bold leading-tight text-white sm:text-xs',
+                badge.color,
+              )}
+            >
+              {badge.label}
+            </span>
+          ))}
+        </div>
 
         <ProductCardActions
           action="wishlist"
@@ -552,7 +527,7 @@ export const ProductCard = ({
             'mt-auto',
           )}
         >
-          {mode === 'flash' && isSale ? (
+          {shouldShowDiscountBadge ? (
             <div
               className={cn(
                 'flex flex-col justify-end',

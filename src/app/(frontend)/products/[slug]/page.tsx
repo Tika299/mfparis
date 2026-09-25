@@ -1037,6 +1037,7 @@ const relatedProductSelect = {
     isDefault: true,
     image: true,
   },
+  displayLocation: true,
 } as const
 
 const sortRelatedCandidates = (

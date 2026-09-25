@@ -531,6 +531,8 @@ export default async function BrandProductsPage({
           isDefault: true,
           image: true,
         },
+        createdAt: true,
+        displayLocation: true,
       },
     }),
 
