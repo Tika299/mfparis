@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { getSiteSettings } from '@/data/getSiteSettings'
 import { SITE_ORIGIN } from '@/utilities/seo'
+import { DeferredMap } from '@/components/DeferredMap'
 
 const BO_CONG_THUONG_URL =
   'http://online.gov.vn/nen-tang/0b38011e-cd02-475e-9746-3842a34a8adc'
@@ -654,20 +655,7 @@ export const Footer = async () => {
             </FooterHeading>
 
             <div className="relative mt-4 h-[150px] overflow-hidden rounded-[11px] border border-white/25 bg-white shadow-[0_10px_28px_rgba(59,0,0,0.20)]">
-              <iframe
-                title="Bản đồ Marais de France"
-                src={mapEmbedUrl}
-                width="100%"
-                height="100%"
-                loading="lazy"
-                allowFullScreen={false}
-                referrerPolicy="no-referrer-when-downgrade"
-                className="pointer-events-none h-full w-full border-0"
-                style={{
-                  filter:
-                    'saturate(0.65) contrast(0.92) brightness(1.08)',
-                }}
-              />
+              <DeferredMap src={mapEmbedUrl} />
 
               <a
                 href={googleMapsUrl}
