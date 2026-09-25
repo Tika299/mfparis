@@ -111,6 +111,7 @@ export const OptimizedImage = ({
         alt={imageAlt}
         fill
         priority={priority}
+        fetchPriority={priority ? 'high' : undefined}
         sizes={imageSizes}
         quality={quality}
         loading={priority ? undefined : 'lazy'}
