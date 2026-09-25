@@ -39,6 +39,7 @@ import {
   type CategoryTreeItem,
 } from '@/lib/categoryTree'
 import { CategoryFamilyNav } from '@/components/CategoryFamilyNav'
+import { cache, Suspense } from 'react'
 
 const PRODUCTS_PER_PAGE = 20
 const DEFAULT_SORT = '-createdAt'
@@ -129,7 +130,7 @@ function getLandingFaqItems(value: unknown): { question: string; answer: string 
     .filter((item) => item.question && item.answer)
 }
 
-async function getCategoryBySlug(slug: string) {
+const getCategoryBySlug = cache(async (slug: string) => {
   const payload = await getPayload({
     config: configPromise,
   })
@@ -147,7 +148,7 @@ async function getCategoryBySlug(slug: string) {
   })
 
   return categoryRes.docs[0] ?? null
-}
+})
 
 function truncateText(
   value: string,
@@ -360,6 +361,14 @@ function normalizeSort(value?: string): string {
   return DEFAULT_SORT
 }
 
+async function LinkedCategoryHtml(
+  props: Parameters<typeof applyInternalLinksForRender>[0],
+) {
+  const result = await applyInternalLinksForRender(props)
+
+  return <SafeHtmlContent html={result.html} />
+}
+
 export default async function CategoryPage({
   params,
   searchParams,
@@ -387,38 +396,27 @@ export default async function CategoryPage({
   /*
    * Bước 1: Tìm category hiện tại bằng slug.
    */
-  const categoryRes = await payload.find({
-    collection: 'categories',
-    where: {
-      slug: {
-        equals: slug,
+  const [currentCategory, allCategoriesRes] = await Promise.all([
+    getCategoryBySlug(slug),
+    payload.find({
+      collection: 'categories',
+      depth: 1,
+      limit: 1000,
+      pagination: false,
+      overrideAccess: true,
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        parent: true,
+        image: true,
       },
-    },
-    limit: 1,
-    pagination: false,
-    depth: 2,
-  })
-
-  const currentCategory = categoryRes.docs[0]
+    }),
+  ])
 
   if (!currentCategory) {
     notFound()
   }
-
-  const allCategoriesRes = await payload.find({
-    collection: 'categories',
-    depth: 1,
-    limit: 1000,
-    pagination: false,
-    overrideAccess: true,
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      parent: true,
-      image: true,
-    },
-  })
 
   const allCategories = allCategoriesRes.docs as CategoryTreeItem[]
 
@@ -578,21 +576,6 @@ export default async function CategoryPage({
 
   const internalLinkingConfig = getInternalLinkingConfig(currentCategory)
 
-  const linkedCategoryDescription = await applyInternalLinksForRender({
-    html: currentCategory.description,
-    currentUrl: categoryUrl,
-    scope: 'categories',
-    payload,
-    ...internalLinkingConfig,
-  })
-
-  const linkedBottomContent = await applyInternalLinksForRender({
-    html: bottomContentHtml,
-    currentUrl: categoryUrl,
-    scope: 'categories',
-    payload,
-    ...internalLinkingConfig,
-  })
   const schemaGraph = buildCollectionPageSchemaGraph({
     page: {
       url: categoryUrl,
@@ -899,13 +882,15 @@ export default async function CategoryPage({
                   </h2>
 
                   <div className="category-description prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
-                    <ExpandableContent maxHeight={500}>
-                      <SafeHtmlContent
-                        html={
-                          linkedCategoryDescription.html
-                        }
+                    <Suspense key={`description:${categoryUrl}`} fallback={null}>
+                      <LinkedCategoryHtml
+                        html={currentCategory.description}
+                        currentUrl={categoryUrl}
+                        scope="categories"
+                        payload={payload}
+                        {...internalLinkingConfig}
                       />
-                    </ExpandableContent>
+                    </Suspense>
                   </div>
                 </section>
               )}
@@ -913,7 +898,15 @@ export default async function CategoryPage({
             {bottomContentHtml ? (
               <section className="mt-10 rounded-2xl bg-white p-5 shadow-sm md:mt-12 md:p-8">
                 <div className="category-description prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
-                  <SafeHtmlContent html={linkedBottomContent.html} />
+                  <Suspense key={`bottom:${categoryUrl}`} fallback={null}>
+                    <LinkedCategoryHtml
+                      html={bottomContentHtml}
+                      currentUrl={categoryUrl}
+                      scope="categories"
+                      payload={payload}
+                      {...internalLinkingConfig}
+                    />
+                  </Suspense>
                 </div>
               </section>
             ) : null}
