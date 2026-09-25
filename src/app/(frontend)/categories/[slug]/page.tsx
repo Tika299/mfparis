@@ -369,6 +369,34 @@ async function LinkedCategoryHtml(
   return <SafeHtmlContent html={result.html} />
 }
 
+async function measureCategoryTask<T>(
+  slug: string,
+  task: string,
+  run: () => Promise<T>,
+): Promise<T> {
+  const enabled =
+    process.env.CATEGORY_PERF === '1' &&
+    slug === 'nuoc-hoa-nam'
+
+  if (!enabled) return run()
+
+  const started = performance.now()
+  let success = false
+
+  try {
+    const result = await run()
+    success = true
+    return result
+  } finally {
+    console.info('[CATEGORY PERF]', JSON.stringify({
+      slug,
+      task,
+      ms: Math.round(performance.now() - started),
+      success,
+    }))
+  }
+}
+
 export default async function CategoryPage({
   params,
   searchParams,
@@ -489,7 +517,7 @@ export default async function CategoryPage({
     productsRes,
     filterOptions,
   ] = await Promise.all([
-    payload.find({
+    measureCategoryTask(slug, 'products', () => payload.find({
       collection: 'products',
       where: whereQueries,
       sort,
@@ -520,11 +548,13 @@ export default async function CategoryPage({
           image: true,
         },
       },
-    }),
+    })),
 
-    getProductFilterOptions(
-      [...new Set(categoryScopeIDs.map(String))].sort(),
-      'categories',
+    measureCategoryTask(slug, 'filter-options', () =>
+      getProductFilterOptions(
+        [...new Set(categoryScopeIDs.map(String))].sort(),
+        'categories',
+      ),
     ),
   ])
 
