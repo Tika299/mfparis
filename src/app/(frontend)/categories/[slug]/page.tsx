@@ -41,6 +41,7 @@ import {
 import { CategoryFamilyNav } from '@/components/CategoryFamilyNav'
 import { cache, Suspense } from 'react'
 import type { ComponentProps } from 'react'
+import { getCachedCategoryTree } from '@/data/getCachedCategoryTree'
 
 const PRODUCTS_PER_PAGE = 20
 const DEFAULT_SORT = '-createdAt'
@@ -455,25 +456,14 @@ export default async function CategoryPage({
    */
   const [currentCategory, allCategoriesRes] = await Promise.all([
     measureCategoryTask(
-      slug, 'category',
+      slug,
+      'category',
       () => getCategoryBySlug(slug),
     ),
     measureCategoryTask(
-      slug, 'category-tree',
-      () => payload.find({
-        collection: 'categories',
-        depth: 1,
-        limit: 1000,
-        pagination: false,
-        overrideAccess: true,
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          parent: true,
-          image: true,
-        },
-      }),
+      slug,
+      'category-tree',
+      () => getCachedCategoryTree(),
     ),
   ])
 
