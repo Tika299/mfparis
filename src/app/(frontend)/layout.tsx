@@ -49,14 +49,15 @@ const playfair = Playfair_Display({
   weight: ['600', '700'],
   variable: '--font-playfair',
   display: 'swap',
+  preload: false,
 })
 
-// Cấu hình Be Vietnam Pro
 const beVietnam = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
   weight: ['400', '600', '700'],
   variable: '--font-be-vietnam',
   display: 'swap',
+  preload: false,
 })
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
