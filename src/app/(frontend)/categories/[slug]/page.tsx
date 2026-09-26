@@ -377,7 +377,7 @@ async function measureCategoryTask<T>(
 ): Promise<T> {
   const enabled =
     process.env.CATEGORY_PERF === '1' &&
-    slug === 'nuoc-hoa-nam'
+    ['nuoc-hoa-nam', 'cham-soc-da', 'kem-chong-nang'].includes(slug)
 
   if (!enabled) return run()
 
@@ -454,21 +454,27 @@ export default async function CategoryPage({
    * Bước 1: Tìm category hiện tại bằng slug.
    */
   const [currentCategory, allCategoriesRes] = await Promise.all([
-    getCategoryBySlug(slug),
-    payload.find({
-      collection: 'categories',
-      depth: 1,
-      limit: 1000,
-      pagination: false,
-      overrideAccess: true,
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        parent: true,
-        image: true,
-      },
-    }),
+    measureCategoryTask(
+      slug, 'category',
+      () => getCategoryBySlug(slug),
+    ),
+    measureCategoryTask(
+      slug, 'category-tree',
+      () => payload.find({
+        collection: 'categories',
+        depth: 1,
+        limit: 1000,
+        pagination: false,
+        overrideAccess: true,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          parent: true,
+          image: true,
+        },
+      }),
+    ),
   ])
 
   if (!currentCategory) {
