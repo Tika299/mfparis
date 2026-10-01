@@ -27,6 +27,7 @@ import * as migration_20260817_040000_add_post_status from './20260817_040000_ad
 import * as migration_20260817_050000_add_category_filter_profile from './20260817_050000_add_category_filter_profile';
 import * as migration_20260901_064901 from './20260901_064901';
 import * as migration_20260911_024614_add_reviewer_name from './20260911_024614_add_reviewer_name';
+import * as migration_20261001_075341 from './20261001_075341';
 
 export const migrations = [
   {
@@ -172,6 +173,11 @@ export const migrations = [
   {
     up: migration_20260911_024614_add_reviewer_name.up,
     down: migration_20260911_024614_add_reviewer_name.down,
-    name: '20260911_024614_add_reviewer_name'
+    name: '20260911_024614_add_reviewer_name',
+  },
+  {
+    up: migration_20261001_075341.up,
+    down: migration_20261001_075341.down,
+    name: '20261001_075341'
   },
 ];

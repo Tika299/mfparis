@@ -110,6 +110,38 @@ export const InternalLinkRules: CollectionConfig = {
             },
         },
         {
+            name: 'managedBy',
+            type: 'select',
+            label: 'Nguồn quản lý rule',
+            options: [
+                { label: 'Tạo thủ công', value: 'manual' },
+                { label: 'Cấu hình tại sản phẩm', value: 'product' },
+            ],
+            admin: {
+                readOnly: true,
+            },
+        },
+        {
+            name: 'managedKey',
+            type: 'text',
+            unique: true,
+            index: true,
+            label: 'Khóa đồng bộ',
+            admin: {
+                readOnly: true,
+                position: 'sidebar',
+            },
+        },
+        {
+            name: 'managedSourceId',
+            type: 'text',
+            label: 'ID trang đích quản lý rule',
+            admin: {
+                readOnly: true,
+                position: 'sidebar',
+            },
+        },
+        {
             name: 'scope',
             type: 'select',
             hasMany: true,

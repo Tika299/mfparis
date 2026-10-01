@@ -426,6 +426,20 @@ export interface Product {
       | null;
   };
   /**
+   * Cấu hình keyword để các nội dung khác tự động liên kết đến sản phẩm này.
+   */
+  inboundInternalLinks?: {
+    enabled?: boolean | null;
+    keywords?:
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
+    scope?: ('posts' | 'products' | 'categories' | 'brands' | 'post-categories')[] | null;
+    maxInsertionsPerPage?: number | null;
+  };
+  /**
    * Quyết định cách trang chi tiết sản phẩm được render, index và chuyển hướng.
    */
   seoStatus: 'active' | 'temporarily_out_of_stock' | 'discontinued_keep_page' | 'discontinued_redirect';
@@ -1543,6 +1557,9 @@ export interface InternalLinkRule {
   }[];
   targetType: 'custom_url' | 'product' | 'category' | 'brand' | 'post' | 'post_category';
   targetUrl: string;
+  managedBy?: ('manual' | 'product') | null;
+  managedKey?: string | null;
+  managedSourceId?: string | null;
   scope?: ('posts' | 'products' | 'categories' | 'brands' | 'post-categories')[] | null;
   maxInsertionsPerPage?: number | null;
   totalInsertions?: number | null;
@@ -1970,6 +1987,19 @@ export interface ProductsSelect<T extends boolean = true> {
               keyword?: T;
               id?: T;
             };
+      };
+  inboundInternalLinks?:
+    | T
+    | {
+        enabled?: T;
+        keywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+        scope?: T;
+        maxInsertionsPerPage?: T;
       };
   seoStatus?: T;
   relatedProduct?: T;
@@ -2680,6 +2710,9 @@ export interface InternalLinkRulesSelect<T extends boolean = true> {
       };
   targetType?: T;
   targetUrl?: T;
+  managedBy?: T;
+  managedKey?: T;
+  managedSourceId?: T;
   scope?: T;
   maxInsertionsPerPage?: T;
   totalInsertions?: T;
