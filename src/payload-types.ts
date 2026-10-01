@@ -309,6 +309,20 @@ export interface Brand {
         }[]
       | null;
   };
+  /**
+   * Cấu hình keyword để nội dung khác tự động liên kết đến thương hiệu này.
+   */
+  inboundInternalLinks?: {
+    enabled?: boolean | null;
+    keywords?:
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
+    scope?: ('posts' | 'products' | 'categories' | 'brands' | 'post-categories')[] | null;
+    maxInsertionsPerPage?: number | null;
+  };
   name: string;
   /**
    * Tu dong tao tu ten, co the chinh sua thu cong de toi uu SEO
@@ -1557,7 +1571,7 @@ export interface InternalLinkRule {
   }[];
   targetType: 'custom_url' | 'product' | 'category' | 'brand' | 'post' | 'post_category';
   targetUrl: string;
-  managedBy?: ('manual' | 'product') | null;
+  managedBy?: ('manual' | 'product' | 'brand') | null;
   managedKey?: string | null;
   managedSourceId?: string | null;
   scope?: ('posts' | 'products' | 'categories' | 'brands' | 'post-categories')[] | null;
@@ -1915,6 +1929,19 @@ export interface BrandsSelect<T extends boolean = true> {
               keyword?: T;
               id?: T;
             };
+      };
+  inboundInternalLinks?:
+    | T
+    | {
+        enabled?: T;
+        keywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+        scope?: T;
+        maxInsertionsPerPage?: T;
       };
   name?: T;
   slug?: T;

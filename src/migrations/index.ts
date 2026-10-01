@@ -28,6 +28,7 @@ import * as migration_20260817_050000_add_category_filter_profile from './202608
 import * as migration_20260901_064901 from './20260901_064901';
 import * as migration_20260911_024614_add_reviewer_name from './20260911_024614_add_reviewer_name';
 import * as migration_20261001_075341 from './20261001_075341';
+import * as migration_20261001_104138 from './20261001_104138';
 
 export const migrations = [
   {
@@ -178,6 +179,11 @@ export const migrations = [
   {
     up: migration_20261001_075341.up,
     down: migration_20261001_075341.down,
-    name: '20261001_075341'
+    name: '20261001_075341',
+  },
+  {
+    up: migration_20261001_104138.up,
+    down: migration_20261001_104138.down,
+    name: '20261001_104138'
   },
 ];
