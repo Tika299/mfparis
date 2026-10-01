@@ -10,19 +10,18 @@ import {
   type InternalLinkSuggestionSource,
 } from '@/lib/internal-links/suggestRules'
 import { getAuthenticatedAdminPayload } from '@/utilities/adminAuth'
+import {
+  getInternalLinkPreviewField,
+  isInternalLinkPreviewCollection,
+  type InternalLinkPreviewCollection,
+} from '@/lib/internal-links/previewFields'
 
 type PreviewBody = {
-  collection: 'posts' | 'products' | 'categories' | 'brands' | 'post-categories'
+  collection: InternalLinkPreviewCollection
   currentUrl?: string
   html?: string
   id: string | number
-}
-
-function getHtmlField(collection: PreviewBody['collection']) {
-  if (collection === 'posts') return 'content'
-  if (collection === 'products') return 'description'
-
-  return 'description'
+  field?: string
 }
 
 function getScope(collection: PreviewBody['collection']) {
@@ -56,8 +55,35 @@ export async function POST(req: Request) {
 
     const body = (await req.json()) as PreviewBody
 
-    if (!body.collection || !body.id) {
-      return NextResponse.json({ error: 'Missing collection or id' }, { status: 400 })
+    if (
+      !isInternalLinkPreviewCollection(body.collection) ||
+      body.id === undefined ||
+      body.id === null ||
+      body.id === ''
+    ) {
+      return NextResponse.json(
+        { error: 'Invalid collection or missing id' },
+        { status: 400 },
+      )
+    }
+
+    if (typeof body.field !== 'string') {
+      return NextResponse.json(
+        { error: 'Missing preview field' },
+        { status: 400 },
+      )
+    }
+
+    const selectedField = getInternalLinkPreviewField(
+      body.collection,
+      body.field,
+    )
+
+    if (!selectedField) {
+      return NextResponse.json(
+        { error: 'Invalid preview field for this collection' },
+        { status: 400 },
+      )
     }
 
     const payload = auth.payload
@@ -67,7 +93,7 @@ export async function POST(req: Request) {
       id: body.id,
     })
 
-    const htmlField = getHtmlField(body.collection)
+    const htmlField = selectedField.name
     const html = body.html ?? doc?.[htmlField] ?? ''
     const currentUrl =
       body.currentUrl ||
@@ -99,6 +125,8 @@ export async function POST(req: Request) {
       sourceTitle,
       sourceType: getScope(body.collection),
       sourceUrl: currentUrl,
+      sourceField: selectedField.name,
+      sourceFieldLabel: selectedField.label,
     })
 
     return NextResponse.json({

@@ -4,6 +4,11 @@ import React, { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { AlertCircle, CheckCircle2, Eye, FileSearch, Link2, Loader2 } from 'lucide-react'
 import { useDocumentInfo } from '@payloadcms/ui'
+import {
+    INTERNAL_LINK_PREVIEW_FIELDS,
+    type InternalLinkPreviewCollection,
+    type InternalLinkPreviewField,
+} from '@/lib/internal-links/previewFields'
 
 type PreviewResult = {
     html: string
@@ -33,7 +38,7 @@ type PreviewResult = {
 }
 
 type Props = {
-    collection: 'posts' | 'products' | 'categories' | 'brands' | 'post-categories'
+    collection: InternalLinkPreviewCollection
 }
 
 const reasonLabels: Record<string, string> = {
@@ -106,6 +111,10 @@ export function InternalLinkPreview({ collection }: Props) {
     const [loading, setLoading] = useState(false)
     const [result, setResult] = useState<PreviewResult | null>(null)
     const [error, setError] = useState('')
+    const previewFields = INTERNAL_LINK_PREVIEW_FIELDS[collection]
+    const [field, setField] = useState<InternalLinkPreviewField>(
+        previewFields[0].name,
+    )
 
     const skippedByReason = useMemo(() => {
         const counts = new Map<string, number>()
@@ -127,7 +136,7 @@ export function InternalLinkPreview({ collection }: Props) {
             const res = await fetch('/api/internal-links/preview', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ collection, id }),
+                body: JSON.stringify({ collection, id, field }),
             })
 
             if (!res.ok) {
@@ -163,6 +172,37 @@ export function InternalLinkPreview({ collection }: Props) {
                         Kiểm tra link sẽ được tự động chèn vào nội dung này. Preview có ghi log để audit SEO.
                     </p>
                 </div>
+
+                <select
+                    value={field}
+                    onChange={(event) => {
+                        const selected = previewFields.find(
+                            (item) => item.name === event.target.value,
+                        )
+
+                        if (!selected) return
+
+                        setField(selected.name)
+                        setResult(null)
+                    }}
+                    disabled={loading}
+                    aria-label="Chọn vùng nội dung để preview"
+                    style={{
+                        minHeight: 40,
+                        border: '1px solid #d1d5db',
+                        borderRadius: 8,
+                        background: '#fff',
+                        padding: '8px 12px',
+                        color: '#111827',
+                        fontWeight: 600,
+                    }}
+                >
+                    {previewFields.map((item) => (
+                        <option key={item.name} value={item.name}>
+                            {item.label}
+                        </option>
+                    ))}
+                </select>
 
                 <button
                     type="button"
@@ -207,6 +247,17 @@ export function InternalLinkPreview({ collection }: Props) {
 
             {result ? (
                 <div style={{ marginTop: 18 }}>
+                    <div
+                        style={{
+                            marginBottom: 12,
+                            color: '#475569',
+                            fontSize: 13,
+                            fontWeight: 700,
+                        }}
+                    >
+                        Vùng đang kiểm tra:{' '}
+                        {previewFields.find((item) => item.name === field)?.label}
+                    </div>
                     <div
                         style={{
                             display: 'grid',

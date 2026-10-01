@@ -467,7 +467,7 @@ export default async function BlogCategoryPage({
   const linkedCategoryDescription = await applyInternalLinksForRender({
     html: currentCategory.description,
     currentUrl: categoryUrl,
-    scope: 'categories',
+    scope: 'post-categories',
     payload,
     ...internalLinkingConfig,
   })
@@ -475,7 +475,7 @@ export default async function BlogCategoryPage({
   const linkedBottomContent = await applyInternalLinksForRender({
     html: bottomContentHtml,
     currentUrl: categoryUrl,
-    scope: 'categories',
+    scope: 'post-categories',
     payload,
     ...internalLinkingConfig,
   })
@@ -483,7 +483,7 @@ export default async function BlogCategoryPage({
   const linkedIntroContent = await applyInternalLinksForRender({
     html: introHtml,
     currentUrl: categoryUrl,
-    scope: 'categories',
+    scope: 'post-categories',
     payload,
     ...internalLinkingConfig,
   })

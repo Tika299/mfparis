@@ -15,6 +15,8 @@ type RecordInternalLinkPreviewInput = {
   sourceTitle?: string | null
   sourceUrl: string
   result: ApplyInternalLinksResult
+  sourceField: string
+  sourceFieldLabel: string
 }
 
 type AggregatedLogItem = {
@@ -33,6 +35,8 @@ type AggregatedLogItem = {
   skippedCount: number
   skipReasons: Set<string>
   lastTextPreview?: string
+  sourceField: string
+  sourceFieldLabel: string
 }
 
 function stablePart(value: unknown): string {
@@ -49,10 +53,12 @@ function makeLogKey(input: {
   ruleId?: string | number
   keyword: string
   targetUrl: string
+  sourceField: string
 }): string {
   return [
     input.sourceType,
     input.sourceId,
+    input.sourceField,
     input.ruleId ? String(input.ruleId) : 'no-rule',
     stablePart(input.keyword),
     stablePart(input.targetUrl),
@@ -71,7 +77,7 @@ function makeSummary(item: AggregatedLogItem): string {
   const sourceLabel = labelForSource(item.sourceType)
   const keyword = item.anchorText || item.keyword
 
-  return `${sourceLabel} #${item.sourceId}: ${keyword} -> ${item.targetUrl}`
+  return `${sourceLabel} #${item.sourceId} [${item.sourceFieldLabel}]: ${keyword} -> ${item.targetUrl}`
 }
 
 function addInsertion(
@@ -94,6 +100,7 @@ function addInsertion(
   const logKey = makeLogKey({
     sourceType: base.sourceType,
     sourceId: base.sourceId,
+    sourceField: base.sourceField,
     ruleId: insertion.ruleId,
     keyword: insertion.keyword,
     targetUrl: insertion.targetUrl,
@@ -147,6 +154,7 @@ function addSkipped(
   const logKey = makeLogKey({
     sourceType: base.sourceType,
     sourceId: base.sourceId,
+    sourceField: base.sourceField,
     ruleId: skipped.ruleId,
     keyword: skipped.keyword,
     targetUrl: skipped.targetUrl,
@@ -197,56 +205,11 @@ async function findExistingLog(payload: Payload, logKey: string) {
 
   return result.docs[0] as
     | {
-        id: string | number
-        totalInsertedCount?: number | null
-        previewCount?: number | null
-      }
-    | undefined
-}
-
-async function updateRuleCounters(
-  payload: Payload,
-  insertions: InternalLinkInsertion[],
-  checkedAt: string,
-): Promise<void> {
-  const insertedByRule = new Map<string | number, number>()
-
-  for (const insertion of insertions) {
-    if (!insertion.ruleId) continue
-
-    insertedByRule.set(
-      insertion.ruleId,
-      (insertedByRule.get(insertion.ruleId) || 0) + 1,
-    )
-  }
-
-  for (const [ruleId, insertedCount] of insertedByRule) {
-    const rule = (await payload.findByID({
-      collection: 'internal-link-rules' as any,
-      id: ruleId,
-      depth: 0,
-      overrideAccess: true,
-    })) as {
-      totalInsertions?: number | null
+      id: string | number
+      totalInsertedCount?: number | null
+      previewCount?: number | null
     }
-
-    const currentTotal =
-      typeof rule.totalInsertions === 'number' &&
-      Number.isFinite(rule.totalInsertions)
-        ? rule.totalInsertions
-        : 0
-
-    await payload.update({
-      collection: 'internal-link-rules' as any,
-      id: ruleId,
-      depth: 0,
-      overrideAccess: true,
-      data: {
-        totalInsertions: currentTotal + insertedCount,
-        lastUsedAt: checkedAt,
-      },
-    })
-  }
+    | undefined
 }
 
 export async function recordInternalLinkPreview({
@@ -256,6 +219,8 @@ export async function recordInternalLinkPreview({
   sourceTitle,
   sourceUrl,
   result,
+  sourceField,
+  sourceFieldLabel,
 }: RecordInternalLinkPreviewInput): Promise<{
   runId: string
   logsWritten: number
@@ -272,6 +237,8 @@ export async function recordInternalLinkPreview({
     sourceId: sourceIdText,
     sourceTitle,
     sourceUrl,
+    sourceField,
+    sourceFieldLabel,
     lastTextPreview: undefined,
   }
 
@@ -291,12 +258,12 @@ export async function recordInternalLinkPreview({
     const existing = await findExistingLog(payload, item.logKey)
     const previousTotal =
       typeof existing?.totalInsertedCount === 'number' &&
-      Number.isFinite(existing.totalInsertedCount)
+        Number.isFinite(existing.totalInsertedCount)
         ? existing.totalInsertedCount
         : 0
     const previousPreviewCount =
       typeof existing?.previewCount === 'number' &&
-      Number.isFinite(existing.previewCount)
+        Number.isFinite(existing.previewCount)
         ? existing.previewCount
         : 0
 
@@ -341,8 +308,6 @@ export async function recordInternalLinkPreview({
 
     logsWritten += 1
   }
-
-  await updateRuleCounters(payload, result.insertions, checkedAt)
 
   return {
     runId,

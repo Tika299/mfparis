@@ -562,7 +562,7 @@ export default async function BrandProductsPage({
   const linkedBrandDescription = await applyInternalLinksForRender({
     html: currentBrand.description,
     currentUrl: brandUrl,
-    scope: 'categories',
+    scope: 'brands',
     payload,
     ...internalLinkingConfig,
   })
@@ -570,7 +570,7 @@ export default async function BrandProductsPage({
   const linkedBottomContent = await applyInternalLinksForRender({
     html: bottomContentHtml,
     currentUrl: brandUrl,
-    scope: 'categories',
+    scope: 'brands',
     payload,
     ...internalLinkingConfig,
   })
