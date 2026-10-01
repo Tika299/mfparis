@@ -68,7 +68,7 @@ export const InternalLinkRules: CollectionConfig = {
                 {
                     name: 'matchType',
                     type: 'select',
-                    defaultValue: 'contains',
+                    defaultValue: 'phrase',
                     label: 'Kiểu match',
                     options: [
                         { label: 'Chứa cụm từ', value: 'contains' },

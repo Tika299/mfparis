@@ -127,7 +127,7 @@ export const Brands: CollectionConfig = {
           Field: {
             path: '@/components/Admin/InternalLinkPreview#InternalLinkPreview',
             clientProps: {
-              collection: 'posts',
+              collection: 'brands',
             },
           },
         },

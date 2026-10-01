@@ -29,6 +29,26 @@ function getScope(collection: PreviewBody['collection']) {
   return collection
 }
 
+function getDocumentUrl(
+  collection: PreviewBody['collection'],
+  slug: string,
+) {
+  const encodedSlug = encodeURIComponent(slug)
+
+  switch (collection) {
+    case 'posts':
+      return `/blog/${encodedSlug}`
+    case 'products':
+      return `/products/${encodedSlug}`
+    case 'categories':
+      return `/categories/${encodedSlug}`
+    case 'brands':
+      return `/brands/${encodedSlug}`
+    case 'post-categories':
+      return `/blog/category/${encodedSlug}`
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const auth = await getAuthenticatedAdminPayload(req)
@@ -49,7 +69,11 @@ export async function POST(req: Request) {
 
     const htmlField = getHtmlField(body.collection)
     const html = body.html ?? doc?.[htmlField] ?? ''
-    const currentUrl = body.currentUrl || (doc?.slug ? `/${body.collection}/${doc.slug}/` : '/')
+    const currentUrl =
+      body.currentUrl ||
+      (typeof doc?.slug === 'string'
+        ? getDocumentUrl(body.collection, doc.slug)
+        : '/')
     const internalLinkingConfig = getInternalLinkingConfig(doc)
 
     const result = await applyInternalLinksForRender({

@@ -950,7 +950,7 @@ export const Products: CollectionConfig = {
           Field: {
             path: '@/components/Admin/InternalLinkPreview#InternalLinkPreview',
             clientProps: {
-              collection: 'posts',
+              collection: 'products',
             },
           },
         },

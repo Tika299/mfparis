@@ -169,6 +169,43 @@ describe('Kiem tra loi khop tu khoa', () => {
         })
         expect(result.insertions).toHaveLength(1)
     })
+    it('không link nhầm "là Dermato" tới A-Derma', () => {
+        const result = run('<p>Điểm quan trọng là Dermato không phải sản phẩm chống tiết mồ hôi.</p>', {
+            rules: [
+                rule({
+                    id: 8865,
+                    priority: 'brand',
+                    targetUrl: '/brands/a-derma/',
+                    keywords: [
+                        { keyword: 'A-derma', matchType: 'phrase' },
+                        { keyword: 'a derma', matchType: 'contains' },
+                    ],
+                }),
+            ],
+        })
+
+        expect(result.html).not.toContain('href="/brands/a-derma/"')
+        expect(result.insertions).toHaveLength(0)
+    })
+
+    it('link đúng cụm A-Derma khi tên thương hiệu xuất hiện nguyên vẹn', () => {
+        const result = run('<p>Sản phẩm A-Derma phù hợp với da nhạy cảm.</p>', {
+            rules: [
+                rule({
+                    id: 8865,
+                    priority: 'brand',
+                    targetUrl: '/brands/a-derma/',
+                    keywords: [
+                        { keyword: 'A-derma', matchType: 'phrase' },
+                        { keyword: 'a derma', matchType: 'phrase' },
+                    ],
+                }),
+            ],
+        })
+
+        expect(result.html).toContain('href="/brands/a-derma/"')
+        expect(result.insertions).toHaveLength(1)
+    })
 })
 
 describe('Render nhanh va preview', () => {

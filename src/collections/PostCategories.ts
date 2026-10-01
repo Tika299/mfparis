@@ -110,7 +110,7 @@ export const PostCategories: CollectionConfig = {
           Field: {
             path: '@/components/Admin/InternalLinkPreview#InternalLinkPreview',
             clientProps: {
-              collection: 'posts',
+              collection: 'post-categories',
             },
           },
         },

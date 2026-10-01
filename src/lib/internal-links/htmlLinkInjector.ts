@@ -489,7 +489,7 @@ function findBestMatch(
             if (index < 0) break
 
             const end = index + candidate.normalizedKeyword.length
-            const needsBoundary = candidate.matchType !== 'contains'
+            const needsBoundary = true
 
             if (needsBoundary && !hasWordBoundary(normalizedText, index, end)) {
                 searchFrom = index + 1
