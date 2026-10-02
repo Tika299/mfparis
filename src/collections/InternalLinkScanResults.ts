@@ -1,0 +1,183 @@
+import type { CollectionConfig } from 'payload'
+
+export const InternalLinkScanResults: CollectionConfig = {
+  slug: 'internal-link-scan-results',
+  admin: {
+    useAsTitle: 'sourceTitle',
+    group: 'SEO',
+    defaultColumns: [
+      'rowType',
+      'sourceType',
+      'sourceTitle',
+      'anchorText',
+      'targetUrl',
+      'reviewStatus',
+    ],
+  },
+  access: {
+    read: ({ req }) => Boolean(req.user),
+    create: ({ req }) => Boolean(req.user),
+    update: ({ req }) => Boolean(req.user),
+    delete: ({ req }) => Boolean(req.user),
+  },
+  fields: [
+    {
+      name: 'recordKey',
+      type: 'text',
+      required: true,
+      unique: true,
+      index: true,
+      admin: { readOnly: true },
+    },
+    {
+      name: 'scanRun',
+      type: 'relationship',
+      relationTo: 'internal-link-scan-runs',
+      required: true,
+      index: true,
+      admin: { readOnly: true },
+    },
+    {
+      name: 'rowType',
+      type: 'select',
+      required: true,
+      index: true,
+      options: [
+        { label: 'Field đã quét', value: 'page' },
+        { label: 'Link dự kiến chèn', value: 'inserted' },
+        { label: 'Match bị bỏ qua', value: 'skipped' },
+      ],
+      admin: { readOnly: true },
+    },
+    {
+      name: 'sourceType',
+      type: 'select',
+      required: true,
+      index: true,
+      options: [
+        { label: 'Bài viết', value: 'posts' },
+        { label: 'Sản phẩm', value: 'products' },
+        { label: 'Danh mục sản phẩm', value: 'categories' },
+        { label: 'Thương hiệu', value: 'brands' },
+      ],
+      admin: { readOnly: true },
+    },
+    {
+      name: 'sourceId',
+      type: 'text',
+      required: true,
+      index: true,
+      admin: { readOnly: true },
+    },
+    {
+      name: 'sourceTitle',
+      type: 'text',
+      index: true,
+      admin: { readOnly: true },
+    },
+    {
+      name: 'sourceUrl',
+      type: 'text',
+      required: true,
+      index: true,
+      admin: { readOnly: true },
+    },
+    {
+      name: 'sourceField',
+      type: 'text',
+      required: true,
+      admin: { readOnly: true },
+    },
+    {
+      name: 'sourceFieldLabel',
+      type: 'text',
+      admin: { readOnly: true },
+    },
+    {
+      name: 'wordCount',
+      type: 'number',
+      min: 0,
+      admin: { readOnly: true },
+    },
+    {
+      name: 'linkCount',
+      type: 'number',
+      min: 0,
+      admin: { readOnly: true },
+    },
+    {
+      name: 'linksPerHundredWords',
+      type: 'number',
+      min: 0,
+      admin: {
+        readOnly: true,
+        description: 'Số link dự kiến trên mỗi 100 từ tại thời điểm quét.',
+      },
+    },
+    {
+      name: 'rule',
+      type: 'relationship',
+      relationTo: 'internal-link-rules',
+      index: true,
+      admin: { readOnly: true },
+    },
+    {
+      name: 'ruleTitle',
+      type: 'text',
+      admin: { readOnly: true },
+    },
+    {
+      name: 'keyword',
+      type: 'text',
+      index: true,
+      admin: { readOnly: true },
+    },
+    {
+      name: 'anchorText',
+      type: 'text',
+      admin: { readOnly: true },
+    },
+    {
+      name: 'targetUrl',
+      type: 'text',
+      index: true,
+      admin: { readOnly: true },
+    },
+    {
+      name: 'paragraphIndex',
+      type: 'number',
+      min: 0,
+      admin: { readOnly: true },
+    },
+    {
+      name: 'contextExcerpt',
+      type: 'textarea',
+      admin: {
+        readOnly: true,
+        description: 'Đoạn ngữ cảnh ngắn; không lưu toàn bộ nội dung.',
+      },
+    },
+    {
+      name: 'skipReason',
+      type: 'text',
+      admin: { readOnly: true },
+    },
+    {
+      name: 'issueFlags',
+      type: 'json',
+      admin: { readOnly: true },
+    },
+    {
+      name: 'reviewStatus',
+      type: 'select',
+      defaultValue: 'new',
+      index: true,
+      options: [
+        { label: 'Mới', value: 'new' },
+        { label: 'Đã xem', value: 'reviewed' },
+        { label: 'Đã xử lý', value: 'resolved' },
+        { label: 'Bỏ qua', value: 'dismissed' },
+      ],
+    },
+  ],
+}

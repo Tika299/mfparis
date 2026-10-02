@@ -28,6 +28,8 @@ import { BlogComments } from '@/collections/BlogComments'
 import { BlogAuthors } from '@/collections/BlogAuthors'
 import { InternalLinkRules } from '@/collections/InternalLinkRules'
 import { InternalLinkLogs } from '@/collections/InternalLinkLogs'
+import { InternalLinkScanRuns } from '@/collections/InternalLinkScanRuns'
+import { InternalLinkScanResults } from '@/collections/InternalLinkScanResults'
 import { ProductFilterGroups } from '@/collections/ProductFilterGroups'
 
 const filename = fileURLToPath(import.meta.url)
@@ -84,6 +86,10 @@ export default buildConfig({
           Component: '@/components/Admin/InternalLinkSuggestions#InternalLinkSuggestions',
           path: '/internal-links/suggestions',
         },
+        InternalLinkDashboard: {
+          Component: '@/components/Admin/InternalLinkDashboard#InternalLinkDashboard',
+          path: '/internal-links/dashboard',
+        },
         ContentExcelManager: {
           Component: '@/components/Admin/ContentExcelManager#ContentExcelManager',
           path: '/content-excel',
@@ -115,6 +121,8 @@ export default buildConfig({
     VoucherRedemptions,
     InternalLinkRules,
     InternalLinkLogs,
+    InternalLinkScanRuns,
+    InternalLinkScanResults,
     ProductFilterGroups,
   ],
   globals: [SiteSettings, AboutPage],

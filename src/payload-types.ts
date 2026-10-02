@@ -90,6 +90,8 @@ export interface Config {
     'voucher-redemptions': VoucherRedemption;
     'internal-link-rules': InternalLinkRule;
     'internal-link-logs': InternalLinkLog;
+    'internal-link-scan-runs': InternalLinkScanRun;
+    'internal-link-scan-results': InternalLinkScanResult;
     'product-filter-groups': ProductFilterGroup;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -120,6 +122,8 @@ export interface Config {
     'voucher-redemptions': VoucherRedemptionsSelect<false> | VoucherRedemptionsSelect<true>;
     'internal-link-rules': InternalLinkRulesSelect<false> | InternalLinkRulesSelect<true>;
     'internal-link-logs': InternalLinkLogsSelect<false> | InternalLinkLogsSelect<true>;
+    'internal-link-scan-runs': InternalLinkScanRunsSelect<false> | InternalLinkScanRunsSelect<true>;
+    'internal-link-scan-results': InternalLinkScanResultsSelect<false> | InternalLinkScanResultsSelect<true>;
     'product-filter-groups': ProductFilterGroupsSelect<false> | ProductFilterGroupsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -674,6 +678,20 @@ export interface Category {
           id?: string | null;
         }[]
       | null;
+  };
+  /**
+   * Cấu hình keyword để nội dung khác tự động liên kết đến danh mục này.
+   */
+  inboundInternalLinks?: {
+    enabled?: boolean | null;
+    keywords?:
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
+    scope?: ('posts' | 'products' | 'categories' | 'brands' | 'post-categories')[] | null;
+    maxInsertionsPerPage?: number | null;
   };
   name: string;
   image?: (number | null) | Media;
@@ -1610,6 +1628,74 @@ export interface InternalLinkLog {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal-link-scan-runs".
+ */
+export interface InternalLinkScanRun {
+  id: number;
+  status: 'running' | 'completed' | 'failed' | 'cancelled';
+  requestedBy?: (number | null) | User;
+  sourceTypes: ('posts' | 'products' | 'categories' | 'brands')[];
+  currentSourceTypeIndex?: number | null;
+  currentPage?: number | null;
+  pagesScanned?: number | null;
+  fieldsScanned?: number | null;
+  candidateLinks?: number | null;
+  insertedCandidates?: number | null;
+  skippedCandidates?: number | null;
+  issueCount?: number | null;
+  startedAt: string;
+  finishedAt?: string | null;
+  errorMessage?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal-link-scan-results".
+ */
+export interface InternalLinkScanResult {
+  id: number;
+  recordKey: string;
+  scanRun: number | InternalLinkScanRun;
+  rowType: 'page' | 'inserted' | 'skipped';
+  sourceType: 'posts' | 'products' | 'categories' | 'brands';
+  sourceId: string;
+  sourceTitle?: string | null;
+  sourceUrl: string;
+  sourceField: string;
+  sourceFieldLabel?: string | null;
+  wordCount?: number | null;
+  linkCount?: number | null;
+  /**
+   * Số link dự kiến trên mỗi 100 từ tại thời điểm quét.
+   */
+  linksPerHundredWords?: number | null;
+  rule?: (number | null) | InternalLinkRule;
+  ruleTitle?: string | null;
+  keyword?: string | null;
+  anchorText?: string | null;
+  targetUrl?: string | null;
+  paragraphIndex?: number | null;
+  /**
+   * Đoạn ngữ cảnh ngắn; không lưu toàn bộ nội dung.
+   */
+  contextExcerpt?: string | null;
+  skipReason?: string | null;
+  issueFlags?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  reviewStatus?: ('new' | 'reviewed' | 'resolved' | 'dismissed') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Cấu hình bộ lọc hiển thị ở trang sản phẩm, danh mục và thương hiệu.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1744,6 +1830,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'internal-link-logs';
         value: number | InternalLinkLog;
+      } | null)
+    | ({
+        relationTo: 'internal-link-scan-runs';
+        value: number | InternalLinkScanRun;
+      } | null)
+    | ({
+        relationTo: 'internal-link-scan-results';
+        value: number | InternalLinkScanResult;
       } | null)
     | ({
         relationTo: 'product-filter-groups';
@@ -2152,6 +2246,19 @@ export interface CategoriesSelect<T extends boolean = true> {
               keyword?: T;
               id?: T;
             };
+      };
+  inboundInternalLinks?:
+    | T
+    | {
+        enabled?: T;
+        keywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+        scope?: T;
+        maxInsertionsPerPage?: T;
       };
   name?: T;
   image?: T;
@@ -2771,6 +2878,58 @@ export interface InternalLinkLogsSelect<T extends boolean = true> {
   lastTextPreview?: T;
   lastRunId?: T;
   lastCheckedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal-link-scan-runs_select".
+ */
+export interface InternalLinkScanRunsSelect<T extends boolean = true> {
+  status?: T;
+  requestedBy?: T;
+  sourceTypes?: T;
+  currentSourceTypeIndex?: T;
+  currentPage?: T;
+  pagesScanned?: T;
+  fieldsScanned?: T;
+  candidateLinks?: T;
+  insertedCandidates?: T;
+  skippedCandidates?: T;
+  issueCount?: T;
+  startedAt?: T;
+  finishedAt?: T;
+  errorMessage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "internal-link-scan-results_select".
+ */
+export interface InternalLinkScanResultsSelect<T extends boolean = true> {
+  recordKey?: T;
+  scanRun?: T;
+  rowType?: T;
+  sourceType?: T;
+  sourceId?: T;
+  sourceTitle?: T;
+  sourceUrl?: T;
+  sourceField?: T;
+  sourceFieldLabel?: T;
+  wordCount?: T;
+  linkCount?: T;
+  linksPerHundredWords?: T;
+  rule?: T;
+  ruleTitle?: T;
+  keyword?: T;
+  anchorText?: T;
+  targetUrl?: T;
+  paragraphIndex?: T;
+  contextExcerpt?: T;
+  skipReason?: T;
+  issueFlags?: T;
+  reviewStatus?: T;
   updatedAt?: T;
   createdAt?: T;
 }

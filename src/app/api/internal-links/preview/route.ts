@@ -11,6 +11,7 @@ import {
 } from '@/lib/internal-links/suggestRules'
 import { getAuthenticatedAdminPayload } from '@/utilities/adminAuth'
 import {
+  getInternalLinkDocumentUrl,
   getInternalLinkPreviewField,
   isInternalLinkPreviewCollection,
   type InternalLinkPreviewCollection,
@@ -26,26 +27,6 @@ type PreviewBody = {
 
 function getScope(collection: PreviewBody['collection']) {
   return collection
-}
-
-function getDocumentUrl(
-  collection: PreviewBody['collection'],
-  slug: string,
-) {
-  const encodedSlug = encodeURIComponent(slug)
-
-  switch (collection) {
-    case 'posts':
-      return `/blog/${encodedSlug}`
-    case 'products':
-      return `/products/${encodedSlug}`
-    case 'categories':
-      return `/categories/${encodedSlug}`
-    case 'brands':
-      return `/brands/${encodedSlug}`
-    case 'post-categories':
-      return `/blog/category/${encodedSlug}`
-  }
 }
 
 export async function POST(req: Request) {
@@ -88,19 +69,20 @@ export async function POST(req: Request) {
 
     const payload = auth.payload
     const doc = await payload.findByID({
-      collection: body.collection as any,
+      collection: body.collection,
       depth: 1,
       id: body.id,
     })
+    const previewDoc = doc as unknown as Record<string, unknown>
 
     const htmlField = selectedField.name
-    const html = body.html ?? doc?.[htmlField] ?? ''
+    const html = body.html ?? previewDoc[htmlField] ?? ''
     const currentUrl =
       body.currentUrl ||
-      (typeof doc?.slug === 'string'
-        ? getDocumentUrl(body.collection, doc.slug)
+      (typeof previewDoc.slug === 'string'
+        ? getInternalLinkDocumentUrl(body.collection, previewDoc.slug)
         : '/')
-    const internalLinkingConfig = getInternalLinkingConfig(doc)
+    const internalLinkingConfig = getInternalLinkingConfig(previewDoc)
 
     const result = await applyInternalLinksForRender({
       html,
@@ -112,10 +94,10 @@ export async function POST(req: Request) {
     })
 
     const sourceTitle =
-      typeof doc?.title === 'string'
-        ? doc.title
-        : typeof doc?.name === 'string'
-          ? doc.name
+      typeof previewDoc.title === 'string'
+        ? previewDoc.title
+        : typeof previewDoc.name === 'string'
+          ? previewDoc.name
           : null
 
     const logResult = await recordInternalLinkPreview({

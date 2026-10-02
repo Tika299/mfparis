@@ -48,3 +48,23 @@ export function getInternalLinkPreviewField(
         (item) => item.name === field,
     )
 }
+
+export function getInternalLinkDocumentUrl(
+    collection: InternalLinkPreviewCollection,
+    slug: string,
+): string {
+    const encodedSlug = encodeURIComponent(slug)
+
+    switch (collection) {
+        case 'posts':
+            return `/blog/${encodedSlug}`
+        case 'products':
+            return `/products/${encodedSlug}`
+        case 'categories':
+            return `/categories/${encodedSlug}`
+        case 'brands':
+            return `/brands/${encodedSlug}`
+        case 'post-categories':
+            return `/blog/category/${encodedSlug}`
+    }
+}
