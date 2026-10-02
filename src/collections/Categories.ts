@@ -49,6 +49,59 @@ export const Categories: CollectionConfig = {
   admin: { useAsTitle: 'name' },
   fields: [
     internalLinkingFields,
+    {
+      name: 'inboundInternalLinks',
+      type: 'group',
+      label: 'Nhận link tự động',
+      admin: {
+        position: 'sidebar',
+        description:
+          'Cấu hình keyword để nội dung khác tự động liên kết đến danh mục này.',
+      },
+      fields: [
+        {
+          name: 'enabled',
+          type: 'checkbox',
+          label: 'Bật nhận link tự động',
+          defaultValue: false,
+        },
+        {
+          name: 'keywords',
+          type: 'array',
+          label: 'Từ khóa nhận link',
+          fields: [
+            {
+              name: 'keyword',
+              type: 'text',
+              required: true,
+              label: 'Keyword',
+            },
+          ],
+        },
+        {
+          name: 'scope',
+          type: 'select',
+          hasMany: true,
+          defaultValue: ['posts'],
+          label: 'Áp dụng trên loại nội dung nguồn',
+          options: [
+            { label: 'Bài viết blog', value: 'posts' },
+            { label: 'Sản phẩm', value: 'products' },
+            { label: 'Danh mục sản phẩm', value: 'categories' },
+            { label: 'Thương hiệu', value: 'brands' },
+            { label: 'Danh mục blog', value: 'post-categories' },
+          ],
+        },
+        {
+          name: 'maxInsertionsPerPage',
+          type: 'number',
+          defaultValue: 1,
+          min: 1,
+          max: 10,
+          label: 'Số link tối đa trên mỗi trang nguồn',
+        },
+      ],
+    },
     { name: 'name', type: 'text', required: true },
     { name: 'image', type: 'upload', relationTo: 'media' },
     htmlEditorField({
