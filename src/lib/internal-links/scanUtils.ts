@@ -18,6 +18,22 @@ export function countInternalLinkWords(text: string): number {
   return text.split(/\s+/u).filter(Boolean).length
 }
 
+export function getInternalLinkDensityIssueFlags(
+  linkCount: number,
+  wordCount: number,
+  threshold: number,
+): string[] {
+  if (
+    threshold > 0 &&
+    wordCount > 0 &&
+    (linkCount / wordCount) * 100 > threshold
+  ) {
+    return ['high_link_density']
+  }
+
+  return []
+}
+
 export function getInternalLinkContextExcerpt(
   text: string,
   anchor: string | undefined,
@@ -65,6 +81,13 @@ export function shouldStoreInternalLinkSkip(
     item.reason !== 'self_link' &&
     item.reason !== 'excluded_keyword'
   ) {
+    if (item.keyword && item.textPreview) {
+      const keyword = normalizeVietnameseText(item.keyword)
+      const preview = normalizeVietnameseText(item.textPreview)
+
+      return Boolean(keyword && preview.includes(keyword))
+    }
+
     return true
   }
 
@@ -72,6 +95,31 @@ export function shouldStoreInternalLinkSkip(
   const normalizedText = normalizeVietnameseText(plainText)
 
   return Boolean(keyword && normalizedText.includes(keyword))
+}
+
+export function dedupeInternalLinkSkips(
+  items: InternalLinkSkippedItem[],
+  plainText: string,
+): InternalLinkSkippedItem[] {
+  const unique = new Map<string, InternalLinkSkippedItem>()
+
+  for (const item of items) {
+    if (!shouldStoreInternalLinkSkip(item, plainText)) continue
+
+    const anchorKey = normalizeVietnameseText(
+      item.anchorText || item.keyword || '',
+    )
+    const key = [
+      item.reason,
+      String(item.ruleId || ''),
+      anchorKey,
+      item.targetUrl || '',
+    ].join('|')
+
+    if (!unique.has(key)) unique.set(key, item)
+  }
+
+  return Array.from(unique.values())
 }
 
 export function getInternalLinkSkipIssueFlags(

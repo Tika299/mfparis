@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   countInternalLinkWords,
+  dedupeInternalLinkSkips,
   getInternalLinkContextExcerpt,
+  getInternalLinkDensityIssueFlags,
   getInternalLinkInsertionIssueFlags,
   getInternalLinkSkipIssueFlags,
   shouldStoreInternalLinkSkip,
@@ -48,6 +50,38 @@ describe('Tiện ích quét internal link', () => {
     ).toBe(false)
   })
 
+  it('loại cảnh báo giả và gộp diagnostic trùng nhau', () => {
+    const skipped = dedupeInternalLinkSkips(
+      [
+        {
+          keyword: 'Montblanc',
+          reason: 'max_anchor_reached',
+          ruleId: 12,
+          targetUrl: '/brands/montblanc/',
+          textPreview: 'Đoạn này không chứa thương hiệu cần tìm.',
+        },
+        {
+          keyword: 'Montblanc',
+          reason: 'max_anchor_reached',
+          ruleId: 12,
+          targetUrl: '/brands/montblanc/',
+          textPreview: 'Montblanc Legend phù hợp môi trường văn phòng.',
+        },
+        {
+          keyword: 'Montblanc',
+          reason: 'max_anchor_reached',
+          ruleId: 12,
+          targetUrl: '/brands/montblanc/',
+          textPreview: 'Một lựa chọn khác là Montblanc Explorer.',
+        },
+      ],
+      'Montblanc xuất hiện trong nội dung.',
+    )
+
+    expect(skipped).toHaveLength(1)
+    expect(skipped[0]?.textPreview).toContain('Montblanc Legend')
+  })
+
   it('gắn cờ cho lý do bỏ qua cần người quản trị xem lại', () => {
     expect(
       getInternalLinkSkipIssueFlags({ reason: 'max_links_reached' }),
@@ -67,5 +101,13 @@ describe('Tiện ích quét internal link', () => {
     )
 
     expect(flags).toEqual(['duplicate_target', 'duplicate_anchor'])
+  })
+
+  it('chỉ cảnh báo mật độ khi vượt ngưỡng cấu hình', () => {
+    expect(getInternalLinkDensityIssueFlags(4, 1_000, 0.5)).toEqual([])
+    expect(getInternalLinkDensityIssueFlags(6, 1_000, 0.5)).toEqual([
+      'high_link_density',
+    ])
+    expect(getInternalLinkDensityIssueFlags(50, 1_000, 0)).toEqual([])
   })
 })

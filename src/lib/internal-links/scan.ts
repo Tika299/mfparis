@@ -1,6 +1,7 @@
 import pLimit from 'p-limit'
 import type { Payload, Where } from 'payload'
 
+import { getSiteSettings } from '@/data/getSiteSettings'
 import type { InternalLinkScanRun } from '@/payload-types'
 import { stripHtmlToText } from '@/utilities/autoSummary'
 
@@ -13,10 +14,11 @@ import {
 } from './previewFields'
 import {
   countInternalLinkWords,
+  dedupeInternalLinkSkips,
   getInternalLinkContextExcerpt,
+  getInternalLinkDensityIssueFlags,
   getInternalLinkInsertionIssueFlags,
   getInternalLinkSkipIssueFlags,
-  shouldStoreInternalLinkSkip,
 } from './scanUtils'
 import type {
   InternalLinkInsertion,
@@ -260,8 +262,7 @@ function buildSkippedResults(args: {
   sourceType: InternalLinkScanSourceType
   sourceUrl: string
 }): ScanResultData[] {
-  return args.skipped
-    .filter((item) => shouldStoreInternalLinkSkip(item, args.plainText))
+  return dedupeInternalLinkSkips(args.skipped, args.plainText)
     .map((item, index) => {
       const issueFlags = getInternalLinkSkipIssueFlags(item)
 
@@ -298,6 +299,7 @@ function buildSkippedResults(args: {
 }
 
 async function buildDocumentResults(args: {
+  densityThreshold: number
   doc: Record<string, unknown>
   payload: Payload
   runId: number
@@ -383,6 +385,12 @@ async function buildDocumentResults(args: {
     documentWordCount += wordCount
   }
 
+  const densityIssueFlags = getInternalLinkDensityIssueFlags(
+    documentLinkCount,
+    documentWordCount,
+    args.densityThreshold,
+  )
+
   results.push({
     recordKey: createRecordKey([
       args.runId,
@@ -404,7 +412,7 @@ async function buildDocumentResults(args: {
     linksPerHundredWords: documentWordCount
       ? Number(((documentLinkCount / documentWordCount) * 100).toFixed(2))
       : 0,
-    issueFlags: null,
+    issueFlags: densityIssueFlags.length ? densityIssueFlags : null,
   })
 
   return results
@@ -568,6 +576,13 @@ export async function runInternalLinkScanBatch(args: {
   }
 
   try {
+    const siteSettings = await getSiteSettings()
+    const configuredDensityThreshold =
+      siteSettings.internalLinking?.maxLinksPerHundredWords
+    const densityThreshold =
+      typeof configuredDensityThreshold === 'number'
+        ? configuredDensityThreshold
+        : 0.5
     const page = await args.payload.find({
       collection: sourceType,
       depth: 0,
@@ -580,6 +595,7 @@ export async function runInternalLinkScanBatch(args: {
     const resultGroups = await Promise.all(
       page.docs.map((doc) =>
         buildDocumentResults({
+          densityThreshold,
           doc: doc as unknown as Record<string, unknown>,
           payload: args.payload,
           runId: run.id,
@@ -588,11 +604,23 @@ export async function runInternalLinkScanBatch(args: {
       ),
     )
     const limiter = pLimit(RESULT_WRITE_CONCURRENCY)
+    const allResults = resultGroups.flat()
+    const documentMarkers = allResults.filter(
+      (data) => data.sourceField === DOCUMENT_MARKER_FIELD,
+    )
+    const detailResults = allResults.filter(
+      (data) => data.sourceField !== DOCUMENT_MARKER_FIELD,
+    )
 
     await Promise.all(
-      resultGroups
-        .flat()
-        .map((data) => limiter(() => upsertScanResult(args.payload, data))),
+      detailResults.map((data) =>
+        limiter(() => upsertScanResult(args.payload, data)),
+      ),
+    )
+    await Promise.all(
+      documentMarkers.map((data) =>
+        limiter(() => upsertScanResult(args.payload, data)),
+      ),
     )
 
     const counts = await getRunCounts(args.payload, run.id)

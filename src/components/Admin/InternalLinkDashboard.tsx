@@ -84,6 +84,51 @@ const statusLabels: Record<ScanRun['status'], string> = {
   running: 'Đang chạy',
 }
 
+type IssueSeverity = 'danger' | 'info' | 'warning'
+
+const issueLabels: Record<
+  string,
+  { label: string; severity: IssueSeverity }
+> = {
+  duplicate_anchor: { label: 'Anchor bị lặp', severity: 'warning' },
+  duplicate_target: { label: 'URL đích bị lặp', severity: 'warning' },
+  high_link_density: { label: 'Mật độ link cao', severity: 'warning' },
+  skipped_duplicate_paragraph: {
+    label: 'Nhiều link trong cùng đoạn',
+    severity: 'warning',
+  },
+  skipped_generic_anchor: {
+    label: 'Anchor quá chung chung',
+    severity: 'info',
+  },
+  skipped_max_anchor_reached: {
+    label: 'Vượt giới hạn cùng anchor',
+    severity: 'warning',
+  },
+  skipped_max_links_reached: {
+    label: 'Vượt giới hạn link',
+    severity: 'warning',
+  },
+  skipped_max_target_reached: {
+    label: 'Vượt giới hạn cùng URL đích',
+    severity: 'warning',
+  },
+  skipped_product_name_fragment: {
+    label: 'Có thể là một phần tên sản phẩm',
+    severity: 'info',
+  },
+  skipped_self_link: {
+    label: 'Tự trỏ về chính trang',
+    severity: 'danger',
+  },
+}
+
+const issueBadgeStyles: Record<IssueSeverity, React.CSSProperties> = {
+  danger: { background: '#fef3f2', color: '#b42318' },
+  info: { background: '#eff8ff', color: '#175cd3' },
+  warning: { background: '#fffaeb', color: '#b54708' },
+}
+
 const cardStyle: React.CSSProperties = {
   background: '#fff',
   border: '1px solid #e5e7eb',
@@ -119,6 +164,44 @@ function getRuleId(rule: ScanResult['rule']) {
   if (typeof rule === 'number') return rule
   if (rule && typeof rule === 'object') return rule.id
   return null
+}
+
+function HighlightedContext({
+  anchor,
+  text,
+}: {
+  anchor?: string | null
+  text: string
+}) {
+  const cleanAnchor = anchor?.trim()
+
+  if (!cleanAnchor) return <>{text}</>
+
+  const index = text
+    .toLocaleLowerCase('vi')
+    .indexOf(cleanAnchor.toLocaleLowerCase('vi'))
+
+  if (index < 0) return <>{text}</>
+
+  const end = index + cleanAnchor.length
+
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark
+        style={{
+          background: '#fef0c7',
+          borderRadius: 3,
+          color: '#7a2e0e',
+          fontWeight: 700,
+          padding: '1px 2px',
+        }}
+      >
+        {text.slice(index, end)}
+      </mark>
+      {text.slice(end)}
+    </>
+  )
 }
 
 async function readJson(response: Response) {
@@ -582,11 +665,31 @@ export function InternalLinkDashboard() {
                           </td>
                           <td style={{ borderBottom: '1px solid #eef2f6', padding: 12, verticalAlign: 'top' }}>
                             <div>{result.targetUrl || '—'}</div>
-                            {flags.map((flag) => (
-                              <span key={flag} style={{ background: '#fef3f2', borderRadius: 999, color: '#b42318', display: 'inline-block', fontSize: 11, marginRight: 5, marginTop: 6, padding: '3px 7px' }}>
-                                {flag}
-                              </span>
-                            ))}
+                            {flags.map((flag) => {
+                              const issue = issueLabels[flag] || {
+                                label: flag,
+                                severity: 'info' as const,
+                              }
+
+                              return (
+                                <span
+                                  key={flag}
+                                  title={flag}
+                                  style={{
+                                    ...issueBadgeStyles[issue.severity],
+                                    borderRadius: 999,
+                                    display: 'inline-block',
+                                    fontSize: 11,
+                                    fontWeight: 650,
+                                    marginRight: 5,
+                                    marginTop: 6,
+                                    padding: '3px 7px',
+                                  }}
+                                >
+                                  {issue.label}
+                                </span>
+                              )
+                            })}
                           </td>
                           <td style={{ borderBottom: '1px solid #eef2f6', padding: 12, verticalAlign: 'top' }}>
                             {result.reviewStatus || '—'}
@@ -651,7 +754,12 @@ export function InternalLinkDashboard() {
                                         </div>
                                         {link.contextExcerpt ? (
                                           <div style={{ color: '#344054', fontSize: 13, lineHeight: 1.55, marginTop: 8 }}>
-                                            “…{link.contextExcerpt.replace(/^…|…$/gu, '')}…”
+                                            “
+                                            <HighlightedContext
+                                              anchor={link.anchorText || link.keyword}
+                                              text={link.contextExcerpt.replace(/^…|…$/gu, '')}
+                                            />
+                                            ”
                                           </div>
                                         ) : null}
                                       </div>

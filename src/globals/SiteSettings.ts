@@ -436,6 +436,18 @@ export const SiteSettings: GlobalConfig = {
           min: 1,
           max: 10,
         },
+        {
+          name: 'maxLinksPerHundredWords',
+          type: 'number',
+          label: 'Ngưỡng cảnh báo mật độ (link / 100 từ)',
+          defaultValue: 0.5,
+          min: 0,
+          max: 10,
+          admin: {
+            description:
+              'Chỉ dùng để gắn cảnh báo cần xem lại, không tự động xóa hoặc chặn link.',
+          },
+        },
       ],
     }
   ],

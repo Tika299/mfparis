@@ -38,6 +38,7 @@ export type InternalLinkSettings = {
     maxLinksPerParagraph?: number | null
     maxSameTargetUrl?: number | null
     maxSameAnchor?: number | null
+    maxLinksPerHundredWords?: number | null
 }
 
 export type ApplyInternalLinksInput = {

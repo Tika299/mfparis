@@ -3095,6 +3095,10 @@ export interface SiteSetting {
     maxLinksPerParagraph?: number | null;
     maxSameTargetUrl?: number | null;
     maxSameAnchor?: number | null;
+    /**
+     * Chỉ dùng để gắn cảnh báo cần xem lại, không tự động xóa hoặc chặn link.
+     */
+    maxLinksPerHundredWords?: number | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -3283,6 +3287,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         maxLinksPerParagraph?: T;
         maxSameTargetUrl?: T;
         maxSameAnchor?: T;
+        maxLinksPerHundredWords?: T;
       };
   updatedAt?: T;
   createdAt?: T;
