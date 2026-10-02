@@ -39,6 +39,15 @@ describe('Tiện ích quét internal link', () => {
     ).toBe(true)
   })
 
+  it('không tính diagnostic hệ thống thành candidate link', () => {
+    expect(
+      shouldStoreInternalLinkSkip({ reason: 'empty_html' }, ''),
+    ).toBe(false)
+    expect(
+      shouldStoreInternalLinkSkip({ reason: 'no_rules' }, 'Nội dung bình thường'),
+    ).toBe(false)
+  })
+
   it('gắn cờ cho lý do bỏ qua cần người quản trị xem lại', () => {
     expect(
       getInternalLinkSkipIssueFlags({ reason: 'max_links_reached' }),

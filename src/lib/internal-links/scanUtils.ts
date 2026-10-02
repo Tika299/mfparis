@@ -57,6 +57,10 @@ export function shouldStoreInternalLinkSkip(
   item: InternalLinkSkippedItem,
   plainText: string,
 ): boolean {
+  if (!item.keyword && !item.anchorText && !item.targetUrl) {
+    return false
+  }
+
   if (
     item.reason !== 'self_link' &&
     item.reason !== 'excluded_keyword'

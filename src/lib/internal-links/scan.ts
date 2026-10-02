@@ -736,6 +736,7 @@ export async function listInternalLinkScanResults(args: {
   reviewStatus?: string | null
   runId: unknown
   search?: string | null
+  sourceId?: string | null
   sourceType?: string | null
 }) {
   const run = await getScanRun(args.payload, args.runId)
@@ -756,6 +757,10 @@ export async function listInternalLinkScanResults(args: {
 
   if (isInternalLinkScanSourceType(args.sourceType)) {
     conditions.push({ sourceType: { equals: args.sourceType } })
+  }
+
+  if (args.sourceId?.trim()) {
+    conditions.push({ sourceId: { equals: args.sourceId.trim() } })
   }
 
   if (

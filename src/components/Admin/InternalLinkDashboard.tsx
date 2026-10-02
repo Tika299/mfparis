@@ -155,6 +155,9 @@ export function InternalLinkDashboard() {
   const [loading, setLoading] = useState(false)
   const [scanning, setScanning] = useState(false)
   const [message, setMessage] = useState('')
+  const [expandedSourceKey, setExpandedSourceKey] = useState<string | null>(null)
+  const [expandedLinks, setExpandedLinks] = useState<Record<string, ScanResult[]>>({})
+  const [loadingSourceKey, setLoadingSourceKey] = useState<string | null>(null)
 
   const activeSourceLabel = useMemo(() => {
     if (!run || run.status !== 'running') return null
@@ -319,6 +322,49 @@ export function InternalLinkDashboard() {
       if (run) await loadResults(run.id, pagination.page)
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Không thể cập nhật review.')
+    }
+  }
+
+  async function togglePageLinks(result: ScanResult) {
+    const sourceKey = `${result.sourceType}:${result.sourceId}`
+
+    if (expandedSourceKey === sourceKey) {
+      setExpandedSourceKey(null)
+      return
+    }
+
+    setExpandedSourceKey(sourceKey)
+
+    if (expandedLinks[sourceKey] || !run) return
+
+    setLoadingSourceKey(sourceKey)
+
+    try {
+      const params = new URLSearchParams({
+        runId: String(run.id),
+        mode: 'inserted',
+        sourceType: result.sourceType,
+        sourceId: result.sourceId,
+        limit: '100',
+      })
+      const data = await readJson(
+        await fetch(`/api/internal-links/scan?${params.toString()}`, {
+          cache: 'no-store',
+        }),
+      )
+
+      setExpandedLinks((current) => ({
+        ...current,
+        [sourceKey]: Array.isArray(data.results) ? data.results : [],
+      }))
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : 'Không thể tải link của trang này.',
+      )
+    } finally {
+      setLoadingSourceKey(null)
     }
   }
 
@@ -502,59 +548,123 @@ export function InternalLinkDashboard() {
                   {results.map((result) => {
                     const flags = getIssueFlags(result.issueFlags)
                     const ruleId = getRuleId(result.rule)
+                    const sourceKey = `${result.sourceType}:${result.sourceId}`
+                    const isExpanded = expandedSourceKey === sourceKey
+                    const pageLinks = expandedLinks[sourceKey] || []
 
                     return (
-                      <tr key={result.id}>
-                        <td style={{ borderBottom: '1px solid #eef2f6', padding: 12, verticalAlign: 'top' }}>
-                          <strong>{result.sourceTitle || `#${result.sourceId}`}</strong>
-                          <div style={{ color: '#667085', fontSize: 12, marginTop: 4 }}>{result.sourceUrl}</div>
-                          {result.contextExcerpt ? (
-                            <div style={{ color: '#475467', fontSize: 12, marginTop: 8, maxWidth: 360 }}>{result.contextExcerpt}</div>
-                          ) : null}
-                        </td>
-                        <td style={{ borderBottom: '1px solid #eef2f6', padding: 12, verticalAlign: 'top' }}>
-                          {result.sourceType}<br />
-                          <span style={{ color: '#667085', fontSize: 12 }}>{result.sourceFieldLabel || result.sourceField}</span>
-                        </td>
-                        <td style={{ borderBottom: '1px solid #eef2f6', padding: 12, verticalAlign: 'top' }}>
-                          {mode === 'pages' ? (
-                            <>
-                              <strong>{result.linkCount || 0} link</strong>
-                              <div>{result.wordCount || 0} từ</div>
-                              <div>{result.linksPerHundredWords || 0} link / 100 từ</div>
-                            </>
-                          ) : (
-                            <>
-                              <strong>{result.anchorText || result.keyword || '—'}</strong>
-                              <div style={{ color: '#667085', fontSize: 12, marginTop: 4 }}>{result.skipReason || result.rowType}</div>
-                            </>
-                          )}
-                        </td>
-                        <td style={{ borderBottom: '1px solid #eef2f6', padding: 12, verticalAlign: 'top' }}>
-                          <div>{result.targetUrl || '—'}</div>
-                          {flags.map((flag) => (
-                            <span key={flag} style={{ background: '#fef3f2', borderRadius: 999, color: '#b42318', display: 'inline-block', fontSize: 11, marginRight: 5, marginTop: 6, padding: '3px 7px' }}>
-                              {flag}
-                            </span>
-                          ))}
-                        </td>
-                        <td style={{ borderBottom: '1px solid #eef2f6', padding: 12, verticalAlign: 'top' }}>
-                          {result.reviewStatus || '—'}
-                        </td>
-                        <td style={{ borderBottom: '1px solid #eef2f6', padding: 12, verticalAlign: 'top' }}>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                            <a href={result.sourceUrl} rel="noreferrer" target="_blank">Frontend</a>
-                            <a href={`/admin/collections/${result.sourceType}/${result.sourceId}`}>Sửa nguồn</a>
-                            {ruleId ? <a href={`/admin/collections/internal-link-rules/${ruleId}`}>Mở rule</a> : null}
-                            {mode !== 'pages' ? (
-                              <>
-                                <button type="button" onClick={() => updateReview(result.id, 'reviewed')}>Đã xem</button>
-                                <button type="button" onClick={() => updateReview(result.id, 'dismissed')}>Bỏ qua</button>
-                              </>
+                      <React.Fragment key={result.id}>
+                        <tr>
+                          <td style={{ borderBottom: '1px solid #eef2f6', padding: 12, verticalAlign: 'top' }}>
+                            <strong>{result.sourceTitle || `#${result.sourceId}`}</strong>
+                            <div style={{ color: '#667085', fontSize: 12, marginTop: 4 }}>{result.sourceUrl}</div>
+                            {result.contextExcerpt ? (
+                              <div style={{ color: '#475467', fontSize: 12, marginTop: 8, maxWidth: 360 }}>{result.contextExcerpt}</div>
                             ) : null}
-                          </div>
-                        </td>
-                      </tr>
+                          </td>
+                          <td style={{ borderBottom: '1px solid #eef2f6', padding: 12, verticalAlign: 'top' }}>
+                            {result.sourceType}<br />
+                            <span style={{ color: '#667085', fontSize: 12 }}>{result.sourceFieldLabel || result.sourceField}</span>
+                          </td>
+                          <td style={{ borderBottom: '1px solid #eef2f6', padding: 12, verticalAlign: 'top' }}>
+                            {mode === 'pages' ? (
+                              <>
+                                <strong>{result.linkCount || 0} link</strong>
+                                <div>{result.wordCount || 0} từ</div>
+                                <div>{result.linksPerHundredWords || 0} link / 100 từ</div>
+                              </>
+                            ) : (
+                              <>
+                                <strong>{result.anchorText || result.keyword || '—'}</strong>
+                                <div style={{ color: '#667085', fontSize: 12, marginTop: 4 }}>{result.skipReason || result.rowType}</div>
+                              </>
+                            )}
+                          </td>
+                          <td style={{ borderBottom: '1px solid #eef2f6', padding: 12, verticalAlign: 'top' }}>
+                            <div>{result.targetUrl || '—'}</div>
+                            {flags.map((flag) => (
+                              <span key={flag} style={{ background: '#fef3f2', borderRadius: 999, color: '#b42318', display: 'inline-block', fontSize: 11, marginRight: 5, marginTop: 6, padding: '3px 7px' }}>
+                                {flag}
+                              </span>
+                            ))}
+                          </td>
+                          <td style={{ borderBottom: '1px solid #eef2f6', padding: 12, verticalAlign: 'top' }}>
+                            {result.reviewStatus || '—'}
+                          </td>
+                          <td style={{ borderBottom: '1px solid #eef2f6', padding: 12, verticalAlign: 'top' }}>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                              {mode === 'pages' ? (
+                                <button
+                                  disabled={!result.linkCount}
+                                  type="button"
+                                  onClick={() => togglePageLinks(result)}
+                                >
+                                  {loadingSourceKey === sourceKey
+                                    ? 'Đang tải…'
+                                    : isExpanded
+                                      ? 'Ẩn link'
+                                      : `Xem ${result.linkCount || 0} link`}
+                                </button>
+                              ) : null}
+                              <a href={result.sourceUrl} rel="noreferrer" target="_blank">Frontend</a>
+                              <a href={`/admin/collections/${result.sourceType}/${result.sourceId}`}>Sửa nguồn</a>
+                              {ruleId ? <a href={`/admin/collections/internal-link-rules/${ruleId}`}>Mở rule</a> : null}
+                              {mode !== 'pages' ? (
+                                <>
+                                  <button type="button" onClick={() => updateReview(result.id, 'reviewed')}>Đã xem</button>
+                                  <button type="button" onClick={() => updateReview(result.id, 'dismissed')}>Bỏ qua</button>
+                                </>
+                              ) : null}
+                            </div>
+                          </td>
+                        </tr>
+                        {mode === 'pages' && isExpanded ? (
+                          <tr>
+                            <td colSpan={6} style={{ background: '#f8fafc', borderBottom: '1px solid #d0d5dd', padding: 16 }}>
+                              <div style={{ fontWeight: 700, marginBottom: 10 }}>
+                                Các link dự kiến trên “{result.sourceTitle || result.sourceUrl}”
+                              </div>
+                              {loadingSourceKey === sourceKey ? (
+                                <div style={{ color: '#667085' }}>Đang tải chi tiết link…</div>
+                              ) : pageLinks.length ? (
+                                <div style={{ display: 'grid', gap: 10 }}>
+                                  {pageLinks.map((link, index) => {
+                                    const nestedRuleId = getRuleId(link.rule)
+
+                                    return (
+                                      <div key={link.id} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
+                                        <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                          <strong>{index + 1}. “{link.anchorText || link.keyword || 'Không rõ anchor'}”</strong>
+                                          <span aria-hidden="true">→</span>
+                                          <a href={link.targetUrl || '#'} rel="noreferrer" target="_blank">
+                                            {link.targetUrl || 'Không có URL đích'}
+                                          </a>
+                                          {nestedRuleId ? (
+                                            <a href={`/admin/collections/internal-link-rules/${nestedRuleId}`}>
+                                              Mở rule
+                                            </a>
+                                          ) : null}
+                                        </div>
+                                        <div style={{ color: '#667085', fontSize: 12, marginTop: 5 }}>
+                                          Field: {link.sourceFieldLabel || link.sourceField}
+                                          {link.ruleTitle ? ` · Rule: ${link.ruleTitle}` : ''}
+                                        </div>
+                                        {link.contextExcerpt ? (
+                                          <div style={{ color: '#344054', fontSize: 13, lineHeight: 1.55, marginTop: 8 }}>
+                                            “…{link.contextExcerpt.replace(/^…|…$/gu, '')}…”
+                                          </div>
+                                        ) : null}
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              ) : (
+                                <div style={{ color: '#667085' }}>Trang này không có link dự kiến.</div>
+                              )}
+                            </td>
+                          </tr>
+                        ) : null}
+                      </React.Fragment>
                     )
                   })}
                   {!results.length ? (

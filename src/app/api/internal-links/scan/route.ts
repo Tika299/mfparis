@@ -77,6 +77,7 @@ export async function GET(req: Request) {
         sourceType: url.searchParams.get('sourceType'),
         reviewStatus: url.searchParams.get('reviewStatus'),
         search: url.searchParams.get('search'),
+        sourceId: url.searchParams.get('sourceId'),
       })
 
       return NextResponse.json({
