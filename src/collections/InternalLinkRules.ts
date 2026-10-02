@@ -117,6 +117,10 @@ export const InternalLinkRules: CollectionConfig = {
                 { label: 'Tạo thủ công', value: 'manual' },
                 { label: 'Cấu hình tại sản phẩm', value: 'product' },
                 { label: 'Cấu hình tại thương hiệu', value: 'brand' },
+                {
+                    label: 'Cấu hình tại danh mục sản phẩm',
+                    value: 'category',
+                },
             ],
             admin: {
                 readOnly: true,

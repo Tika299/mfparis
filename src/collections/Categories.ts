@@ -6,6 +6,10 @@ import { htmlEditorField } from '@/collections/fields/htmlEditorField'
 import { siloSeoFields } from '@/collections/fields/siloSeoFields'
 import { landingSeoContentFields, seoFields } from '@/collections/fields/seoFields'
 import { internalLinkingFields } from '@/collections/fields/internalLinkingFields'
+import {
+  disableCategoryInboundInternalLinks,
+  syncCategoryInboundInternalLinks,
+} from '@/collections/hooks/syncCategoryInboundInternalLinks'
 
 const revalidateCategoryTags = async () => {
   try {
@@ -30,11 +34,13 @@ export const Categories: CollectionConfig = {
   hooks: {
     afterChange: [
       trackCategorySlugHistory,
+      syncCategoryInboundInternalLinks,
       async () => {
         await revalidateCategoryTags()
       },
     ],
     afterDelete: [
+      disableCategoryInboundInternalLinks,
       async () => {
         await revalidateCategoryTags()
       },

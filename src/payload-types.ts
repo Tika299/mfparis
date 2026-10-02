@@ -1571,7 +1571,7 @@ export interface InternalLinkRule {
   }[];
   targetType: 'custom_url' | 'product' | 'category' | 'brand' | 'post' | 'post_category';
   targetUrl: string;
-  managedBy?: ('manual' | 'product' | 'brand') | null;
+  managedBy?: ('manual' | 'product' | 'brand' | 'category') | null;
   managedKey?: string | null;
   managedSourceId?: string | null;
   scope?: ('posts' | 'products' | 'categories' | 'brands' | 'post-categories')[] | null;
