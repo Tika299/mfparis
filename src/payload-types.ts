@@ -408,8 +408,14 @@ export interface Brand {
       }[]
     | null;
   featuredProducts?: (number | Product)[] | null;
+  /**
+   * Mỗi dòng là một landing page SEO riêng. Hãy khai báo đủ các mùa bạn muốn index.
+   */
   indexableFacets?:
     | {
+        /**
+         * Facet mùa attr_mua tạo URL /categories/{slug}/mua-{value}.
+         */
         key: string;
         value: string;
         metaTitle?: string | null;
@@ -832,12 +838,30 @@ export interface Category {
       }[]
     | null;
   featuredProducts?: (number | Product)[] | null;
+  /**
+   * Mỗi dòng là một landing page SEO riêng. Hãy khai báo đủ các mùa bạn muốn index.
+   */
   indexableFacets?:
     | {
+        /**
+         * Facet mùa attr_mua tạo URL /categories/{slug}/mua-{value}.
+         */
         key: string;
         value: string;
         metaTitle?: string | null;
         metaDescription?: string | null;
+        /**
+         * Ví dụ: Nước Hoa Mùa Xuân Chính Hãng
+         */
+        h1?: string | null;
+        /**
+         * Nội dung riêng hiển thị phía trên danh sách sản phẩm của landing page bộ lọc.
+         */
+        introHtml?: string | null;
+        /**
+         * Bài viết dài riêng hiển thị phía dưới danh sách sản phẩm.
+         */
+        bottomContentHtml?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -2338,6 +2362,9 @@ export interface CategoriesSelect<T extends boolean = true> {
         value?: T;
         metaTitle?: T;
         metaDescription?: T;
+        h1?: T;
+        introHtml?: T;
+        bottomContentHtml?: T;
         id?: T;
       };
   noindexWhenEmpty?: T;

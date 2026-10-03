@@ -529,7 +529,12 @@ export const productStructuredSeoFields: Field[] = [
   },
 ]
 
-export const landingSeoContentFields: Field[] = [
+export function landingSeoContentFields({
+  includeFacetContent = false,
+}: {
+  includeFacetContent?: boolean
+} = {}): Field[] {
+  return [
   {
     name: 'h1Override',
     type: 'text',
@@ -584,7 +589,10 @@ export const landingSeoContentFields: Field[] = [
   {
     name: 'indexableFacets',
     type: 'array',
-    label: 'Facet duoc phep index',
+    label: 'Landing page bộ lọc được phép index',
+    admin: {
+      description: 'Mỗi dòng là một landing page SEO riêng. Hãy khai báo đủ các mùa bạn muốn index.',
+    },
     fields: [
       {
         name: 'key',
@@ -593,7 +601,7 @@ export const landingSeoContentFields: Field[] = [
         label: 'Ten filter',
         admin: {
           placeholder: 'VD: attr_mua',
-          description: 'Facet mùa attr_mua tạo URL /categories/{slug}/{value}.',
+          description: 'Facet mùa attr_mua tạo URL /categories/{slug}/mua-{value}.',
         },
       },
       {
@@ -612,6 +620,48 @@ export const landingSeoContentFields: Field[] = [
         type: 'textarea',
         label: 'Meta description rieng',
       },
+      ...((includeFacetContent
+        ? [
+          {
+            name: 'h1',
+            type: 'text',
+            label: 'H1 riêng',
+            admin: {
+              description: 'Ví dụ: Nước Hoa Mùa Xuân Chính Hãng',
+            },
+          },
+          {
+            name: 'introHtml',
+            type: 'textarea',
+            maxLength: 1000000,
+            label: 'Mô tả mở đầu riêng',
+            admin: {
+              rows: 12,
+              description: 'Nội dung riêng hiển thị phía trên danh sách sản phẩm của landing page bộ lọc.',
+              components: {
+                Field: {
+                  path: '@/components/Admin/TinyMCEHtmlEditor#TinyMCEHtmlEditor',
+                },
+              },
+            },
+          },
+          {
+            name: 'bottomContentHtml',
+            type: 'textarea',
+            maxLength: 1000000,
+            label: 'Bài viết SEO riêng',
+            admin: {
+              rows: 24,
+              description: 'Bài viết dài riêng hiển thị phía dưới danh sách sản phẩm.',
+              components: {
+                Field: {
+                  path: '@/components/Admin/TinyMCEHtmlEditor#TinyMCEHtmlEditor',
+                },
+              },
+            },
+          },
+        ]
+        : []) as Field[]),
     ],
   },
   {
@@ -638,7 +688,8 @@ export const landingSeoContentFields: Field[] = [
     relationTo: 'media',
     label: 'Anh social rieng cho landing page',
   },
-]
+  ]
+}
 
 export const blogLandingSeoContentFields: Field[] = [
   {

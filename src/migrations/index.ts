@@ -33,6 +33,8 @@ import * as migration_20261002_034844 from './20261002_034844';
 import * as migration_20261002_041947 from './20261002_041947';
 import * as migration_20261002_073228_add_internal_link_scans from './20261002_073228_add_internal_link_scans';
 import * as migration_20261002_093725_add_internal_link_density_threshold from './20261002_093725_add_internal_link_density_threshold';
+import * as migration_20261003_084539 from './20261003_084539';
+import * as migration_20261003_151500_add_category_facet_seo_content from './20261003_151500_add_category_facet_seo_content';
 
 export const migrations = [
   {
@@ -209,5 +211,15 @@ export const migrations = [
     up: migration_20261002_093725_add_internal_link_density_threshold.up,
     down: migration_20261002_093725_add_internal_link_density_threshold.down,
     name: '20261002_093725_add_internal_link_density_threshold',
+  },
+  {
+    up: migration_20261003_084539.up,
+    down: migration_20261003_084539.down,
+    name: '20261003_084539',
+  },
+  {
+    up: migration_20261003_151500_add_category_facet_seo_content.up,
+    down: migration_20261003_151500_add_category_facet_seo_content.down,
+    name: '20261003_151500_add_category_facet_seo_content'
   },
 ];

@@ -16,7 +16,7 @@ describe('category season SEO URLs', () => {
     const params = new URLSearchParams({ attr_mua: 'xuan' })
 
     expect(buildFilterUrl(params, categoryRoute))
-      .toBe('/categories/nuoc-hoa/xuan')
+      .toBe('/categories/nuoc-hoa/mua-xuan')
   })
 
   it('keeps additional filters in the query string', () => {
@@ -27,10 +27,16 @@ describe('category season SEO URLs', () => {
     })
 
     expect(buildFilterUrl(params, categoryRoute))
-      .toBe('/categories/nuoc-hoa/xuan?brand=dior&page=2')
+      .toBe('/categories/nuoc-hoa/mua-xuan?brand=dior&page=2')
   })
 
   it('reads the season filter back from the clean URL', () => {
+    const params = getFilterParamsFromPrettyPathname('/categories/nuoc-hoa/mua-xuan')
+
+    expect(params.get('attr_mua')).toBe('xuan')
+  })
+
+  it('still understands the old one-word path during redirect rollout', () => {
     const params = getFilterParamsFromPrettyPathname('/categories/nuoc-hoa/xuan')
 
     expect(params.get('attr_mua')).toBe('xuan')

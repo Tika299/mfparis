@@ -68,10 +68,11 @@ export function getFilterParamsFromPrettyPathname(pathname: string): URLSearchPa
 
   /*
    * Facet mùa có landing page SEO riêng:
-   * /categories/nuoc-hoa/xuan -> attr_mua=xuan
+   * /categories/nuoc-hoa/mua-xuan -> attr_mua=xuan
+   * Đường dẫn /xuan cũ vẫn được đọc để Proxy chuyển hướng 308.
    */
   if (parts[0] === 'categories' && parts[1] && parts[2] && parts.length === 3) {
-    params.set('attr_mua', parts[2])
+    params.set('attr_mua', parts[2].replace(/^mua-/, ''))
     return params
   }
 
@@ -172,7 +173,7 @@ export function buildPrettyFilterUrl(
   const remainingParams = new URLSearchParams(params.toString())
   remainingParams.delete('attr_mua')
 
-  const pathname = `/categories/${safeEncode(routeContext.slug)}/${safeEncode(season)}`
+  const pathname = `/categories/${safeEncode(routeContext.slug)}/mua-${safeEncode(season)}`
   const query = remainingParams.toString()
 
   return query ? `${pathname}?${query}` : pathname

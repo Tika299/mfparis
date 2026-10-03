@@ -269,7 +269,7 @@ export const Categories: CollectionConfig = {
         },
         {
           label: 'Nội dung SEO',
-          fields: landingSeoContentFields,
+          fields: landingSeoContentFields({ includeFacetContent: true }),
         },
       ],
     },

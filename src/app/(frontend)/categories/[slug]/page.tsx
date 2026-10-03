@@ -89,14 +89,20 @@ type SeasonFacet = {
 type IndexableFacetConfig = {
   key?: string | null
   value?: string | null
+  h1?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
+  introHtml?: string | null
+  bottomContentHtml?: string | null
 }
 
 const SEASON_FILTER_KEY = 'attr_mua'
 
 function normalizePrettyFacet(value: string | undefined): string | null {
-  const normalized = String(value || '').trim().toLowerCase()
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^mua-/, '')
 
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(normalized)) {
     return null
@@ -178,7 +184,7 @@ function hasExtraFacetFilters(searchParams: ProductSearchParams): boolean {
 }
 
 function buildCategoryFacetUrl(categorySlug: string, facetSlug: string): string {
-  return `/categories/${encodeURIComponent(categorySlug)}/${encodeURIComponent(facetSlug)}`
+  return `/categories/${encodeURIComponent(categorySlug)}/mua-${encodeURIComponent(facetSlug)}`
 }
 
 function buildLegacyFacetRedirectUrl(
@@ -231,7 +237,9 @@ function buildCategoryContainsWhere(categoryIDs: string[]): Where {
   }
 }
 
-function getCategoryDisplayName(category: any): string {
+function getCategoryDisplayName(
+  category: Pick<Category, 'displayName' | 'h1Override' | 'name'>,
+): string {
   return (
     category?.h1Override ||
     category?.displayName ||
@@ -477,8 +485,8 @@ export async function generateMetadata({
     : getSeoCanonical(category, defaultCategoryCanonicalUrl)
   const imageUrl = getMediaUrl(
     (getSeoMedia(category, 'ogImage') ||
-      (category as any).ogImage ||
-      (category as any).thumbnail ||
+      category.ogImage ||
+      category.thumbnail ||
       category.image) as RelationshipMedia,
   )
   const twitterImageUrl =
@@ -751,6 +759,10 @@ export default async function CategoryPage({
     notFound()
   }
 
+  const facetConfig = seasonFacet
+    ? getIndexableFacetConfig(currentCategory, SEASON_FILTER_KEY, seasonFacet.slug)
+    : null
+
   const allCategories = allCategoriesRes.docs as CategoryTreeItem[]
 
   const categoryScopeIDs = getCategoryDescendantIDs(
@@ -887,18 +899,21 @@ export default async function CategoryPage({
     (key) => key !== 'category',
   )
 
-  const hasDescription = Boolean(
-    normalizeContentHtml(currentCategory.description),
+  const categoryDescriptionHtml = normalizeContentHtml(
+    seasonFacet ? facetConfig?.introHtml : currentCategory.description,
   )
+  const hasDescription = Boolean(categoryDescriptionHtml)
   const bottomContentHtml = normalizeContentHtml(
-    currentCategory.bottomContentHtml,
+    seasonFacet ? facetConfig?.bottomContentHtml : currentCategory.bottomContentHtml,
   )
-  const faqItems = getLandingFaqItems(currentCategory.faq)
+  const faqItems = seasonFacet ? [] : getLandingFaqItems(currentCategory.faq)
   const baseCategoryDisplayName = getCategoryDisplayName(currentCategory)
   const seasonPhrase = seasonFacet ? getSeasonPhrase(seasonFacet.label) : null
-  const categoryDisplayName = seasonPhrase
-    ? `${baseCategoryDisplayName} ${seasonPhrase}`
-    : baseCategoryDisplayName
+  const categoryDisplayName = facetConfig?.h1 || (
+    seasonPhrase
+      ? `${baseCategoryDisplayName} ${seasonPhrase}`
+      : baseCategoryDisplayName
+  )
   const breadcrumb = [
     {
       name: 'Trang chủ',
@@ -936,9 +951,11 @@ export default async function CategoryPage({
   const categoryUrl = seasonFacet
     ? buildCategoryFacetUrl(slug, seasonFacet.slug)
     : `/categories/${encodeURIComponent(slug)}`
-  const pageDescription = seasonPhrase
-    ? `Khám phá ${currentCategory.name} ${seasonPhrase.toLocaleLowerCase('vi')} chính hãng, phù hợp thời tiết và phong cách tại MF Paris.`
-    : getCategoryDescription(currentCategory)
+  const pageDescription = facetConfig?.metaDescription || (
+    seasonPhrase
+      ? `Khám phá ${currentCategory.name} ${seasonPhrase.toLocaleLowerCase('vi')} chính hãng, phù hợp thời tiết và phong cách tại MF Paris.`
+      : getCategoryDescription(currentCategory)
+  )
 
   const internalLinkingConfig = getInternalLinkingConfig(currentCategory)
 
@@ -1089,7 +1106,7 @@ export default async function CategoryPage({
             )}{' '}
             sản phẩm
           </p>
-          {seasonFacet ? (
+          {seasonFacet && !hasDescription ? (
             <p className="mt-3 max-w-3xl text-sm leading-6 text-gray-600 md:text-base">
               {pageDescription}
             </p>
@@ -1155,6 +1172,22 @@ export default async function CategoryPage({
           </aside>
 
           <main className="min-w-0 flex-1">
+            {seasonFacet && hasDescription && categoryDescriptionHtml ? (
+              <section className="mb-6 rounded-2xl bg-white p-5 shadow-sm md:mb-8 md:p-8">
+                <div className="category-description prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
+                  <Suspense key={`facet-intro:${categoryUrl}`} fallback={null}>
+                    <LinkedCategoryHtml
+                      html={categoryDescriptionHtml}
+                      currentUrl={categoryUrl}
+                      scope="categories"
+                      payload={payload}
+                      {...internalLinkingConfig}
+                    />
+                  </Suspense>
+                </div>
+              </section>
+            ) : null}
+
             {productsRes.docs.length > 0 ? (
               <>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
@@ -1258,8 +1291,7 @@ export default async function CategoryPage({
               </div>
             )}
 
-            {hasDescription &&
-              currentCategory.description && (
+            {!seasonFacet && hasDescription && categoryDescriptionHtml && (
                 <section className="mt-10 rounded-2xl bg-white p-5 shadow-sm md:mt-12 md:p-8">
                   <h2 className="mb-4 text-xl font-bold md:text-2xl">
                     Giới thiệu về{' '}
@@ -1272,7 +1304,7 @@ export default async function CategoryPage({
                     <ExpandableContent maxHeight={500}>
                       <Suspense key={`description:${categoryUrl}`} fallback={null}>
                         <LinkedCategoryHtml
-                          html={currentCategory.description}
+                          html={categoryDescriptionHtml}
                           currentUrl={categoryUrl}
                           scope="categories"
                           payload={payload}

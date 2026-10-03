@@ -14,6 +14,7 @@ import {
 
 const REDIRECT_LOOKUP_TIMEOUT_MS = 1_500
 const CATEGORY_PATH_PATTERN = /^\/categories\/([^/]+)\/?$/
+const CATEGORY_FACET_PATH_PATTERN = /^\/categories\/([^/]+)\/([^/]+)\/?$/
 const SEO_SEASON_FILTER_KEY = 'attr_mua'
 
 function isRedirectableMethod(method: string): boolean {
@@ -40,7 +41,7 @@ function getCategorySeasonRedirect(request: NextRequest): URL | null {
     }
 
     const targetUrl = request.nextUrl.clone()
-    targetUrl.pathname = `/categories/${categoryMatch[1]}/${encodeURIComponent(season)}`
+    targetUrl.pathname = `/categories/${categoryMatch[1]}/mua-${encodeURIComponent(season)}`
     targetUrl.searchParams.delete(SEO_SEASON_FILTER_KEY)
 
     return targetUrl
@@ -120,6 +121,18 @@ export async function proxy(
 ): Promise<NextResponse> {
     if (!isRedirectableMethod(request.method)) {
         return NextResponse.next()
+    }
+
+    const categoryFacetMatch = request.nextUrl.pathname.match(CATEGORY_FACET_PATH_PATTERN)
+
+    if (categoryFacetMatch && !categoryFacetMatch[2].startsWith('mua-')) {
+        const legacyFacet = categoryFacetMatch[2].trim().toLowerCase()
+
+        if (/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(legacyFacet)) {
+            const targetUrl = request.nextUrl.clone()
+            targetUrl.pathname = `/categories/${categoryFacetMatch[1]}/mua-${encodeURIComponent(legacyFacet)}`
+            return NextResponse.redirect(targetUrl, 308)
+        }
     }
 
     const categorySeasonRedirect = getCategorySeasonRedirect(request)

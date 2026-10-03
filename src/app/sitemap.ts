@@ -456,7 +456,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 : [...observedValues]
 
             return values.map((facetValue) => ({
-                url: toAbsoluteUrl(`/categories/${category.slug}/${facetValue}`),
+                url: toAbsoluteUrl(`/categories/${category.slug}/mua-${facetValue}`),
                 lastModified: toValidLastModified(category.updatedAt),
                 changeFrequency: 'weekly' as const,
                 priority: 0.65,

@@ -145,7 +145,7 @@ export const Brands: CollectionConfig = {
         },
         {
           label: 'Nội dung SEO',
-          fields: landingSeoContentFields,
+          fields: landingSeoContentFields(),
         },
       ],
     },
