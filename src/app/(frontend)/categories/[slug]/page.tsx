@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import type { Where } from 'payload'
+import type { Category } from '@/payload-types'
 
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import '@/styles/prose.css'
 import { ProductCard } from '@/components/ProductCard'
 import { JsonLd } from '@/components/JsonLd'
@@ -20,6 +21,9 @@ import { buildCollectionPageSchemaGraph } from '@/lib/structured-data'
 import {
   appendAdvancedProductWhereConditions,
   appendAdvancedSearchParams,
+  getFirstSearchParam,
+  getSearchParamValues,
+  type ProductSearchParams,
 } from '@/lib/productSearchFilters'
 import { applyInternalLinksForRender } from '@/lib/internal-links/applyInternalLinks'
 import { getInternalLinkingConfig } from '@/lib/internal-links/getInternalLinkingConfig'
@@ -58,15 +62,10 @@ const ALLOWED_SORT_VALUES = new Set([
 type CategoryPageProps = {
   params: Promise<{
     slug: string
+    facet?: string
   }>
 
-  searchParams: Promise<{
-    page?: string
-    brand?: string
-    min?: string
-    max?: string
-    sort?: string
-  }>
+  searchParams: Promise<ProductSearchParams>
 }
 
 type RelationshipMedia =
@@ -80,6 +79,128 @@ type RelationshipMedia =
 type LandingFaqItem = {
   question?: string | null
   answer?: string | null
+}
+
+type SeasonFacet = {
+  label: string
+  slug: string
+}
+
+type IndexableFacetConfig = {
+  key?: string | null
+  value?: string | null
+  metaTitle?: string | null
+  metaDescription?: string | null
+}
+
+const SEASON_FILTER_KEY = 'attr_mua'
+
+function normalizePrettyFacet(value: string | undefined): string | null {
+  const normalized = String(value || '').trim().toLowerCase()
+
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(normalized)) {
+    return null
+  }
+
+  return normalized
+}
+
+function getSeasonPhrase(label: string): string {
+  const normalized = label.trim()
+
+  if (/^mùa\s/i.test(normalized)) {
+    return normalized
+  }
+
+  return `Mùa ${normalized}`
+}
+
+function normalizeFacetKey(value: unknown): string {
+  const key = String(value || '').trim()
+  return key === 'mua' ? SEASON_FILTER_KEY : key
+}
+
+function getIndexableFacetConfig(
+  category: Pick<Category, 'indexableFacets'>,
+  key: string,
+  value: string,
+): IndexableFacetConfig | null {
+  if (!Array.isArray(category?.indexableFacets)) {
+    return null
+  }
+
+  return category.indexableFacets.find((item: IndexableFacetConfig) => (
+    normalizeFacetKey(item?.key) === key &&
+    String(item?.value || '').trim().toLowerCase() === value
+  )) ?? null
+}
+
+function isFacetAllowedToIndex(
+  category: Pick<Category, 'indexableFacets'>,
+  facetConfig: IndexableFacetConfig | null,
+): boolean {
+  const configuredFacets = Array.isArray(category?.indexableFacets)
+    ? category.indexableFacets.filter((item: IndexableFacetConfig) => (
+      normalizeFacetKey(item?.key) === SEASON_FILTER_KEY
+    ))
+    : []
+
+  // Nếu admin chưa khai báo allowlist mùa, các giá trị mùa hợp lệ được phép index.
+  // Khi đã có allowlist, chỉ những giá trị được khai báo mới được index.
+  return configuredFacets.length === 0 || facetConfig !== null
+}
+
+function hasExtraFacetFilters(searchParams: ProductSearchParams): boolean {
+  for (const key of Object.keys(searchParams)) {
+    const values = getSearchParamValues(searchParams, key)
+
+    if (values.length === 0 || key === SEASON_FILTER_KEY) {
+      continue
+    }
+
+    if (key === 'page' && values[0] === '1') {
+      continue
+    }
+
+    if (key === 'sort' && values[0] === DEFAULT_SORT) {
+      continue
+    }
+
+    // Tracking parameters do not change page content.
+    if (/^(utm_|gclid$|fbclid$)/i.test(key)) {
+      continue
+    }
+
+    return true
+  }
+
+  return false
+}
+
+function buildCategoryFacetUrl(categorySlug: string, facetSlug: string): string {
+  return `/categories/${encodeURIComponent(categorySlug)}/${encodeURIComponent(facetSlug)}`
+}
+
+function buildLegacyFacetRedirectUrl(
+  categorySlug: string,
+  facetSlug: string,
+  searchParams: ProductSearchParams,
+): string {
+  const query = new URLSearchParams()
+
+  for (const [key, rawValue] of Object.entries(searchParams)) {
+    if (key === SEASON_FILTER_KEY || rawValue === undefined) {
+      continue
+    }
+
+    for (const value of Array.isArray(rawValue) ? rawValue : [rawValue]) {
+      query.append(key, value)
+    }
+  }
+
+  const pathname = buildCategoryFacetUrl(categorySlug, facetSlug)
+  const queryString = query.toString()
+  return queryString ? `${pathname}?${queryString}` : pathname
 }
 
 function getSiteUrl(): string {
@@ -152,6 +273,63 @@ const getCategoryBySlug = cache(async (slug: string) => {
   return categoryRes.docs[0] ?? null
 })
 
+const getSeasonFacetBySlug = cache(async (slug: string): Promise<SeasonFacet | null> => {
+  const payload = await getPayload({
+    config: configPromise,
+  })
+
+  const attributeRes = await payload.find({
+    collection: 'attributes',
+    where: {
+      and: [
+        { slug: { equals: 'mua' } },
+        { isActive: { equals: true } },
+      ],
+    },
+    limit: 1,
+    pagination: false,
+    depth: 0,
+    select: {
+      slug: true,
+    },
+  })
+
+  const attribute = attributeRes.docs[0]
+
+  if (!attribute) {
+    return null
+  }
+
+  const valueRes = await payload.find({
+    collection: 'attribute-values',
+    where: {
+      and: [
+        { attribute: { equals: attribute.id } },
+        { slug: { equals: slug } },
+        { isActive: { equals: true } },
+      ],
+    },
+    limit: 1,
+    pagination: false,
+    depth: 0,
+    select: {
+      label: true,
+      slug: true,
+    },
+  })
+
+  const value = valueRes.docs[0]
+
+  if (!value) {
+    return null
+  }
+
+  return {
+    label: value.label,
+    slug: value.slug,
+  }
+})
+
 function truncateText(
   value: string,
   maxLength: number,
@@ -205,19 +383,27 @@ function getMediaUrl(
 }
 
 function shouldIndexCategoryPage(
-  category: any,
-  searchParams?: Record<string, string | undefined>,
+  category: Pick<Category, 'canonicalToParent' | 'indexableFacets' | 'seoIndex'>,
+  searchParams: ProductSearchParams,
+  seasonFacet: SeasonFacet | null,
+  facetConfig: IndexableFacetConfig | null,
 ): boolean {
   const seoIndex = String(category?.seoIndex || 'index')
-  const hasFilterParams = Boolean(
-    searchParams?.brand ||
-    searchParams?.min ||
-    searchParams?.max ||
-    (searchParams?.sort && searchParams.sort !== DEFAULT_SORT) ||
-    (searchParams?.page && searchParams.page !== '1'),
-  )
+  const seasonValues = getSearchParamValues(searchParams, SEASON_FILTER_KEY)
 
-  if (hasFilterParams) {
+  if (hasExtraFacetFilters(searchParams)) {
+    return false
+  }
+
+  if (
+    seasonValues.length > 0 &&
+    (
+      seasonValues.length !== 1 ||
+      !seasonFacet ||
+      category?.canonicalToParent === true ||
+      !isFacetAllowedToIndex(category, facetConfig)
+    )
+  ) {
     return false
   }
 
@@ -236,12 +422,25 @@ export async function generateMetadata({
   CategoryPageProps,
   'params' | 'searchParams'
 >): Promise<Metadata> {
-  const { slug } = await params
-  const resolvedSearchParams =
-    await searchParams
+  const { slug, facet } = await params
+  const rawSearchParams = await searchParams
+  const prettyFacetSlug = normalizePrettyFacet(facet)
+  const queryFacetValues = getSearchParamValues(rawSearchParams, SEASON_FILTER_KEY)
+  const requestedFacetSlug = prettyFacetSlug || (
+    queryFacetValues.length === 1
+      ? normalizePrettyFacet(queryFacetValues[0])
+      : null
+  )
+  const resolvedSearchParams: ProductSearchParams = requestedFacetSlug
+    ? { ...rawSearchParams, [SEASON_FILTER_KEY]: requestedFacetSlug }
+    : rawSearchParams
 
-  const category =
-    await getCategoryBySlug(slug)
+  const [category, seasonFacet] = await Promise.all([
+    getCategoryBySlug(slug),
+    requestedFacetSlug
+      ? getSeasonFacetBySlug(requestedFacetSlug)
+      : Promise.resolve(null),
+  ])
 
   if (!category) {
     return {
@@ -255,14 +454,27 @@ export async function generateMetadata({
     }
   }
 
-  const fallbackTitle = `${category.name} Chính Hãng`
-  const title = getSeoText(category, 'metaTitle') || fallbackTitle
-  const description =
-    getSeoText(category, 'metaDescription') || getCategoryDescription(category)
-  const defaultCanonicalUrl = `/categories/${encodeURIComponent(
-    slug,
-  )}`
-  const canonicalUrl = getSeoCanonical(category, defaultCanonicalUrl)
+  const facetConfig = seasonFacet
+    ? getIndexableFacetConfig(category, SEASON_FILTER_KEY, seasonFacet.slug)
+    : null
+  const seasonPhrase = seasonFacet ? getSeasonPhrase(seasonFacet.label) : null
+  const fallbackTitle = seasonPhrase
+    ? `${category.name} ${seasonPhrase} Chính Hãng`
+    : `${category.name} Chính Hãng`
+  const title = facetConfig?.metaTitle || (
+    seasonFacet
+      ? fallbackTitle
+      : getSeoText(category, 'metaTitle') || fallbackTitle
+  )
+  const description = facetConfig?.metaDescription || (
+    seasonPhrase
+      ? `Khám phá ${category.name} ${seasonPhrase.toLocaleLowerCase('vi')} chính hãng, phù hợp thời tiết và phong cách tại MF Paris.`
+      : getSeoText(category, 'metaDescription') || getCategoryDescription(category)
+  )
+  const defaultCategoryCanonicalUrl = `/categories/${encodeURIComponent(slug)}`
+  const canonicalUrl = seasonFacet && category?.canonicalToParent !== true
+    ? buildCategoryFacetUrl(slug, seasonFacet.slug)
+    : getSeoCanonical(category, defaultCategoryCanonicalUrl)
   const imageUrl = getMediaUrl(
     (getSeoMedia(category, 'ogImage') ||
       (category as any).ogImage ||
@@ -274,6 +486,8 @@ export async function generateMetadata({
   const shouldIndex = shouldIndexCategoryPage(
     category,
     resolvedSearchParams,
+    seasonFacet,
+    facetConfig,
   )
   const index = getSeoIndexValue(category, shouldIndex)
   const follow = getSeoFollowValue(category)
@@ -300,8 +514,10 @@ export async function generateMetadata({
       locale: 'vi_VN',
       url: canonicalUrl,
       siteName: 'MF Paris',
-      title: getSeoText(category, 'ogTitle') || title,
-      description: getSeoText(category, 'ogDescription') || description,
+      title: seasonFacet ? title : getSeoText(category, 'ogTitle') || title,
+      description: seasonFacet
+        ? description
+        : getSeoText(category, 'ogDescription') || description,
       images: imageUrl
         ? [
           {
@@ -427,20 +643,81 @@ async function DeferredCategoryFilters({
   )
 }
 
+async function DeferredSeasonFacetLinks({
+  optionsPromise,
+  categorySlug,
+  categoryName,
+  activeFacet,
+}: {
+  optionsPromise: ReturnType<typeof getProductFilterOptions>
+  categorySlug: string
+  categoryName: string
+  activeFacet: string | null
+}) {
+  const options = await optionsPromise
+  const seasonFacet = options.facets.find((facet) => facet.key === SEASON_FILTER_KEY)
+
+  if (!seasonFacet || seasonFacet.items.length === 0) {
+    return null
+  }
+
+  return (
+    <nav aria-label="Mua sắm theo mùa" className="mb-5 rounded-2xl border border-gray-100 bg-white p-4">
+      <p className="mb-3 text-sm font-bold text-gray-900">Mua sắm theo mùa</p>
+      <div className="flex flex-wrap gap-2">
+        {seasonFacet.items.map((item) => {
+          const isActive = item.slug === activeFacet
+
+          return (
+            <Link
+              key={item.id}
+              href={buildCategoryFacetUrl(categorySlug, item.slug)}
+              aria-current={isActive ? 'page' : undefined}
+              className={isActive
+                ? 'rounded-full bg-[#b72828] px-3 py-2 text-sm font-semibold text-white'
+                : 'rounded-full border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-[#b72828] hover:text-[#b72828]'}
+            >
+              {categoryName} {getSeasonPhrase(item.name).toLocaleLowerCase('vi')}
+              {typeof item.count === 'number' ? ` (${item.count})` : ''}
+            </Link>
+          )
+        })}
+      </div>
+    </nav>
+  )
+}
+
 export default async function CategoryPage({
   params,
   searchParams,
 }: CategoryPageProps) {
-  const { slug } = await params
+  const { slug, facet } = await params
+  const rawSearchParams = await searchParams
+  const prettyFacetSlug = normalizePrettyFacet(facet)
+  const queryFacetValues = getSearchParamValues(rawSearchParams, SEASON_FILTER_KEY)
 
-  const resolvedSearchParams = await searchParams
-  const {
-    page,
-    brand,
-    min,
-    max,
-    sort: requestedSort,
-  } = resolvedSearchParams
+  if (facet && !prettyFacetSlug) {
+    notFound()
+  }
+
+  if (!facet && queryFacetValues.length === 1) {
+    const legacyFacetSlug = normalizePrettyFacet(queryFacetValues[0])
+
+    if (legacyFacetSlug) {
+      permanentRedirect(
+        buildLegacyFacetRedirectUrl(slug, legacyFacetSlug, rawSearchParams),
+      )
+    }
+  }
+
+  const resolvedSearchParams: ProductSearchParams = prettyFacetSlug
+    ? { ...rawSearchParams, [SEASON_FILTER_KEY]: prettyFacetSlug }
+    : rawSearchParams
+  const page = getFirstSearchParam(resolvedSearchParams, 'page')
+  const brand = getFirstSearchParam(resolvedSearchParams, 'brand')
+  const min = getFirstSearchParam(resolvedSearchParams, 'min')
+  const max = getFirstSearchParam(resolvedSearchParams, 'max')
+  const requestedSort = getFirstSearchParam(resolvedSearchParams, 'sort')
 
   const currentPage = normalizePage(page)
   const minimumPrice = normalizePrice(min)
@@ -454,7 +731,7 @@ export default async function CategoryPage({
   /*
    * Bước 1: Tìm category hiện tại bằng slug.
    */
-  const [currentCategory, allCategoriesRes] = await Promise.all([
+  const [currentCategory, allCategoriesRes, seasonFacet] = await Promise.all([
     measureCategoryTask(
       slug,
       'category',
@@ -465,9 +742,12 @@ export default async function CategoryPage({
       'category-tree',
       () => getCachedCategoryTree(),
     ),
+    prettyFacetSlug
+      ? getSeasonFacetBySlug(prettyFacetSlug)
+      : Promise.resolve(null),
   ])
 
-  if (!currentCategory) {
+  if (!currentCategory || (prettyFacetSlug && !seasonFacet)) {
     notFound()
   }
 
@@ -598,6 +878,10 @@ export default async function CategoryPage({
   const totalDocs =
     productsRes.totalDocs || 0
 
+  if (seasonFacet && totalDocs === 0) {
+    notFound()
+  }
+
   const filterArchitecture = resolveCategoryFilterArchitecture(currentCategory)
   const categoryPageCoreFilters = filterArchitecture.coreFilters.filter(
     (key) => key !== 'category',
@@ -610,7 +894,11 @@ export default async function CategoryPage({
     currentCategory.bottomContentHtml,
   )
   const faqItems = getLandingFaqItems(currentCategory.faq)
-  const categoryDisplayName = getCategoryDisplayName(currentCategory)
+  const baseCategoryDisplayName = getCategoryDisplayName(currentCategory)
+  const seasonPhrase = seasonFacet ? getSeasonPhrase(seasonFacet.label) : null
+  const categoryDisplayName = seasonPhrase
+    ? `${baseCategoryDisplayName} ${seasonPhrase}`
+    : baseCategoryDisplayName
   const breadcrumb = [
     {
       name: 'Trang chủ',
@@ -626,13 +914,31 @@ export default async function CategoryPage({
         name: String(category.name),
         url: `/categories/${category.slug}`,
       })),
-    {
-      name: categoryDisplayName,
-      url: `/categories/${currentCategory.slug}`,
-    },
+    ...(seasonFacet
+      ? [
+        {
+          name: baseCategoryDisplayName,
+          url: `/categories/${currentCategory.slug}`,
+        },
+        {
+          name: seasonPhrase || seasonFacet.label,
+          url: buildCategoryFacetUrl(slug, seasonFacet.slug),
+        },
+      ]
+      : [
+        {
+          name: baseCategoryDisplayName,
+          url: `/categories/${currentCategory.slug}`,
+        },
+      ]),
   ]
 
-  const categoryUrl = `/categories/${encodeURIComponent(slug)}`
+  const categoryUrl = seasonFacet
+    ? buildCategoryFacetUrl(slug, seasonFacet.slug)
+    : `/categories/${encodeURIComponent(slug)}`
+  const pageDescription = seasonPhrase
+    ? `Khám phá ${currentCategory.name} ${seasonPhrase.toLocaleLowerCase('vi')} chính hãng, phù hợp thời tiết và phong cách tại MF Paris.`
+    : getCategoryDescription(currentCategory)
 
   const internalLinkingConfig = getInternalLinkingConfig(currentCategory)
 
@@ -640,9 +946,9 @@ export default async function CategoryPage({
     page: {
       url: categoryUrl,
       name: categoryDisplayName,
-      description: getCategoryDescription(currentCategory),
+      description: pageDescription,
       breadcrumb,
-      faq: faqItems.length > 0
+      faq: !seasonFacet && faqItems.length > 0
         ? {
           questions: faqItems,
         }
@@ -689,6 +995,10 @@ export default async function CategoryPage({
       resolvedSearchParams,
     )
 
+    if (seasonFacet) {
+      query.delete(SEASON_FILTER_KEY)
+    }
+
     if (pageNumber > 1) {
       query.set(
         'page',
@@ -699,12 +1009,8 @@ export default async function CategoryPage({
     const queryString = query.toString()
 
     return queryString
-      ? `/categories/${encodeURIComponent(
-        slug,
-      )}?${queryString}`
-      : `/categories/${encodeURIComponent(
-        slug,
-      )}`
+      ? `${categoryUrl}?${queryString}`
+      : categoryUrl
   }
 
   const visiblePages = Array.from(
@@ -783,6 +1089,11 @@ export default async function CategoryPage({
             )}{' '}
             sản phẩm
           </p>
+          {seasonFacet ? (
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-gray-600 md:text-base">
+              {pageDescription}
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -794,6 +1105,14 @@ export default async function CategoryPage({
           ancestorCategories={ancestorCategories}
           allCategories={allCategories}
         />
+        <Suspense fallback={null}>
+          <DeferredSeasonFacetLinks
+            optionsPromise={filterOptionsPromise}
+            categorySlug={slug}
+            categoryName={baseCategoryDisplayName}
+            activeFacet={seasonFacet?.slug ?? null}
+          />
+        </Suspense>
         {/* Tablet */}
         <div className="sticky top-28 z-40 mb-5 hidden md:block lg:hidden">
           <Suspense fallback={

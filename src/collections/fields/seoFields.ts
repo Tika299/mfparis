@@ -592,7 +592,8 @@ export const landingSeoContentFields: Field[] = [
         required: true,
         label: 'Ten filter',
         admin: {
-          placeholder: 'VD: brand, gender, volume',
+          placeholder: 'VD: attr_mua',
+          description: 'Facet mùa attr_mua tạo URL /categories/{slug}/{value}.',
         },
       },
       {

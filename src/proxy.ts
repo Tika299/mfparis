@@ -13,9 +13,37 @@ import {
 } from '@/utilities/redirects'
 
 const REDIRECT_LOOKUP_TIMEOUT_MS = 1_500
+const CATEGORY_PATH_PATTERN = /^\/categories\/([^/]+)\/?$/
+const SEO_SEASON_FILTER_KEY = 'attr_mua'
 
 function isRedirectableMethod(method: string): boolean {
     return method === 'GET' || method === 'HEAD'
+}
+
+function getCategorySeasonRedirect(request: NextRequest): URL | null {
+    const categoryMatch = request.nextUrl.pathname.match(CATEGORY_PATH_PATTERN)
+
+    if (!categoryMatch) {
+        return null
+    }
+
+    const seasonValues = request.nextUrl.searchParams.getAll(SEO_SEASON_FILTER_KEY)
+
+    if (seasonValues.length !== 1) {
+        return null
+    }
+
+    const season = seasonValues[0].trim().toLowerCase()
+
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(season)) {
+        return null
+    }
+
+    const targetUrl = request.nextUrl.clone()
+    targetUrl.pathname = `/categories/${categoryMatch[1]}/${encodeURIComponent(season)}`
+    targetUrl.searchParams.delete(SEO_SEASON_FILTER_KEY)
+
+    return targetUrl
 }
 
 async function fetchRedirectResult(
@@ -92,6 +120,12 @@ export async function proxy(
 ): Promise<NextResponse> {
     if (!isRedirectableMethod(request.method)) {
         return NextResponse.next()
+    }
+
+    const categorySeasonRedirect = getCategorySeasonRedirect(request)
+
+    if (categorySeasonRedirect) {
+        return NextResponse.redirect(categorySeasonRedirect, 308)
     }
 
     const normalizedRequestPath = normalizeRedirectSource(

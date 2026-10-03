@@ -148,11 +148,24 @@ export function appendAdvancedProductWhereConditions(
   searchParams: ProductSearchParams,
 ): void {
   for (const entry of getAttributeFilterEntries(searchParams)) {
-    addStringFilterCondition(
-      conditions,
-      'productAttributes.values.slug',
-      entry.values,
-    )
+    const attributeSlug = entry.key
+      .replace(/^attr_/, '')
+      .replace(/^attribute_/, '')
+
+    conditions.push({
+      and: [
+        {
+          'productAttributes.attribute.slug': {
+            equals: attributeSlug,
+          },
+        },
+        {
+          'productAttributes.values.slug': entry.values.length === 1
+            ? { equals: entry.values[0] }
+            : { in: entry.values.join(',') },
+        },
+      ],
+    })
   }
 
   const rewrittenAttributeValue = getFirstSearchParam(searchParams, 'value')

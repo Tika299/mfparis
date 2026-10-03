@@ -66,6 +66,15 @@ export function getFilterParamsFromPrettyPathname(pathname: string): URLSearchPa
     return params
   }
 
+  /*
+   * Facet mùa có landing page SEO riêng:
+   * /categories/nuoc-hoa/xuan -> attr_mua=xuan
+   */
+  if (parts[0] === 'categories' && parts[1] && parts[2] && parts.length === 3) {
+    params.set('attr_mua', parts[2])
+    return params
+  }
+
   if (parts[0] !== 'loc') {
     return params
   }
@@ -119,7 +128,7 @@ export function mergeFilterSearchParams(
 
 export function getBaseFilterPathname(
   routeContext: FilterRouteContext,
-  params: URLSearchParams,
+  _params: URLSearchParams,
 ): string {
   if (routeContext.type === 'brand') {
     return `/brands/${safeEncode(routeContext.slug)}`
@@ -137,15 +146,36 @@ export function getBaseFilterPathname(
 }
 
 export function buildPrettyFilterUrl(
-  _params: URLSearchParams,
-  _routeContext: FilterRouteContext,
+  params: URLSearchParams,
+  routeContext: FilterRouteContext,
 ): string | null {
-  /*
-   * SEO policy Phase 4-6:
-   * filter/facet combinations must stay as query parameters and noindex.
-   * Only real brand/category/collection landing pages should have clean indexable URLs.
-   */
-  return null
+  if (routeContext.type !== 'category') {
+    return null
+  }
+
+  const seasonValues = params
+    .getAll('attr_mua')
+    .flatMap((value) => value.split(','))
+    .map((value) => value.trim())
+    .filter(Boolean)
+
+  if (seasonValues.length !== 1) {
+    return null
+  }
+
+  const season = seasonValues[0]
+
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(season)) {
+    return null
+  }
+
+  const remainingParams = new URLSearchParams(params.toString())
+  remainingParams.delete('attr_mua')
+
+  const pathname = `/categories/${safeEncode(routeContext.slug)}/${safeEncode(season)}`
+  const query = remainingParams.toString()
+
+  return query ? `${pathname}?${query}` : pathname
 }
 
 export function buildFilterUrl(

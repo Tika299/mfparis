@@ -121,6 +121,22 @@ function hasUsableSlug(
     return typeof value === 'string' && value.trim().length > 0
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null
+}
+
+function getRelationshipID(value: unknown): string | null {
+    if (typeof value === 'string' || typeof value === 'number') {
+        return String(value)
+    }
+
+    if (isRecord(value) && (typeof value.id === 'string' || typeof value.id === 'number')) {
+        return String(value.id)
+    }
+
+    return null
+}
+
 function shouldIncludeSeoPage(doc: {
     seo?: Record<string, unknown> | null
     seoStatus?: string | null
@@ -194,12 +210,37 @@ function shouldIncludeTaxonomyPage(doc: {
     return true
 }
 
+function getConfiguredSeasonFacetValues(doc: {
+    indexableFacets?: Array<{
+        key?: string | null
+        value?: string | null
+    }> | null
+}): string[] {
+    if (!Array.isArray(doc.indexableFacets)) {
+        return []
+    }
+
+    return [...new Set(
+        doc.indexableFacets
+            .filter((facet) => ['mua', 'attr_mua'].includes(String(facet?.key || '').trim()))
+            .map((facet) => String(facet?.value || '').trim().toLowerCase())
+            .filter((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)),
+    )]
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const payload = await getPayload({
         config: configPromise,
     })
 
-    const [productsRes, categoriesRes, brandsRes, postsRes, postCategoriesRes] = await Promise.all([
+    const [
+        productsRes,
+        categoriesRes,
+        brandsRes,
+        postsRes,
+        postCategoriesRes,
+        seasonAttributeRes,
+    ] = await Promise.all([
         payload.find({
             collection: 'products',
             depth: 0,
@@ -216,6 +257,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 updatedAt: true,
                 seo: true,
                 seoStatus: true,
+                categories: true,
+                productAttributes: true,
             },
         }),
         payload.find({
@@ -231,6 +274,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 seoIndex: true,
                 taxonomyType: true,
                 redirectStatus: true,
+                indexableFacets: true,
+                parent: true,
             },
         }),
         payload.find({
@@ -278,7 +323,42 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 redirectStatus: true,
             },
         }),
+        payload.find({
+            collection: 'attributes',
+            depth: 0,
+            limit: 1,
+            pagination: false,
+            overrideAccess: true,
+            where: {
+                and: [
+                    { slug: { equals: 'mua' } },
+                    { isActive: { equals: true } },
+                ],
+            },
+            select: {
+                slug: true,
+            },
+        }),
     ])
+
+    const seasonAttribute = seasonAttributeRes.docs[0]
+    const seasonValuesRes = seasonAttribute
+        ? await payload.find({
+            collection: 'attribute-values',
+            depth: 0,
+            pagination: false,
+            overrideAccess: true,
+            where: {
+                and: [
+                    { attribute: { equals: seasonAttribute.id } },
+                    { isActive: { equals: true } },
+                ],
+            },
+            select: {
+                slug: true,
+            },
+        })
+        : { docs: [] }
 
     const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((route) => ({
         url: route.url,
@@ -304,6 +384,84 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             changeFrequency: 'weekly',
             priority: 0.7,
         }))
+
+    const seasonSlugByValueID = new Map(
+        seasonValuesRes.docs
+            .filter((value) => hasUsableSlug(value.slug))
+            .map((value) => [String(value.id), value.slug]),
+    )
+    const parentByCategoryID = new Map(
+        categoriesRes.docs.map((category) => [
+            String(category.id),
+            getRelationshipID(category.parent),
+        ]),
+    )
+    const seasonSlugsByCategoryID = new Map<string, Set<string>>()
+
+    const addSeasonToCategoryAndAncestors = (categoryID: string, seasonSlug: string) => {
+        const visited = new Set<string>()
+        let currentCategoryID: string | null = categoryID
+
+        while (currentCategoryID && !visited.has(currentCategoryID)) {
+            visited.add(currentCategoryID)
+            const values = seasonSlugsByCategoryID.get(currentCategoryID) ?? new Set<string>()
+            values.add(seasonSlug)
+            seasonSlugsByCategoryID.set(currentCategoryID, values)
+            currentCategoryID = parentByCategoryID.get(currentCategoryID) ?? null
+        }
+    }
+
+    if (seasonAttribute) {
+        const seasonAttributeID = String(seasonAttribute.id)
+
+        for (const product of productsRes.docs) {
+            const seasonSlugs = new Set<string>()
+
+            for (const row of Array.isArray(product.productAttributes) ? product.productAttributes : []) {
+                if (getRelationshipID(row.attribute) !== seasonAttributeID) {
+                    continue
+                }
+
+                for (const value of Array.isArray(row.values) ? row.values : []) {
+                    const valueID = getRelationshipID(value)
+                    const seasonSlug = valueID ? seasonSlugByValueID.get(valueID) : undefined
+
+                    if (seasonSlug) {
+                        seasonSlugs.add(seasonSlug)
+                    }
+                }
+            }
+
+            for (const category of Array.isArray(product.categories) ? product.categories : []) {
+                const categoryID = getRelationshipID(category)
+
+                if (!categoryID) {
+                    continue
+                }
+
+                for (const seasonSlug of seasonSlugs) {
+                    addSeasonToCategoryAndAncestors(categoryID, seasonSlug)
+                }
+            }
+        }
+    }
+
+    const categoryFacetEntries: MetadataRoute.Sitemap = categoriesRes.docs
+        .filter(shouldIncludeTaxonomyPage)
+        .flatMap((category) => {
+            const observedValues = seasonSlugsByCategoryID.get(String(category.id)) ?? new Set<string>()
+            const configuredValues = getConfiguredSeasonFacetValues(category)
+            const values = configuredValues.length > 0
+                ? configuredValues.filter((value) => observedValues.has(value))
+                : [...observedValues]
+
+            return values.map((facetValue) => ({
+                url: toAbsoluteUrl(`/categories/${category.slug}/${facetValue}`),
+                lastModified: toValidLastModified(category.updatedAt),
+                changeFrequency: 'weekly' as const,
+                priority: 0.65,
+            }))
+        })
 
     const brandEntries: MetadataRoute.Sitemap = brandsRes.docs
         .filter(shouldIncludeSeoPage)
@@ -336,6 +494,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ...staticEntries,
         ...productEntries,
         ...categoryEntries,
+        ...categoryFacetEntries,
         ...brandEntries,
         ...blogCategoryEntries,
         ...blogEntries,
