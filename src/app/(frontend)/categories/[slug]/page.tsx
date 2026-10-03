@@ -595,34 +595,6 @@ async function LinkedCategoryHtml(
   return <SafeHtmlContent html={result.html} />
 }
 
-async function measureCategoryTask<T>(
-  slug: string,
-  task: string,
-  run: () => Promise<T>,
-): Promise<T> {
-  const enabled =
-    process.env.CATEGORY_PERF === '1' &&
-    ['nuoc-hoa-nam', 'cham-soc-da', 'kem-chong-nang'].includes(slug)
-
-  if (!enabled) return run()
-
-  const started = performance.now()
-  let success = false
-
-  try {
-    const result = await run()
-    success = true
-    return result
-  } finally {
-    console.info('[CATEGORY PERF]', JSON.stringify({
-      slug,
-      task,
-      ms: Math.round(performance.now() - started),
-      success,
-    }))
-  }
-}
-
 type DeferredCategoryFiltersProps = Omit<
   ComponentProps<typeof SearchFilters>,
   'brands' | 'categories' | 'facets'
@@ -738,18 +710,10 @@ export default async function CategoryPage({
 
   /*
    * Bước 1: Tìm category hiện tại bằng slug.
-   */
+  */
   const [currentCategory, allCategoriesRes, seasonFacet] = await Promise.all([
-    measureCategoryTask(
-      slug,
-      'category',
-      () => getCategoryBySlug(slug),
-    ),
-    measureCategoryTask(
-      slug,
-      'category-tree',
-      () => getCachedCategoryTree(),
-    ),
+    getCategoryBySlug(slug),
+    getCachedCategoryTree(),
     prettyFacetSlug
       ? getSeasonFacetBySlug(prettyFacetSlug)
       : Promise.resolve(null),
@@ -830,59 +794,49 @@ export default async function CategoryPage({
     and: andConditions,
   }
 
-  const filterOptionsPromise = measureCategoryTask(
-    slug,
-    'filter-options',
-    () =>
-      getProductFilterOptions(
-        [...new Set(categoryScopeIDs.map(String))].sort(),
-        'categories',
-      ),
+  const filterOptionsPromise = getProductFilterOptions(
+    [...new Set(categoryScopeIDs.map(String))].sort(),
+    'categories',
   )
 
   // Prevent an unhandled rejection while products are pending.
   // The original promise still propagates errors to the consumer.
   void filterOptionsPromise.catch(() => { })
 
-  const productsRes = await measureCategoryTask(
-    slug,
-    'products',
-    () =>
-      payload.find({
-        collection: 'products',
-        where: whereQueries,
-        sort,
-        limit: PRODUCTS_PER_PAGE,
-        page: currentPage,
-        depth: 1,
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          sku: true,
-          brand: true,
-          price: true,
-          images: true,
-          averageRating: true,
-          reviewCount: true,
-          status: true,
-          productType: true,
-          variants: {
-            id: true,
-            name: true,
-            sku: true,
-            basePrice: true,
-            salePrice: true,
-            stock: true,
-            isActive: true,
-            isDefault: true,
-            image: true,
-          },
-          createdAt: true,
-          displayLocation: true,
-        },
-      }),
-  )
+  const productsRes = await payload.find({
+    collection: 'products',
+    where: whereQueries,
+    sort,
+    limit: PRODUCTS_PER_PAGE,
+    page: currentPage,
+    depth: 1,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      sku: true,
+      brand: true,
+      price: true,
+      images: true,
+      averageRating: true,
+      reviewCount: true,
+      status: true,
+      productType: true,
+      variants: {
+        id: true,
+        name: true,
+        sku: true,
+        basePrice: true,
+        salePrice: true,
+        stock: true,
+        isActive: true,
+        isDefault: true,
+        image: true,
+      },
+      createdAt: true,
+      displayLocation: true,
+    },
+  })
 
   const totalPages =
     productsRes.totalPages || 1

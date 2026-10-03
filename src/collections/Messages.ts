@@ -70,14 +70,6 @@ export const Messages: CollectionConfig = {
 
           const text = await res.text()
 
-          console.log('🔌 Socket broadcast response:', {
-            status: res.status,
-            text,
-            messageId: doc.id,
-            sessionId: String(profileId),
-            sender: doc.sender,
-          })
-
           if (!res.ok) {
             console.error('❌ Socket broadcast failed:', {
               status: res.status,

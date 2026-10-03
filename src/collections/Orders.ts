@@ -397,7 +397,6 @@ const handleVoucherLifecycle:
 const sendOrderEmail = async ({ doc, operation, req }: any) => {
   if (operation === 'create') {
     const { payload } = req
-    console.log('Dữ liệu đơn hàng:', doc.id)
 
     const escapeEmailHTML = (value: unknown): string =>
       String(value ?? '')
