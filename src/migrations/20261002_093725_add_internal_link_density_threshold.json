@@ -1132,24 +1132,6 @@
           "type": "varchar",
           "primaryKey": false,
           "notNull": false
-        },
-        "h1": {
-          "name": "h1",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "intro_html": {
-          "name": "intro_html",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "bottom_content_html": {
-          "name": "bottom_content_html",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {
