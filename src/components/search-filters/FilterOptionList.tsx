@@ -55,7 +55,7 @@ export const FilterOptionList = ({
           <div className="space-y-3">
             {description && <p>{description}</p>}
             <input type="search" value={query} aria-label={`Tìm ${title}`}
-              placeholder={placeholder} className="w-full rounded border p-2 text-sm"
+              placeholder={placeholder} className="w-full rounded border p-2 text-base lg:text-sm"
               onChange={event => { setQuery(event.target.value); setLimit(12) }} />
             {visible.length === 0 && <p>{items.length ? 'Không tìm thấy lựa chọn' : emptyMessage}</p>}
             <div className="max-h-72 space-y-2 overflow-y-auto">

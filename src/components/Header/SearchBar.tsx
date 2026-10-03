@@ -194,7 +194,7 @@ export const SearchBar = ({
         }}
         placeholder="Bạn tìm sản phẩm gì..."
         autoComplete="off"
-        className="h-full min-w-0 flex-1 bg-transparent text-[13px] font-normal text-[#202020] outline-none placeholder:text-[#8a8a8a]"
+        className="h-full min-w-0 flex-1 bg-transparent text-base font-normal text-[#202020] outline-none placeholder:text-[#8a8a8a] lg:text-[13px]"
         aria-label="Nhập từ khóa tìm kiếm"
       />
 
