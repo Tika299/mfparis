@@ -17,8 +17,6 @@ RUN \
 FROM base AS builder
 WORKDIR /app
 
-ARG DATABASE_URL
-ARG PAYLOAD_SECRET
 ARG NEXT_PUBLIC_BASE_URL
 ARG NEXT_PUBLIC_SERVER_URL
 ARG NEXT_PUBLIC_SOCKET_URL
@@ -26,8 +24,6 @@ ARG NEXT_PUBLIC_TINYMCE_API_KEY
 ARG SOCKET_SERVER_URL
 ARG MEDIA_DIR
 
-ENV DATABASE_URL=$DATABASE_URL
-ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
 ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
 ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL
 ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
@@ -41,7 +37,10 @@ COPY . .
 
 RUN mkdir -p public
 
-RUN \
+RUN --mount=type=secret,id=database_url \
+  --mount=type=secret,id=payload_secret \
+  export DATABASE_URL="$(cat /run/secrets/database_url)" && \
+  export PAYLOAD_SECRET="$(cat /run/secrets/payload_secret)" && \
   if [ -f yarn.lock ]; then yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
   elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \

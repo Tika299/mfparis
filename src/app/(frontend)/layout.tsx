@@ -7,12 +7,12 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import '../globals.css'
 import '@/styles/floating-contact.css'
-import { Be_Vietnam_Pro, Playfair_Display } from 'next/font/google'
 import { FloatingContact } from '@/components/FloatingContact'
 import { Toaster } from 'sonner'
 import { SITE_ORIGIN } from '@/utilities/seo'
 import { ClientEnhancements } from '@/components/ClientEnhancements'
 import { RouteLoadingIndicator } from '@/components/RouteLoadingIndicator'
+import { beVietnam, playfair } from '@/app/localFonts'
 
 const siteUrl =
   process.env.NEXT_PUBLIC_BASE_URL ||
@@ -43,22 +43,6 @@ export const metadata: Metadata = {
       'MF Paris chuyên nước hoa, mỹ phẩm và sản phẩm làm đẹp chính hãng từ Pháp và Châu Âu, tuyển chọn kỹ lưỡng cùng dịch vụ tư vấn tận tâm.',
   },
 }
-
-const playfair = Playfair_Display({
-  subsets: ['latin', 'vietnamese'],
-  weight: ['600', '700'],
-  variable: '--font-playfair',
-  display: 'swap',
-  preload: false,
-})
-
-const beVietnam = Be_Vietnam_Pro({
-  subsets: ['latin', 'vietnamese'],
-  weight: ['400', '600', '700'],
-  variable: '--font-be-vietnam',
-  display: 'swap',
-  preload: false,
-})
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
