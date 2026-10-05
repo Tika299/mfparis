@@ -1,55 +1,103 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { getAuthenticatedAdminPayload } from '@/utilities/adminAuth'
+import {
+  consumeChatRateLimit,
+  getAuthenticatedChatProfile,
+  getRequestAddress,
+} from '@/utilities/chatAuth'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json()
+    if (!consumeChatRateLimit(`chat-send:${getRequestAddress(req)}`, 30, 60 * 1000)) {
+      return Response.json(
+        { error: 'Bạn gửi tin quá nhanh. Vui lòng thử lại sau.' },
+        { status: 429 },
+      )
+    }
 
-    if (!body.sessionId || !body.sender || !body.content) {
+    const body = await req.json()
+    const sender = body?.sender
+    const content = typeof body?.content === 'string' ? body.content.trim() : ''
+
+    if (!sender || !content) {
       return Response.json(
         {
-          error: 'Missing sessionId, sender or content',
+          error: 'Missing sender or content',
         },
         { status: 400 },
       )
     }
 
-    const adminAuth = body.sender === 'admin' ? await getAuthenticatedAdminPayload(req) : null
+    if (!['customer', 'admin'].includes(sender)) {
+      return Response.json({ error: 'Invalid sender' }, { status: 400 })
+    }
 
-    if (adminAuth && 'error' in adminAuth) return adminAuth.error
+    if (content.length > 2000) {
+      return Response.json({ error: 'Tin nhắn không được vượt quá 2000 ký tự.' }, { status: 400 })
+    }
 
-    const payload =
-      adminAuth && !('error' in adminAuth)
-        ? adminAuth.payload
-        : await getPayload({ config: configPromise })
+    const payload = await getPayload({ config: configPromise })
+    let profileId: number
+    let customerName = 'Khách hàng'
+
+    if (sender === 'admin') {
+      const adminAuth = await getAuthenticatedAdminPayload(req)
+
+      if ('error' in adminAuth) return adminAuth.error
+
+      if (!body?.sessionId) {
+        return Response.json({ error: 'Missing sessionId' }, { status: 400 })
+      }
+
+      profileId = Number(body.sessionId)
+      customerName =
+        typeof body.customerName === 'string' && body.customerName.trim()
+          ? body.customerName.trim().slice(0, 100)
+          : customerName
+    } else {
+      const chatProfile = await getAuthenticatedChatProfile(payload, req)
+
+      if (!chatProfile) {
+        return Response.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+
+      profileId = Number(chatProfile.id)
+      customerName =
+        typeof chatProfile.name === 'string' && chatProfile.name.trim()
+          ? chatProfile.name.trim().slice(0, 100)
+          : customerName
+    }
+
+    if (!Number.isInteger(profileId) || profileId <= 0) {
+      return Response.json({ error: 'Invalid sessionId' }, { status: 400 })
+    }
 
     const msg = await payload.create({
       collection: 'messages',
       data: {
-        profile: body.sessionId,
-        customerName: body.customerName || 'Khách hàng',
-        sender: body.sender,
-        content: body.content,
-      } as any,
+        profile: profileId,
+        customerName,
+        sender,
+        content,
+      },
       depth: 0,
+      overrideAccess: true,
     })
 
     return Response.json({
       success: true,
       doc: msg,
     })
-  } catch (error: any) {
-    console.error('❌ CHAT SEND ERROR:', error)
-    console.error('❌ CHI TIẾT LỖI VALIDATION:', JSON.stringify(error.data, null, 2))
+  } catch (error) {
+    console.error('Chat send failed', error)
 
     return Response.json(
       {
-        error: error.message || 'Không thể gửi tin nhắn',
-        details: error.data || null,
+        error: 'Không thể gửi tin nhắn',
       },
       { status: 500 },
     )

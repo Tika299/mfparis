@@ -1,4 +1,5 @@
 import { CollectionConfig } from 'payload'
+import { isAdminUser } from '@/utilities/chatAuth'
 
 export const Messages: CollectionConfig = {
   slug: 'messages',
@@ -7,8 +8,12 @@ export const Messages: CollectionConfig = {
     defaultColumns: ['customerName', 'content', 'sender', 'createdAt'],
   },
   access: {
-    read: () => true,
-    create: () => true,
+    // Customer traffic goes through the authenticated chat routes. The
+    // collection endpoint itself must remain admin-only.
+    read: ({ req }) => isAdminUser(req.user),
+    create: ({ req }) => isAdminUser(req.user),
+    update: ({ req }) => isAdminUser(req.user),
+    delete: ({ req }) => isAdminUser(req.user),
   },
   fields: [
     {
@@ -36,10 +41,7 @@ export const Messages: CollectionConfig = {
         const socketServerUrl = process.env.SOCKET_SERVER_URL?.replace(/\/$/, '')
         const socketToken = process.env.SOCKET_INTERNAL_TOKEN
 
-        const profileId =
-          typeof doc.profile === 'object'
-            ? doc.profile.id
-            : doc.profile
+        const profileId = typeof doc.profile === 'object' ? doc.profile.id : doc.profile
 
         if (!socketServerUrl) {
           console.warn('⚠️ Missing SOCKET_SERVER_URL, skip socket broadcast')
@@ -76,10 +78,10 @@ export const Messages: CollectionConfig = {
               text,
             })
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('❌ Socket broadcast fetch error:', {
-            message: error?.message,
-            cause: error?.cause,
+            message: error instanceof Error ? error.message : String(error),
+            cause: error instanceof Error ? error.cause : undefined,
           })
         }
       },

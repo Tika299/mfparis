@@ -1,6 +1,7 @@
 import configPromise from '@payload-config'
 import { NextResponse } from 'next/server'
 import { getPayload, type Payload } from 'payload'
+import { isAdminUser } from '@/utilities/chatAuth'
 
 type AuthenticatedPayload = {
   payload: Payload
@@ -18,7 +19,7 @@ export async function getAuthenticatedAdminPayload(
   const payload = await getPayload({ config: configPromise })
   const authentication = await payload.auth({ headers: request.headers })
 
-  if (!authentication.user) {
+  if (!authentication.user || !isAdminUser(authentication.user)) {
     return {
       error: NextResponse.json(
         {
