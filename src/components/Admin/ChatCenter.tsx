@@ -13,7 +13,16 @@ const socketURL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001'
 
 const socket = io(socketURL, {
   autoConnect: false,
-  reconnection: true
+  reconnection: true,
+  auth: (callback) => {
+    fetch('/api/chat/socket-ticket', { cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Socket authentication failed')
+        return response.json() as Promise<{ ticket: string }>
+      })
+      .then(({ ticket }) => callback({ ticket }))
+      .catch(() => callback({}))
+  },
 })
 
 export const ChatCenter = () => {

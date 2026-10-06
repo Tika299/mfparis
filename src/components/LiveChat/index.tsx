@@ -13,7 +13,6 @@ type ChatProfile = {
   name: string
   username?: string
 }
-
 type ChatMessage = {
   id?: string
   sender: 'customer' | 'admin'
@@ -135,6 +134,15 @@ export const LiveChat = () => {
       autoConnect: false,
       reconnection: true,
       transports: ['websocket'],
+      auth: (callback) => {
+        fetch('/api/chat/socket-ticket', { cache: 'no-store' })
+          .then(async (response) => {
+            if (!response.ok) throw new Error('Socket authentication failed')
+            return response.json() as Promise<{ ticket: string }>
+          })
+          .then(({ ticket }) => callback({ ticket }))
+          .catch(() => callback({}))
+      },
     })
 
     bindSocketListeners(socket)
@@ -274,7 +282,7 @@ export const LiveChat = () => {
           }).catch(() => {})
         }
       } else {
-        await ensureSocket()
+        // The socket is created only after the customer is authenticated.
       }
     }
   }
@@ -595,3 +603,4 @@ export const LiveChat = () => {
     </div>
   )
 }
+
