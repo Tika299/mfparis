@@ -40,7 +40,7 @@ export default function StoreLocationPage() {
           <div className="mt-8 grid gap-5 text-sm leading-7 text-gray-700">
             <p><strong>Địa chỉ:</strong> 220/24 Nguyễn Oanh, Phường Gò Vấp, Thành phố Hồ Chí Minh, Việt Nam</p>
             <p><strong>Hotline:</strong> 079.29.79.299</p>
-            <p><strong>Email:</strong> cskh@maraisdefrance.vn</p>
+            <p><strong>Email:</strong> mfparisvn@gmail.com</p>
             <p><strong>Giờ mở cửa:</strong> 08:00 - 22:00, Thứ 2 đến Chủ nhật</p>
             <p><strong>Khu vực phục vụ:</strong> TP.HCM và toàn quốc qua vận chuyển</p>
           </div>

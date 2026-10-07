@@ -67,6 +67,6 @@ const sections = [
   },
   {
     "title": "Kênh hỗ trợ",
-    "body": "Liên hệ hotline 079.29.79.299 hoặc email cskh@maraisdefrance.vn để được cập nhật trạng thái đơn hàng."
+    "body": "Liên hệ hotline 079.29.79.299 hoặc email mfparisvn@gmail.com để được cập nhật trạng thái đơn hàng."
   }
 ]

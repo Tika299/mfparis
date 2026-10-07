@@ -2858,9 +2858,9 @@ export default async function ProductPage({
           logo: {
             '@type': 'ImageObject',
             '@id': SITE_ORIGIN + '/#logo',
-            url: 'https://mfparis.vn/wp-content/uploads/2024/08/logo-mfparis-512x512-2.png',
+            url: 'https://mfparis.vn/api/media/file/logo-thuong-hieu-marais-de-france-1200x1200-1-edited-e1768551529162.webp',
             contentUrl:
-              'https://mfparis.vn/wp-content/uploads/2024/08/logo-mfparis-512x512-2.png',
+              'https://mfparis.vn/api/media/file/logo-thuong-hieu-marais-de-france-1200x1200-1-edited-e1768551529162.webp',
             caption: 'MF Paris',
             inLanguage: 'vi',
             width: '512',
