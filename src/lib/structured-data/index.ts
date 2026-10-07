@@ -227,7 +227,7 @@ const DEFAULT_SITE_NAME = 'MF Paris'
 const DEFAULT_LANGUAGE = 'vi-VN'
 const DEFAULT_CURRENCY = 'VND'
 const MF_PARIS_LOGO_URL =
-  'https://mfparis.vn/wp-content/uploads/2024/08/logo-mfparis-512x512-2.png'
+  'https://mfparis.vn/api/media/file/logo-thuong-hieu-marais-de-france-1200x1200-1-edited-e1768551529162.webp'
 
 const MF_PARIS_DEFAULT_OG_IMAGE = `${SITE_ORIGIN}/og/og-mfparis.png`
 
