@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import type { Where } from 'payload'
+import type { Product } from '@/payload-types'
 
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
@@ -611,6 +612,23 @@ export default async function BrandProductsPage({
     },
   })
 
+  const configuredFeaturedProducts = (currentBrand as unknown as {
+    featuredProducts?: Array<number | Product>
+  }).featuredProducts
+
+  const featuredProducts = !hasAnyBrandListFilterParams(resolvedSearchParams)
+    ? (Array.isArray(configuredFeaturedProducts)
+      ? configuredFeaturedProducts
+        .filter((product): product is Product => (
+          Boolean(product) &&
+          typeof product === 'object' &&
+          product.status === 'published' &&
+          typeof product.slug === 'string'
+        ))
+        .slice(0, 4)
+      : [])
+    : []
+
   const buildPageHref = (
     pageNumber: number,
   ): string => {
@@ -733,6 +751,32 @@ export default async function BrandProductsPage({
           </aside>
 
           <main className="min-w-0 flex-1">
+            {featuredProducts.length > 0 ? (
+              <section className="mb-10 rounded-2xl bg-white p-5 shadow-sm md:p-8">
+                <div className="mb-5 flex items-end justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                      Gợi ý nổi bật
+                    </p>
+                    <h2 className="mt-2 text-xl font-bold md:text-2xl">
+                      Sản phẩm {brandDisplayName} được quan tâm
+                    </h2>
+                  </div>
+                  <Link
+                    href={`/brands/${encodeURIComponent(slug)}`}
+                    className="shrink-0 text-sm font-semibold text-primary hover:underline"
+                  >
+                    Xem tất cả
+                  </Link>
+                </div>
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+                  {featuredProducts.map((product) => (
+                    <ProductCard key={`featured-${product.id}`} product={product} />
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
             {productsRes.docs.length > 0 ? (
               <>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
