@@ -46,6 +46,17 @@ import { CategoryFamilyNav } from '@/components/CategoryFamilyNav'
 import { cache, Suspense } from 'react'
 import type { ComponentProps } from 'react'
 import { getCachedCategoryTree } from '@/data/getCachedCategoryTree'
+import {
+  buildIndexableFacetPath,
+  getConfiguredIndexableFacet,
+  getConfiguredIndexableFacetByPath,
+  getIndexableFacetAttributeSlug,
+  getIndexableFacetPathFromQuery,
+  normalizeIndexableFacetKey,
+  normalizePrettyFacet,
+  SEASON_FILTER_KEY,
+  type IndexableFacetConfig,
+} from '@/lib/indexableCategoryFacets'
 
 const PRODUCTS_PER_PAGE = 20
 const DEFAULT_SORT = '-createdAt'
@@ -81,34 +92,12 @@ type LandingFaqItem = {
   answer?: string | null
 }
 
-type SeasonFacet = {
+type IndexableFacet = {
+  key: string
+  queryKey: string
+  attributeSlug: string
   label: string
   slug: string
-}
-
-type IndexableFacetConfig = {
-  key?: string | null
-  value?: string | null
-  h1?: string | null
-  metaTitle?: string | null
-  metaDescription?: string | null
-  introHtml?: string | null
-  bottomContentHtml?: string | null
-}
-
-const SEASON_FILTER_KEY = 'attr_mua'
-
-function normalizePrettyFacet(value: string | undefined): string | null {
-  const normalized = String(value || '')
-    .trim()
-    .toLowerCase()
-    .replace(/^mua-/, '')
-
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(normalized)) {
-    return null
-  }
-
-  return normalized
 }
 
 function getSeasonPhrase(label: string): string {
@@ -121,24 +110,12 @@ function getSeasonPhrase(label: string): string {
   return `Mùa ${normalized}`
 }
 
-function normalizeFacetKey(value: unknown): string {
-  const key = String(value || '').trim()
-  return key === 'mua' ? SEASON_FILTER_KEY : key
-}
-
 function getIndexableFacetConfig(
   category: Pick<Category, 'indexableFacets'>,
   key: string,
   value: string,
 ): IndexableFacetConfig | null {
-  if (!Array.isArray(category?.indexableFacets)) {
-    return null
-  }
-
-  return category.indexableFacets.find((item: IndexableFacetConfig) => (
-    normalizeFacetKey(item?.key) === key &&
-    String(item?.value || '').trim().toLowerCase() === value
-  )) ?? null
+  return getConfiguredIndexableFacet(category, key, value)
 }
 
 function isFacetAllowedToIndex(
@@ -147,7 +124,7 @@ function isFacetAllowedToIndex(
 ): boolean {
   const configuredFacets = Array.isArray(category?.indexableFacets)
     ? category.indexableFacets.filter((item: IndexableFacetConfig) => (
-      normalizeFacetKey(item?.key) === SEASON_FILTER_KEY
+      normalizeIndexableFacetKey(item?.key) === SEASON_FILTER_KEY
     ))
     : []
 
@@ -156,11 +133,14 @@ function isFacetAllowedToIndex(
   return configuredFacets.length === 0 || facetConfig !== null
 }
 
-function hasExtraFacetFilters(searchParams: ProductSearchParams): boolean {
+function hasExtraFacetFilters(
+  searchParams: ProductSearchParams,
+  activeFacetKey?: string,
+): boolean {
   for (const key of Object.keys(searchParams)) {
     const values = getSearchParamValues(searchParams, key)
 
-    if (values.length === 0 || key === SEASON_FILTER_KEY) {
+    if (values.length === 0 || key === activeFacetKey) {
       continue
     }
 
@@ -183,19 +163,20 @@ function hasExtraFacetFilters(searchParams: ProductSearchParams): boolean {
   return false
 }
 
-function buildCategoryFacetUrl(categorySlug: string, facetSlug: string): string {
-  return `/categories/${encodeURIComponent(categorySlug)}/mua-${encodeURIComponent(facetSlug)}`
+function buildCategoryFacetUrl(categorySlug: string, facetPath: string): string {
+  return `/categories/${encodeURIComponent(categorySlug)}/${encodeURIComponent(facetPath)}`
 }
 
 function buildLegacyFacetRedirectUrl(
   categorySlug: string,
-  facetSlug: string,
+  facetPath: string,
+  facetQueryKey: string,
   searchParams: ProductSearchParams,
 ): string {
   const query = new URLSearchParams()
 
   for (const [key, rawValue] of Object.entries(searchParams)) {
-    if (key === SEASON_FILTER_KEY || rawValue === undefined) {
+    if (key === facetQueryKey || rawValue === undefined) {
       continue
     }
 
@@ -204,7 +185,7 @@ function buildLegacyFacetRedirectUrl(
     }
   }
 
-  const pathname = buildCategoryFacetUrl(categorySlug, facetSlug)
+  const pathname = buildCategoryFacetUrl(categorySlug, facetPath)
   const queryString = query.toString()
   return queryString ? `${pathname}?${queryString}` : pathname
 }
@@ -281,7 +262,30 @@ const getCategoryBySlug = cache(async (slug: string) => {
   return categoryRes.docs[0] ?? null
 })
 
-const getSeasonFacetBySlug = cache(async (slug: string): Promise<SeasonFacet | null> => {
+const getIndexableFacetByPath = cache(async (
+  category: Pick<Category, 'indexableFacets'>,
+  facetPath: string,
+): Promise<IndexableFacet | null> => {
+  const facetConfig = getConfiguredIndexableFacetByPath(category, facetPath)
+  const facetPathParts = facetPath.split('-')
+
+  if (!facetConfig && facetPathParts[0] !== 'mua') {
+    return null
+  }
+
+  const queryKey = facetConfig
+    ? normalizeIndexableFacetKey(facetConfig.key)
+    : SEASON_FILTER_KEY
+  const attributeSlug = getIndexableFacetAttributeSlug(queryKey)
+  const configuredValue = facetConfig?.value
+  const valueSlug = configuredValue
+    ? String(configuredValue).trim().toLowerCase()
+    : facetPathParts.slice(1).join('-')
+
+  if (!attributeSlug || !valueSlug) {
+    return null
+  }
+
   const payload = await getPayload({
     config: configPromise,
   })
@@ -290,7 +294,7 @@ const getSeasonFacetBySlug = cache(async (slug: string): Promise<SeasonFacet | n
     collection: 'attributes',
     where: {
       and: [
-        { slug: { equals: 'mua' } },
+        { slug: { equals: attributeSlug } },
         { isActive: { equals: true } },
       ],
     },
@@ -313,7 +317,7 @@ const getSeasonFacetBySlug = cache(async (slug: string): Promise<SeasonFacet | n
     where: {
       and: [
         { attribute: { equals: attribute.id } },
-        { slug: { equals: slug } },
+        { slug: { equals: valueSlug } },
         { isActive: { equals: true } },
       ],
     },
@@ -333,6 +337,9 @@ const getSeasonFacetBySlug = cache(async (slug: string): Promise<SeasonFacet | n
   }
 
   return {
+    key: queryKey,
+    queryKey,
+    attributeSlug,
     label: value.label,
     slug: value.slug,
   }
@@ -393,22 +400,25 @@ function getMediaUrl(
 function shouldIndexCategoryPage(
   category: Pick<Category, 'canonicalToParent' | 'indexableFacets' | 'seoIndex'>,
   searchParams: ProductSearchParams,
-  seasonFacet: SeasonFacet | null,
+  facet: IndexableFacet | null,
   facetConfig: IndexableFacetConfig | null,
 ): boolean {
   const seoIndex = String(category?.seoIndex || 'index')
-  const seasonValues = getSearchParamValues(searchParams, SEASON_FILTER_KEY)
+  const facetValues = facet
+    ? getSearchParamValues(searchParams, facet.queryKey)
+    : []
 
-  if (hasExtraFacetFilters(searchParams)) {
+  if (hasExtraFacetFilters(searchParams, facet?.queryKey)) {
     return false
   }
 
   if (
-    seasonValues.length > 0 &&
+    facetValues.length > 0 &&
     (
-      seasonValues.length !== 1 ||
-      !seasonFacet ||
+      facetValues.length !== 1 ||
+      !facet ||
       category?.canonicalToParent === true ||
+      (facet.queryKey !== SEASON_FILTER_KEY && !facetConfig) ||
       !isFacetAllowedToIndex(category, facetConfig)
     )
   ) {
@@ -433,22 +443,7 @@ export async function generateMetadata({
   const { slug, facet } = await params
   const rawSearchParams = await searchParams
   const prettyFacetSlug = normalizePrettyFacet(facet)
-  const queryFacetValues = getSearchParamValues(rawSearchParams, SEASON_FILTER_KEY)
-  const requestedFacetSlug = prettyFacetSlug || (
-    queryFacetValues.length === 1
-      ? normalizePrettyFacet(queryFacetValues[0])
-      : null
-  )
-  const resolvedSearchParams: ProductSearchParams = requestedFacetSlug
-    ? { ...rawSearchParams, [SEASON_FILTER_KEY]: requestedFacetSlug }
-    : rawSearchParams
-
-  const [category, seasonFacet] = await Promise.all([
-    getCategoryBySlug(slug),
-    requestedFacetSlug
-      ? getSeasonFacetBySlug(requestedFacetSlug)
-      : Promise.resolve(null),
-  ])
+  const category = await getCategoryBySlug(slug)
 
   if (!category) {
     return {
@@ -462,26 +457,38 @@ export async function generateMetadata({
     }
   }
 
-  const facetConfig = seasonFacet
-    ? getIndexableFacetConfig(category, SEASON_FILTER_KEY, seasonFacet.slug)
+  const requestedFacetPath = prettyFacetSlug || getIndexableFacetPathFromQuery(
+    category,
+    rawSearchParams,
+  )
+  const indexableFacet = requestedFacetPath
+    ? await getIndexableFacetByPath(category, requestedFacetPath)
     : null
-  const seasonPhrase = seasonFacet ? getSeasonPhrase(seasonFacet.label) : null
-  const fallbackTitle = seasonPhrase
-    ? `${category.name} ${seasonPhrase} Chính Hãng`
+  const facetConfig = indexableFacet
+    ? getIndexableFacetConfig(category, indexableFacet.queryKey, indexableFacet.slug)
+    : null
+  const seasonFacet = indexableFacet?.queryKey === SEASON_FILTER_KEY
+    ? indexableFacet
+    : null
+  const facetPhrase = seasonFacet
+    ? getSeasonPhrase(seasonFacet.label)
+    : indexableFacet?.label || null
+  const fallbackTitle = facetPhrase
+    ? `${category.name} ${facetPhrase} Chính Hãng`
     : `${category.name} Chính Hãng`
   const title = facetConfig?.metaTitle || (
-    seasonFacet
+    indexableFacet
       ? fallbackTitle
       : getSeoText(category, 'metaTitle') || fallbackTitle
   )
   const description = facetConfig?.metaDescription || (
-    seasonPhrase
-      ? `Khám phá ${category.name} ${seasonPhrase.toLocaleLowerCase('vi')} chính hãng, phù hợp thời tiết và phong cách tại MF Paris.`
+    facetPhrase
+      ? `Khám phá ${category.name} ${facetPhrase.toLocaleLowerCase('vi')} chính hãng tại MF Paris.`
       : getSeoText(category, 'metaDescription') || getCategoryDescription(category)
   )
   const defaultCategoryCanonicalUrl = `/categories/${encodeURIComponent(slug)}`
-  const canonicalUrl = seasonFacet && category?.canonicalToParent !== true
-    ? buildCategoryFacetUrl(slug, seasonFacet.slug)
+  const canonicalUrl = indexableFacet && category?.canonicalToParent !== true
+    ? buildCategoryFacetUrl(slug, requestedFacetPath || buildIndexableFacetPath(indexableFacet.queryKey, indexableFacet.slug))
     : getSeoCanonical(category, defaultCategoryCanonicalUrl)
   const imageUrl = getMediaUrl(
     (getSeoMedia(category, 'ogImage') ||
@@ -493,8 +500,10 @@ export async function generateMetadata({
     getMediaUrl(getSeoMedia(category, 'twitterImage') as RelationshipMedia) || imageUrl
   const shouldIndex = shouldIndexCategoryPage(
     category,
-    resolvedSearchParams,
-    seasonFacet,
+    indexableFacet
+      ? { ...rawSearchParams, [indexableFacet.queryKey]: indexableFacet.slug }
+      : rawSearchParams,
+    indexableFacet,
     facetConfig,
   )
   const index = getSeoIndexValue(category, shouldIndex)
@@ -522,8 +531,8 @@ export async function generateMetadata({
       locale: 'vi_VN',
       url: canonicalUrl,
       siteName: 'MF Paris',
-      title: seasonFacet ? title : getSeoText(category, 'ogTitle') || title,
-      description: seasonFacet
+      title: indexableFacet ? title : getSeoText(category, 'ogTitle') || title,
+      description: indexableFacet
         ? description
         : getSeoText(category, 'ogDescription') || description,
       images: imageUrl
@@ -651,7 +660,10 @@ async function DeferredSeasonFacetLinks({
           return (
             <Link
               key={item.id}
-              href={buildCategoryFacetUrl(categorySlug, item.slug)}
+              href={buildCategoryFacetUrl(
+                categorySlug,
+                buildIndexableFacetPath(SEASON_FILTER_KEY, item.slug),
+              )}
               aria-current={isActive ? 'page' : undefined}
               className={isActive
                 ? 'rounded-full bg-[#b72828] px-3 py-2 text-sm font-semibold text-white'
@@ -674,24 +686,42 @@ export default async function CategoryPage({
   const { slug, facet } = await params
   const rawSearchParams = await searchParams
   const prettyFacetSlug = normalizePrettyFacet(facet)
-  const queryFacetValues = getSearchParamValues(rawSearchParams, SEASON_FILTER_KEY)
 
   if (facet && !prettyFacetSlug) {
     notFound()
   }
 
-  if (!facet && queryFacetValues.length === 1) {
-    const legacyFacetSlug = normalizePrettyFacet(queryFacetValues[0])
+  const currentCategory = await getCategoryBySlug(slug)
 
-    if (legacyFacetSlug) {
-      permanentRedirect(
-        buildLegacyFacetRedirectUrl(slug, legacyFacetSlug, rawSearchParams),
-      )
-    }
+  if (!currentCategory) {
+    notFound()
   }
 
-  const resolvedSearchParams: ProductSearchParams = prettyFacetSlug
-    ? { ...rawSearchParams, [SEASON_FILTER_KEY]: prettyFacetSlug }
+  const requestedFacetPath = prettyFacetSlug || getIndexableFacetPathFromQuery(
+    currentCategory,
+    rawSearchParams,
+  )
+  const indexableFacet = requestedFacetPath
+    ? await getIndexableFacetByPath(currentCategory, requestedFacetPath)
+    : null
+
+  if (facet && !indexableFacet) {
+    notFound()
+  }
+
+  if (!facet && requestedFacetPath && indexableFacet) {
+    permanentRedirect(
+      buildLegacyFacetRedirectUrl(
+        slug,
+        requestedFacetPath,
+        indexableFacet.queryKey,
+        rawSearchParams,
+      ),
+    )
+  }
+
+  const resolvedSearchParams: ProductSearchParams = indexableFacet
+    ? { ...rawSearchParams, [indexableFacet.queryKey]: indexableFacet.slug }
     : rawSearchParams
   const page = getFirstSearchParam(resolvedSearchParams, 'page')
   const brand = getFirstSearchParam(resolvedSearchParams, 'brand')
@@ -711,20 +741,12 @@ export default async function CategoryPage({
   /*
    * Bước 1: Tìm category hiện tại bằng slug.
   */
-  const [currentCategory, allCategoriesRes, seasonFacet] = await Promise.all([
-    getCategoryBySlug(slug),
-    getCachedCategoryTree(),
-    prettyFacetSlug
-      ? getSeasonFacetBySlug(prettyFacetSlug)
-      : Promise.resolve(null),
-  ])
-
-  if (!currentCategory || (prettyFacetSlug && !seasonFacet)) {
-    notFound()
-  }
-
-  const facetConfig = seasonFacet
-    ? getIndexableFacetConfig(currentCategory, SEASON_FILTER_KEY, seasonFacet.slug)
+  const allCategoriesRes = await getCachedCategoryTree()
+  const facetConfig = indexableFacet
+    ? getIndexableFacetConfig(currentCategory, indexableFacet.queryKey, indexableFacet.slug)
+    : null
+  const seasonFacet = indexableFacet?.queryKey === SEASON_FILTER_KEY
+    ? indexableFacet
     : null
 
   const allCategories = allCategoriesRes.docs as CategoryTreeItem[]
@@ -844,7 +866,7 @@ export default async function CategoryPage({
   const totalDocs =
     productsRes.totalDocs || 0
 
-  if (seasonFacet && totalDocs === 0) {
+  if (indexableFacet && totalDocs === 0) {
     notFound()
   }
 
@@ -854,18 +876,18 @@ export default async function CategoryPage({
   )
 
   const categoryDescriptionHtml = normalizeContentHtml(
-    seasonFacet ? facetConfig?.introHtml : currentCategory.description,
+    indexableFacet ? facetConfig?.introHtml : currentCategory.description,
   )
   const hasDescription = Boolean(categoryDescriptionHtml)
   const bottomContentHtml = normalizeContentHtml(
-    seasonFacet ? facetConfig?.bottomContentHtml : currentCategory.bottomContentHtml,
+    indexableFacet ? facetConfig?.bottomContentHtml : currentCategory.bottomContentHtml,
   )
-  const faqItems = seasonFacet ? [] : getLandingFaqItems(currentCategory.faq)
+  const faqItems = indexableFacet ? [] : getLandingFaqItems(currentCategory.faq)
   const baseCategoryDisplayName = getCategoryDisplayName(currentCategory)
   const seasonPhrase = seasonFacet ? getSeasonPhrase(seasonFacet.label) : null
   const categoryDisplayName = facetConfig?.h1 || (
-    seasonPhrase
-      ? `${baseCategoryDisplayName} ${seasonPhrase}`
+    indexableFacet
+      ? `${baseCategoryDisplayName} ${seasonPhrase || indexableFacet.label}`
       : baseCategoryDisplayName
   )
   const breadcrumb = [
@@ -883,15 +905,15 @@ export default async function CategoryPage({
         name: String(category.name),
         url: `/categories/${category.slug}`,
       })),
-    ...(seasonFacet
+    ...(indexableFacet
       ? [
         {
           name: baseCategoryDisplayName,
           url: `/categories/${currentCategory.slug}`,
         },
         {
-          name: seasonPhrase || seasonFacet.label,
-          url: buildCategoryFacetUrl(slug, seasonFacet.slug),
+          name: seasonPhrase || indexableFacet.label,
+          url: buildCategoryFacetUrl(slug, requestedFacetPath || buildIndexableFacetPath(indexableFacet.queryKey, indexableFacet.slug)),
         },
       ]
       : [
@@ -902,14 +924,23 @@ export default async function CategoryPage({
       ]),
   ]
 
-  const categoryUrl = seasonFacet
-    ? buildCategoryFacetUrl(slug, seasonFacet.slug)
+  const categoryUrl = indexableFacet
+    ? buildCategoryFacetUrl(slug, requestedFacetPath || buildIndexableFacetPath(indexableFacet.queryKey, indexableFacet.slug))
     : `/categories/${encodeURIComponent(slug)}`
   const pageDescription = facetConfig?.metaDescription || (
-    seasonPhrase
-      ? `Khám phá ${currentCategory.name} ${seasonPhrase.toLocaleLowerCase('vi')} chính hãng, phù hợp thời tiết và phong cách tại MF Paris.`
+    indexableFacet
+      ? `Khám phá ${currentCategory.name} ${(seasonPhrase || indexableFacet.label).toLocaleLowerCase('vi')} chính hãng tại MF Paris.`
       : getCategoryDescription(currentCategory)
   )
+
+  const curatedFacetLinks = Array.isArray(currentCategory.indexableFacets)
+    ? currentCategory.indexableFacets
+      .map((config) => ({
+        config,
+        path: buildIndexableFacetPath(config.key, config.value),
+      }))
+      .filter((item) => item.path && item.config.h1)
+    : []
 
   const internalLinkingConfig = getInternalLinkingConfig(currentCategory)
 
@@ -919,7 +950,7 @@ export default async function CategoryPage({
       name: categoryDisplayName,
       description: pageDescription,
       breadcrumb,
-      faq: !seasonFacet && faqItems.length > 0
+      faq: !indexableFacet && faqItems.length > 0
         ? {
           questions: faqItems,
         }
@@ -966,8 +997,8 @@ export default async function CategoryPage({
       resolvedSearchParams,
     )
 
-    if (seasonFacet) {
-      query.delete(SEASON_FILTER_KEY)
+    if (indexableFacet) {
+      query.delete(indexableFacet.queryKey)
     }
 
     if (pageNumber > 1) {
@@ -1060,7 +1091,7 @@ export default async function CategoryPage({
             )}{' '}
             sản phẩm
           </p>
-          {seasonFacet && !hasDescription ? (
+          {indexableFacet && !hasDescription ? (
             <p className="mt-3 max-w-3xl text-sm leading-6 text-gray-600 md:text-base">
               {pageDescription}
             </p>
@@ -1084,6 +1115,34 @@ export default async function CategoryPage({
             activeFacet={seasonFacet?.slug ?? null}
           />
         </Suspense>
+        {curatedFacetLinks.length > 0 ? (
+          <nav
+            aria-label="Bộ sưu tập nước hoa được chọn"
+            className="mb-5 rounded-2xl border border-gray-100 bg-white p-4"
+          >
+            <p className="mb-3 text-sm font-bold text-gray-900">
+              Bộ sưu tập được chọn
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {curatedFacetLinks.map(({ config, path }) => {
+                const isActive = path === requestedFacetPath
+
+                return (
+                  <Link
+                    key={path}
+                    href={buildCategoryFacetUrl(slug, path)}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={isActive
+                      ? 'rounded-full bg-[#b72828] px-3 py-2 text-sm font-semibold text-white'
+                      : 'rounded-full border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-[#b72828] hover:text-[#b72828]'}
+                  >
+                    {config.h1}
+                  </Link>
+                )
+              })}
+            </div>
+          </nav>
+        ) : null}
         {/* Tablet */}
         <div className="sticky top-28 z-40 mb-5 hidden md:block lg:hidden">
           <Suspense fallback={
@@ -1126,7 +1185,7 @@ export default async function CategoryPage({
           </aside>
 
           <main className="min-w-0 flex-1">
-            {seasonFacet && hasDescription && categoryDescriptionHtml ? (
+            {indexableFacet && hasDescription && categoryDescriptionHtml ? (
               <section className="mb-6 rounded-2xl bg-white p-5 shadow-sm md:mb-8 md:p-8">
                 <div className="category-description prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
                   <Suspense key={`facet-intro:${categoryUrl}`} fallback={null}>
@@ -1245,7 +1304,7 @@ export default async function CategoryPage({
               </div>
             )}
 
-            {!seasonFacet && hasDescription && categoryDescriptionHtml && (
+            {!indexableFacet && hasDescription && categoryDescriptionHtml && (
                 <section className="mt-10 rounded-2xl bg-white p-5 shadow-sm md:mt-12 md:p-8">
                   <h2 className="mb-4 text-xl font-bold md:text-2xl">
                     Giới thiệu về{' '}

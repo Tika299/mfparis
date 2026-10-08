@@ -3,6 +3,9 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 
 import { SITE_ORIGIN } from '@/utilities/seo'
+import {
+    buildIndexableFacetPath,
+} from '@/lib/indexableCategoryFacets'
 
 const STATIC_ROUTES = [
     {
@@ -210,7 +213,7 @@ function shouldIncludeTaxonomyPage(doc: {
     return true
 }
 
-function getConfiguredSeasonFacetValues(doc: {
+function getConfiguredFacetPaths(doc: {
     indexableFacets?: Array<{
         key?: string | null
         value?: string | null
@@ -222,9 +225,8 @@ function getConfiguredSeasonFacetValues(doc: {
 
     return [...new Set(
         doc.indexableFacets
-            .filter((facet) => ['mua', 'attr_mua'].includes(String(facet?.key || '').trim()))
-            .map((facet) => String(facet?.value || '').trim().toLowerCase())
-            .filter((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)),
+            .map((facet) => buildIndexableFacetPath(facet?.key, facet?.value))
+            .filter((path) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(path)),
     )]
 }
 
@@ -239,7 +241,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         brandsRes,
         postsRes,
         postCategoriesRes,
-        seasonAttributeRes,
+        attributesRes,
+        attributeValuesRes,
     ] = await Promise.all([
         payload.find({
             collection: 'products',
@@ -326,39 +329,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         payload.find({
             collection: 'attributes',
             depth: 0,
-            limit: 1,
+            limit: 1000,
             pagination: false,
             overrideAccess: true,
             where: {
-                and: [
-                    { slug: { equals: 'mua' } },
-                    { isActive: { equals: true } },
-                ],
+                isActive: { equals: true },
             },
             select: {
                 slug: true,
             },
         }),
-    ])
-
-    const seasonAttribute = seasonAttributeRes.docs[0]
-    const seasonValuesRes = seasonAttribute
-        ? await payload.find({
+        payload.find({
             collection: 'attribute-values',
             depth: 0,
+            limit: 10000,
             pagination: false,
             overrideAccess: true,
             where: {
-                and: [
-                    { attribute: { equals: seasonAttribute.id } },
-                    { isActive: { equals: true } },
-                ],
+                isActive: { equals: true },
             },
             select: {
+                attribute: true,
                 slug: true,
             },
-        })
-        : { docs: [] }
+        }),
+    ])
 
     const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((route) => ({
         url: route.url,
@@ -385,10 +380,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.7,
         }))
 
-    const seasonSlugByValueID = new Map(
-        seasonValuesRes.docs
+    const attributeSlugByID = new Map(
+        attributesRes.docs
+            .filter((attribute) => hasUsableSlug(attribute.slug))
+            .map((attribute) => [String(attribute.id), String(attribute.slug).replace(/^pa_/, '')]),
+    )
+    const valueSlugByID = new Map(
+        attributeValuesRes.docs
             .filter((value) => hasUsableSlug(value.slug))
-            .map((value) => [String(value.id), value.slug]),
+            .map((value) => [String(value.id), String(value.slug)]),
     )
     const parentByCategoryID = new Map(
         categoriesRes.docs.map((category) => [
@@ -396,52 +396,54 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             getRelationshipID(category.parent),
         ]),
     )
-    const seasonSlugsByCategoryID = new Map<string, Set<string>>()
+    const facetPathsByCategoryID = new Map<string, Set<string>>()
 
-    const addSeasonToCategoryAndAncestors = (categoryID: string, seasonSlug: string) => {
+    const addFacetToCategoryAndAncestors = (categoryID: string, facetPath: string) => {
         const visited = new Set<string>()
         let currentCategoryID: string | null = categoryID
 
         while (currentCategoryID && !visited.has(currentCategoryID)) {
             visited.add(currentCategoryID)
-            const values = seasonSlugsByCategoryID.get(currentCategoryID) ?? new Set<string>()
-            values.add(seasonSlug)
-            seasonSlugsByCategoryID.set(currentCategoryID, values)
+            const values = facetPathsByCategoryID.get(currentCategoryID) ?? new Set<string>()
+            values.add(facetPath)
+            facetPathsByCategoryID.set(currentCategoryID, values)
             currentCategoryID = parentByCategoryID.get(currentCategoryID) ?? null
         }
     }
 
-    if (seasonAttribute) {
-        const seasonAttributeID = String(seasonAttribute.id)
+    for (const product of productsRes.docs) {
+        const facetPaths = new Set<string>()
 
-        for (const product of productsRes.docs) {
-            const seasonSlugs = new Set<string>()
+        for (const row of Array.isArray(product.productAttributes) ? product.productAttributes : []) {
+            const attributeID = getRelationshipID(row.attribute)
+            const attributeSlug = attributeID ? attributeSlugByID.get(attributeID) : undefined
 
-            for (const row of Array.isArray(product.productAttributes) ? product.productAttributes : []) {
-                if (getRelationshipID(row.attribute) !== seasonAttributeID) {
-                    continue
-                }
-
-                for (const value of Array.isArray(row.values) ? row.values : []) {
-                    const valueID = getRelationshipID(value)
-                    const seasonSlug = valueID ? seasonSlugByValueID.get(valueID) : undefined
-
-                    if (seasonSlug) {
-                        seasonSlugs.add(seasonSlug)
-                    }
-                }
+            if (!attributeSlug) {
+                continue
             }
 
-            for (const category of Array.isArray(product.categories) ? product.categories : []) {
-                const categoryID = getRelationshipID(category)
+            for (const value of Array.isArray(row.values) ? row.values : []) {
+                const valueID = getRelationshipID(value)
+                const valueSlug = valueID ? valueSlugByID.get(valueID) : undefined
+                const facetPath = valueSlug
+                    ? buildIndexableFacetPath(`attr_${attributeSlug}`, valueSlug)
+                    : ''
 
-                if (!categoryID) {
-                    continue
+                if (facetPath) {
+                    facetPaths.add(facetPath)
                 }
+            }
+        }
 
-                for (const seasonSlug of seasonSlugs) {
-                    addSeasonToCategoryAndAncestors(categoryID, seasonSlug)
-                }
+        for (const category of Array.isArray(product.categories) ? product.categories : []) {
+            const categoryID = getRelationshipID(category)
+
+            if (!categoryID) {
+                continue
+            }
+
+            for (const facetPath of facetPaths) {
+                addFacetToCategoryAndAncestors(categoryID, facetPath)
             }
         }
     }
@@ -449,14 +451,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const categoryFacetEntries: MetadataRoute.Sitemap = categoriesRes.docs
         .filter(shouldIncludeTaxonomyPage)
         .flatMap((category) => {
-            const observedValues = seasonSlugsByCategoryID.get(String(category.id)) ?? new Set<string>()
-            const configuredValues = getConfiguredSeasonFacetValues(category)
+            const observedValues = facetPathsByCategoryID.get(String(category.id)) ?? new Set<string>()
+            const configuredValues = getConfiguredFacetPaths(category)
             const values = configuredValues.length > 0
                 ? configuredValues.filter((value) => observedValues.has(value))
-                : [...observedValues]
+                : [...observedValues].filter((value) => value.startsWith('mua-'))
 
-            return values.map((facetValue) => ({
-                url: toAbsoluteUrl(`/categories/${category.slug}/mua-${facetValue}`),
+            return values.map((facetPath) => ({
+                url: toAbsoluteUrl(`/categories/${category.slug}/${facetPath}`),
                 lastModified: toValidLastModified(category.updatedAt),
                 changeFrequency: 'weekly' as const,
                 priority: 0.65,

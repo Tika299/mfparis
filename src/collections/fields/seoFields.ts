@@ -591,7 +591,7 @@ export function landingSeoContentFields({
     type: 'array',
     label: 'Landing page bộ lọc được phép index',
     admin: {
-      description: 'Mỗi dòng là một landing page SEO riêng. Hãy khai báo đủ các mùa bạn muốn index.',
+      description: 'Mỗi dòng là một landing page SEO riêng. Chỉ khai báo facet có nhu cầu tìm kiếm, đủ sản phẩm và có nội dung riêng.',
     },
     fields: [
       {
@@ -601,7 +601,7 @@ export function landingSeoContentFields({
         label: 'Ten filter',
         admin: {
           placeholder: 'VD: attr_mua',
-          description: 'Facet mùa attr_mua tạo URL /categories/{slug}/mua-{value}.',
+          description: 'Ví dụ attr_mua tạo /categories/{slug}/mua-{value}; attr_thoi-diem-su-dung tạo /categories/{slug}/thoi-diem-su-dung-{value}.',
         },
       },
       {
