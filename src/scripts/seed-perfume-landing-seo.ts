@@ -125,6 +125,231 @@ const LANDINGS: LandingDefinition[] = [
   },
 ] as const
 
+type GenericLandingSeed = {
+  categorySlug: string
+  key: string
+  value: string
+  label: string
+  titleLabel?: string
+  description?: string
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  'nuoc-hoa-nam': 'Nước Hoa Nam',
+  'nuoc-hoa-nu': 'Nước Hoa Nữ',
+  'nuoc-hoa-unisex': 'Nước Hoa Unisex',
+  'nuoc-hoa': 'Nước Hoa',
+}
+
+const SEASON_LABELS: Record<string, string> = {
+  xuan: 'Mùa Xuân',
+  he: 'Mùa Hè',
+  thu: 'Mùa Thu',
+  dong: 'Mùa Đông',
+}
+
+const TIME_LABELS: Record<string, string> = {
+  'van-phong': 'Văn Phòng',
+  'hen-ho': 'Hẹn Hò',
+  'di-tiec': 'Đi Tiệc',
+  'hang-ngay': 'Hằng Ngày',
+  'buoi-toi': 'Buổi Tối',
+  'trang-trong': 'Trang Trọng',
+}
+
+const STYLE_LABELS: Record<string, string> = {
+  'lich-lam': 'Lịch Lãm',
+  'sang-trong': 'Sang Trọng',
+  'nam-tinh': 'Nam Tính',
+  'tuoi-mat': 'Tươi Mát',
+  'sach-se': 'Sạch Sẽ',
+  'tre-trung': 'Trẻ Trung',
+  'truong-thanh': 'Trưởng Thành',
+  'bi-an': 'Bí Ẩn',
+  'quyen-ru': 'Quyến Rũ',
+  'nang-dong': 'Năng Động',
+  'thanh-lich': 'Thanh Lịch',
+  'ngot-ngao': 'Ngọt Ngào',
+  'nu-tinh': 'Nữ Tính',
+}
+
+const SCENT_LABELS: Record<string, string> = {
+  go: 'Hương Gỗ',
+  'go-cay': 'Hương Gỗ Cay',
+  aromatic: 'Hương Thơm Thảo Mộc',
+  'aromatic-aquatic': 'Hương Aromatic Aquatic',
+  'aromatic-fougere': 'Hương Aromatic Fougere',
+  'aromatic-green': 'Hương Aromatic Green',
+  'aromatic-spicy': 'Hương Aromatic Spicy',
+  chypre: 'Hương Chypre',
+  'chypre-floral': 'Hương Chypre Floral',
+  'chypre-fruity': 'Hương Chypre Fruity',
+  'citrus-aromatic': 'Hương Citrus Aromatic',
+  'vanilla-phuong-dong': 'Hương Vanilla Phương Đông',
+  'da-thuoc': 'Hương Da Thuộc',
+  'ho-phach': 'Hương Hổ Phách',
+  'floral': 'Hương Hoa',
+  'floral-aldehyde': 'Hương Floral Aldehyde',
+  'floral-aquatic': 'Hương Floral Aquatic',
+  'floral-fruity': 'Hương Hoa Trái Cây',
+  'floral-woody-musk': 'Hương Floral Woody Musk',
+  'fruity-green': 'Hương Trái Cây Xanh',
+  gourmand: 'Hương Gourmand',
+  'hoa-trai-cay': 'Hương Hoa Trái Cây',
+  oriental: 'Hương Phương Đông',
+  'oriental-floral': 'Hương Hoa Phương Đông',
+  'oriental-fougere': 'Hương Oriental Fougere',
+  'oriental-spicy': 'Hương Phương Đông Cay',
+  'oriental-woody': 'Hương Gỗ Phương Đông',
+  'sweet-woody': 'Hương Gỗ Ngọt',
+  'trai-cay': 'Hương Trái Cây',
+  vani: 'Hương Vani',
+  'woody-aquatic': 'Hương Gỗ Biển',
+  'woody-aromatic': 'Hương Gỗ Thơm',
+  'woody-chypre': 'Hương Gỗ Chypre',
+  'woody-spicy': 'Hương Gỗ Cay',
+  'xa-huong': 'Hương Xạ Hương',
+}
+
+const CONCENTRATION_LABELS: Record<string, string> = {
+  'eau-de-toilette': 'Eau de Toilette',
+  'eau-de-parfum': 'Eau de Parfum',
+  parfum: 'Parfum',
+  'extrait-de-parfum': 'Extrait de Parfum',
+  extrait: 'Extrait',
+  cologne: 'Cologne',
+}
+
+const LONGEVITY_LABELS: Record<string, string> = {
+  '4-tieng-6-tieng': 'Lưu Hương 4–6 Tiếng',
+  '6-tieng-8-tieng': 'Lưu Hương 6–8 Tiếng',
+  '8-tieng-10-tieng': 'Lưu Hương 8–10 Tiếng',
+  '10-tieng-12-tieng': 'Lưu Hương 10–12 Tiếng',
+}
+
+const PROJECTION_LABELS: Record<string, string> = {
+  'tren-1-met': 'Tỏa Hương Trên 1 Mét',
+  'tren-2-met': 'Tỏa Hương Trên 2 Mét',
+  'tren-3-met': 'Tỏa Hương Trên 3 Mét',
+}
+
+function genericLandingDefinition(seed: GenericLandingSeed): LandingDefinition {
+  const categoryLabel = CATEGORY_LABELS[seed.categorySlug] || 'Nước Hoa'
+  const label = seed.titleLabel || seed.label
+  const displayName = `${categoryLabel} ${label}`
+
+  return {
+    categorySlug: seed.categorySlug,
+    key: seed.key,
+    value: seed.value,
+    h1: displayName,
+    metaTitle: `${displayName} Chính Hãng | MF Paris`,
+    metaDescription: seed.description || `Khám phá ${displayName.toLocaleLowerCase('vi')} với nhiều thương hiệu và phong cách tại MF Paris. Xem sản phẩm chính hãng và thông tin chi tiết trước khi lựa chọn.`,
+    introHtml: `<p>Khám phá <strong>${displayName.toLocaleLowerCase('vi')}</strong> được lọc theo thuộc tính sản phẩm tương ứng. Xem nhóm hương, nồng độ, độ lưu hương và thời điểm sử dụng của từng sản phẩm trước khi chọn.</p>`,
+    bottomContentHtml: `<h2>Cách chọn ${displayName.toLocaleLowerCase('vi')}</h2><p>Hãy cân nhắc thời tiết, không gian sử dụng, độ tỏa và sở thích cá nhân thay vì chỉ dựa vào tên nhóm hương. Nên đọc thông tin trên từng trang sản phẩm và thử mùi trên da khi có thể.</p><p>Danh sách sản phẩm được cập nhật theo dữ liệu đang có tại MF Paris. Số lượng và tình trạng còn hàng có thể thay đổi theo thời điểm.</p>`,
+  }
+}
+
+function makeSeeds(
+  categorySlugs: string[],
+  key: string,
+  labels: Record<string, string>,
+  values: string[] = Object.keys(labels),
+): GenericLandingSeed[] {
+  return categorySlugs.flatMap((categorySlug) => values.map((value) => ({
+    categorySlug,
+    key,
+    value,
+    label: labels[value],
+  })))
+}
+
+const EXPANDED_LANDING_DEFINITIONS: LandingDefinition[] = [
+  ...makeSeeds(
+    ['nuoc-hoa-nam', 'nuoc-hoa-nu', 'nuoc-hoa-unisex'],
+    'attr_mua',
+    SEASON_LABELS,
+  ).map((seed) => genericLandingDefinition({
+    ...seed,
+    description: `Chọn ${CATEGORY_LABELS[seed.categorySlug].toLocaleLowerCase('vi')} phù hợp ${seed.label.toLocaleLowerCase('vi')}, tươi mát hoặc ấm áp theo thời tiết. Tham khảo sản phẩm chính hãng tại MF Paris.`,
+  })),
+  ...makeSeeds(
+    ['nuoc-hoa-nam', 'nuoc-hoa-nu', 'nuoc-hoa-unisex'],
+    'attr_thoi-diem-su-dung',
+    TIME_LABELS,
+  ).map((seed) => genericLandingDefinition(seed)),
+  ...makeSeeds(
+    ['nuoc-hoa-nam'],
+    'attr_phong-cach',
+    STYLE_LABELS,
+    ['lich-lam', 'sang-trong', 'nam-tinh', 'tuoi-mat', 'sach-se', 'tre-trung', 'truong-thanh', 'bi-an', 'quyen-ru', 'nang-dong'],
+  ).map((seed) => genericLandingDefinition(seed)),
+  ...makeSeeds(
+    ['nuoc-hoa-nu'],
+    'attr_phong-cach',
+    STYLE_LABELS,
+    ['thanh-lich', 'sang-trong', 'quyen-ru', 'ngot-ngao', 'nu-tinh', 'tre-trung', 'sach-se', 'tuoi-mat', 'bi-an'],
+  ).map((seed) => genericLandingDefinition(seed)),
+  ...makeSeeds(
+    ['nuoc-hoa-unisex'],
+    'attr_phong-cach',
+    STYLE_LABELS,
+    ['sang-trong', 'thanh-lich', 'tuoi-mat', 'bi-an', 'nang-dong'],
+  ).map((seed) => genericLandingDefinition(seed)),
+  ...makeSeeds(
+    ['nuoc-hoa-nam'],
+    'attr_nhom-huong',
+    SCENT_LABELS,
+    ['go', 'go-cay', 'aromatic', 'citrus-aromatic', 'woody-aromatic', 'woody-spicy', 'da-thuoc', 'ho-phach', 'xa-huong', 'floral', 'trai-cay', 'oriental-woody'],
+  ).map((seed) => genericLandingDefinition(seed)),
+  ...makeSeeds(
+    ['nuoc-hoa-nu'],
+    'attr_nhom-huong',
+    SCENT_LABELS,
+    ['vani', 'vanilla-phuong-dong', 'floral', 'floral-fruity', 'xa-huong', 'gourmand', 'ho-phach', 'go', 'citrus-aromatic', 'hoa-trai-cay', 'trai-cay'],
+  ).map((seed) => genericLandingDefinition(seed)),
+  ...makeSeeds(
+    ['nuoc-hoa-unisex'],
+    'attr_nhom-huong',
+    SCENT_LABELS,
+    ['go', 'vani', 'vanilla-phuong-dong', 'xa-huong', 'ho-phach', 'citrus-aromatic', 'da-thuoc', 'gourmand', 'woody-aquatic', 'floral'],
+  ).map((seed) => genericLandingDefinition(seed)),
+  ...makeSeeds(
+    ['nuoc-hoa-nam', 'nuoc-hoa-nu', 'nuoc-hoa-unisex'],
+    'attr_do-luu-huong',
+    LONGEVITY_LABELS,
+  ).map((seed) => genericLandingDefinition(seed)),
+  ...makeSeeds(
+    ['nuoc-hoa-nam', 'nuoc-hoa-nu', 'nuoc-hoa-unisex'],
+    'attr_do-toa-huong',
+    PROJECTION_LABELS,
+  ).map((seed) => genericLandingDefinition(seed)),
+  ...makeSeeds(
+    ['nuoc-hoa', 'nuoc-hoa-nam', 'nuoc-hoa-nu', 'nuoc-hoa-unisex'],
+    'attr_nong-do',
+    CONCENTRATION_LABELS,
+  ).map((seed) => genericLandingDefinition(seed)),
+  ...makeSeeds(
+    ['nuoc-hoa-nam', 'nuoc-hoa-nu', 'nuoc-hoa-unisex'],
+    'attr_xuat-xu',
+    { phap: 'Nước Hoa Pháp' },
+  ).map((seed) => genericLandingDefinition(seed)),
+  ...makeSeeds(
+    ['nuoc-hoa-nam', 'nuoc-hoa-nu', 'nuoc-hoa-unisex'],
+    'attr_phan-khuc',
+    { niche: 'Nước Hoa Niche', designer: 'Nước Hoa Designer' },
+  ).map((seed) => genericLandingDefinition(seed)),
+]
+
+const ALL_LANDINGS: LandingDefinition[] = Array.from(
+  new Map(
+    [...LANDINGS, ...EXPANDED_LANDING_DEFINITIONS].map((definition) => [
+      `${definition.categorySlug}:${normalizeIndexableFacetKey(definition.key)}:${definition.value}`,
+      definition,
+    ]),
+  ).values(),
+)
+
 function mergeFacet(
   facets: unknown,
   definition: LandingDefinition,
@@ -168,7 +393,7 @@ async function main() {
   const payload = await getPayload({ config: configPromise })
   const byCategory = new Map<string, LandingDefinition[]>()
 
-  for (const definition of LANDINGS) {
+  for (const definition of ALL_LANDINGS) {
     const list = byCategory.get(definition.categorySlug) ?? []
     list.push(definition)
     byCategory.set(definition.categorySlug, list)
