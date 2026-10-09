@@ -568,6 +568,14 @@ export default async function BrandProductsPage({
     ...internalLinkingConfig,
   })
 
+  const linkedIntroContent = await applyInternalLinksForRender({
+    html: introHtml,
+    currentUrl: brandUrl,
+    scope: 'brands',
+    payload,
+    ...internalLinkingConfig,
+  })
+
   const linkedBottomContent = await applyInternalLinksForRender({
     html: bottomContentHtml,
     currentUrl: brandUrl,
@@ -773,6 +781,14 @@ export default async function BrandProductsPage({
                   {featuredProducts.map((product) => (
                     <ProductCard key={`featured-${product.id}`} product={product} />
                   ))}
+                </div>
+              </section>
+            ) : null}
+
+            {introHtml ? (
+              <section className="mb-10 rounded-2xl bg-white p-5 shadow-sm md:p-8">
+                <div className="brand-description prose prose-sm max-w-none text-gray-700 prose-a:font-semibold prose-a:text-primary md:prose-base">
+                  <SafeHtmlContent html={linkedIntroContent.html} />
                 </div>
               </section>
             ) : null}

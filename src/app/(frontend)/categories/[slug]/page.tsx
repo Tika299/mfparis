@@ -1107,14 +1107,16 @@ export default async function CategoryPage({
           ancestorCategories={ancestorCategories}
           allCategories={allCategories}
         />
-        <Suspense fallback={null}>
-          <DeferredSeasonFacetLinks
-            optionsPromise={filterOptionsPromise}
-            categorySlug={slug}
-            categoryName={baseCategoryDisplayName}
-            activeFacet={seasonFacet?.slug ?? null}
-          />
-        </Suspense>
+        {!indexableFacet ? (
+          <Suspense fallback={null}>
+            <DeferredSeasonFacetLinks
+              optionsPromise={filterOptionsPromise}
+              categorySlug={slug}
+              categoryName={baseCategoryDisplayName}
+              activeFacet={seasonFacet?.slug ?? null}
+            />
+          </Suspense>
+        ) : null}
         {curatedFacetLinks.length > 0 ? (
           <nav
             aria-label="Bộ sưu tập nước hoa được chọn"

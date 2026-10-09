@@ -409,12 +409,12 @@ export interface Brand {
     | null;
   featuredProducts?: (number | Product)[] | null;
   /**
-   * Mỗi dòng là một landing page SEO riêng. Hãy khai báo đủ các mùa bạn muốn index.
+   * Mỗi dòng là một landing page SEO riêng. Chỉ khai báo facet có nhu cầu tìm kiếm, đủ sản phẩm và có nội dung riêng.
    */
   indexableFacets?:
     | {
         /**
-         * Facet mùa attr_mua tạo URL /categories/{slug}/mua-{value}.
+         * Ví dụ attr_mua tạo /categories/{slug}/mua-{value}; attr_thoi-diem-su-dung tạo /categories/{slug}/thoi-diem-su-dung-{value}.
          */
         key: string;
         value: string;
@@ -839,12 +839,12 @@ export interface Category {
     | null;
   featuredProducts?: (number | Product)[] | null;
   /**
-   * Mỗi dòng là một landing page SEO riêng. Hãy khai báo đủ các mùa bạn muốn index.
+   * Mỗi dòng là một landing page SEO riêng. Chỉ khai báo facet có nhu cầu tìm kiếm, đủ sản phẩm và có nội dung riêng.
    */
   indexableFacets?:
     | {
         /**
-         * Facet mùa attr_mua tạo URL /categories/{slug}/mua-{value}.
+         * Ví dụ attr_mua tạo /categories/{slug}/mua-{value}; attr_thoi-diem-su-dung tạo /categories/{slug}/thoi-diem-su-dung-{value}.
          */
         key: string;
         value: string;
