@@ -933,14 +933,7 @@ export default async function CategoryPage({
       : getCategoryDescription(currentCategory)
   )
 
-  const curatedFacetLinks = Array.isArray(currentCategory.indexableFacets)
-    ? currentCategory.indexableFacets
-      .map((config) => ({
-        config,
-        path: buildIndexableFacetPath(config.key, config.value),
-      }))
-      .filter((item) => item.path && item.config.h1)
-    : []
+
 
   const internalLinkingConfig = getInternalLinkingConfig(currentCategory)
 
@@ -1117,34 +1110,7 @@ export default async function CategoryPage({
             />
           </Suspense>
         ) : null}
-        {curatedFacetLinks.length > 0 ? (
-          <nav
-            aria-label="Bộ sưu tập nước hoa được chọn"
-            className="mb-5 rounded-2xl border border-gray-100 bg-white p-4"
-          >
-            <p className="mb-3 text-sm font-bold text-gray-900">
-              Bộ sưu tập được chọn
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {curatedFacetLinks.map(({ config, path }) => {
-                const isActive = path === requestedFacetPath
 
-                return (
-                  <Link
-                    key={path}
-                    href={buildCategoryFacetUrl(slug, path)}
-                    aria-current={isActive ? 'page' : undefined}
-                    className={isActive
-                      ? 'rounded-full bg-[#b72828] px-3 py-2 text-sm font-semibold text-white'
-                      : 'rounded-full border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-[#b72828] hover:text-[#b72828]'}
-                  >
-                    {config.h1}
-                  </Link>
-                )
-              })}
-            </div>
-          </nav>
-        ) : null}
         {/* Tablet */}
         <div className="sticky top-28 z-40 mb-5 hidden md:block lg:hidden">
           <Suspense fallback={
