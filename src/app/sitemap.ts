@@ -59,6 +59,11 @@ const STATIC_ROUTES = [
         priority: 0.6,
     },
     {
+        url: `${SITE_ORIGIN}/quy-che-hoat-dong`,
+        changeFrequency: 'monthly',
+        priority: 0.6,
+    },
+    {
         url: `${SITE_ORIGIN}/dieu-khoan-su-dung`,
         changeFrequency: 'monthly',
         priority: 0.6,

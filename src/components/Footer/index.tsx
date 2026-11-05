@@ -165,9 +165,10 @@ const fallbackAboutLinks: FooterLink[] = [
 ]
 
 const fallbackPolicyLinks: FooterLink[] = [
-  { id: 'return-policy', label: 'Chính sách đổi trả', link: '/chinh-sach-doi-tra' },
+  { id: 'return-policy', label: 'Chính sách đổi trả & bảo hành', link: '/chinh-sach-doi-tra' },
   { id: 'shipping-policy', label: 'Chính sách vận chuyển', link: '/chinh-sach-van-chuyen' },
   { id: 'privacy-policy', label: 'Chính sách bảo mật', link: '/chinh-sach-bao-mat' },
+  { id: 'operation-rules', label: 'Quy chế hoạt động', link: '/quy-che-hoat-dong' },
   { id: 'terms', label: 'Điều khoản sử dụng', link: '/dieu-khoan-su-dung' },
   {
     id: 'payment-methods',
@@ -197,6 +198,7 @@ const knownSafeInternalRoutes = new Set<string>([
   '/chinh-sach-doi-tra',
   '/chinh-sach-van-chuyen',
   '/chinh-sach-bao-mat',
+  '/quy-che-hoat-dong',
   '/dieu-khoan-su-dung',
   '/phuong-thuc-thanh-toan',
   '/vouchers',

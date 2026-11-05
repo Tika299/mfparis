@@ -1,59 +1,20 @@
-import type { Metadata } from 'next'
-import { JsonLd } from '@/components/JsonLd'
-import { buildStaticPageSchemaGraph } from '@/lib/structured-data'
+import type { Metadata } from 'next'
+
+import { PolicyDocument } from '@/components/PolicyDocument'
+import { legacyShippingPolicyHtml } from '@/content/legacyPolicies'
 
 export const metadata: Metadata = {
-    title: 'Chính sách vận chuyển | MF Paris',
-    description: 'Thông tin vận chuyển, thời gian giao hàng và phí giao hàng của MF Paris.',
+  title: 'Chính sách vận chuyển và giao nhận | MF Paris',
+  description: 'Chính sách vận chuyển, giao nhận và kiểm tra đơn hàng tại MF Paris.',
 }
 
 export default function ShippingPolicyPage() {
-    const schemaGraph = buildStaticPageSchemaGraph({
-        page: {
-            url: '/chinh-sach-van-chuyen',
-            name: 'Chinh sach van chuyen',
-            description: 'Thong tin van chuyen, thoi gian giao hang va phi giao hang cua MF Paris.',
-            type: 'WebPage',
-        },
-        breadcrumb: [
-            {
-                name: 'Trang chủ',
-                url: '/',
-            },
-            {
-                name: 'Chinh sach van chuyen',
-                url: '/chinh-sach-van-chuyen',
-            },
-        ],
-    })
-
-    return (
-        <main className="bg-[#f7f7f7] py-12">
-            <JsonLd data={schemaGraph} />
-            <article className="mx-auto max-w-4xl rounded-2xl bg-white px-6 py-10 shadow-sm md:px-10">
-                <h1 className="text-3xl font-black text-gray-950">Chính sách vận chuyển</h1>
-
-                <div className="mt-8 space-y-6 text-sm leading-7 text-gray-700">
-                    <p>
-                        MF Paris giao hàng toàn quốc thông qua các đơn vị vận chuyển uy tín.
-                    </p>
-
-                    <section>
-                        <h2 className="font-bold text-gray-950">Thời gian giao hàng</h2>
-                        <p>Nội thành TP.HCM: 1-2 ngày làm việc. Tỉnh thành khác: 2-5 ngày làm việc.</p>
-                    </section>
-
-                    <section>
-                        <h2 className="font-bold text-gray-950">Phí vận chuyển</h2>
-                        <p>Miễn phí vận chuyển cho đơn hàng từ 500.000đ. Các đơn hàng khác sẽ được thông báo phí trước khi xác nhận.</p>
-                    </section>
-
-                    <section>
-                        <h2 className="font-bold text-gray-950">Kiểm tra hàng</h2>
-                        <p>Khách hàng được kiểm tra tình trạng bên ngoài của kiện hàng trước khi nhận.</p>
-                    </section>
-                </div>
-            </article>
-        </main>
-    )
+  return (
+    <PolicyDocument
+      path="/chinh-sach-van-chuyen"
+      title="Chính sách vận chuyển và giao nhận"
+      description="Chính sách vận chuyển, giao nhận và kiểm tra đơn hàng tại MF Paris."
+      contentHtml={legacyShippingPolicyHtml}
+    />
+  )
 }
