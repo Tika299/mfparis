@@ -319,15 +319,12 @@ export function shouldLookupRedirectPath(
         return false
     }
 
-    if (isProductPathname(normalizedPathname)) {
-        return false
-    }
-
     const rootSegment = getRootPathSegment(normalizedPathname)
 
     if (
         rootSegment &&
-        RESERVED_ROOT_PATH_SET.has(rootSegment)
+        RESERVED_ROOT_PATH_SET.has(rootSegment) &&
+        !isProductPathname(normalizedPathname)
     ) {
         return false
     }
