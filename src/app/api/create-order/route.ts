@@ -1450,11 +1450,14 @@ export async function POST(
           ?.discountAmount ?? 0
 
       const expectedShippingFee =
-        calculateShippingFee({
-          subtotalAmount,
-          province: input.province,
-          deliveryMethod: input.deliveryMethod,
-        })
+        input.paymentMethod === 'bank_transfer' &&
+        input.deliveryMethod === 'home_delivery'
+          ? 0
+          : calculateShippingFee({
+            subtotalAmount,
+            province: input.province,
+            deliveryMethod: input.deliveryMethod,
+          })
 
       if (input.shippingFee !== expectedShippingFee) {
         throw new CheckoutError(

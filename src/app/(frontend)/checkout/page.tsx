@@ -35,7 +35,9 @@ export default async function CheckoutPage({
   const initialPaymentMethod =
     resolvedSearchParams?.payment === 'fundiin'
       ? 'fundiin'
-      : 'bank_transfer'
+      : resolvedSearchParams?.payment === 'bank_transfer'
+        ? 'bank_transfer'
+        : 'cod'
 
   const payment = (settings as unknown as {
     payment?: {

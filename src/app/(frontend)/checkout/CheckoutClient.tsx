@@ -15,6 +15,7 @@ import {
     CreditCard,
     Store,
     Landmark,
+    AlertTriangle,
 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -65,7 +66,7 @@ export type BankTransferSettings = Readonly<{
 
 export default function CheckoutPage({
     bankTransfer,
-    initialPaymentMethod = 'bank_transfer',
+    initialPaymentMethod = 'cod',
 }: Readonly<{
     bankTransfer: BankTransferSettings
     initialPaymentMethod?: PaymentMethod
@@ -84,11 +85,18 @@ export default function CheckoutPage({
     const [paymentMethod, setPaymentMethod] =
         useState<PaymentMethod>(initialPaymentMethod)
     const isCodPayment = paymentMethod === 'cod'
+    const isBankTransferPayment = paymentMethod === 'bank_transfer'
+    const [showBankTransferNotice, setShowBankTransferNotice] =
+        useState(false)
 
     const handlePaymentMethodChange = (value: string) => {
         const nextPaymentMethod = value as PaymentMethod
 
         setPaymentMethod(nextPaymentMethod)
+
+        if (nextPaymentMethod === 'bank_transfer') {
+            setShowBankTransferNotice(true)
+        }
 
         if (nextPaymentMethod === 'cod') {
             setVoucherData(null)
@@ -127,11 +135,16 @@ export default function CheckoutPage({
     const normalizedDeliveryMethod =
         normalizeDeliveryMethod(deliveryMethod)
 
-    const shippingFee = calculateShippingFee({
+    const calculatedShippingFee = calculateShippingFee({
         subtotalAmount,
         province: selectedProvince,
         deliveryMethod: normalizedDeliveryMethod,
     })
+
+    const shippingFee =
+        isBankTransferPayment && normalizedDeliveryMethod === 'home_delivery'
+            ? 0
+            : calculatedShippingFee
 
     const freeShippingThreshold = getFreeShippingThreshold({
         province: selectedProvince,
@@ -735,6 +748,22 @@ export default function CheckoutPage({
                                 onValueChange={handlePaymentMethodChange}
                                 className="space-y-4"
                             >
+
+                                {/* Lựa chọn COD */}
+                                <Label
+                                    htmlFor="cod"
+                                    className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all cursor-pointer ${paymentMethod === 'cod' ? 'border-[#b72828] bg-red-50/30' : 'border-gray-50 bg-gray-50'}`}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <RadioGroupItem value="cod" id="cod" className="text-[#b72828]" />
+                                        <div>
+                                            <p className="font-bold text-sm">Thanh toán khi nhận hàng (COD)</p>
+                                            <p className="text-[10px] text-gray-400 uppercase tracking-tighter">Bạn chỉ trả tiền khi đã nhận và kiểm tra hàng</p>
+                                        </div>
+                                    </div>
+                                    <Truck size={20} className="text-gray-400" />
+                                </Label>
+
                                 <div
                                     className={`rounded-2xl border-2 transition-all ${paymentMethod === 'bank_transfer'
                                         ? 'border-[#b72828] bg-red-50/30'
@@ -766,58 +795,46 @@ export default function CheckoutPage({
                                     </Label>
 
                                     {paymentMethod === 'bank_transfer' ? (
-                                        <div className="grid gap-4 px-5 pb-5 md:grid-cols-[140px_1fr]">
-                                            {bankTransfer.bankQrImageUrl ? (
-                                                <div className="relative aspect-square overflow-hidden rounded-2xl bg-white">
-                                                    <Image
-                                                        src={bankTransfer.bankQrImageUrl}
-                                                        alt="QR chuyển khoản MF Paris"
-                                                        fill
-                                                        sizes="140px"
-                                                        className="object-contain p-2"
-                                                    />
-                                                </div>
-                                            ) : null}
-
-                                            <div className="rounded-2xl bg-white p-4 text-sm leading-6 text-gray-700">
-                                                <p>
-                                                    <strong>Ngân hàng:</strong>{' '}
-                                                    {bankTransfer.bankName || 'Admin cập nhật trong Site Settings'}
-                                                </p>
-                                                <p>
-                                                    <strong>Chủ tài khoản:</strong>{' '}
-                                                    {bankTransfer.bankAccountName || 'Admin cập nhật trong Site Settings'}
-                                                </p>
-                                                <p>
-                                                    <strong>Số tài khoản:</strong>{' '}
-                                                    {bankTransfer.bankAccountNumber || 'Admin cập nhật trong Site Settings'}
-                                                </p>
-                                                {bankTransfer.bankBranch ? (
-                                                    <p>
-                                                        <strong>Chi nhánh:</strong> {bankTransfer.bankBranch}
-                                                    </p>
+                                        <div className="space-y-4 px-5 pb-5">
+                                            <div className="grid gap-4 md:grid-cols-[140px_1fr]">
+                                                {bankTransfer.bankQrImageUrl ? (
+                                                    <div className="relative aspect-square overflow-hidden rounded-2xl bg-white">
+                                                        <Image
+                                                            src={bankTransfer.bankQrImageUrl}
+                                                            alt="QR chuyển khoản MF Paris"
+                                                            fill
+                                                            sizes="140px"
+                                                            className="object-contain p-2"
+                                                        />
+                                                    </div>
                                                 ) : null}
-                                                <p>
-                                                    <strong>Nội dung:</strong> MF PARIS + số điện thoại đặt hàng
-                                                </p>
+
+                                                <div className="rounded-2xl bg-white p-4 text-sm leading-6 text-gray-700">
+                                                    <p>
+                                                        <strong>Ngân hàng:</strong>{' '}
+                                                        {bankTransfer.bankName || 'Admin cập nhật trong Site Settings'}
+                                                    </p>
+                                                    <p>
+                                                        <strong>Chủ tài khoản:</strong>{' '}
+                                                        {bankTransfer.bankAccountName || 'Admin cập nhật trong Site Settings'}
+                                                    </p>
+                                                    <p>
+                                                        <strong>Số tài khoản:</strong>{' '}
+                                                        {bankTransfer.bankAccountNumber || 'Admin cập nhật trong Site Settings'}
+                                                    </p>
+                                                    {bankTransfer.bankBranch ? (
+                                                        <p>
+                                                            <strong>Chi nhánh:</strong> {bankTransfer.bankBranch}
+                                                        </p>
+                                                    ) : null}
+                                                    <p>
+                                                        <strong>Nội dung:</strong> MF PARIS + số điện thoại đặt hàng
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     ) : null}
                                 </div>
-                                {/* Lựa chọn COD */}
-                                <Label
-                                    htmlFor="cod"
-                                    className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all cursor-pointer ${paymentMethod === 'cod' ? 'border-[#b72828] bg-red-50/30' : 'border-gray-50 bg-gray-50'}`}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <RadioGroupItem value="cod" id="cod" className="text-[#b72828]" />
-                                        <div>
-                                            <p className="font-bold text-sm">Thanh toán khi nhận hàng (COD)</p>
-                                            <p className="text-[10px] text-gray-400 uppercase tracking-tighter">Bạn chỉ trả tiền khi đã nhận và kiểm tra hàng</p>
-                                        </div>
-                                    </div>
-                                    <Truck size={20} className="text-gray-400" />
-                                </Label>
 
                                 {/* Lựa chọn FUNDIIN */}
                                 <div
@@ -1009,6 +1026,47 @@ export default function CheckoutPage({
 
                 </form>
             </div>
+
+            {showBankTransferNotice ? (
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4"
+                    role="presentation"
+                >
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="bank-transfer-notice-title"
+                        className="w-full max-w-md rounded-3xl bg-white p-7 shadow-2xl"
+                    >
+                        <div className="flex items-start gap-3">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                                <AlertTriangle size={20} />
+                            </div>
+                            <div>
+                                <h2
+                                    id="bank-transfer-notice-title"
+                                    className="text-lg font-black text-gray-950"
+                                >
+                                    Lưu ý khi chuyển khoản
+                                </h2>
+                                <p className="mt-3 text-sm leading-6 text-gray-600">
+                                    Đơn hàng chỉ được xác nhận sau khi MF Paris nhận được khoản chuyển khoản.
+                                    Khi thanh toán trước bằng chuyển khoản ngân hàng, bạn được miễn phí vận chuyển
+                                    cho hình thức giao hàng tận nơi.
+                                </p>
+                            </div>
+                        </div>
+
+                        <Button
+                            type="button"
+                            onClick={() => setShowBankTransferNotice(false)}
+                            className="mt-6 h-12 w-full rounded-2xl bg-[#b72828] text-sm font-black uppercase tracking-wider text-white hover:bg-black"
+                        >
+                            OK, tôi đã đọc
+                        </Button>
+                    </div>
+                </div>
+            ) : null}
         </div>
     )
 }
