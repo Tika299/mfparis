@@ -374,6 +374,11 @@ export const Products: CollectionConfig = {
               label: 'Bộ sưu tập hình ảnh',
               admin: {
                 description: 'Ảnh sản phẩm nên dùng tỉ lệ 1:1 để hiển thị đẹp.',
+                components: {
+                  Field: {
+                    path: '@/components/Admin/ProductImageGalleryField#ProductImageGalleryField',
+                  },
+                },
               },
               fields: [
                 {

@@ -4,37 +4,14 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useField } from '@payloadcms/ui'
 import { Editor } from '@tinymce/tinymce-react'
 
+import {
+  getMediaUrl,
+  MediaLibraryDialog,
+  type PayloadMedia,
+} from '@/components/Admin/MediaLibraryDialog'
 import { sanitizeWordPressHtml } from '@/lib/html/sanitizeWordPressHtml'
 
 type EditorMode = 'visual' | 'source' | 'preview'
-
-type PayloadMedia = {
-  id: number | string
-  alt?: string | null
-  title?: string | null
-  caption?: string | null
-  description?: string | null
-  filename?: string | null
-  sourceFilename?: string | null
-  url?: string | null
-  width?: number | null
-  height?: number | null
-  sizes?: {
-    thumbnail?: {
-      url?: string | null
-    } | null
-  } | null
-}
-
-type MediaPagination = {
-  page: number
-  totalPages: number
-  totalDocs: number
-  hasNextPage: boolean
-  hasPrevPage: boolean
-  nextPage?: number | null
-  prevPage?: number | null
-}
 
 type ImageDraft = {
   alt: string
@@ -67,68 +44,6 @@ function escapeHtml(value: string): string {
     .replace(/>/g, '&gt;')
 }
 
-function getMediaUrl(media: PayloadMedia): string {
-  return media.url || ''
-}
-
-function getMediaThumbnailUrl(media: PayloadMedia): string {
-  return media.sizes?.thumbnail?.url || getMediaUrl(media)
-}
-
-function getMediaLabel(media: PayloadMedia): string {
-  return media.title || media.alt || media.filename || 'Ảnh'
-}
-
-const MEDIA_PAGE_SIZE = 60
-
-const mediaSearchFields = [
-  'filename',
-  'alt',
-  'title',
-  'caption',
-  'description',
-  'sourceFilename',
-]
-
-function buildMediaSearchUrl({
-  page,
-  search,
-}: {
-  page: number
-  search: string
-}): string {
-  const params = new URLSearchParams({
-    depth: '0',
-    limit: String(MEDIA_PAGE_SIZE),
-    page: String(page),
-    sort: '-createdAt',
-  })
-  const query = search.trim()
-
-  if (query) {
-    mediaSearchFields.forEach((field, index) => {
-      params.set('where[or][' + index + '][' + field + '][like]', query)
-    })
-  }
-
-  return '/api/media?' + params.toString()
-}
-
-function uniqueMediaItems(items: PayloadMedia[]): PayloadMedia[] {
-  const seen = new Set<string>()
-
-  return items.filter((item) => {
-    const key = String(item.id)
-
-    if (seen.has(key)) {
-      return false
-    }
-
-    seen.add(key)
-    return true
-  })
-}
-
 function createImageDraft(media?: PayloadMedia | null): ImageDraft {
   return {
     alt: media?.alt || media?.title || media?.filename || '',
@@ -137,18 +52,6 @@ function createImageDraft(media?: PayloadMedia | null): ImageDraft {
     description: media?.description || '',
     wrapWithFigure: Boolean(media?.caption),
   }
-}
-
-function getUploadedDoc(result: any): PayloadMedia | null {
-  if (result?.doc && typeof result.doc === 'object') {
-    return result.doc as PayloadMedia
-  }
-
-  if (result && typeof result === 'object') {
-    return result as PayloadMedia
-  }
-
-  return null
 }
 
 function buildImageHtml(media: PayloadMedia, draft: ImageDraft): string {
@@ -196,24 +99,6 @@ export function TinyMCEHtmlEditor({ path, field }: TinyMCEHtmlEditorProps) {
   const [html, setHtml] = useState(normalizeHtml(value))
   const [sourceDraftHtml, setSourceDraftHtml] = useState(normalizeHtml(value))
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false)
-  const [mediaSearch, setMediaSearch] = useState('')
-  const [mediaItems, setMediaItems] = useState<PayloadMedia[]>([])
-  const [mediaPagination, setMediaPagination] = useState<MediaPagination>({
-    page: 1,
-    totalPages: 1,
-    totalDocs: 0,
-    hasNextPage: false,
-    hasPrevPage: false,
-    nextPage: null,
-    prevPage: null,
-  })
-  const [selectedMedia, setSelectedMedia] = useState<PayloadMedia | null>(null)
-  const [imageDraft, setImageDraft] = useState<ImageDraft>(() => createImageDraft())
-  const [uploadFile, setUploadFile] = useState<File | null>(null)
-  const [isMediaLoading, setIsMediaLoading] = useState(false)
-  const [isMediaSaving, setIsMediaSaving] = useState(false)
-  const [mediaError, setMediaError] = useState<string | null>(null)
-  const [mediaNotice, setMediaNotice] = useState<string | null>(null)
   const editorRef = useRef<any>(null)
   const lastCommittedHtmlRef = useRef(normalizeHtml(value))
 
@@ -243,187 +128,18 @@ export function TinyMCEHtmlEditor({ path, field }: TinyMCEHtmlEditorProps) {
   )
 
 
-  const selectMedia = useCallback((media: PayloadMedia) => {
-    setSelectedMedia(media)
-    setImageDraft(createImageDraft(media))
-    setMediaError(null)
-    setMediaNotice(null)
-  }, [])
-
-  const loadMediaItems = useCallback(
-    async (nextPage = 1, options: { append?: boolean } = {}) => {
-      setIsMediaLoading(true)
-      setMediaError(null)
-
-      try {
-        const response = await fetch(
-          buildMediaSearchUrl({ page: nextPage, search: mediaSearch }),
-          {
-            credentials: 'include',
-          },
-        )
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`)
-        }
-
-        const result = await response.json()
-        const docs = Array.isArray(result.docs) ? (result.docs as PayloadMedia[]) : []
-        setMediaPagination({
-          page: Number(result.page || nextPage) || nextPage,
-          totalPages: Number(result.totalPages || 1) || 1,
-          totalDocs: Number(result.totalDocs || docs.length) || docs.length,
-          hasNextPage: Boolean(result.hasNextPage),
-          hasPrevPage: Boolean(result.hasPrevPage),
-          nextPage: result.nextPage ?? null,
-          prevPage: result.prevPage ?? null,
-        })
-        setMediaItems((currentItems) =>
-          options.append ? uniqueMediaItems([...currentItems, ...docs]) : docs,
-        )
-
-        if ((!selectedMedia || !options.append) && docs.length > 0) {
-          selectMedia(docs[0])
-        }
-      } catch (error) {
-        setMediaError(
-          error instanceof Error
-            ? error.message
-            : 'Không tải được thư viện ảnh.',
-        )
-      } finally {
-        setIsMediaLoading(false)
-      }
-    },
-    [mediaSearch, selectMedia, selectedMedia],
-  )
-
   const openMediaPicker = useCallback(() => {
     setIsMediaPickerOpen(true)
-    setMediaError(null)
-    setMediaNotice(null)
+  }, [])
 
-    if (mediaItems.length === 0) {
-      void loadMediaItems(1)
-    }
-  }, [loadMediaItems, mediaItems.length])
+  const insertSelectedImage = useCallback((mediaItems: PayloadMedia[]) => {
+    const selectedMedia = mediaItems[0]
 
-  const uploadQuickMedia = useCallback(async () => {
-    if (!uploadFile) {
-      setMediaError('Hãy chọn file ảnh trước khi tạo media.')
-      return
-    }
-
-    const alt = imageDraft.alt.trim() || imageDraft.title.trim() || uploadFile.name
-
-    setIsMediaSaving(true)
-    setMediaError(null)
-    setMediaNotice(null)
-
-    try {
-      const formData = new FormData()
-      const payloadData = {
-        alt,
-        title: imageDraft.title.trim() || alt,
-        caption: imageDraft.caption.trim(),
-        description: imageDraft.description.trim(),
-        importedFrom: 'manual',
-      }
-
-      formData.append('file', uploadFile)
-      formData.append('_payload', JSON.stringify(payloadData))
-      formData.append('alt', payloadData.alt)
-      formData.append('title', payloadData.title)
-      formData.append('caption', payloadData.caption)
-      formData.append('description', payloadData.description)
-      formData.append('importedFrom', payloadData.importedFrom)
-
-      const response = await fetch('/api/media?depth=0', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        const text = await response.text().catch(() => '')
-        throw new Error(text || `HTTP ${response.status}`)
-      }
-
-      const result = await response.json()
-      const uploaded = getUploadedDoc(result)
-
-      if (!uploaded?.id) {
-        throw new Error('Payload không trả về media vừa tạo.')
-      }
-
-      setMediaItems((items) => [uploaded, ...items.filter((item) => item.id !== uploaded.id)])
-      selectMedia(uploaded)
-      setUploadFile(null)
-      setMediaNotice('Đã tạo media mới. Kiểm tra thông tin rồi bấm chèn ảnh.')
-    } catch (error) {
-      setMediaError(
-        error instanceof Error ? error.message : 'Không upload được media.',
-      )
-    } finally {
-      setIsMediaSaving(false)
-    }
-  }, [imageDraft, selectMedia, uploadFile])
-
-  const updateSelectedMedia = useCallback(async () => {
     if (!selectedMedia) {
       return
     }
 
-    setIsMediaSaving(true)
-    setMediaError(null)
-    setMediaNotice(null)
-
-    try {
-      const response = await fetch(`/api/media/${selectedMedia.id}?depth=0`, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          alt: imageDraft.alt.trim() || selectedMedia.filename || 'Ảnh',
-          title: imageDraft.title.trim(),
-          caption: imageDraft.caption.trim(),
-          description: imageDraft.description.trim(),
-        }),
-      })
-
-      if (!response.ok) {
-        const text = await response.text().catch(() => '')
-        throw new Error(text || `HTTP ${response.status}`)
-      }
-
-      const result = await response.json()
-      const updated = getUploadedDoc(result) || {
-        ...selectedMedia,
-        alt: imageDraft.alt,
-        title: imageDraft.title,
-        caption: imageDraft.caption,
-        description: imageDraft.description,
-      }
-
-      setMediaItems((items) => items.map((item) => (item.id === updated.id ? updated : item)))
-      setSelectedMedia(updated)
-      setMediaNotice('Đã cập nhật thông tin media.')
-    } catch (error) {
-      setMediaError(
-        error instanceof Error ? error.message : 'Không cập nhật được media.',
-      )
-    } finally {
-      setIsMediaSaving(false)
-    }
-  }, [imageDraft, selectedMedia])
-
-  const insertSelectedImage = useCallback(() => {
-    if (!selectedMedia) {
-      return
-    }
-
+    const imageDraft = createImageDraft(selectedMedia)
     const imageHtml = buildImageHtml(selectedMedia, imageDraft)
 
     if (!imageHtml) {
@@ -435,7 +151,7 @@ export function TinyMCEHtmlEditor({ path, field }: TinyMCEHtmlEditorProps) {
     const nextHtml = editorRef.current?.getContent?.() || html
     commitHtml(nextHtml)
     setIsMediaPickerOpen(false)
-  }, [commitHtml, html, imageDraft, selectedMedia])
+  }, [commitHtml, html])
 
   const switchMode = useCallback(
     (nextMode: EditorMode) => {
@@ -556,280 +272,15 @@ export function TinyMCEHtmlEditor({ path, field }: TinyMCEHtmlEditorProps) {
         />
       ) : null}
 
-      {isMediaPickerOpen ? (
-        <div className="payload-media-picker" role="dialog" aria-modal="true">
-          <div
-            className="payload-media-picker__backdrop"
-            onClick={() => setIsMediaPickerOpen(false)}
-          />
-          <div className="payload-media-picker__panel payload-media-picker__panel--wide">
-            <div className="payload-media-picker__header">
-              <div>
-                <h3>Chọn ảnh từ Payload</h3>
-                <p>Upload nhanh, bổ sung alt/title/chú thích/mô tả rồi chèn vào nội dung.</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsMediaPickerOpen(false)}
-              >
-                Đóng
-              </button>
-            </div>
+      <MediaLibraryDialog
+        open={isMediaPickerOpen}
+        title="Chọn ảnh từ Payload"
+        description="Tải nhiều ảnh theo hàng chờ, chỉnh thông tin Media rồi chèn vào nội dung."
+        confirmLabel="Chèn ảnh"
+        onClose={() => setIsMediaPickerOpen(false)}
+        onConfirm={insertSelectedImage}
+      />
 
-            <div className="payload-media-picker__quick-upload">
-              <div>
-                <strong>Tạo media nhanh</strong>
-                <span>Chọn ảnh mới, nhập thông tin, rồi bấm tạo media.</span>
-              </div>
-
-              <label className="payload-media-picker__file">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0] || null
-                    setUploadFile(file)
-
-                    if (file) {
-                      setImageDraft((draft) => ({
-                        ...draft,
-                        alt: draft.alt || file.name.replace(/\.[^.]+$/u, ''),
-                        title: draft.title || file.name.replace(/\.[^.]+$/u, ''),
-                      }))
-                    }
-                  }}
-                />
-                <span>{uploadFile ? uploadFile.name : 'Chọn file ảnh'}</span>
-              </label>
-
-              <button
-                type="button"
-                onClick={uploadQuickMedia}
-                disabled={isMediaSaving || !uploadFile}
-              >
-                {isMediaSaving ? 'Đang xử lý...' : 'Tạo media'}
-              </button>
-            </div>
-
-            <div className="payload-media-picker__tools">
-              <div className="payload-media-picker__search">
-                <input
-                  value={mediaSearch}
-                  onChange={(event) => setMediaSearch(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
-                      event.preventDefault()
-                      void loadMediaItems(1)
-                    }
-                  }}
-                  placeholder="Tìm theo tên file, alt, title, chú thích, mô tả..."
-                />
-                <button type="button" onClick={() => loadMediaItems(1)}>
-                  Tìm ảnh
-                </button>
-              </div>
-
-              <div className="payload-media-picker__pagination">
-                <span>
-                  Trang {mediaPagination.page}/{mediaPagination.totalPages} ·{' '}
-                  {mediaPagination.totalDocs} ảnh
-                </span>
-                <button
-                  type="button"
-                  onClick={() => loadMediaItems(mediaPagination.prevPage || mediaPagination.page - 1)}
-                  disabled={isMediaLoading || !mediaPagination.hasPrevPage}
-                >
-                  Trước
-                </button>
-                <button
-                  type="button"
-                  onClick={() => loadMediaItems(mediaPagination.nextPage || mediaPagination.page + 1)}
-                  disabled={isMediaLoading || !mediaPagination.hasNextPage}
-                >
-                  Sau
-                </button>
-                <button type="button" onClick={() => loadMediaItems(mediaPagination.page)}>
-                  Tải lại
-                </button>
-              </div>
-            </div>
-
-            {mediaNotice ? (
-              <div className="payload-media-picker__notice">{mediaNotice}</div>
-            ) : null}
-
-            {isMediaLoading ? (
-              <div className="payload-media-picker__state">Đang tải ảnh...</div>
-            ) : null}
-
-            {mediaError ? (
-              <div className="payload-media-picker__error">
-                Không xử lý được media: {mediaError}
-              </div>
-            ) : null}
-
-            <div className="payload-media-picker__body">
-              {!isMediaLoading && !mediaError ? (
-                <div className="payload-media-picker__grid">
-                  {mediaItems.map((item) => {
-                    const src = getMediaUrl(item)
-                    const thumbnailSrc = getMediaThumbnailUrl(item)
-                    const isSelected = selectedMedia?.id === item.id
-
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        className={
-                          isSelected
-                            ? 'payload-media-picker__item is-selected'
-                            : 'payload-media-picker__item'
-                        }
-                        disabled={!src}
-                        onClick={() => selectMedia(item)}
-                      >
-                        {thumbnailSrc ? (
-                          <img
-                            src={thumbnailSrc}
-                            alt={item.alt || item.filename || ''}
-                            loading="lazy"
-                          />
-                        ) : (
-                          <span>Không có ảnh</span>
-                        )}
-                        <strong>{getMediaLabel(item)}</strong>
-                        {item.filename ? <small>{item.filename}</small> : null}
-                      </button>
-                    )
-                  })}
-
-                  {mediaItems.length === 0 ? (
-                    <div className="payload-media-picker__state">
-                      Không có ảnh phù hợp.
-                    </div>
-                  ) : null}
-
-                  {mediaPagination.hasNextPage ? (
-                    <button
-                      type="button"
-                      className="payload-media-picker__load-more"
-                      onClick={() =>
-                        loadMediaItems(mediaPagination.nextPage || mediaPagination.page + 1, {
-                          append: true,
-                        })
-                      }
-                      disabled={isMediaLoading}
-                    >
-                      Tải thêm ảnh
-                    </button>
-                  ) : null}
-                </div>
-              ) : null}
-
-              <aside className="payload-media-picker__details">
-                {selectedMedia ? (
-                  <>
-                    <div className="payload-media-picker__preview-image">
-                      <img
-                        src={getMediaThumbnailUrl(selectedMedia) || getMediaUrl(selectedMedia)}
-                        alt={imageDraft.alt || selectedMedia.filename || ''}
-                      />
-                    </div>
-
-                    <label>
-                      <span>Alt ảnh</span>
-                      <input
-                        value={imageDraft.alt}
-                        onChange={(event) =>
-                          setImageDraft((draft) => ({ ...draft, alt: event.target.value }))
-                        }
-                        placeholder="Mô tả ảnh cho SEO và accessibility"
-                      />
-                    </label>
-
-                    <label>
-                      <span>Title ảnh</span>
-                      <input
-                        value={imageDraft.title}
-                        onChange={(event) =>
-                          setImageDraft((draft) => ({ ...draft, title: event.target.value }))
-                        }
-                        placeholder="Tên hiển thị hoặc tiêu đề ảnh"
-                      />
-                    </label>
-
-                    <label>
-                      <span>Chú thích hiển thị</span>
-                      <textarea
-                        value={imageDraft.caption}
-                        onChange={(event) =>
-                          setImageDraft((draft) => ({
-                            ...draft,
-                            caption: event.target.value,
-                            wrapWithFigure: event.target.value.trim()
-                              ? true
-                              : draft.wrapWithFigure,
-                          }))
-                        }
-                        rows={3}
-                        placeholder="Chú thích nằm dưới ảnh giống WordPress figcaption"
-                      />
-                    </label>
-
-                    <label>
-                      <span>Mô tả media</span>
-                      <textarea
-                        value={imageDraft.description}
-                        onChange={(event) =>
-                          setImageDraft((draft) => ({ ...draft, description: event.target.value }))
-                        }
-                        rows={4}
-                        placeholder="Ghi chú/mô tả nội bộ cho media"
-                      />
-                    </label>
-
-                    <label className="payload-media-picker__check">
-                      <input
-                        type="checkbox"
-                        checked={imageDraft.wrapWithFigure}
-                        onChange={(event) =>
-                          setImageDraft((draft) => ({
-                            ...draft,
-                            wrapWithFigure: event.target.checked,
-                          }))
-                        }
-                      />
-                      <span>Chèn dạng figure giống WordPress</span>
-                    </label>
-
-                    <div className="payload-media-picker__actions">
-                      <button
-                        type="button"
-                        onClick={updateSelectedMedia}
-                        disabled={isMediaSaving}
-                      >
-                        Lưu thông tin media
-                      </button>
-                      <button
-                        type="button"
-                        className="is-primary"
-                        onClick={insertSelectedImage}
-                        disabled={!getMediaUrl(selectedMedia)}
-                      >
-                        Chèn ảnh
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <div className="payload-media-picker__state">
-                    Chọn một ảnh để thêm alt, chú thích hoặc mô tả.
-                  </div>
-                )}
-              </aside>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </div>
   )
 }
