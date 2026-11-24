@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { useField } from '@payloadcms/ui'
+import { useForm, useFormFields } from '@payloadcms/ui'
 
 import {
   getMediaLabel,
@@ -17,6 +17,7 @@ type GalleryRow = {
 
 type ProductImageGalleryFieldProps = {
   path?: string
+  schemaPath?: string
   field?: {
     name?: string
     label?: string
@@ -24,10 +25,6 @@ type ProductImageGalleryFieldProps = {
       description?: string
     }
   }
-}
-
-function normalizeRows(value: unknown): GalleryRow[] {
-  return Array.isArray(value) ? (value as GalleryRow[]) : []
 }
 
 function getRelationshipID(value: GalleryRow['image']): string {
@@ -50,11 +47,28 @@ function getRelationshipMedia(value: GalleryRow['image']): PayloadMedia | null {
 
 export function ProductImageGalleryField({
   path,
+  schemaPath,
   field,
 }: ProductImageGalleryFieldProps) {
   const fieldPath = path || field?.name || 'images'
-  const { value, setValue } = useField<GalleryRow[]>({ path: fieldPath })
-  const rows = useMemo(() => normalizeRows(value), [value])
+  const fieldSchemaPath = schemaPath || field?.name || 'images'
+  const { addFieldRow, moveFieldRow, removeFieldRow } = useForm()
+  const rows = useFormFields<GalleryRow[]>(([fields]) => {
+    const rowMetadata = fields[fieldPath]?.rows || []
+
+    return rowMetadata.map((row, index) => {
+      const idValue = fields[`${fieldPath}.${index}.id`]?.value
+      const imageValue = fields[`${fieldPath}.${index}.image`]?.value
+
+      return {
+        id:
+          typeof idValue === 'string' || typeof idValue === 'number'
+            ? String(idValue)
+            : row.id,
+        image: imageValue as GalleryRow['image'],
+      }
+    })
+  })
   const [mediaByID, setMediaByID] = useState<Record<string, PayloadMedia>>({})
   const [isPickerOpen, setIsPickerOpen] = useState(false)
   const [activeMediaID, setActiveMediaID] = useState<string | null>(null)
@@ -146,12 +160,53 @@ export function ProductImageGalleryField({
     [embeddedMediaByID, mediaByID, relationshipIDs],
   )
 
-  const updateRows = useCallback(
+  const replaceRows = useCallback(
     (nextRows: GalleryRow[]) => {
-      setValue(nextRows)
+      for (let index = rows.length - 1; index >= 0; index -= 1) {
+        removeFieldRow({
+          path: fieldPath,
+          rowIndex: index,
+        })
+      }
+
+      nextRows.forEach((row, index) => {
+        const mediaID = getRelationshipID(row.image)
+        const rowID = row.id || undefined
+
+        addFieldRow({
+          path: fieldPath,
+          rowIndex: index,
+          schemaPath: fieldSchemaPath,
+          subFieldState: {
+            ...(rowID
+              ? {
+                  id: {
+                    initialValue: rowID,
+                    passesCondition: true,
+                    valid: true,
+                    value: rowID,
+                  },
+                }
+              : {}),
+            image: {
+              initialValue: mediaID || null,
+              passesCondition: true,
+              valid: Boolean(mediaID),
+              value: mediaID || null,
+            },
+          },
+        })
+      })
+
       setError('')
     },
-    [setValue],
+    [
+      addFieldRow,
+      fieldPath,
+      fieldSchemaPath,
+      removeFieldRow,
+      rows.length,
+    ],
   )
 
   const moveRow = useCallback(
@@ -162,19 +217,25 @@ export function ProductImageGalleryField({
         return
       }
 
-      const nextRows = [...rows]
-      const [row] = nextRows.splice(index, 1)
-      nextRows.splice(nextIndex, 0, row)
-      updateRows(nextRows)
+      moveFieldRow({
+        path: fieldPath,
+        moveFromIndex: index,
+        moveToIndex: nextIndex,
+      })
+      setError('')
     },
-    [rows, updateRows],
+    [fieldPath, moveFieldRow, rows.length],
   )
 
   const removeRow = useCallback(
     (index: number) => {
-      updateRows(rows.filter((_row, rowIndex) => rowIndex !== index))
+      removeFieldRow({
+        path: fieldPath,
+        rowIndex: index,
+      })
+      setError('')
     },
-    [rows, updateRows],
+    [fieldPath, removeFieldRow],
   )
 
   const openPicker = useCallback((mediaID?: string) => {
@@ -305,7 +366,7 @@ export function ProductImageGalleryField({
             })
             return next
           })
-          updateRows(
+          replaceRows(
             mediaItems.map((media) => {
               const mediaID = String(media.id)
               const existingRow = currentRowsByMediaID.get(mediaID)
