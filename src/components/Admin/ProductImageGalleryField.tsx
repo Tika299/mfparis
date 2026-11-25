@@ -170,7 +170,9 @@ export function ProductImageGalleryField({
       }
 
       nextRows.forEach((row, index) => {
-        const mediaID = getRelationshipID(row.image)
+        // PostgreSQL media IDs are numeric. Payload rejects a numeric string
+        // (for example "38830") as an invalid upload relationship.
+        const mediaID = Number(getRelationshipID(row.image))
         const rowID = row.id || undefined
 
         addFieldRow({
@@ -191,7 +193,7 @@ export function ProductImageGalleryField({
             image: {
               initialValue: mediaID || null,
               passesCondition: true,
-              valid: Boolean(mediaID),
+              valid: Number.isSafeInteger(mediaID) && mediaID > 0,
               value: mediaID || null,
             },
           },
