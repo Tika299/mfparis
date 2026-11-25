@@ -1694,6 +1694,14 @@ body,
     padding: 18px;
 }
 
+// Keep Payload's native array/upload fields mounted so relationship values and
+// required validation are registered, but use the bulk media gallery as the UI.
+.product-images-array-field > .array-field__header,
+.product-images-array-field > .array-field__draggable-rows,
+.product-images-array-field > .array-field__add-row {
+  display: none;
+}
+
 .product-image-gallery-field__header {
     display: flex;
     align-items: flex-start;
